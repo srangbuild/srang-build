@@ -270,7 +270,7 @@
   var outEps = eps.filter(function (e) { return hasLink(e) || (e.date && !future(e.date)); });
   var nextEps = eps.filter(function (e) { return outEps.indexOf(e) < 0 && e.date; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }).slice(0, 2);
   var shown = outEps.concat(nextEps);
-  $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>2</b>ตอนใหม่ต่อสัปดาห์</li><li><b>" + frees.length + "</b>เช็กลิสต์ฟรี</li>";
+  $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>อังคาร 18:00</b>ตอนใหม่ทุกสัปดาห์</li><li><b>" + frees.length + "</b>เช็กลิสต์ฟรี</li>";
   var st = shown.concat(eps).filter(function (e) { return e.cover; }); var pick = [st[3] || st[0], st[0], st[7] || st[1]].filter(Boolean);
   $("stack").innerHTML = pick.map(function (e) { return '<img src="' + esc(e.cover) + '" alt="" loading="lazy">'; }).join("");
 
@@ -320,7 +320,8 @@
   }
 
   // บริการ ร้าน เพลง คำถาม
-  function item(x) { var open = ok(x.url); return '<div class="card it"><h3>' + esc(x.title) + ' <span class="pill' + (open ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : (x.status || "เร็ว ๆ นี้")) + "</span></h3><p>" + esc(x.text) + "</p>" + (open ? '<a class="b line sm" href="' + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (ok(L.line) ? '<a class="b line sm" href="' + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : "")) + "</div>"; }
+  // รายการที่มีหน้าในเว็บนี้เอง (ช่อง page เช่น sheets.html) ได้ปุ่มไปหน้านั้น · รายการที่ยังไม่เปิดได้ปุ่มแจ้งเตือนทาง LINE
+  function item(x) { var open = ok(x.url), pg = /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "") ? x.page : ""; return '<div class="card it"><h3>' + esc(x.title) + ' <span class="pill' + (open ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : (x.status || "เร็ว ๆ นี้")) + "</span></h3><p>" + esc(x.text) + "</p>" + (open ? '<a class="b line sm" href="' + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (pg ? '<a class="b line sm" href="' + esc(pg) + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="' + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>"; }
   $("services").innerHTML = (S.services || []).map(item).join("");
   $("shopitems").innerHTML = (S.shop || []).map(item).join("");
   $("musiclinks").innerHTML = (S.music || []).map(function (m) { var on = ok(m.url); return '<a class="card ch' + (on ? "" : " off") + '" href="' + (on ? esc(m.url) : "#") + '"' + (on ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>♪</i><span><strong>" + esc(m.title) + "</strong><small>" + esc(m.text) + '</small></span><span class="arr">' + (on ? "→" : "") + "</span></a>"; }).join("");

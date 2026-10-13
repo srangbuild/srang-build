@@ -87,15 +87,25 @@
       return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + B.memberPrice(x.price) + '"' + (wantList.indexOf(x.id) >= 0 ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(B.memberPrice(x.price)) + "</em></label>";
     }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">ชำระด้วยการโอนเงินแล้วแนบสลิป · ไฟล์ดิจิทัลเปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว</p></form>';
   }
+  function dmy(iso) { var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || "")); return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || ""); }
+  /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบในชีต asks ของหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
+  function askBox() {
+    var list = (me.asks || []).map(function (q) {
+      return '<div class="card pad" style="margin-top:10px"><p style="margin:0;font-size:13.5px;color:#5A6573">' + esc(q.id) + " · " + esc(q.topic) + " · " + esc(B.when(q.created)) + '</p><p style="margin:6px 0 0;white-space:pre-wrap">' + esc(q.text) + "</p>" +
+        (q.answer ? '<div style="margin-top:10px;padding:10px 12px;border-left:4px solid #FF6B1A;background:#FFF6EF;border-radius:8px"><b style="color:#0F2A44">คำตอบจากร้าน</b>' + (q.answeredAt ? ' <span style="font-size:13px;color:#5A6573">' + esc(B.when(q.answeredAt)) + "</span>" : "") + '<p style="margin:4px 0 0;white-space:pre-wrap">' + esc(q.answer) + "</p></div>" : '<p class="note" style="margin:8px 0 0">รอร้านตอบ' + (B.demo ? ' · <button type="button" data-qa="' + esc(q.id) + '" style="background:none;border:0;padding:0;color:#0F2A44;text-decoration:underline;cursor:pointer;font:inherit">โหมดทดลอง: ดูตัวอย่างคำตอบ</button>' : "") + "</p>") + "</div>";
+    }).join("");
+    return '<form class="f card pad" id="f-ask" novalidate><label>หัวข้อ<select name="topic" required><option value="">เลือกหัวข้อ</option>' + (B.ASK || []).map(function (t) { return "<option>" + esc(t) + "</option>"; }).join("") + '</select></label><label>คำถามของคุณ (10–1000 ตัวอักษร)<textarea name="text" rows="4" maxlength="1000" required></textarea></label><button class="b dark" type="submit">ส่งคำถาม</button><p class="note" style="margin:8px 0 0">ร้านตอบภายใน 2 วันทำการ คำตอบขึ้นที่หน้านี้และส่งไปที่อีเมลของคุณ · คำตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่ใช่การรับรองทางวิศวกรรมของงานคุณ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในคำถาม</p></form>' + list;
+  }
   function homeView() {
     var m = me.member, owned = me.owned || [], perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
-    var files = owned.length ? '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + owned.map(function (id) { var sx = B.find(id) || {}; return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">' + esc(title(id)) + (sx.rev ? " · Rev." + esc(sx.rev) : "") + "</button>"; }).join("") + '</div><p class="note">ไฟล์ที่ดาวน์โหลดเป็นรุ่นล่าสุดของฉบับปี ' + esc((B.sheets[0] || {}).edition || "") + " เสมอ · เทียบรหัส Rev. กับมุมล่างซ้ายของไฟล์ที่คุณมี</p>" : '<p class="note" style="margin:0">ยังไม่มีไฟล์ฉบับมืออาชีพ</p>';
+    var files = owned.length ? '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + owned.map(function (id) { var sx = B.find(id) || {}; return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">' + esc(title(id)) + (sx.revDate ? " · ฉบับวันที่ " + esc(dmy(sx.revDate)) : "") + "</button>"; }).join("") + '</div><p class="note">ไฟล์ที่ดาวน์โหลดเป็นฉบับล่าสุดเสมอ · เทียบวันที่กับมุมล่างซ้ายของไฟล์ที่คุณมี</p>' : '<p class="note" style="margin:0">ยังไม่มีไฟล์ฉบับมืออาชีพ</p>';
     $("view").innerHTML =
       '<div class="card pad" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><div><h1 style="font-size:26px;color:#0F2A44;margin:0">สวัสดี ' + esc(m.name) + '</h1><p class="note" style="margin:2px 0 0">' + esc(m.email) + " · สมาชิกตั้งแต่ " + esc(B.when(m.created)) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>' +
       '<section><div class="head"><h2>สิทธิ์สมาชิก</h2></div><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button></p></div></section>' +
       '<section><div class="head"><h2>ไฟล์ของฉัน</h2></div><div class="card pad">' + files + "</div></section>" +
       '<section><div class="head"><h2>สั่งซื้อฉบับมืออาชีพ</h2></div>' + shopBox() + "</section>" +
       '<section><div class="head"><h2>คำสั่งซื้อของฉัน</h2></div><div style="display:grid;gap:12px">' + ((me.orders || []).map(orderCard).join("") || '<p class="note">ยังไม่มีคำสั่งซื้อ</p>') + "</div></section>" +
+      '<section id="ask"><div class="head"><h2>สอบถามร้าน</h2></div>' + askBox() + "</section>" +
       '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">เปลี่ยนรหัสผ่าน</summary><form class="f" id="f-pass" style="margin-top:12px" novalidate><label>รหัสผ่านเดิม<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form></details></section>' +
       '<section><p class="note">ต้องการลบบัญชีและข้อมูลทั้งหมด:<button type="button" data-erase="1" style="background:none;border:0;padding:0;color:#B3261E;text-decoration:underline;cursor:pointer;font:inherit">ลบบัญชีของฉัน</button></p></section>';
     [].forEach.call(document.querySelectorAll("img.qr"), function (im) { im.addEventListener("error", function () { im.remove(); }); });
@@ -109,7 +119,8 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase]"); if (!t) return;
+    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa]"); if (!t) return;
+    if (t.dataset.qa) { run(B.call("demoAnswer", { ask: t.dataset.qa }).then(function (r) { me.asks = r.asks; homeView(); var s = document.getElementById("ask"); if (s) s.scrollIntoView(); }), "โหมดทดลอง: ใส่ตัวอย่างคำตอบแล้ว"); return; }
     if (t.dataset.mode) { mode = t.dataset.mode; say(""); authView(); return; }
     if (t.dataset.out) { run(B.call("logout").then(function () { B.token.clear(); me = null; authView(); }), "ออกจากระบบแล้ว"); return; }
     if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) { if (j.demo) say("โหมดทดลอง: สิทธิ์ถูกต้อง ไฟล์ " + j.name + " จะส่งจากหลังบ้านเมื่อต่อระบบจริงแล้ว"); else { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); } })); return; }
@@ -122,6 +133,7 @@
     ev.preventDefault(); var f = ev.target, v = function (n) { return f.elements[n] ? f.elements[n].value : ""; };
     if (f.id === "f-reg") { run(B.call("register", { name: v("name"), email: v("email"), pass: v("pass"), line: v("line"), consent: f.elements.consent.checked }).then(function (r) { B.token.set(r.token); return refresh(true); }), "สมัครสมาชิกแล้ว"); return; }
     if (f.id === "f-in") { run(B.call("login", { email: v("email"), pass: v("pass") }).then(function (r) { B.token.set(r.token); return refresh(true); }), "เข้าสู่ระบบแล้ว"); return; }
+    if (f.id === "f-ask") { run(B.call("ask", { topic: v("topic"), text: v("text") }).then(function (r) { me.asks = r.asks; homeView(); var s = document.getElementById("ask"); if (s) s.scrollIntoView(); }), "ส่งคำถามแล้ว ร้านจะตอบภายใน 2 วันทำการ"); return; }
     if (f.id === "f-pass") { run(B.call("passwd", { pass: v("pass"), newPass: v("newPass") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
     if (f.id === "f-order") { var ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value; }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true); }), "สร้างคำสั่งซื้อแล้ว โอนเงินและแนบสลิปได้ที่ด้านล่าง"); return; }
     if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้"); }

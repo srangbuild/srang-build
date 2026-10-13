@@ -10,6 +10,8 @@
   var TK = "build_member_token", DB = "build_demo_db";
   var sheets = Array.isArray(S.sheets) ? S.sheets : [], bundles = Array.isArray(S.bundles) ? S.bundles : [];
   var ST = { wait: "รอชำระ", check: "รอตรวจ", paid: "ชำระแล้ว", reject: "สลิปไม่ผ่าน", cancel: "ยกเลิก" };
+  /* หัวข้อที่สมาชิกถามร้านได้ (ตรงกับหลังบ้าน Code.gs ตัวแปร ASK_TOPICS) */
+  var ASK = ["คำสั่งซื้อและการชำระเงิน", "ไฟล์และการดาวน์โหลด", "เนื้อหาของใบตรวจงาน", "บัญชีสมาชิก", "เรื่องอื่น"];
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function baht(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
@@ -36,7 +38,7 @@
   }
 
   // ---------- โหมดทดลอง (เก็บในเครื่องนี้เท่านั้น) ----------
-  function load() { try { var d = JSON.parse(localStorage.getItem(DB) || "null"); if (d && d.members) return d; } catch (e) {} return { members: [], orders: [], sessions: {}, seq: 0 }; }
+  function load() { try { var d = JSON.parse(localStorage.getItem(DB) || "null"); if (d && d.members) return d; } catch (e) {} return { members: [], orders: [], asks: [], sessions: {}, seq: 0 }; }
   function save(d) { try { localStorage.setItem(DB, JSON.stringify(d)); } catch (e) {} }
   function rnd() { var a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
   function sha(t) {
@@ -72,7 +74,16 @@
       if (action === "google") fail("เข้าสู่ระบบด้วย Google ใช้ได้เมื่อเชื่อมหลังบ้านแล้ว");
       if (action === "logout") { delete d.sessions[a.token || ""]; save(d); return { ok: true }; }
       var m = me();
-      if (action === "me") return { ok: true, member: pub(m), orders: mine(m).map(view), owned: owned(m) };
+      if (!Array.isArray(d.asks)) d.asks = [];
+      var myAsks = function () { return d.asks.filter(function (q) { return q.member === m.id; }).sort(function (x, y) { return x.created < y.created ? 1 : -1; }).map(function (q) { return { id: q.id, created: q.created, topic: q.topic, text: q.text, answer: q.answer || "", answeredAt: q.answeredAt || "" }; }); };
+      if (action === "me") return { ok: true, member: pub(m), orders: mine(m).map(view), owned: owned(m), asks: myAsks() };
+      if (action === "ask") {
+        var tp = String(a.topic || ""), tx = String(a.text || "").replace(/\s+/g, " ").trim();
+        if (ASK.indexOf(tp) < 0) fail("เลือกหัวข้อของคำถาม"); if (tx.length < 10 || tx.length > 1000) fail("พิมพ์คำถาม 10–1000 ตัวอักษร");
+        if (d.asks.filter(function (q) { return q.member === m.id && !q.answer; }).length >= 3) fail("มีคำถามที่รอคำตอบ 3 ข้อแล้ว รอร้านตอบก่อน");
+        d.seq = (d.seq || 0) + 1; d.asks.push({ id: "Q-" + ("000" + d.seq).slice(-4), member: m.id, created: now, topic: tp, text: tx }); save(d); return { ok: true, asks: myAsks() };
+      }
+      if (action === "demoAnswer") { var q0 = d.asks.filter(function (q) { return q.id === a.ask && q.member === m.id; })[0]; if (!q0) fail("ไม่พบคำถาม"); q0.answer = "ตัวอย่างคำตอบในโหมดทดลอง: เมื่อต่อหลังบ้านแล้ว ร้านพิมพ์คำตอบในชีต asks แล้วคำตอบจะขึ้นที่นี่ และส่งไปที่อีเมลของคุณ"; q0.answeredAt = now; save(d); return { ok: true, asks: myAsks() }; }
       if (action === "passwd") {
         var np = String(a.newPass || ""); if (np.length < 8 || np.length > 72) fail("รหัสผ่านใหม่ต้องยาว 8–72 ตัวอักษร");
         return sha(m.salt + ":" + String(a.pass || "")).then(function (h) { if (h !== m.hash) fail("รหัสผ่านเดิมไม่ถูกต้อง"); var s2 = rnd(); return sha(s2 + ":" + np).then(function (h2) { m.salt = s2; m.hash = h2; save(d); return { ok: true }; }); });
@@ -93,7 +104,7 @@
       if (action === "cancel") { if (!od || od.status !== ST.wait) fail("ยกเลิกได้เฉพาะคำสั่งซื้อที่ยังไม่แนบสลิป"); od.status = ST.cancel; save(d); return { ok: true, order: view(od) }; }
       if (action === "demoApprove") { if (!od || od.status !== ST.check) fail("ไม่มีสลิปรอตรวจ"); od.status = ST.paid; save(d); return { ok: true, order: view(od) }; }
       if (action === "download") { var id = String(a.sheet || ""); if (id !== "FREE-ALL" && owned(m).indexOf(id) < 0) fail("ยังไม่มีสิทธิ์เปิดไฟล์นี้"); return { ok: true, demo: true, name: id === "FREE-ALL" ? "BUILD_F-ALL_free.pdf" : "BUILD_" + id + "_pro.pdf" }; }
-      if (action === "erase") { d.members = d.members.filter(function (x) { return x.id !== m.id; }); d.orders = d.orders.filter(function (o) { return o.member !== m.id; }); Object.keys(d.sessions).forEach(function (k) { if (d.sessions[k] === m.id) delete d.sessions[k]; }); save(d); return { ok: true }; }
+      if (action === "erase") { d.members = d.members.filter(function (x) { return x.id !== m.id; }); d.orders = d.orders.filter(function (o) { return o.member !== m.id; }); d.asks = d.asks.filter(function (q) { return q.member !== m.id; }); Object.keys(d.sessions).forEach(function (k) { if (d.sessions[k] === m.id) delete d.sessions[k]; }); save(d); return { ok: true }; }
       fail("ไม่รู้จักคำสั่ง");
     });
   }
@@ -146,5 +157,5 @@
     saving: function (id) { var x = find(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(y.price) : 0); }, 0); return Math.max(0, s - memberPrice(x.price)); }
   };
 
-  window.BUILD = { S: S, M: M, P: P, ST: ST, demo: !API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, token: token, call: call, shrink: shrink, saveFile: saveFile, when: when, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
+  window.BUILD = { S: S, M: M, P: P, ST: ST, ASK: ASK, demo: !API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, token: token, call: call, shrink: shrink, saveFile: saveFile, when: when, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();
