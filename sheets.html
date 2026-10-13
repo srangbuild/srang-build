@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบตรวจงานก่อสร้างและติดตั้ง — สร้าง | BUILD TH</title>
+<meta name="description" content="ใบตรวจงานก่อสร้างและงานติดตั้ง แบ่งตามขั้นงาน มีจุดหยุดรอตรวจ เกณฑ์ยอมรับ และช่องลงชื่อ ฉบับฟรี 1 หน้า และฉบับมืออาชีพ">
+<meta name="theme-color" content="#0F2A44">
+<meta property="og:title" content="ใบตรวจงานก่อสร้างและติดตั้ง — สร้าง | BUILD TH">
+<meta property="og:image" content="img/og.jpg">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<div id="hdr"></div><script src="nav.js"></script>
+<div class="demo" id="demo" hidden>โหมดทดลอง: ระบบสมาชิกยังไม่ได้ต่อกับหลังบ้าน ข้อมูลที่กรอกอยู่ในเบราว์เซอร์เครื่องนี้เท่านั้น</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">ใบตรวจงานก่อสร้างและติดตั้ง</span>
+    <h1>ตรวจงานทีละขั้น <em>ก่อนถูกปิดทับ</em></h1>
+    <p>งานที่เทคอนกรีตทับ ฉาบปิด หรือปูทับไปแล้ว ตรวจย้อนหลังไม่ได้ ใบตรวจงานบอกว่าต้องดูอะไร ดูตอนไหน และผ่านเมื่อไร พิมพ์ไปใช้หน้างานได้เลย</p>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+
+  <section id="compare">
+    <div class="head"><h2>สองฉบับต่างกันอย่างไร</h2></div>
+    <div class="card" style="overflow:auto">
+      <table class="cmp">
+        <thead><tr><th>สิ่งที่ได้</th><th>ฉบับฟรี</th><th>ฉบับมืออาชีพ</th></tr></thead>
+        <tbody>
+          <tr><td>จุดสำคัญที่เจ้าของบ้านควรดูเอง</td><td>✓</td><td>✓</td></tr>
+          <tr><td>รายการตรวจครบทุกขั้นของงาน</td><td>–</td><td>✓</td></tr>
+          <tr><td>จุดหยุดรอตรวจ (H) ที่ห้ามทำต่อจนกว่าจะผ่าน</td><td>–</td><td>✓</td></tr>
+          <tr><td>ตารางบันทึกค่าที่วัดได้</td><td>–</td><td>✓</td></tr>
+          <tr><td>ใบรายการข้อบกพร่องและการตรวจซ้ำ</td><td>–</td><td>✓</td></tr>
+          <tr><td>บันทึกรูปถ่ายอ้างอิงรายข้อ</td><td>–</td><td>✓</td></tr>
+          <tr><td>ช่องลงชื่อ</td><td>2 ฝ่าย</td><td>3 ฝ่าย</td></tr>
+          <tr><td>จำนวนหน้า A4</td><td>1</td><td id="cmp-pages">3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">เกณฑ์ยอมรับทุกข้อเว้นช่องให้เติมค่าจากแบบและข้อกำหนดของงานคุณ ใบตรวจงานไม่ใส่ตัวเลขแทนแบบ</p>
+  </section>
+
+  <section id="list">
+    <div class="head"><h2>ใบตรวจงานทั้งหมด</h2><div class="chips" id="chips" role="group" aria-label="กรองตามกลุ่มงาน"></div><p class="lead" id="list-lead"></p></div>
+    <div class="grid g3" id="cards"></div>
+  </section>
+
+  <section id="bundle">
+    <div class="head"><h2>ชุดรวม</h2><p class="lead">ซื้อเป็นชุดสำหรับงานสร้างบ้านทั้งหลัง</p></div>
+    <div class="grid" id="bundles"></div>
+  </section>
+
+  <section id="member">
+    <div class="head"><h2>สมาชิก</h2></div>
+    <div class="card pad">
+      <ul class="tick" id="perks"></ul>
+      <p style="margin:14px 0 0"><a class="b pri" href="member.html" id="join">สมัครสมาชิกฟรี</a></p>
+    </div>
+  </section>
+
+  <section id="next" hidden>
+    <div class="head"><h2>ใบที่กำลังทำ</h2></div>
+    <div class="card pad"><ul class="tick" id="nextlist"></ul></div>
+  </section>
+
+  <section id="how" class="narrow">
+    <div class="head"><h2>ซื้อและรับไฟล์อย่างไร</h2></div>
+    <div class="card pad">
+      <ol style="margin:0;padding-left:22px">
+        <li>สมัครสมาชิก (ฟรี) แล้วเลือกใบตรวจงานที่ต้องการ</li>
+        <li>โอนเงินตามยอดในคำสั่งซื้อ แล้วแนบรูปสลิปในหน้าสมาชิก</li>
+        <li id="how-wait">ร้านตรวจยอดเข้าบัญชี แล้วเปิดสิทธิ์ให้ดาวน์โหลด</li>
+        <li>ดาวน์โหลดไฟล์ PDF ได้จากหน้าสมาชิกทุกเมื่อ รวมฉบับปรับปรุงของรุ่นเดียวกัน</li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>ใบตรวจงานเป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด มาตรฐานที่สัญญาอ้างอิง หรือการตรวจโดยวิศวกรผู้มีใบอนุญาต</p>
+    <p>ไฟล์ฉบับมืออาชีพสำหรับผู้ซื้อใช้ในงานของตนเอง ไม่อนุญาตให้จำหน่ายหรือแจกจ่ายต่อ · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
+    <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var B = window.BUILD, S = B.S, esc = B.esc, q = B.preview;
+  var $ = function (id) { return document.getElementById(id); };
+  $("yr").textContent = new Date().getFullYear();
+  if (B.demo) $("demo").hidden = false;
+  if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
+  if (B.token.get()) { $("join").textContent = "ไปหน้าสมาชิก"; }
+  var sh = B.sheets, groups = [], cur = "ทั้งหมด";
+  sh.forEach(function (x) { if (x.group && groups.indexOf(x.group) < 0) groups.push(x.group); });
+  var ready = sh.filter(function (x) { return x.ok === true; }).length;
+  $("list-lead").textContent = sh.length + " งาน · พร้อมดาวน์โหลด " + ready + " งาน" + (ready < sh.length ? " · ที่เหลือกำลังตรวจรายการ" : "");
+  var pg = sh.map(function (x) { return +x.pages || 0; }).filter(Boolean); if (pg.length) { var lo = Math.min.apply(0, pg), hi = Math.max.apply(0, pg); $("cmp-pages").textContent = lo === hi ? String(lo) : lo + "–" + hi; }
+  // ราคาแสดงทุกใบ · ปุ่มใส่ตะกร้ามีเฉพาะรายการที่เปิดขายแล้ว (ตรวจรายการแล้ว + เปิดขาย + เปิดรับชำระ) · ชุดรวมบอกส่วนที่ถูกกว่าซื้อแยก
+  function buy(x) {
+    var pr = +x.price > 0 ? '<span class="price">' + B.baht(B.memberPrice(x.price)) + "</span>" : "", sv = B.cart.saving(x.id);
+    var save = sv > 0 ? '<span class="pill ok" style="margin-right:auto">ถูกกว่าซื้อแยก ' + B.baht(sv) + "</span>" : "";
+    return B.canSell(x) ? save + pr + '<button class="b pri sm" type="button" data-add="' + esc(x.id) + '">ใส่ตะกร้า</button>' : save + pr + '<span class="pill">' + (B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "กำลังตรวจรายการ") + "</span>";
+  }
+  function relabel() { try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} }
+  function draw() {
+    $("cards").innerHTML = sh.filter(function (x) { return cur === "ทั้งหมด" || x.group === cur; }).map(function (x) {
+      return '<article class="card sh">' + (x.ok === true ? '<div class="im"><img src="' + esc(x.img) + '" alt="ตัวอย่างหน้าแรกของ ' + esc(x.id) + '" loading="lazy" width="794" height="1123"></div>' : '<div class="im wait"><span>ตัวอย่างจะแสดงเมื่อตรวจรายการเสร็จ</span></div>') + '<div class="tx"><span class="code">' + esc(x.id) + " · " + esc(x.group) + "</span><h3>" + esc(x.title) + "</h3><p>" + esc(x.sum) + '</p><div class="two"><div class="ver"><b>ฉบับฟรี</b><small>' + esc(x.nFree) + " จุดสำคัญ · 1 หน้า</small>" + (x.ok === true ? '<a class="b line sm" href="' + esc(x.free) + '" download>ดาวน์โหลด</a>' : '<span class="pill gray">กำลังตรวจรายการ</span>') + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + " · Rev." + esc(x.rev || "A") + "</small>" + buy(x) + "</div></div></div></article>";
+    }).join("") || '<p class="note">ยังไม่มีใบตรวจงานในกลุ่มนี้</p>';
+    relabel();
+  }
+  $("chips").innerHTML = ["ทั้งหมด"].concat(groups).map(function (g) { return '<button class="chip" type="button" aria-pressed="' + (g === cur) + '">' + esc(g) + "</button>"; }).join("");
+  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); });
+  draw();
+  $("bundles").innerHTML = B.bundles.map(function (x) {
+    var names = x.items.map(function (id) { var s = B.find(id); return s ? s.id : id; }).join(" · ");
+    return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">' + esc(x.id) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit">' + esc(x.title) + '</h3><p style="margin:0 0 4px;font-size:15.5px">' + esc(x.text) + '</p><p class="note" style="margin:0 0 12px">' + esc(names) + '</p><div class="sum" style="margin:0">' + buy(x) + "</div></div>";
+  }).join("");
+  if (!B.bundles.length) $("bundle").hidden = true;
+  $("perks").innerHTML = (B.M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+  if (B.M.on === false) $("member").hidden = true;
+  var nx = S.sheetsNext || []; if (nx.length) { $("next").hidden = false; $("nextlist").innerHTML = nx.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join(""); }
+  if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด";
+})();
+</script>
+<script src="cart.js"></script>
+<script src="extras.js"></script>
+</body>
+</html>

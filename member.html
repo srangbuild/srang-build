@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สมาชิก — สร้าง | BUILD TH</title>
+<meta name="description" content="สมัครสมาชิก สร้าง | BUILD TH รับไฟล์รวมใบตรวจงาน สั่งซื้อฉบับมืออาชีพ แนบสลิป และดาวน์โหลดไฟล์">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F2A44">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<div id="hdr"></div><script src="nav.js"></script>
+<div class="demo" id="demo" hidden>โหมดทดลอง: ยังไม่ได้ต่อกับหลังบ้าน ข้อมูลที่กรอกอยู่ในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่มีการส่งออกไปที่ใด</div>
+
+<main class="wrap narrow" id="main" style="padding-top:26px">
+  <p class="msg" id="msg" role="status" hidden></p>
+  <div id="view"><p class="note">กำลังโหลด…</p></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>ระบบสมาชิกเก็บเฉพาะข้อมูลที่คุณกรอกเอง ใช้เพื่อดูแลบัญชีและส่งไฟล์ที่สั่งซื้อ · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
+    <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var B = window.BUILD, esc = B.esc, ST = B.ST, P = B.P, M = B.M, q = B.preview;
+  var $ = function (id) { return document.getElementById(id); };
+  $("yr").textContent = new Date().getFullYear();
+  if (B.demo) $("demo").hidden = false;
+  if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
+  var me = null, mode = "reg", busy = false;
+  var want = (function () { try { return new URLSearchParams(location.search).get("buy") || ""; } catch (e) { return ""; } })();
+  // รายการที่ติ๊กไว้ให้ก่อน: จากลิงก์ ?buy=F-01,B-ST (ตะกร้า) หรือจากตะกร้าที่ค้างในเครื่องนี้
+  var wantList = want ? want.split(",") : (B.cart ? B.cart.get() : []);
+  var gOn = !B.demo && /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""), gReady = false;
+  function gDraw() { var el = $("g-btn"); if (!el) return; if (!gReady) { if (!document.getElementById("gsi")) { var sc = document.createElement("script"); sc.id = "gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true; sc.onload = function () { gReady = true; google.accounts.id.initialize({ client_id: M.googleClientId, callback: gDone }); gDraw(); }; document.head.appendChild(sc); } return; } google.accounts.id.renderButton(el, { theme: "outline", size: "large", text: mode === "reg" ? "signup_with" : "signin_with", locale: "th" }); }
+  function gDone(resp) { var cb = document.querySelector("#f-reg input[name=consent]"); run(B.call("google", { credential: resp.credential, consent: !!(cb && cb.checked) }).then(function (r) { B.token.set(r.token); return refresh(true); }), "เข้าสู่ระบบแล้ว"); }
+  function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
+  function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
+  function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
+  function title(id) { var x = B.find(id); return x ? x.id + " " + x.title : id; }
+
+  // ---------- ยังไม่เข้าสู่ระบบ ----------
+  function authView() {
+    var perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+    var tabs = '<div class="tabs2"><button class="chip" type="button" data-mode="reg" aria-pressed="' + (mode === "reg") + '">สมัครสมาชิก</button><button class="chip" type="button" data-mode="in" aria-pressed="' + (mode === "in") + '">เข้าสู่ระบบ</button></div>';
+    var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>ตั้งรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)<input type="password" name="pass" minlength="8" maxlength="72" autocomplete="new-password" required></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label><label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label><button class="b pri" type="submit">สมัครสมาชิก</button></form>';
+    var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>รหัสผ่าน<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note">ลืมรหัสผ่าน: แจ้งร้านทางช่องทางในหน้าหลัก ด้วยอีเมลที่สมัครไว้ ร้านจะส่งรหัสผ่านชั่วคราวไปที่อีเมลนั้น</p></form>';
+    $("view").innerHTML = '<h1 style="font-size:30px;color:#0F2A44;margin:0 0 6px">สมาชิก</h1><p class="lead" style="margin:0 0 16px">สมัครฟรี ใช้อีเมลเดียว</p>' + (perks ? '<div class="card pad" style="margin-bottom:14px"><ul class="tick">' + perks + "</ul></div>" : "") + '<div class="card pad">' + tabs + (mode === "reg" ? reg : inn) + (gOn ? '<div class="or">หรือ</div><div id="g-btn" style="display:flex;justify-content:center"></div><p class="note" style="text-align:center">' + (mode === "reg" ? "สมัครด้วยบัญชี Google: ติ๊กยินยอมด้านบนก่อน แล้วกดปุ่ม" : "เข้าสู่ระบบด้วยบัญชี Google ที่เคยสมัครไว้") + "</p>" : "") + "</div>";
+    if (gOn) gDraw();
+  }
+
+  // ---------- เข้าสู่ระบบแล้ว ----------
+  function payBox(o) {
+    var rows = "<dt>ยอดที่ต้องโอน</dt><dd style=\"font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44\">" + B.baht(o.amount) + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + "</dd>";
+    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + (P.qr ? '<img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์รับเงินของร้าน">' : "") + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+      '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
+  }
+  function orderCard(o) {
+    var cls = o.status === ST.paid ? "ok" : o.status === ST.cancel ? "gray" : o.status === ST.reject ? "bad" : "";
+    var body = "";
+    if (o.status === ST.wait || o.status === ST.reject) body = P.on === true ? payBox(o) : '<p class="note">ร้านยังไม่เปิดรับชำระเงิน</p>';
+    else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt)) + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + "</p>" + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
+    else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + B.expand(o.items).map(function (id) { return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>"; }).join("") + "</div>";
+    var stp = o.status === ST.wait ? 1 : o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid ? 4 : -1;
+    var trk = stp < 0 ? "" : '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "โอนและแนบสลิป", "ร้านตรวจยอด", "ดาวน์โหลดได้"].map(function (nm, i) { var cl = i < stp ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : ""; return '<span class="' + cl + '"><b>' + (i < stp ? "✓" : i + 1) + "</b>" + nm + "</span>"; }).join("") + "</div>";
+    return '<div class="card ord"><div class="top"><b>' + esc(o.id) + '</b><span class="pill ' + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created)) + " · " + B.baht(o.amount) + "</span></div><ul>" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" + trk + body + "</div>";
+  }
+  function shopBox() {
+    var owned = me.owned || [], list = B.bundles.concat(B.sheets).filter(function (x) { return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) { return owned.indexOf(id) >= 0; }) : owned.indexOf(x.id) < 0); });
+    if (!list.length) return '<div class="card pad"><p style="margin:0">' + (B.sheets.some(function (x) { return owned.indexOf(x.id) < 0; }) ? "ฉบับมืออาชีพยังไม่เปิดขาย เมื่อเปิดจะแจ้งทางอีเมลที่สมัครไว้" : "คุณมีครบทุกใบแล้ว") + '</p><p class="note"><a href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div>';
+    return '<form class="card pad" id="f-order"><div class="pick">' + list.map(function (x) {
+      return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + B.memberPrice(x.price) + '"' + (wantList.indexOf(x.id) >= 0 ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(B.memberPrice(x.price)) + "</em></label>";
+    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">ชำระด้วยการโอนเงินแล้วแนบสลิป · ไฟล์ดิจิทัลเปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว</p></form>';
+  }
+  function homeView() {
+    var m = me.member, owned = me.owned || [], perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+    var files = owned.length ? '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + owned.map(function (id) { var sx = B.find(id) || {}; return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">' + esc(title(id)) + (sx.rev ? " · Rev." + esc(sx.rev) : "") + "</button>"; }).join("") + '</div><p class="note">ไฟล์ที่ดาวน์โหลดเป็นรุ่นล่าสุดของฉบับปี ' + esc((B.sheets[0] || {}).edition || "") + " เสมอ · เทียบรหัส Rev. กับมุมล่างซ้ายของไฟล์ที่คุณมี</p>" : '<p class="note" style="margin:0">ยังไม่มีไฟล์ฉบับมืออาชีพ</p>';
+    $("view").innerHTML =
+      '<div class="card pad" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><div><h1 style="font-size:26px;color:#0F2A44;margin:0">สวัสดี ' + esc(m.name) + '</h1><p class="note" style="margin:2px 0 0">' + esc(m.email) + " · สมาชิกตั้งแต่ " + esc(B.when(m.created)) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>' +
+      '<section><div class="head"><h2>สิทธิ์สมาชิก</h2></div><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button></p></div></section>' +
+      '<section><div class="head"><h2>ไฟล์ของฉัน</h2></div><div class="card pad">' + files + "</div></section>" +
+      '<section><div class="head"><h2>สั่งซื้อฉบับมืออาชีพ</h2></div>' + shopBox() + "</section>" +
+      '<section><div class="head"><h2>คำสั่งซื้อของฉัน</h2></div><div style="display:grid;gap:12px">' + ((me.orders || []).map(orderCard).join("") || '<p class="note">ยังไม่มีคำสั่งซื้อ</p>') + "</div></section>" +
+      '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">เปลี่ยนรหัสผ่าน</summary><form class="f" id="f-pass" style="margin-top:12px" novalidate><label>รหัสผ่านเดิม<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form></details></section>' +
+      '<section><p class="note">ต้องการลบบัญชีและข้อมูลทั้งหมด:<button type="button" data-erase="1" style="background:none;border:0;padding:0;color:#B3261E;text-decoration:underline;cursor:pointer;font:inherit">ลบบัญชีของฉัน</button></p></section>';
+    [].forEach.call(document.querySelectorAll("img.qr"), function (im) { im.addEventListener("error", function () { im.remove(); }); });
+    total();
+  }
+  function total() { var t = 0; [].forEach.call(document.querySelectorAll("#f-order input[name=it]:checked"), function (c) { t += +c.dataset.price; }); var e = $("total"); if (e) e.textContent = B.baht(t); }
+  function refresh(keepMsg) {
+    if (!B.token.get()) { me = null; authView(); return Promise.resolve(); }
+    return B.call("me").then(function (r) { me = r; homeView(); }).catch(function (e) { B.token.clear(); me = null; authView(); if (!keepMsg) say(e.message, true); });
+  }
+
+  // ---------- เหตุการณ์ ----------
+  $("view").addEventListener("click", function (ev) {
+    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase]"); if (!t) return;
+    if (t.dataset.mode) { mode = t.dataset.mode; say(""); authView(); return; }
+    if (t.dataset.out) { run(B.call("logout").then(function () { B.token.clear(); me = null; authView(); }), "ออกจากระบบแล้ว"); return; }
+    if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) { if (j.demo) say("โหมดทดลอง: สิทธิ์ถูกต้อง ไฟล์ " + j.name + " จะส่งจากหลังบ้านเมื่อต่อระบบจริงแล้ว"); else { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); } })); return; }
+    if (t.dataset.cancel) { if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return; run(B.call("cancel", { order: t.dataset.cancel }).then(function () { return refresh(true); }), "ยกเลิกคำสั่งซื้อแล้ว"); return; }
+    if (t.dataset.approve) { run(B.call("demoApprove", { order: t.dataset.approve }).then(function () { return refresh(true); }), "โหมดทดลอง: เปิดสิทธิ์ดาวน์โหลดแล้ว"); return; }
+    if (t.dataset.erase) { if (!confirm("ลบบัญชีและข้อมูลทั้งหมดของคุณ รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ ?")) return; run(B.call("erase").then(function () { B.token.clear(); me = null; authView(); }), "ลบบัญชีแล้ว"); }
+  });
+  $("view").addEventListener("change", function (ev) { if (ev.target.name === "it") total(); });
+  $("view").addEventListener("submit", function (ev) {
+    ev.preventDefault(); var f = ev.target, v = function (n) { return f.elements[n] ? f.elements[n].value : ""; };
+    if (f.id === "f-reg") { run(B.call("register", { name: v("name"), email: v("email"), pass: v("pass"), line: v("line"), consent: f.elements.consent.checked }).then(function (r) { B.token.set(r.token); return refresh(true); }), "สมัครสมาชิกแล้ว"); return; }
+    if (f.id === "f-in") { run(B.call("login", { email: v("email"), pass: v("pass") }).then(function (r) { B.token.set(r.token); return refresh(true); }), "เข้าสู่ระบบแล้ว"); return; }
+    if (f.id === "f-pass") { run(B.call("passwd", { pass: v("pass"), newPass: v("newPass") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
+    if (f.id === "f-order") { var ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value; }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true); }), "สร้างคำสั่งซื้อแล้ว โอนเงินและแนบสลิปได้ที่ด้านล่าง"); return; }
+    if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้"); }
+  });
+  refresh(true);
+})();
+</script>
+<script src="extras.js"></script>
+</body>
+</html>

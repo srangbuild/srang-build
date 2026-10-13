@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สร้าง | BUILD TH — เข้าใจโลกที่มนุษย์กำลังสร้าง</title>
+<meta name="description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม ในคลิป 70 วินาที พร้อมเช็กลิสต์ฟรีที่หยิบไปใช้ได้จริง">
+<meta name="theme-color" content="#0F2A44">
+<meta property="og:type" content="website">
+<meta property="og:title" content="สร้าง | BUILD TH — เรื่องที่คนไม่เล่า">
+<meta property="og:description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม ในคลิป 70 วินาที พร้อมเช็กลิสต์ฟรี">
+<meta property="og:image" content="img/og.jpg">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F2A44; --navy2:#16395C; --ink:#16202B; --orange:#FF6B1A; --orange-d:#C24A08; --paper:#F6F4EF; --card:#FFFFFF; --line:#DDE2E8; --mute:#5A6573; --ok:#1E7D4F; --r:16px; --shadow:0 1px 2px rgba(15,42,68,.06), 0 8px 24px rgba(15,42,68,.07); }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:72px; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI","Sarabun",system-ui,sans-serif; font-size:17px; line-height:1.7; -webkit-text-size-adjust:100%; }
+  h1,h2,h3,.kn { font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif; line-height:1.25; }
+  a { color:inherit; }
+  img { max-width:100%; display:block; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 18px; }
+  .narrow { max-width:760px; }
+  .skip { position:absolute; left:-999px; top:0; background:#fff; color:var(--navy); padding:8px 14px; z-index:99; }
+  .skip:focus { left:8px; top:8px; }
+  :focus-visible { outline:3px solid var(--orange); outline-offset:2px; border-radius:6px; }
+
+  .topbar { position:sticky; top:0; z-index:20; background:rgba(15,42,68,.94); backdrop-filter:blur(8px); color:#fff; }
+  .topbar .wrap { display:flex; align-items:center; gap:14px; min-height:58px; }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; font-family:"Kanit",sans-serif; font-weight:700; font-size:18px; white-space:nowrap; flex:none; }
+  .logo img { width:34px; height:34px; object-fit:contain; }
+  .logo b { color:var(--orange); font-weight:700; }
+  .nav { display:flex; gap:4px; overflow-x:auto; margin-left:auto; min-width:0; scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%); mask-image:linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%); padding:0 10px; }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav a { text-decoration:none; font-size:14.5px; padding:8px 11px; border-radius:999px; color:#D5E1EE; white-space:nowrap; }
+  .nav a:hover { background:rgba(255,255,255,.1); color:#fff; }
+
+  .announce { background:var(--orange); color:#fff; font-weight:600; font-size:15px; text-align:center; padding:8px 16px; }
+  .announce a { text-decoration:underline; }
+
+  .hero { background-color:var(--navy); background-image:linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px), radial-gradient(900px 500px at 85% 0%, #1E4B77 0%, rgba(30,75,119,0) 70%); background-size:34px 34px, 34px 34px, auto; color:#fff; padding:46px 0 54px; overflow:hidden; }
+  .hero .wrap { display:grid; grid-template-columns:1fr; gap:30px; align-items:center; }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#FFD9C4; background:rgba(255,107,26,.16); border:1px solid rgba(255,107,26,.45); padding:4px 12px; border-radius:999px; }
+  .hero h1 { font-size:clamp(34px, 7.2vw, 56px); font-weight:800; margin:16px 0 10px; letter-spacing:.2px; }
+  .hero h1 em { font-style:normal; color:var(--orange); white-space:nowrap; }
+  .hero p.sub { font-size:18px; color:#D5E1EE; margin:0 0 22px; max-width:34em; }
+  .cta { display:flex; flex-wrap:wrap; gap:10px; }
+  .b { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:50px; padding:10px 20px; border-radius:14px; font-weight:700; text-decoration:none; border:2px solid transparent; font-size:16.5px; cursor:pointer; font-family:inherit; }
+  .b.pri { background:var(--orange); color:#fff; box-shadow:0 6px 18px rgba(255,107,26,.35); }
+  .b.pri:hover { background:#FF7C33; }
+  .b.sec { border-color:rgba(255,255,255,.4); color:#fff; }
+  .b.sec:hover { border-color:#fff; }
+  .b.line { background:#fff; color:var(--navy); border-color:var(--line); }
+  .b.line:hover { border-color:var(--orange); }
+  .b.sm { min-height:40px; padding:6px 14px; font-size:14.5px; border-radius:11px; }
+  .facts { display:flex; flex-wrap:wrap; gap:8px 22px; margin:24px 0 0; padding:0; list-style:none; font-size:14.5px; color:#B9CADB; }
+  .facts b { color:#fff; font-family:"Kanit",sans-serif; font-size:19px; margin-right:5px; }
+  .stack { position:relative; height:330px; display:none; }
+  .stack img { position:absolute; width:176px; aspect-ratio:9/16; object-fit:cover; border-radius:18px; border:3px solid rgba(255,255,255,.9); box-shadow:0 18px 40px rgba(0,0,0,.45); }
+  .stack img:nth-child(1) { left:8%; top:26px; transform:rotate(-8deg); }
+  .stack img:nth-child(2) { left:36%; top:0; z-index:2; }
+  .stack img:nth-child(3) { left:64%; top:26px; transform:rotate(8deg); }
+
+  section { padding:44px 0 8px; }
+  .head { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 16px; }
+  h2 { font-size:clamp(24px, 4.6vw, 31px); margin:0; color:var(--navy); font-weight:700; }
+  h2::before { content:""; display:inline-block; width:10px; height:22px; background:var(--orange); border-radius:3px; margin-right:10px; vertical-align:-2px; }
+  .lead { color:var(--mute); margin:4px 0 0; font-size:15.5px; flex-basis:100%; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); }
+  .pill { display:inline-block; font-size:12.5px; font-weight:700; padding:2px 10px; border-radius:999px; background:#FFE9DC; color:#9A3A05; white-space:nowrap; }
+  .pill.ok { background:#DFF3E8; color:var(--ok); }
+  .pill.gray { background:#E8ECF1; color:#475466; }
+
+  .channels { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; }
+  .ch { display:flex; align-items:center; gap:12px; padding:13px 16px; text-decoration:none; min-height:64px; }
+  .ch:hover { border-color:var(--orange); }
+  .ch i { flex:none; width:38px; height:38px; border-radius:11px; background:var(--navy); color:#fff; display:grid; place-items:center; font-style:normal; font-family:"Kanit",sans-serif; font-weight:700; font-size:15px; }
+  .ch.main i { background:var(--orange); }
+  .ch strong { display:block; line-height:1.3; }
+  .ch small { color:var(--mute); font-size:13.5px; }
+  .ch.off { opacity:.55; pointer-events:none; }
+  .ch .arr { margin-left:auto; color:var(--orange); font-weight:700; }
+
+  .free { display:grid; grid-template-columns:1fr; gap:12px; }
+  .fb { padding:0; overflow:hidden; }
+  .fb summary { cursor:pointer; list-style:none; padding:16px 18px; display:flex; gap:12px; align-items:flex-start; }
+  .fb summary::-webkit-details-marker { display:none; }
+  .fb summary .n { flex:none; font-family:"Kanit",sans-serif; font-weight:700; color:var(--orange); background:#FFF1E8; border-radius:10px; padding:2px 9px; font-size:14px; margin-top:3px; }
+  .fb summary strong { flex:1; font-size:17.5px; color:var(--navy); line-height:1.4; }
+  .fb summary::after { content:"+"; font-family:"Kanit",sans-serif; font-size:24px; line-height:1; color:var(--mute); }
+  .fb[open] summary::after { content:"–"; }
+  .fb .in { padding:0 18px 16px; }
+  .fb ol { margin:0 0 10px; padding-left:22px; }
+  .fb li { margin:0 0 7px; }
+  .note { font-size:14px; color:var(--mute); margin:0 0 12px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .kw { font-size:14px; color:var(--mute); }
+  .kw b { color:var(--navy); background:#EEF2F6; padding:1px 8px; border-radius:7px; }
+  .leadbox { margin-top:14px; padding:18px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; background:var(--navy); color:#fff; border:0; }
+  .leadbox p { margin:0; max-width:32em; }
+  .leadbox small { color:#B9CADB; display:block; font-size:14px; }
+
+  .chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:6px 14px; font-size:14.5px; cursor:pointer; font-family:inherit; min-height:38px; }
+  .chip[aria-pressed="true"] { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .eps { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .ep { overflow:hidden; display:flex; flex-direction:column; }
+  .ep .im { position:relative; aspect-ratio:3/4; background:var(--navy); overflow:hidden; }
+  .ep .im img { width:100%; height:100%; object-fit:cover; object-position:50% 34%; }
+  .ep .im .pill { position:absolute; left:8px; bottom:8px; }
+  .ep .tx { padding:11px 13px 13px; display:flex; flex-direction:column; gap:7px; flex:1; }
+  .ep h3 { margin:0; font-size:16px; font-weight:600; color:var(--navy); font-family:inherit; line-height:1.45; }
+  .ep .meta { font-size:13px; color:var(--mute); }
+  .ep .acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; }
+  .ep .acts a { font-size:13.5px; font-weight:600; text-decoration:none; padding:5px 10px; border-radius:9px; background:#EEF2F6; color:var(--navy); }
+  .ep .acts a.p { background:var(--orange); color:#fff; }
+  .ep .song { font-size:13px; color:var(--mute); border-top:1px dashed var(--line); padding-top:7px; }
+
+  .disc { font-size:14px; color:#6B4A1E; background:#FFF6E5; border:1px solid #F2D9A8; border-radius:12px; padding:10px 14px; margin:0 0 14px; }
+  .prods { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:12px; }
+  .pd { padding:15px 16px; display:flex; flex-direction:column; gap:6px; }
+  .pd h3 { margin:0; font-size:17px; color:var(--navy); font-family:inherit; font-weight:700; }
+  .pd p { margin:0; font-size:15px; color:#3B4654; }
+  .pd .meta { font-size:13px; color:var(--mute); }
+  .pd .b { margin-top:8px; }
+
+  .list { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; }
+  .it { padding:16px 18px; }
+  .it h3 { margin:0 0 4px; font-size:18px; color:var(--navy); font-family:inherit; font-weight:700; }
+  .it p { margin:0 0 8px; font-size:15.5px; }
+  .faq details { border-bottom:1px solid var(--line); padding:4px 0; }
+  .faq summary { cursor:pointer; font-weight:600; padding:12px 0; color:var(--navy); }
+  .faq p { margin:0 0 14px; color:#3B4654; }
+
+  footer { margin:48px 0 0; padding:26px 0 96px; background:var(--navy); color:#B9CADB; font-size:14px; }
+  footer p { margin:0 0 8px; max-width:60em; }
+  footer a { color:#fff; }
+  .dock { position:fixed; left:0; right:0; bottom:0; z-index:30; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(246,244,239,.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); transform:translateY(110%); transition:transform .25s; }
+  .dock.show { transform:none; }
+  .dock .b { width:100%; }
+  @media (min-width:640px) { .eps { grid-template-columns:repeat(3, 1fr); } .free { grid-template-columns:1fr 1fr; align-items:start; } }
+  @media (min-width:900px) { .hero .wrap { grid-template-columns:1.15fr .85fr; } .stack { display:block; } .eps { grid-template-columns:repeat(5, 1fr); } .dock { display:none; } footer { padding-bottom:36px; } }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .dock { transition:none; } }
+  @media print { .topbar, .dock, .cta, .nav { display:none !important; } body { background:#fff; } }
+</style>
+<script src="data.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+
+<div id="hdr"></div><script src="nav.js"></script>
+<div class="announce" id="announce" hidden></div>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow" id="eyebrow">รายการประจำ · เรื่องที่คนไม่เล่า</span>
+      <h1><span id="tagline">เข้าใจโลกที่มนุษย์<em>กำลังสร้าง</em></span></h1>
+      <p class="sub" id="about-hero"></p>
+      <div class="cta" id="hero-cta"></div>
+      <ul class="facts" id="facts"></ul>
+    </div>
+    <div class="stack" id="stack" aria-hidden="true"></div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+
+  <section id="watch">
+    <div class="head"><h2>ดูคลิป</h2><p class="lead" id="schedule"></p></div>
+    <div class="channels" id="channels"></div>
+  </section>
+
+  <section id="free">
+    <div class="head"><h2>ของแจกฟรี</h2><p class="lead">เช็กลิสต์จากในคลิป อ่านตรงนี้ได้เลย ไม่ต้องสมัครอะไร</p></div>
+    <div class="free" id="freebies"></div>
+    <div class="card leadbox" id="leadbox"></div>
+  </section>
+
+  <section id="sheets" hidden>
+    <div class="head"><h2>ใบตรวจงาน</h2><p class="lead">ใบตรวจงานก่อสร้างและติดตั้ง แบ่งตามขั้นงาน พิมพ์ไปใช้หน้างานได้</p></div>
+    <div class="card leadbox" id="sheetbox"></div>
+  </section>
+
+  <section id="episodes">
+    <div class="head"><h2 id="ep-title">ตอนทั้งหมด</h2><div class="chips" id="chips" role="group" aria-label="กรองตามหัวข้อ"></div><p class="lead">ตอนที่ปล่อยแล้ว และตอนของสัปดาห์ถัดไป · ทุกตอนมีเวอร์ชันเล่าและเวอร์ชันเพลง</p></div>
+    <div class="eps" id="eps"></div>
+  </section>
+
+  <section id="gear" hidden>
+    <div class="head"><h2>ของที่ใช้ในคลิป</h2><p class="lead">เครื่องมือและของใช้ที่พูดถึงในแต่ละตอน</p></div>
+    <p class="disc" id="disclosure"></p>
+    <div class="prods" id="prods"></div>
+  </section>
+
+  <section id="service">
+    <div class="head"><h2>บริการ</h2></div>
+    <div class="list" id="services"></div>
+  </section>
+
+  <section id="shop">
+    <div class="head"><h2>ร้าน</h2><p class="lead">ใบตรวจงาน ไฟล์ และชุดเครื่องมือสำหรับคนสร้างบ้าน</p></div>
+    <div class="list" id="shopitems"></div>
+  </section>
+
+  <section id="music">
+    <div class="head"><h2>เพลง</h2><p class="lead">ทุกตอนมีเวอร์ชันเพลง และจบชุดจะรวมเป็นอัลบั้ม</p></div>
+    <div class="channels" id="musiclinks"></div>
+  </section>
+
+  <div id="adslot"></div>
+<section id="about" class="narrow">
+    <div class="head"><h2>เกี่ยวกับช่อง</h2></div>
+    <div class="faq" id="faq"></div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>ภาพและเพลงในคลิปสร้างด้วย AI บทและข้อเท็จจริงเขียนและตรวจโดยคน ภาพที่ดูสมจริงเป็นภาพจำลอง ไม่ใช่โครงการจริง</p>
+    <p>เนื้อหาเป็นความรู้ทั่วไป ไม่แทนการตรวจหน้างานโดยวิศวกรผู้มีใบอนุญาต</p>
+    <p id="foot-disc"></p>
+    <p>หน้านี้ไม่ขอและไม่เก็บข้อมูลส่วนตัวของคุณ ระบบสมาชิกเก็บเฉพาะข้อมูลที่คุณกรอกเอง (<a href="privacy.html">นโยบายความเป็นส่วนตัว</a>) การเพิ่มเพื่อนทาง LINE เป็นไปตามนโยบายของ LINE และเลิกติดตามได้ทุกเมื่อ</p>
+    <p id="contact"></p>
+    <p>© <span id="yr"></span> <span id="foot-name"></span></p>
+  </div>
+</footer>
+<div class="dock" id="dock"></div>
+
+<script>
+(function () {
+  "use strict";
+  var S = window.SITE || {};
+  try { if (new URLSearchParams(location.search).get("preview") === "1") { var d = localStorage.getItem("build_site_draft"); if (d) S = JSON.parse(d); } } catch (e) {}
+  var L = S.links || {}, B = S.brand || {};
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var ok = function (u) { return /^https?:\/\//i.test(u || ""); };
+  var MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  var fmt = function (iso, short) { var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(iso || ""); if (!m) return ""; return (+m[3]) + " " + MON[+m[2] - 1] + (short ? "" : " " + m[1]); };
+  var future = function (iso) { return iso && new Date(iso + "T00:00:00") > new Date(); };
+  var PLAT = [["tiktok", "TikTok", "TT"], ["youtube", "YouTube", "YT"], ["facebook", "Facebook", "FB"], ["instagram", "Instagram", "IG"], ["threads", "Threads", "TH"], ["x", "X", "X"]];
+  var ext = ' target="_blank" rel="noopener"';
+
+  // แบรนด์
+  document.title = (B.name || "สร้าง | BUILD TH") + " — " + (B.tagline || "");
+  $("about-hero").textContent = B.about || "";
+  $("eyebrow").textContent = "รายการประจำ · " + (B.show || "");
+  $("schedule").textContent = "รายการประจำ “" + (B.show || "") + "” " + (B.schedule || "") + " เลือกแพลตฟอร์มที่คุณใช้อยู่";
+  $("ep-title").textContent = (B.show || "ตอนทั้งหมด");
+  $("foot-name").textContent = B.name || "";
+  $("yr").textContent = new Date().getFullYear();
+  if (S.announce && S.announce.on && S.announce.text) { var an = $("announce"); an.hidden = false; an.innerHTML = ok(S.announce.url) ? '<a href="' + esc(S.announce.url) + '"' + ext + ">" + esc(S.announce.text) + "</a>" : esc(S.announce.text); }
+
+  // ปุ่มหลัก
+  var firstCh = PLAT.filter(function (p) { return ok(L[p[0]]); })[0];
+  var cta = "";
+  if (ok(L.line)) cta += '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">รับเช็กลิสต์ฟรีทาง LINE</a>"; else cta += '<a class="b pri" href="#free">อ่านเช็กลิสต์ฟรี</a>';
+  if (firstCh) cta += '<a class="b sec" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ดูคลิปบน " + firstCh[1] + "</a>"; else cta += '<a class="b sec" href="#episodes">ดูตอนทั้งหมด</a>';
+  $("hero-cta").innerHTML = cta;
+  var eps = S.episodes || [], frees = S.freebies || [];
+  // แสดงเฉพาะตอนที่ปล่อยแล้ว กับตอนของสัปดาห์ถัดไป (2 ตอนที่ใกล้ที่สุด)
+  var hasLink = function (e) { return PLAT.some(function (p) { return ok((e.watch || {})[p[0]]); }); };
+  var outEps = eps.filter(function (e) { return hasLink(e) || (e.date && !future(e.date)); });
+  var nextEps = eps.filter(function (e) { return outEps.indexOf(e) < 0 && e.date; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }).slice(0, 2);
+  var shown = outEps.concat(nextEps);
+  $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>2</b>ตอนใหม่ต่อสัปดาห์</li><li><b>" + frees.length + "</b>เช็กลิสต์ฟรี</li>";
+  var st = shown.concat(eps).filter(function (e) { return e.cover; }); var pick = [st[3] || st[0], st[0], st[7] || st[1]].filter(Boolean);
+  $("stack").innerHTML = pick.map(function (e) { return '<img src="' + esc(e.cover) + '" alt="" loading="lazy">'; }).join("");
+
+  // ช่องทาง
+  var sub = { tiktok: "คลิปสั้นทุกตอน", youtube: "Shorts และคลิปรวมตอน", facebook: "Reels และตอบคำถาม", instagram: "Reels", threads: "โพสต์สั้นและภาพเบื้องหลัง", x: "ข่าวและเกร็ดสั้น" };
+  $("channels").innerHTML = PLAT.map(function (p, i) { var u = L[p[0]], on = ok(u); return '<a class="card ch' + (on ? "" : " off") + (on && p === firstCh ? " main" : "") + '" href="' + (on ? esc(u) : "#") + '"' + (on ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>" + p[2] + "</i><span><strong>" + p[1] + "</strong><small>" + (on ? sub[p[0]] : "เร็ว ๆ นี้") + '</small></span><span class="arr">' + (on ? "→" : "") + "</span></a>"; }).join("");
+
+  // ของแจก
+  var epNo = {}; eps.forEach(function (e) { epNo[e.id] = e.no; });
+  $("freebies").innerHTML = frees.map(function (f, i) {
+    return '<details class="card fb"' + (i === 0 ? " open" : "") + '><summary><span class="n">' + (epNo[f.from] ? "#" + epNo[f.from] : "ฟรี") + "</span><strong>" + esc(f.title) + '</strong></summary><div class="in"><ol>' + (f.items || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>" + (f.note ? '<p class="note">' + esc(f.note) + "</p>" : "") + '<div class="row"><a class="b line sm" href="free.html?id=' + encodeURIComponent(f.id) + '">เปิดฉบับพิมพ์</a>' + (ok(L.line) && f.keyword ? '<span class="kw">หรือพิมพ์ <b>' + esc(f.keyword) + "</b> ใน LINE รับไฟล์</span>" : "") + "</div></div></details>";
+  }).join("");
+  $("leadbox").innerHTML = ok(L.line)
+    ? "<p><strong>รับไฟล์พิมพ์ครบทุกชุดทาง LINE</strong><small>เพิ่มเพื่อนแล้วระบบส่งให้ทันที มีชุดใหม่จะแจ้งก่อนใคร เลิกติดตามได้ทุกเมื่อ</small></p>" + '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">เพิ่มเพื่อน LINE" + (L.lineId ? " " + esc(L.lineId) : "") + "</a>"
+    : "<p><strong>ไฟล์พิมพ์ครบทุกชุด</strong><small>กด “เปิดฉบับพิมพ์” ของชุดที่ต้องการ แล้วสั่งพิมพ์หรือบันทึกเป็น PDF ได้เลย</small></p>" + '<a class="b pri" href="free.html">เปิดทุกชุด</a>';
+
+  // ใบตรวจงานและสมาชิก (แสดงเมื่อมีใบตรวจงานใน data.js)
+  var shs = Array.isArray(S.sheets) ? S.sheets : [], pv = /[?&]preview=1/.test(location.search) ? "?preview=1" : "";
+  if (shs.length) {
+    var rdy = shs.filter(function (x) { return x.ok === true; }).length, memOn = !S.member || S.member.on !== false;
+    $("sheets").hidden = false;
+
+    $("facts").innerHTML += "<li><b>" + shs.length + "</b>ใบตรวจงาน</li>";
+    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " งานหลัก: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรี 1 หน้า และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่า และใบข้อบกพร่อง" + (rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">ดูใบตรวจงาน</a>' + (memOn ? '<a class="b sec" href="member.html' + pv + '">สมัครสมาชิกฟรี</a>' : "") + "</span>";
+  }
+
+  // ตอน
+  var topics = []; shown.forEach(function (e) { if (e.topic && topics.indexOf(e.topic) < 0) topics.push(e.topic); });
+  var cur = "ทั้งหมด";
+  function links(o, cls) { o = o || {}; return PLAT.filter(function (p) { return ok(o[p[0]]); }).map(function (p, i) { return '<a class="' + (i === 0 && cls ? cls : "") + '" href="' + esc(o[p[0]]) + '"' + ext + ">" + p[1] + "</a>"; }).join(""); }
+  function drawEps() {
+    $("eps").innerHTML = shown.filter(function (e) { return cur === "ทั้งหมด" || e.topic === cur; }).map(function (e) {
+      var w = links(e.watch, "p"), s = links(e.song, "");
+      var badge = w ? '<span class="pill ok">ดูได้แล้ว</span>' : (future(e.date) ? '<span class="pill">ปล่อย ' + fmt(e.date, true) + "</span>" : '<span class="pill gray">เร็ว ๆ นี้</span>');
+      return '<article class="card ep"><div class="im">' + (e.cover ? '<img src="' + esc(e.cover) + '" alt="ปกตอน #' + esc(e.no) + '" loading="lazy" width="360" height="480">' : "") + badge + '</div><div class="tx"><h3>#' + esc(e.no) + " " + esc(e.title) + '</h3><div class="meta">' + esc(e.topic || "") + (e.date ? " · " + fmt(e.date) : "") + "</div>" + (w ? '<div class="acts">' + w + "</div>" : "") + (e.songTitle ? '<div class="song">เพลง “' + esc(e.songTitle) + "”" + (s ? ' <span class="acts" style="display:inline-flex;margin-left:4px">' + s + "</span>" : (e.songDate ? " · " + fmt(e.songDate, true) : "")) + "</div>" : "") + "</div></article>";
+    }).join("");
+  }
+  $("chips").innerHTML = ["ทั้งหมด"].concat(topics).map(function (t) { return '<button class="chip" type="button" aria-pressed="' + (t === cur) + '">' + esc(t) + "</button>"; }).join("");
+  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); drawEps(); });
+  drawEps();
+
+  // ของที่ใช้ในคลิป (แสดงเฉพาะรายการที่ใส่ลิงก์แล้ว)
+  var pr = (S.products || []).filter(function (p) { return p.on !== false && ok(p.url); });
+  if (pr.length) {
+    $("gear").hidden = false; $("disclosure").textContent = S.disclosure || ""; $("foot-disc").textContent = S.disclosure || "";
+    $("prods").innerHTML = pr.map(function (p) { return '<div class="card pd"><h3>' + esc(p.name) + "</h3><p>" + esc(p.why) + '</p><div class="meta">' + (epNo[p.ep] ? "จากตอน #" + epNo[p.ep] + " · " : "") + esc(p.cat || "") + '</div><a class="b line sm" href="' + esc(p.url) + '" target="_blank" rel="sponsored nofollow noopener">ดูราคาที่ ' + esc(p.network || "ร้านค้า") + " →</a></div>"; }).join("");
+  }
+
+  // บริการ ร้าน เพลง คำถาม
+  function item(x) { var open = ok(x.url); return '<div class="card it"><h3>' + esc(x.title) + ' <span class="pill' + (open ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : (x.status || "เร็ว ๆ นี้")) + "</span></h3><p>" + esc(x.text) + "</p>" + (open ? '<a class="b line sm" href="' + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (ok(L.line) ? '<a class="b line sm" href="' + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : "")) + "</div>"; }
+  $("services").innerHTML = (S.services || []).map(item).join("");
+  $("shopitems").innerHTML = (S.shop || []).map(item).join("");
+  $("musiclinks").innerHTML = (S.music || []).map(function (m) { var on = ok(m.url); return '<a class="card ch' + (on ? "" : " off") + '" href="' + (on ? esc(m.url) : "#") + '"' + (on ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>♪</i><span><strong>" + esc(m.title) + "</strong><small>" + esc(m.text) + '</small></span><span class="arr">' + (on ? "→" : "") + "</span></a>"; }).join("");
+  $("faq").innerHTML = (S.faq || []).map(function (f) { return "<details><summary>" + esc(f.q) + "</summary><p>" + esc(f.a) + "</p></details>"; }).join("");
+  if (L.email) $("contact").innerHTML = 'ติดต่องานและสปอนเซอร์: <a href="mailto:' + esc(L.email) + '">' + esc(L.email) + "</a>";
+
+  // แถบปุ่มล่างจอ (มือถือ)
+  var dock = $("dock");
+  dock.innerHTML = ok(L.line) ? '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">รับเช็กลิสต์ฟรีทาง LINE</a>" : (firstCh ? '<a class="b pri" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ติดตามบน " + firstCh[1] + "</a>" : "");
+  if (dock.innerHTML) window.addEventListener("scroll", function () { dock.classList.toggle("show", window.scrollY > 520); }, { passive: true });
+
+  // ข้อมูลให้เครื่องมือค้นหา + สถิติ (ทำงานเมื่อใส่รหัส GA4 ใน data.js เท่านั้น)
+  var ld = { "@context": "https://schema.org", "@type": "Organization", name: B.name, description: B.about, sameAs: PLAT.map(function (p) { return L[p[0]]; }).filter(ok) };
+  if (S.site && ok(S.site.url)) ld.url = S.site.url;
+  var sc = document.createElement("script"); sc.type = "application/ld+json"; sc.textContent = JSON.stringify(ld); document.head.appendChild(sc);
+  var ga = S.site && S.site.ga4;
+  window.BUILD_GA = function () { if (window.gtag || !/^G-[A-Z0-9]{6,}$/.test(ga || "")) return; var g = document.createElement("script"); g.async = true; g.src = "https://www.googletagmanager.com/gtag/js?id=" + ga; document.head.appendChild(g); window.dataLayer = window.dataLayer || []; window.gtag = function () { dataLayer.push(arguments); }; gtag("js", new Date()); gtag("config", ga); document.addEventListener("click", function (ev) { var a = ev.target.closest("a[href^='http']"); if (a) gtag("event", "outbound_click", { link_url: a.href, link_text: (a.textContent || "").trim().slice(0, 60) }); }); }; /* สถิติเริ่มเมื่อผู้ชมกดยอมรับในแถบแจ้งเท่านั้น (extras.js) */ try { if (localStorage.getItem("build_consent") === "all") window.BUILD_GA(); } catch (e) {}
+})();
+</script>
+<script src="extras.js"></script>
+</body>
+</html>

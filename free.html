@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เช็กลิสต์ฟรี — สร้าง | BUILD TH</title>
+<meta name="description" content="เช็กลิสต์จากคลิป เรื่องที่คนไม่เล่า ไทยและอังกฤษ พิมพ์ได้ 1 แผ่น A4">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F2A44; --orange:#FF6B1A; --ink:#111; --mute:#3F4A58; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECEF; color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI","Sarabun",sans-serif; font-size:15px; line-height:1.5; }
+  .bar { position:sticky; top:0; background:var(--navy); color:#fff; padding:10px 16px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; z-index:5; }
+  .bar a { color:#fff; }
+  .bar button { background:var(--orange); color:#fff; border:0; border-radius:12px; padding:10px 18px; font:inherit; font-weight:700; cursor:pointer; min-height:44px; }
+  .sheet { background:#fff; width:210mm; max-width:calc(100% - 20px); min-height:297mm; margin:16px auto; padding:13mm 12mm 12mm; box-shadow:0 6px 24px rgba(0,0,0,.14); display:flex; flex-direction:column; }
+  .en { display:block; font-family:Arial,"Segoe UI",sans-serif; font-size:.8em; line-height:1.3; color:var(--mute); font-weight:400; }
+  .hd { display:grid; grid-template-columns:46mm 1fr 36mm; border:1.6px solid #111; }
+  .lg { display:flex; align-items:center; gap:8px; padding:8px 10px; border-right:1.3px solid #111; }
+  .lg img { width:44px; height:44px; object-fit:contain; }
+  .lg b { display:block; font-size:14px; color:var(--navy); white-space:nowrap; } .lg span { display:block; font-size:10px; color:var(--mute); line-height:1.3; }
+  .ti { padding:8px 12px; text-align:center; display:flex; flex-direction:column; justify-content:center; }
+  .ti small { font-size:11px; font-weight:700; color:#C24A08; letter-spacing:.3px; }
+  .ti h1 { font-family:"Kanit","Leelawadee UI",sans-serif; font-size:21px; line-height:1.25; margin:2px 0 0; }
+  .ti h2 { font:700 14px/1.25 Arial,sans-serif; color:#26313F; margin:3px 0 0; }
+  .cd { border-left:1.3px solid #111; display:grid; grid-template-rows:1fr 1fr; font-size:10.5px; font-weight:700; }
+  .cd div { padding:6px 8px; } .cd div:first-child { border-bottom:1.3px solid #111; }
+  .info { display:grid; grid-template-columns:1fr 1fr; border:1.6px solid #111; border-top:0; font-size:12.5px; }
+  .info div { padding:6px 10px 7px; display:flex; gap:8px; align-items:flex-end; white-space:nowrap; } .info div:first-child { border-right:1px solid #111; }
+  .info i { font:10.5px Arial,sans-serif; color:var(--mute); font-style:normal; } .info span { flex:1; border-bottom:1px dotted #333; }
+  table { width:100%; border-collapse:collapse; margin-top:8px; }
+  th, td { border:1px solid #111; padding:7px 9px; vertical-align:top; }
+  th { background:#E4E7EB; font-size:11.5px; text-align:center; line-height:1.25; } th .en { font-weight:700; color:#26313F; font-size:10px; }
+  td.n { text-align:center; width:11mm; font-weight:700; } td.c { width:15mm; } td.r { width:52mm; }
+  td.it { font-size:15px; } td.it .en { font-size:11.5px; margin-top:2px; }
+  .lgd { font-size:10.5px; color:#26313F; text-align:right; margin:4px 0 0; }
+  .note { margin-top:10px; font-size:12.5px; border:1px solid #C24A08; background:#FFF6EF; padding:8px 12px; break-inside:avoid; } .note .en { font-size:11px; }
+  .sig { display:grid; grid-template-columns:1fr 1fr; border:1.6px solid #111; margin-top:10px; break-inside:avoid; }
+  .sig > div { font-size:12px; } .sig > div:first-child { border-right:1.2px solid #111; }
+  .sig h4 { margin:0; background:#D9DCE0; font-size:12px; padding:4px 9px; border-bottom:1.2px solid #111; } .sig h4 .en { display:inline; margin-left:6px; }
+  .sig p { margin:0; padding:7px 9px 0; display:flex; gap:6px; align-items:flex-end; white-space:nowrap; } .sig p:last-child { padding-bottom:9px; }
+  .sig p i { font:10px Arial,sans-serif; color:var(--mute); font-style:normal; } .sig p span { flex:1; border-bottom:1px dotted #333; height:20px; }
+  .more { margin-top:10px; font-size:12px; border:1.2px solid var(--orange); padding:7px 12px; break-inside:avoid; } .more b { color:#C24A08; }
+  .foot { margin-top:auto; padding-top:12px; font-size:10.5px; color:var(--mute); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .foot b { font:12px Arial,sans-serif; color:#111; font-weight:400; }
+  body.shot { background:#fff; } body.shot .bar { display:none; } body.shot .sheet { margin:0; box-shadow:none; max-width:none; width:210mm; min-height:297mm; }
+  @page { size:A4; margin:0; }
+  @media print { html { -webkit-print-color-adjust:exact; print-color-adjust:exact; } body { background:#fff; } .bar { display:none; } .sheet { box-shadow:none; margin:0; width:210mm; max-width:none; height:297mm; min-height:0; page-break-after:always; } .sheet:last-child { page-break-after:auto; } }
+</style>
+<script src="data.js"></script>
+</head>
+<body>
+<div id="hdr"></div>
+<script>/* เมนูเดียวกับทุกหน้า · ไม่โหลดตอนถ่ายภาพหน้าเพื่อทำ PDF และรูป (shot=1) · ตอนพิมพ์ เมนูซ่อนตัวเอง */
+(function () { if (/[?&]shot=1/.test(location.search)) return; var s = document.createElement("script"); s.src = "nav.js"; document.body.insertBefore(s, document.getElementById("hdr").nextSibling); })();</script>
+<div class="bar"><a href="index.html">← กลับหน้าหลัก</a><button type="button" id="b-print">พิมพ์ หรือบันทึกเป็น PDF</button></div>
+<div id="out"></div>
+<script>
+(function () {
+  "use strict";
+  var S = window.SITE || {};
+  try { if (new URLSearchParams(location.search).get("preview") === "1") { var d = localStorage.getItem("build_site_draft"); if (d) S = JSON.parse(d); } } catch (e) {}
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var qs = new URLSearchParams(location.search), id = qs.get("id");
+  if (qs.get("shot") === "1") document.body.className = "shot";
+  document.getElementById("b-print").addEventListener("click", function () { window.print(); });
+  var epNo = {}; (S.episodes || []).forEach(function (e) { epNo[e.id] = e.no; });
+  var list = (S.freebies || []).filter(function (f) { return !id || f.id === id; });
+  var B = S.brand || {}, L = S.links || {};
+  var where = [S.site && S.site.url ? S.site.url.replace(/^https?:\/\//, "") : "", L.lineId ? "LINE " + L.lineId : ""].filter(Boolean).join(" · ");
+  var en = function (t) { return t ? '<span class="en">' + esc(t) + "</span>" : ""; };
+  document.getElementById("out").innerHTML = list.length ? list.map(function (f) {
+    var no = epNo[f.from] || "", code = f.code || ("BTH-C" + (no || "00")), ie = f.itemsEn || [];
+    var rows = (f.items || []).map(function (x, i) { return '<tr><td class="n">' + (i + 1) + '</td><td class="it">' + esc(x) + en(ie[i]) + '</td><td class="c"></td><td class="r"></td></tr>'; }).join("");
+    return '<article class="sheet"><header class="hd"><div class="lg"><img src="img/logo.png" alt=""><div><b>' + esc(B.name) + '</b><span>เช็กลิสต์จากคลิป</span><span style="font-family:Arial">Checklist from the episode</span></div></div><div class="ti"><small>เช็กลิสต์ฟรี · FREE CHECKLIST' + (no ? " · " + esc(B.show) + " #" + esc(no) : "") + "</small><h1>" + esc(f.title) + "</h1>" + (f.titleEn ? "<h2>" + esc(f.titleEn) + "</h2>" : "") + '</div><div class="cd"><div>SHEET NO. / ใบที่</div><div>DATE / วันที่</div></div></header>' +
+      '<section class="info"><div>บ้าน / โครงการ <i>House / Project</i><span></span></div><div>ผู้ตรวจ <i>Checked by</i><span></span></div></section>' +
+      '<table><thead><tr><th>No.</th><th>รายการ<span class="en">ITEM</span></th><th>ทำแล้ว<span class="en">DONE</span></th><th>บันทึก<span class="en">NOTES</span></th></tr></thead><tbody>' + rows + "</tbody></table>" +
+      '<p class="lgd">ติ๊กช่อง “ทำแล้ว” ทีละข้อ · จดสิ่งที่เห็นในช่องบันทึก · เก็บแผ่นนี้ไว้กับเอกสารบ้าน</p>' +
+      (f.note ? '<p class="note">' + esc(f.note) + en(f.noteEn) + "</p>" : "") +
+      '<div class="sig"><div><h4>ผู้ตรวจ<span class="en">Checked by</span></h4><p>ลงชื่อ <i>Signature</i><span></span></p><p>วันที่ <i>Date</i><span></span></p></div><div><h4>ผู้รับทราบ<span class="en">Acknowledged by</span></h4><p>ลงชื่อ <i>Signature</i><span></span></p><p>วันที่ <i>Date</i><span></span></p></div></div>' +
+      ((S.sheets || []).length ? '<p class="more"><b>ต้องการตรวจงานก่อสร้างทีละขั้น</b> ดูใบตรวจงาน ' + (S.sheets || []).length + " งาน (เสาเข็ม ฐานราก เหล็กเสริม คอนกรีต หลังคา กันซึม ไฟฟ้า ประปา และอื่น ๆ) ที่หน้าใบตรวจงานของ " + esc(B.name) + "</p>" : "") +
+      '<div class="foot"><b>' + esc(code) + "  Rev." + esc(f.rev || "A") + "  " + esc(f.revDate || "12/10/2026") + "</b><span>© " + esc(B.name) + " · ใช้และส่งต่อได้โดยไม่ดัดแปลง · Free to share without changes</span><span>" + esc(where) + "</span></div></article>";
+  }).join("") : '<article class="sheet"><h1>ไม่พบเช็กลิสต์นี้</h1><p><a href="free.html">ดูทุกชุด</a></p></article>';
+  if (list.length === 1) document.title = list[0].title + " — " + (B.name || "");
+})();
+</script>
+</body>
+</html>
