@@ -1,5 +1,5 @@
 window.SITE = {
-  "version": "2026-10-14",
+  "version": "2026-10-16",
   "brand": {
     "name": "สร้าง | BUILD TH",
     "show": "เรื่องที่คนไม่เล่า",
@@ -14,7 +14,7 @@ window.SITE = {
   "links": {
     "tiktok": "https://www.tiktok.com/@srang.build",
     "youtube": "https://www.youtube.com/@srangbuild",
-    "facebook": "",
+    "facebook": "https://www.facebook.com/profile.php?id=61594517382694",
     "instagram": "https://www.instagram.com/srang.build/",
     "x": "https://x.com/srangbuid",
     "line": "https://line.me/R/ti/p/@028bxspq",
