@@ -867,14 +867,14 @@ window.SITE = {
     "consent": "ฉันยินยอมให้ สร้าง | BUILD TH เก็บชื่อและอีเมลของฉัน เพื่อดูแลบัญชีสมาชิก ส่งไฟล์ที่สั่งซื้อ และแจ้งใบตรวจงานใหม่ ตามนโยบายความเป็นส่วนตัว",
     "lineChannelId": "",
     "facebookAppId": "",
-    "googleClientId": "",
+    "googleClientId": "514263949305-6qth9e3ro6aecdcauoul2tflnegp0aa9.apps.googleusercontent.com",
     "fbVersion": "v26.0",
     "lineBotPrompt": ""
   },
   "pay": {
     "on": true,
     "qr": "pay/qr.jpg",
-    "bank": "ิิิิbbl",
+    "bank": "BBL",
     "name": "Thanatat J",
     "acc": "1314132745",
     "hours": 24,

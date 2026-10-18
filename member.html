@@ -42,7 +42,7 @@
   $("yr").textContent = new Date().getFullYear();
   if (B.demo) $("demo").hidden = false;
   if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
-  var me = null, mode = "reg", busy = false, pending = null, forgot = { step: 1, email: "" };
+  var me = null, mode = "reg", busy = false, pending = null, forgot = { step: 1, email: "" }, regWait = null;
   var want = (function () { try { return new URLSearchParams(location.search).get("buy") || ""; } catch (e) { return ""; } })();
   // รายการที่ติ๊กไว้ให้ก่อน: จากลิงก์ ?buy=F-01,B-ST (ตะกร้า) หรือจากตะกร้าที่ค้างในเครื่องนี้
   var wantList = want ? want.split(",") : (B.cart ? B.cart.get() : []);
@@ -54,7 +54,41 @@
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
   function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
   function title(id) { var x = B.find(id); return x ? x.id + " " + x.title : id; }
-  function signedIn(r) { B.token.set(r.token); pending = null; return refresh(true); }
+  function signedIn(r) { B.token.set(r.token); pending = null; regWait = null; return refresh(true); }
+
+  // ---------- รหัสผ่าน (กติกาเดียวกับหลังบ้าน · ผู้ใช้เลือก 18 ต.ค. 2026: มาตรฐานทั่วไป) ----------
+  var COMMON = ["12345678", "123456789", "1234567890", "password", "password1", "password123", "passw0rd", "p@ssw0rd", "qwerty12", "qwerty123", "1q2w3e4r", "q1w2e3r4", "1qaz2wsx", "abc12345", "abcd1234", "a1234567", "aa123456", "asdf1234", "zxcvbnm1", "iloveyou1", "admin123", "welcome1", "letmein1", "thailand1", "bangkok1", "bangkok123", "test1234", "11223344", "12341234", "12121212", "123123123", "987654321"];
+  function pwRules(p, email, name) {
+    p = String(p || ""); var low = p.toLowerCase(), local = String(email || "").split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, ""), nm = String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+    return [
+      ["len", "อย่างน้อย 8 ตัวอักษร", p.length >= 8 && p.length <= 128],
+      ["mix", "มีทั้งตัวอักษรและตัวเลข", /[A-Za-zก-๎]/.test(p) && /[0-9๐-๙]/.test(p)],
+      ["easy", "ไม่ใช่รหัสที่เดาง่ายหรือตัวซ้ำ", !!p && COMMON.indexOf(low) < 0 && !/^(.)\1+$/.test(p) && !/(.)\1{4,}/.test(p) && !/^(.{1,4})\1+$/.test(low)],
+      ["own", "ไม่มีชื่อหรือชื่ออีเมลของคุณอยู่ในรหัส", !!p && !(local.length >= 4 && low.replace(/[^a-z0-9]/g, "").indexOf(local) >= 0) && !(nm.length >= 4 && low.replace(/\s+/g, "").indexOf(nm) >= 0)]
+    ];
+  }
+  function pwScore(p) { p = String(p || ""); var s = 0; if (p.length >= 8) s++; if (p.length >= 12) s++; if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++; if (/[^A-Za-z0-9฀-๿\s]/.test(p)) s++; if (/[0-9]/.test(p)) s++; return Math.min(4, s); }
+  // ช่องรหัสผ่านพร้อมปุ่มแสดงรหัส · meter = แถบความแข็งแรงและรายการกติกา (ใช้กับรหัสผ่านใหม่)
+  function pwField(name, label, ac, meter) {
+    return '<label>' + label + '<span class="pw"><input type="password" name="' + name + '" maxlength="128" autocomplete="' + ac + '" required' + (meter ? ' data-pw="1" aria-describedby="pwr-' + name + '"' : "") + '><button type="button" class="eye" data-eye="1" aria-label="แสดงรหัสผ่าน">แสดง</button></span></label>' +
+      (meter ? '<div class="pwm" aria-hidden="true"><i id="pwb-' + name + '"></i></div><ul class="pwr" id="pwr-' + name + '">' + pwRules("").map(function (r) { return '<li data-r="' + r[0] + '">' + r[1] + "</li>"; }).join("") + '<li data-r="lvl" class="lvl">ความแข็งแรง: -</li></ul>' : "");
+  }
+  function pwPaint(f) {
+    if (!f) return; var inp = f.querySelector("input[data-pw]"); if (!inp) return;
+    var email = f.elements.email ? f.elements.email.value : (forgot.email || (me && me.member && me.member.email) || ""), name = f.elements.name ? f.elements.name.value : ((me && me.member && me.member.name) || "");
+    var rules = pwRules(inp.value, email, name), list = $("pwr-" + inp.name), bar = $("pwb-" + inp.name), sc = pwScore(inp.value), allOk = rules.every(function (r) { return r[2]; });
+    rules.forEach(function (r) { var li = list && list.querySelector('[data-r="' + r[0] + '"]'); if (li) li.className = r[2] ? "ok" : ""; });
+    var lv = !inp.value ? "-" : !allOk ? "ยังใช้ไม่ได้" : ["พอใช้", "พอใช้", "ดี", "แข็งแรง", "แข็งแรงมาก"][sc];
+    var lvl = list && list.querySelector('[data-r="lvl"]'); if (lvl) lvl.textContent = "ความแข็งแรง: " + lv;
+    if (bar) { bar.style.width = (!inp.value ? 0 : allOk ? 40 + sc * 15 : 15) + "%"; bar.className = !allOk ? "w" : sc >= 3 ? "s" : "m"; }
+    var p2 = f.querySelector("input[name$='2']"); if (p2 && p2.value) p2.setCustomValidity(p2.value === inp.value ? "" : "ไม่ตรงกัน");
+  }
+  // ตรวจก่อนส่ง: ผ่านทุกข้อและ 2 ช่องตรงกัน · คืนข้อความผิดข้อแรก (หลังบ้านตรวจซ้ำเสมอ)
+  function pwOk(f, a, b) {
+    var p = f.elements[a].value, email = f.elements.email ? f.elements.email.value : (forgot.email || (me && me.member && me.member.email) || ""), name = f.elements.name ? f.elements.name.value : ((me && me.member && me.member.name) || "");
+    var bad1 = pwRules(p, email, name).filter(function (r) { return !r[2]; })[0]; if (bad1) return "รหัสผ่าน: " + bad1[1];
+    if (b && f.elements[b] && f.elements[b].value !== p) return "รหัสผ่านทั้ง 2 ช่องไม่ตรงกัน"; return "";
+  }
   // ผลจาก social: เข้าระบบเลย หรือต้องยืนยันการสมัครก่อน (สมาชิกใหม่)
   function afterSocial(r) { if (r.pending) { pending = r; say(""); pendingView(); return; } return signedIn(r); }
 
@@ -138,10 +172,11 @@
   function authView() {
     var perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
     if (mode === "forgot") return forgotView();
+    if (mode === "verify" && regWait) return verifyView();
     var tabs = '<div class="tabs2"><button class="chip" type="button" data-mode="reg" aria-pressed="' + (mode === "reg") + '">สมัครสมาชิก</button><button class="chip" type="button" data-mode="in" aria-pressed="' + (mode === "in") + '">เข้าสู่ระบบ</button></div>';
     var consent = '<label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>';
-    var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>ตั้งรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)<input type="password" name="pass" minlength="8" maxlength="72" autocomplete="new-password" required></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label>' + consent + '<button class="b pri" type="submit">สมัครสมาชิกด้วยอีเมล</button></form>';
-    var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>รหัสผ่าน<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="forgot">ลืมรหัสผ่าน หรือสมัครด้วย Google LINE Facebook แล้วอยากตั้งรหัสผ่าน</button></p></form>';
+    var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>' + pwField("pass", "ตั้งรหัสผ่าน", "new-password", true) + pwField("pass2", "ยืนยันรหัสผ่าน (พิมพ์ซ้ำอีกครั้ง)", "new-password", false) + '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label>' + consent + '<button class="b pri" type="submit">สมัครสมาชิกด้วยอีเมล</button><p class="note" style="margin:0">ระบบส่งรหัส 6 หลักไปที่อีเมล เพื่อยืนยันว่าเป็นอีเมลของคุณ ก่อนสร้างบัญชี</p></form>';
+    var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>' + pwField("pass", "รหัสผ่าน", "current-password", false) + '<button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="forgot">ลืมรหัสผ่าน หรือสมัครด้วย Google LINE Facebook แล้วอยากตั้งรหัสผ่าน</button></p></form>';
     var soc = socButtons("login");
     $("view").innerHTML = '<h1 style="font-size:30px;color:#0F2A44;margin:0 0 6px">สมาชิก</h1><p class="lead" style="margin:0 0 16px">' + (ON.google || ON.line || ON.facebook ? "สมัครฟรี · ใช้บัญชีที่มีอยู่แล้วได้ ไม่ต้องจำรหัสผ่านใหม่" : "สมัครฟรีด้วยอีเมล ใช้เวลาไม่ถึง 1 นาที") + '</p>' + (perks ? '<div class="card pad" style="margin-bottom:14px"><ul class="tick">' + perks + "</ul></div>" : "") +
       '<div class="card pad">' + tabs + (soc ? soc + '<p class="note" style="text-align:center;margin:8px 0 0">' + (mode === "reg" ? "สมัครครั้งแรกด้วยปุ่มด้านบน ระบบจะขอให้กดยินยอมก่อนสร้างบัญชี" : "เข้าสู่ระบบด้วยบัญชีที่เคยใช้สมัคร") + '</p><div class="or">หรือใช้อีเมล</div>' : "") + (mode === "reg" ? reg : inn) + "</div>";
@@ -155,12 +190,22 @@
       '<label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>' +
       '<button class="b pri" type="submit">ยืนยันและสร้างบัญชี</button><p class="note" style="margin:0">ถ้ามีบัญชีด้วยอีเมลอยู่แล้ว ให้ <button type="button" class="linkbtn" data-mode="in">เข้าสู่ระบบด้วยอีเมล</button> แล้วกด เชื่อมบัญชี ในหน้าสมาชิก</p></form>';
   }
+  // ยืนยันอีเมลตอนสมัคร: ระบบส่งรหัส 6 หลัก · บัญชีถูกสร้างเมื่อใส่รหัสถูกเท่านั้น
+  function verifyView() {
+    var w = regWait, demoHint = "";
+    if (B.demo) { var mm = B.demoMail(w.email); var mt = mm && /คือ (\d{6})/.exec(mm.body); demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>" + mt[1] + "</b>" : "") + "</p>"; }
+    $("view").innerHTML = '<h1 style="font-size:28px;color:#0F2A44;margin:0 0 6px">ยืนยันอีเมล</h1><p class="lead" style="margin:0 0 16px">อีกขั้นเดียว บัญชีจะถูกสร้างเมื่อยืนยันอีเมลแล้ว</p>' +
+      '<form class="f card pad" id="f-vr" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัส 6 หลักไปที่ <b>' + esc(w.email) + '</b> แล้ว ใช้ได้ 15 นาที · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะหรือโปรโมชัน</p>' +
+      '<label>รหัส 6 หลักจากอีเมล<input type="text" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required></label>' +
+      '<button class="b pri" type="submit">ยืนยันและสร้างบัญชี</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-vr="again">ส่งรหัสใหม่</button> · <button type="button" class="linkbtn" data-vr="edit">แก้อีเมล</button></p></form>';
+    var c = document.querySelector("#f-vr input[name=code]"); if (c) c.focus();
+  }
   function forgotView() {
     var demoHint = "";
     if (B.demo && forgot.step === 2) { var mm = B.demoMail(forgot.email); var mt = mm && /รหัสของคุณคือ (\d{6})/.exec(mm.body); demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>" + mt[1] + "</b>" : "ไม่มีบัญชีของอีเมลนี้ในเครื่อง ระบบจึงไม่ได้ส่งรหัส") + "</p>"; }
     $("view").innerHTML = '<h1 style="font-size:28px;color:#0F2A44;margin:0 0 6px">ตั้งรหัสผ่านใหม่</h1><p class="lead" style="margin:0 0 16px">ระบบส่งรหัส 6 หลักไปที่อีเมลที่สมัครไว้ ใช้ได้ 15 นาที</p>' +
       (forgot.step === 1 ? '<form class="f card pad" id="f-fg1" novalidate><label>อีเมลที่สมัครไว้<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required value="' + esc(forgot.email) + '"></label><button class="b pri" type="submit">ส่งรหัสไปที่อีเมล</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>'
-        : '<form class="f card pad" id="f-fg2" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัสไปที่ <b>' + esc(forgot.email) + '</b> แล้ว (ถ้าเป็นอีเมลสมาชิก) · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะ</p><label>รหัส 6 หลัก<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b pri" type="submit">ตั้งรหัสผ่านใหม่และเข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fg="again">ขอรหัสใหม่</button> · <button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>');
+        : '<form class="f card pad" id="f-fg2" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัสไปที่ <b>' + esc(forgot.email) + '</b> แล้ว (ถ้าเป็นอีเมลสมาชิก) · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะ</p><label>รหัส 6 หลัก<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label>' + pwField("newPass", "รหัสผ่านใหม่", "new-password", true) + pwField("newPass2", "ยืนยันรหัสผ่านใหม่ (พิมพ์ซ้ำ)", "new-password", false) + '<button class="b pri" type="submit">ตั้งรหัสผ่านใหม่และเข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fg="again">ขอรหัสใหม่</button> · <button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>');
   }
 
   // ---------- เข้าสู่ระบบแล้ว ----------
@@ -234,7 +279,7 @@
       '<section><div class="head"><h2>คำสั่งซื้อของฉัน</h2></div><div style="display:grid;gap:12px">' + ((me.orders || []).map(orderCard).join("") || '<p class="note">ยังไม่มีคำสั่งซื้อ</p>') + "</div></section>" +
       '<section id="ask"><div class="head"><h2>สอบถามร้าน</h2></div>' + askBox() + "</section>" +
       '<section>' + profileBox() + "</section>" +
-      '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">' + (social ? "ตั้งหรือเปลี่ยนรหัสผ่าน" : "เปลี่ยนรหัสผ่าน") + '</summary>' + (social ? '<p class="note" style="margin:10px 0 0">บัญชีนี้สมัครด้วย ' + esc(PROV[m.via] || m.via) + ' · ถ้าอยากเข้าด้วยอีเมลและรหัสผ่านด้วย ให้ออกจากระบบ แล้วกด ลืมรหัสผ่าน ที่หน้าเข้าสู่ระบบ</p>' : '<form class="f" id="f-pass" style="margin-top:12px" novalidate><label>รหัสผ่านเดิม<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form>') + "</details></section>" +
+      '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">' + (social ? "ตั้งหรือเปลี่ยนรหัสผ่าน" : "เปลี่ยนรหัสผ่าน") + '</summary>' + (social ? '<p class="note" style="margin:10px 0 0">บัญชีนี้สมัครด้วย ' + esc(PROV[m.via] || m.via) + ' · ถ้าอยากเข้าด้วยอีเมลและรหัสผ่านด้วย ให้ออกจากระบบ แล้วกด ลืมรหัสผ่าน ที่หน้าเข้าสู่ระบบ</p>' : '<form class="f" id="f-pass" style="margin-top:12px" novalidate>' + pwField("pass", "รหัสผ่านเดิม", "current-password", false) + pwField("newPass", "รหัสผ่านใหม่", "new-password", true) + pwField("newPass2", "ยืนยันรหัสผ่านใหม่ (พิมพ์ซ้ำ)", "new-password", false) + '<button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form>') + "</details></section>" +
       '<section><p class="note">ต้องการลบบัญชีและข้อมูลทั้งหมด: <button type="button" data-erase="1" class="linkbtn" style="color:#B3261E">ลบบัญชีของฉัน</button></p></section>';
     [].forEach.call(document.querySelectorAll("img.qr"), function (im) { im.addEventListener("error", function () { im.parentNode.remove(); }); });
     total(); gDraw();
@@ -247,7 +292,10 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg]"); if (!t) return;
+    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr]"); if (!t) return;
+    if (t.dataset.eye) { ev.preventDefault(); var pi = t.parentNode.querySelector("input"); var show = pi.type === "password"; pi.type = show ? "text" : "password"; t.textContent = show ? "ซ่อน" : "แสดง"; t.setAttribute("aria-label", show ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"); return; }
+    if (t.dataset.vr === "again") { run(B.call("registerResend", { email: regWait.email }).then(function () { verifyView(); }), "ส่งรหัสใหม่แล้ว"); return; }
+    if (t.dataset.vr === "edit") { mode = "reg"; regWait = null; say(""); authView(); return; }
     if (t.dataset.soc) { socClick(t.dataset.soc, t.dataset.act || "login"); return; }
     if (t.dataset.copy != null) { var tx = t.dataset.copy; if (navigator.clipboard) navigator.clipboard.writeText(tx).then(function () { t.textContent = "คัดลอกแล้ว"; }, function () {}); return; }
     if (t.dataset.rcpt) { var o0 = (me.orders || []).filter(function (o) { return o.id === t.dataset.rcpt; })[0]; if (o0) receipt(o0); return; }
@@ -261,19 +309,46 @@
     if (t.dataset.erase) { if (!confirm("ลบบัญชีและข้อมูลทั้งหมดของคุณ รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ ?")) return; run(B.call("erase").then(function () { B.token.clear(); me = null; authView(); }), "ลบบัญชีแล้ว"); }
   });
   $("view").addEventListener("change", function (ev) { if (ev.target.name === "it") total(); });
+  $("view").addEventListener("input", function (ev) { var f = ev.target.form; if (f && f.querySelector("input[data-pw]")) pwPaint(f); });
   $("view").addEventListener("submit", function (ev) {
     ev.preventDefault(); var f = ev.target, v = function (n) { return f.elements[n] ? f.elements[n].value : ""; };
-    if (f.id === "f-reg") { run(B.call("register", { name: v("name"), email: v("email"), pass: v("pass"), line: v("line"), consent: f.elements.consent.checked }).then(signedIn), "สมัครสมาชิกแล้ว"); return; }
+    if (f.id === "f-reg") {
+      var em1 = v("email").trim().toLowerCase();
+      if (!v("name").trim()) { say("กรอกชื่อที่ใช้เรียก", true); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(em1)) { say("อีเมลไม่ถูกรูปแบบ", true); return; }
+      var pe = pwOk(f, "pass", "pass2"); if (pe) { say(pe, true); return; }
+      if (!f.elements.consent.checked) { say("กดยินยอมการเก็บข้อมูลก่อนสมัคร", true); return; }
+      // หลังบ้านรุ่นใหม่ตอบ verify (ต้องยืนยันอีเมล) · รุ่นเก่าตอบ token (สร้างบัญชีทันที) ใช้ได้ทั้ง 2 แบบ
+      run(B.call("register", { name: v("name"), email: em1, pass: v("pass"), pass2: v("pass2"), line: v("line"), consent: true }).then(function (r) {
+        if (r && r.token) return signedIn(r).then(function () { say("สมัครสมาชิกแล้ว"); });
+        regWait = { email: em1 }; mode = "verify"; verifyView(); say("ส่งรหัสยืนยันไปที่อีเมลแล้ว");
+      }));
+      return;
+    }
+    if (f.id === "f-vr") { var cd = v("code").replace(/\D/g, ""); if (cd.length !== 6) { say("ใส่รหัส 6 หลักจากอีเมล", true); return; } run(B.call("registerVerify", { email: regWait.email, code: cd }).then(function (r) { mode = "in"; return signedIn(r); }), "สมัครสมาชิกแล้ว ยินดีต้อนรับ"); return; }
     if (f.id === "f-in") { run(B.call("login", { email: v("email"), pass: v("pass") }).then(signedIn), "เข้าสู่ระบบแล้ว"); return; }
     if (f.id === "f-pend") { run(B.call("socialFinish", { ticket: pending.ticket || pending.pending, consent: f.elements.consent.checked, email: v("email") }).then(signedIn), "สมัครสมาชิกแล้ว"); return; }
     if (f.id === "f-fg1") { var em = v("email").trim().toLowerCase(); run(B.call("resetRequest", { email: em }).then(function () { forgot = { step: 2, email: em }; authView(); }), "ถ้าอีเมลนี้เป็นสมาชิก ระบบส่งรหัสไปแล้ว"); return; }
-    if (f.id === "f-fg2") { run(B.call("resetConfirm", { email: forgot.email, code: v("code"), newPass: v("newPass") }).then(function (r) { mode = "in"; return signedIn(r); }), "ตั้งรหัสผ่านใหม่แล้ว"); return; }
+    if (f.id === "f-fg2") { var pe2 = pwOk(f, "newPass", "newPass2"); if (pe2) { say(pe2, true); return; } run(B.call("resetConfirm", { email: forgot.email, code: v("code"), newPass: v("newPass"), newPass2: v("newPass2") }).then(function (r) { mode = "in"; return signedIn(r); }), "ตั้งรหัสผ่านใหม่แล้ว"); return; }
     if (f.id === "f-ask") { run(B.call("ask", { topic: v("topic"), text: v("text") }).then(function (r) { me.asks = r.asks; homeView(); var s = document.getElementById("ask"); if (s) s.scrollIntoView(); }), "ส่งคำถามแล้ว ร้านจะตอบภายใน 2 วันทำการ"); return; }
     if (f.id === "f-prof") { run(B.call("profile", { name: v("name"), line: v("line"), email: v("email") }).then(function (r) { me.member = r.member; homeView(); }), "บันทึกข้อมูลแล้ว"); return; }
-    if (f.id === "f-pass") { run(B.call("passwd", { pass: v("pass"), newPass: v("newPass") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
+    if (f.id === "f-pass") { var pe3 = pwOk(f, "newPass", "newPass2"); if (pe3) { say(pe3, true); return; } run(B.call("passwd", { pass: v("pass"), newPass: v("newPass"), newPass2: v("newPass2") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
     if (f.id === "f-order") { var ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value; }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true); }), "สร้างคำสั่งซื้อแล้ว โอนเงินและแนบสลิปได้ที่ด้านล่าง"); return; }
     if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้ ผลส่งไปที่อีเมล"); }
   });
+
+  // ปุ่มเข้าระบบด้วยบัญชีอื่น: ขึ้นเฉพาะเมื่อหลังบ้านตั้งคีย์ไว้แล้วด้วย (กันปุ่มที่กดแล้วไม่ทำงาน)
+  function applyLogin(r) {
+    if (!r || !r.login || B.demo) return;
+    var off = ["google", "line", "facebook"].filter(function (p) { return ON[p] && !r.login[p]; });
+    if (!off.length) return;
+    off.forEach(function (p) { ON[p] = false; });
+    var typed = [].some.call(document.querySelectorAll("#view input[type=text],#view input[type=email],#view input[type=password]"), function (i) { return i.value; });
+    if (!busy && !typed && !regWait && !pending) { if (me) homeView(); else authView(); return; }
+    off.forEach(function (p) { [].forEach.call(document.querySelectorAll('[data-soc="' + p + '"]' + (p === "google" ? ",#g-btn" : "")), function (el) { el.remove(); }); });
+    [].forEach.call(document.querySelectorAll("#view .soc"), function (s) { if (!s.children.length) { var n = s.nextElementSibling; if (n && n.classList.contains("note")) { var o = n.nextElementSibling; n.remove(); if (o && o.classList.contains("or")) o.remove(); } s.remove(); } });
+  }
+  if (!B.demo && (ON.google || ON.line || ON.facebook)) B.ping().then(applyLogin).catch(function () {});
 
   // เริ่มหน้า: ถ้ากลับมาจาก LINE ให้ส่งรหัสไปตรวจก่อน
   var back = lineBack();
