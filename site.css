@@ -94,8 +94,21 @@ form.f .ck input { width:20px; height:20px; margin-top:2px; flex:none; }
 .ord .top { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; }
 .ord .top b { font-family:"Kanit",sans-serif; color:var(--navy); font-size:17px; }
 .ord ul { margin:0; padding-left:20px; font-size:15px; }
-.trk { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; margin:2px 0 4px; }
-.trk span { font-size:12.5px; text-align:center; padding:7px 4px 6px; border-radius:9px; background:#EEF2F6; color:#5A6573; line-height:1.3; }
+.trk { display:grid; grid-template-columns:repeat(5, 1fr); gap:4px; margin:2px 0 4px; }
+.trk span { font-size:12.5px; text-align:center; padding:7px 3px 6px; border-radius:9px; background:#EEF2F6; color:#5A6573; line-height:1.3; }
+.trk span small { display:block; font-size:11px; opacity:.85; margin-top:2px; }
+@media (max-width:420px) { .trk span { font-size:11px; padding:6px 2px 5px; } .trk span small { font-size:10px; } }
+.soc { display:grid; gap:8px; }
+.soc .sb { display:flex; align-items:center; justify-content:center; gap:10px; min-height:46px; border-radius:12px; font:inherit; font-weight:700; font-size:15.5px; cursor:pointer; border:1.5px solid var(--line); background:#fff; color:var(--ink); width:100%; }
+.soc .sb svg { width:20px; height:20px; flex:none; }
+.soc .sb.line { background:#06C755; border-color:#06C755; color:#fff; }
+.soc .sb.fb { background:#1877F2; border-color:#1877F2; color:#fff; }
+.soc .sb:disabled { opacity:.6; cursor:wait; }
+.soc .gwrap { display:flex; justify-content:center; min-height:46px; }
+.links { display:flex; flex-wrap:wrap; gap:6px; }
+.links .pill { font-weight:600; }
+.copy { background:none; border:1px solid var(--line); border-radius:8px; padding:1px 8px; font:inherit; font-size:13px; cursor:pointer; color:var(--navy); margin-left:6px; }
+.linkbtn { background:none; border:0; padding:0; color:var(--navy); text-decoration:underline; cursor:pointer; font:inherit; }
 .trk span b { display:block; font-family:"Kanit",sans-serif; font-size:15px; }
 .trk span.d { background:#DFF3E8; color:var(--ok); } .trk span.a { background:var(--navy); color:#fff; } .trk span.x { background:#FBE4E2; color:var(--bad); }
 .or { display:flex; align-items:center; gap:12px; color:var(--mute); font-size:14px; margin:14px 0; } .or::before, .or::after { content:""; flex:1; height:1px; background:var(--line); }

@@ -18,7 +18,8 @@
     ".bx-ad{border:1px dashed #C9D2DC;border-radius:16px;padding:14px 16px;background:#fff;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0}.bx-ad .tg{font:700 12px/1 \"Kanit\",sans-serif;background:#E8ECF1;color:#475466;border-radius:999px;padding:5px 10px;flex:none}" +
     ".bx-ad img{width:120px;height:auto;border-radius:10px;flex:none}.bx-ad b{display:block;color:#0F2A44;font-size:17px}.bx-ad span{color:#3B4654;font-size:14.5px}.bx-ad a.go{margin-left:auto;background:#0F2A44;color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",sans-serif;white-space:nowrap}" +
     ".bx-tb{position:fixed;inset:0;z-index:95;background:rgba(10,20,34,.82);display:grid;place-items:center;padding:16px}.bx-tc{background:#FFFDF6;color:#3A2B05;max-width:560px;width:100%;border-radius:18px;border:3px solid #C9A227;padding:26px 22px 22px;text-align:center;font-family:\"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.5)}" +
-    ".bx-tc img{max-width:100%;max-height:46vh;border-radius:10px;margin:0 auto 14px;display:block}.bx-tc h2{font:700 34px/1.25 \"Kanit\",\"Leelawadee UI\",sans-serif;margin:0 0 8px;color:#7A5A00}.bx-tc p{margin:4px 0;font-size:17px;line-height:1.6}.bx-tc button{margin-top:16px;background:#7A5A00;color:#fff;border:0;border-radius:999px;padding:10px 26px;font:700 16px/1.2 \"Kanit\",sans-serif;cursor:pointer}" +
+    ".bx-tc img{max-width:100%;max-height:46vh;border-radius:10px;margin:0 auto 14px;display:block}.bx-tc h2::before{display:none!important;content:none!important}.bx-tc h2{font:700 34px/1.25 \"Kanit\",\"Leelawadee UI\",sans-serif;margin:0 0 8px;color:#7A5A00}.bx-tc p{margin:4px 0;font-size:17px;line-height:1.6}.bx-tc button{margin-top:16px;background:#7A5A00;color:#fff;border:0;border-radius:999px;padding:10px 26px;font:700 16px/1.2 \"Kanit\",sans-serif;cursor:pointer}" +
+    ".bx-tc .en{margin:12px 0 0;padding-top:10px;border-top:1px solid #E6D9A8;color:#5A4510}.bx-tc .en b{display:block;font:700 22px/1.3 \"Kanit\",sans-serif;color:#7A5A00;margin:0 0 2px}.bx-tc .en p{font-size:15px;margin:2px 0}.bx-tc{max-height:94vh;overflow:auto}" +
     ".bx-fa{position:fixed;left:14px;bottom:14px;z-index:80;width:250px;background:#fff;border:1px solid #C9D2DC;border-radius:16px;box-shadow:0 14px 34px rgba(15,42,68,.22);padding:12px 14px 14px;font:14.5px/1.5 \"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif;color:#16202B}" +
     ".bx-fa .tg{display:inline-block;font:700 11.5px/1 \"Kanit\",sans-serif;background:#E8ECF1;color:#475466;border-radius:999px;padding:5px 9px}.bx-fa .x{position:absolute;right:6px;top:4px;width:34px;height:34px;border:0;background:none;font-size:22px;line-height:1;color:#475466;cursor:pointer;border-radius:999px}.bx-fa .x:hover{background:#EEF1F5}" +
     ".bx-fa img{display:block;width:100%;height:auto;border-radius:10px;margin:8px 0 0}.bx-fa b{display:block;margin-top:8px;color:#0F2A44;font-size:16px;line-height:1.35}.bx-fa span.t{display:block;color:#3B4654;font-size:13.5px;margin-top:2px}" +
@@ -85,7 +86,9 @@
     draw();
     if (slides.length > 1) { timer = setInterval(function () { if (hold || document.hidden) return; at = (at + 1) % slides.length; draw(); }, Math.max(5, +F.seconds || 9) * 1000); box.addEventListener("mouseenter", function () { hold = true; }); box.addEventListener("mouseleave", function () { hold = false; }); box.addEventListener("focusin", function () { hold = true; }); box.addEventListener("focusout", function () { hold = false; }); }
     box.querySelector(".x").addEventListener("click", function () { if (timer) clearInterval(timer); box.remove(); try { sessionStorage.setItem(key, "1"); } catch (e) {} });
-    document.body.appendChild(box);
+    // ไม่แสดงโฆษณาหรือข่าวของช่องซ้อนกับหน้าถวายพระพร: รอจนผู้ชมกด เข้าสู่เว็บไซต์ ก่อน
+    if (document.querySelector(".bx-tb")) document.addEventListener("build-tribute-closed", function () { document.body.appendChild(box); }, { once: true });
+    else document.body.appendChild(box);
   }
 
   // ---------- 3) หน้าต่างถวายพระพร (ปิดไว้จนกว่าเจ้าของเว็บตรวจข้อความและเปิดเอง) ----------
@@ -96,10 +99,15 @@
     var day = (T.days || []).filter(function (d) { return d && d.on !== false && d.from && md >= d.from && md <= (d.to || d.from); })[0];
     if (!day && T.mode === "always" && T.always && T.always.head) day = T.always;
     if (!day) return;
-    var key = "build_tribute_" + now.getFullYear() + md; try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch (e) {}
-    var wrap = el("div", "bx-tb", '<div class="bx-tc" role="dialog" aria-modal="true" aria-label="' + esc(day.head || "") + '">' + (day.img ? '<img src="' + esc(day.img) + '" alt="">' : "") + "<h2>" + esc(day.head || "") + "</h2>" + (day.lines || []).map(function (l) { return "<p>" + esc(l) + "</p>"; }).join("") + (T.sign ? "<p>" + esc(T.sign) + "</p>" : "") + '<button type="button">เข้าสู่เว็บไซต์</button></div>');
-    function close() { wrap.remove(); }
-    wrap.addEventListener("click", function (ev) { if (ev.target === wrap || ev.target.tagName === "BUTTON") close(); });
+    // ผู้ใช้สั่ง 18 ต.ค. 2026: ขึ้นแค่ครั้งแรกที่เข้าเว็บ (จำในเบราว์เซอร์นั้น) · วันพิเศษที่มีข้อความของวันนั้น ขึ้นอีก 1 ครั้งในวันนั้นของแต่ละปี
+    var key = day === T.always ? "build_tribute_seen" : "build_tribute_" + now.getFullYear() + md, store = null;
+    try { store = window.localStorage; store.setItem("build_t_test", "1"); store.removeItem("build_t_test"); } catch (e) { try { store = window.sessionStorage; } catch (e2) { store = null; } }
+    try { if (store && store.getItem(key)) return; if (store) store.setItem(key, "1"); } catch (e) {}
+    var wrap = el("div", "bx-tb", '<div class="bx-tc" role="dialog" aria-modal="true" aria-label="' + esc(day.head || "") + '">' + (day.img ? '<img src="' + esc(day.img) + '" alt="' + esc(day.imgAlt || T.imgAlt || "") + '">' : "") + "<h2>" + esc(day.head || "") + "</h2>" + (day.lines || []).map(function (l) { return "<p>" + esc(l) + "</p>"; }).join("") + (T.sign ? '<p class="sg">' + esc(T.sign).replace("สร้าง | BUILD TH", '<span style="white-space:nowrap">สร้าง | BUILD TH</span>') + "</p>" : "") +
+      (day.headEn || (day.linesEn || []).length || T.signEn ? '<div class="en" lang="en">' + (day.headEn ? "<b>" + esc(day.headEn) + "</b>" : "") + (day.linesEn || []).map(function (l) { return "<p>" + esc(l) + "</p>"; }).join("") + (T.signEn ? "<p>" + esc(T.signEn).replace("Srang | BUILD TH", '<span style="white-space:nowrap">Srang | BUILD TH</span>') + "</p>" : "") + "</div>" : "") +
+      '<button type="button">' + esc(T.button || "เข้าสู่เว็บไซต์") + "</button></div>");
+    function close() { if (!wrap.parentNode) return; wrap.remove(); try { document.dispatchEvent(new Event("build-tribute-closed")); } catch (e) {} }
+    wrap.addEventListener("click", function (ev) { if (ev.target.tagName === "BUTTON") close(); }); // ปิดได้ทางปุ่มเข้าสู่เว็บไซต์ (และปุ่ม Esc เพื่อการเข้าถึง) ตามที่ผู้ใช้สั่ง 18 ต.ค.
     document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") close(); });
     document.body.appendChild(wrap); var b = wrap.querySelector("button"); if (b) b.focus();
   }

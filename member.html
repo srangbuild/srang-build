@@ -2,11 +2,11 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://connect.facebook.net https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://graph.facebook.com https://www.facebook.com https://connect.facebook.net https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สมาชิก — สร้าง | BUILD TH</title>
-<meta name="description" content="สมัครสมาชิก สร้าง | BUILD TH รับไฟล์รวมใบตรวจงาน สั่งซื้อฉบับมืออาชีพ แนบสลิป และดาวน์โหลดไฟล์">
+<meta name="description" content="สมัครสมาชิก สร้าง | BUILD TH ด้วยอีเมล Google LINE หรือ Facebook รับไฟล์รวมใบตรวจงาน สั่งซื้อฉบับมืออาชีพ แนบสลิป ติดตามสถานะ และดาวน์โหลดไฟล์">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0F2A44">
 <link rel="icon" href="img/logo.png">
@@ -20,16 +20,16 @@
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
 <div id="hdr"></div><script src="nav.js"></script>
-<div class="demo" id="demo" hidden>โหมดทดลอง: ยังไม่ได้ต่อกับหลังบ้าน ข้อมูลที่กรอกอยู่ในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่มีการส่งออกไปที่ใด</div>
+<div class="demo" id="demo" hidden>โหมดทดลอง: ยังไม่ได้ต่อกับหลังบ้าน ระบบใช้โค้ดหลังบ้านตัวจริงในเบราว์เซอร์เครื่องนี้ ข้อมูลที่กรอกไม่ถูกส่งออกไปที่ใด</div>
 
 <main class="wrap narrow" id="main" style="padding-top:26px">
-  <p class="msg" id="msg" role="status" hidden></p>
+  <p class="msg" id="msg" role="status" aria-live="polite" hidden></p>
   <div id="view"><p class="note">กำลังโหลด…</p></div>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>ระบบสมาชิกเก็บเฉพาะข้อมูลที่คุณกรอกเอง ใช้เพื่อดูแลบัญชีและส่งไฟล์ที่สั่งซื้อ · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
+    <p>ระบบสมาชิกเก็บเฉพาะข้อมูลที่จำเป็นต่อบัญชีและคำสั่งซื้อ · เข้าสู่ระบบด้วย Google LINE หรือ Facebook ร้านได้รับเฉพาะชื่อ อีเมล และรหัสบัญชีของบริการนั้น ไม่ได้รับรหัสผ่าน · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
     <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
   </div>
 </footer>
@@ -42,74 +42,202 @@
   $("yr").textContent = new Date().getFullYear();
   if (B.demo) $("demo").hidden = false;
   if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
-  var me = null, mode = "reg", busy = false;
+  var me = null, mode = "reg", busy = false, pending = null, forgot = { step: 1, email: "" };
   var want = (function () { try { return new URLSearchParams(location.search).get("buy") || ""; } catch (e) { return ""; } })();
   // รายการที่ติ๊กไว้ให้ก่อน: จากลิงก์ ?buy=F-01,B-ST (ตะกร้า) หรือจากตะกร้าที่ค้างในเครื่องนี้
   var wantList = want ? want.split(",") : (B.cart ? B.cart.get() : []);
-  var gOn = !B.demo && /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""), gReady = false;
-  function gDraw() { var el = $("g-btn"); if (!el) return; if (!gReady) { if (!document.getElementById("gsi")) { var sc = document.createElement("script"); sc.id = "gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true; sc.onload = function () { gReady = true; google.accounts.id.initialize({ client_id: M.googleClientId, callback: gDone }); gDraw(); }; document.head.appendChild(sc); } return; } google.accounts.id.renderButton(el, { theme: "outline", size: "large", text: mode === "reg" ? "signup_with" : "signin_with", locale: "th" }); }
-  function gDone(resp) { var cb = document.querySelector("#f-reg input[name=consent]"); run(B.call("google", { credential: resp.credential, consent: !!(cb && cb.checked) }).then(function (r) { B.token.set(r.token); return refresh(true); }), "เข้าสู่ระบบแล้ว"); }
+  var HERE = location.origin + location.pathname; // ที่อยู่กลับของ LINE ต้องตรงกับที่ตั้งใน LINE Developers
+  var PROV = { google: "Google", line: "LINE", facebook: "Facebook" };
+  var ON = { google: B.demo || /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""), line: B.demo || /^\d{8,12}$/.test(String(M.lineChannelId || "")), facebook: B.demo || /^\d{8,20}$/.test(String(M.facebookAppId || "")) };
+
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
   function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
   function title(id) { var x = B.find(id); return x ? x.id + " " + x.title : id; }
+  function signedIn(r) { B.token.set(r.token); pending = null; return refresh(true); }
+  // ผลจาก social: เข้าระบบเลย หรือต้องยืนยันการสมัครก่อน (สมาชิกใหม่)
+  function afterSocial(r) { if (r.pending) { pending = r; say(""); pendingView(); return; } return signedIn(r); }
+
+  // ---------- เข้าสู่ระบบด้วยบริการภายนอก ----------
+  var ICON = {
+    google: '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>',
+    line: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 2.5C6.5 2.5 2 6.1 2 10.6c0 4 3.6 7.4 8.4 8 .3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.6 1.1-.5 6-3.5 8.2-6 1.5-1.7 2.2-3.3 2.2-5.1 0-4.5-4.5-8-10-8zM8.3 13H6.3c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.4h1.5c.3 0 .5.2.5.5s-.2.5-.5.5zm2.1-.5c0 .3-.2.5-.5.5s-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.9zm4.7 0c0 .2-.1.4-.3.5h-.2c-.2 0-.3-.1-.4-.2l-2-2.7v2.4c0 .3-.2.5-.5.5s-.5-.2-.5-.5V8.6c0-.2.1-.4.3-.5h.2c.2 0 .3.1.4.2l2 2.7V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.9zm3.2-2.5c.3 0 .5.2.5.5s-.2.5-.5.5h-1.5v.9h1.5c.3 0 .5.2.5.5s-.2.5-.5.5h-2c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5h2c.3 0 .5.2.5.5s-.2.5-.5.5h-1.5v.9h1.5z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>'
+  };
+  function socButtons(act) {
+    var list = ["google", "line", "facebook"].filter(function (p) { return ON[p]; });
+    if (!list.length) return "";
+    return '<div class="soc">' + list.map(function (p) {
+      if (p === "google" && !B.demo) return '<div class="gwrap" id="g-btn" data-act="' + act + '"></div>';
+      var cls = p === "line" ? "sb line" : p === "facebook" ? "sb fb" : "sb";
+      var label = (act === "link" ? "เชื่อมบัญชี " : "ดำเนินการต่อด้วย ") + PROV[p] + (B.demo ? " (ทดลอง)" : "");
+      return '<button type="button" class="' + cls + '" data-soc="' + p + '" data-act="' + act + '">' + ICON[p] + "<span>" + label + "</span></button>";
+    }).join("") + "</div>";
+  }
+  // Google: ปุ่มของ Google เอง (Google Identity Services)
+  var gReady = false, gAct = "login";
+  function gDraw() {
+    var el = $("g-btn"); if (!el || B.demo) return; gAct = el.dataset.act || "login";
+    if (!gReady) { if (!document.getElementById("gsi")) { var sc = document.createElement("script"); sc.id = "gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true; sc.onload = function () { gReady = true; google.accounts.id.initialize({ client_id: M.googleClientId, callback: gDone, ux_mode: "popup" }); gDraw(); }; document.head.appendChild(sc); } return; }
+    google.accounts.id.renderButton(el, { theme: "outline", size: "large", width: Math.min(360, el.clientWidth || 320), text: gAct === "link" ? "continue_with" : mode === "reg" ? "signup_with" : "signin_with", locale: "th", shape: "rectangular" });
+  }
+  function gDone(resp) { soc("google", gAct, { credential: resp.credential }); }
+  // LINE: เปิดหน้าเข้าสู่ระบบของ LINE แล้วกลับมาที่หน้านี้พร้อมรหัสชั่วคราว (ตรวจที่หลังบ้านด้วย channel secret)
+  function b64url(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+  function lineGo(act) {
+    var st = { state: B.rand(16), nonce: B.rand(16), verifier: B.rand(32), act: act, t: Date.now() };
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(st.verifier)).then(function (h) {
+      try { sessionStorage.setItem("build_line_auth", JSON.stringify(st)); } catch (e) {}
+      var u = (M.lineAuthUrl || "https://access.line.me/oauth2/v2.1/authorize") + "?response_type=code&client_id=" + encodeURIComponent(M.lineChannelId) + "&redirect_uri=" + encodeURIComponent(HERE) + "&state=" + st.state + "&scope=" + encodeURIComponent("profile openid email") + "&nonce=" + st.nonce + "&code_challenge=" + b64url(h) + "&code_challenge_method=S256&ui_locales=th" + (M.lineBotPrompt ? "&bot_prompt=" + encodeURIComponent(M.lineBotPrompt) : "");
+      location.href = u;
+    });
+  }
+  function lineBack() { // กลับจาก LINE: ตรวจ state ก่อนส่งรหัสไปหลังบ้าน แล้วล้างพารามิเตอร์ออกจากแถบที่อยู่
+    var sp; try { sp = new URLSearchParams(location.search); } catch (e) { return null; }
+    if (!sp.get("state") || (!sp.get("code") && !sp.get("error"))) return null;
+    var st = null; try { st = JSON.parse(sessionStorage.getItem("build_line_auth") || "null"); sessionStorage.removeItem("build_line_auth"); } catch (e) {}
+    var code = sp.get("code"), err = sp.get("error"), stateOk = st && st.state === sp.get("state") && Date.now() - st.t < 600000;
+    try { history.replaceState(null, "", HERE + (q || "")); } catch (e) {}
+    if (err) { say("ยกเลิกการเข้าสู่ระบบด้วย LINE", true); return null; }
+    if (!stateOk) { say("การเข้าสู่ระบบด้วย LINE หมดเวลาหรือไม่ตรงกัน กดปุ่ม LINE อีกครั้ง", true); return null; }
+    return { act: st.act, data: { code: code, redirectUri: HERE, nonce: st.nonce, verifier: st.verifier } };
+  }
+  // Facebook: Facebook SDK เปิดหน้าต่างเข้าสู่ระบบ แล้วหลังบ้านตรวจโทเคนด้วย debug_token
+  var fbWait = null;
+  function fbSdk() {
+    if (fbWait) return fbWait;
+    fbWait = new Promise(function (res, rej) {
+      if (window.FB) { res(window.FB); return; }
+      window.fbAsyncInit = function () { window.FB.init({ appId: String(M.facebookAppId), cookie: false, xfbml: false, version: M.fbVersion || "v26.0" }); res(window.FB); };
+      var sc = document.createElement("script"); sc.src = "https://connect.facebook.net/th_TH/sdk.js"; sc.async = true; sc.crossOrigin = "anonymous"; sc.onerror = function () { fbWait = null; rej(new Error("โหลด Facebook ไม่สำเร็จ ลองใหม่อีกครั้ง")); }; document.head.appendChild(sc);
+    });
+    return fbWait;
+  }
+  function fbGo(act) {
+    return fbSdk().then(function (FB) { return new Promise(function (res, rej) { FB.login(function (r) { if (r && r.authResponse && r.authResponse.accessToken) res(r.authResponse.accessToken); else rej(new Error("ยกเลิกการเข้าสู่ระบบด้วย Facebook")); }, { scope: "public_profile,email" }); }); })
+      .then(function (t) { return { accessToken: t }; });
+  }
+  // ส่งผลไปหลังบ้าน: act = login (เข้าสู่ระบบหรือสมัคร) หรือ link (เชื่อมกับบัญชีที่เข้าอยู่)
+  function soc(p, act, data) {
+    var cb = document.querySelector("#f-reg input[name=consent]");
+    var body = { provider: p }; Object.keys(data).forEach(function (k) { body[k] = data[k]; });
+    if (act === "link") return run(B.call("link", body).then(function (r) { me.member = r.member; homeView(); }), "เชื่อมบัญชี " + PROV[p] + " แล้ว");
+    body.consent = !!(cb && cb.checked);
+    return run(B.call("social", body).then(afterSocial), "");
+  }
+  function socClick(p, act) {
+    if (B.demo) { // โหมดทดลอง: ตัวจำลองตอบแทนผู้ให้บริการ (LINE ทดลองไม่มีอีเมล เพื่อให้เห็นขั้นกรอกอีเมล)
+      var d = p === "google" ? { credential: "EMU_GOOGLE_" + B.rand(2) } : p === "line" ? { code: "EMU_LINE_" + B.rand(2), redirectUri: HERE.replace(/[^\/]*$/, "") + "member.html", nonce: B.rand(8) } : { accessToken: "EMU_FB_" + B.rand(12) };
+      return soc(p, act, d);
+    }
+    if (p === "line") { run(lineGo(act), ""); return; }
+    if (p === "facebook") { if (busy) return; lock(true); fbGo(act).then(function (d) { lock(false); soc("facebook", act, d); }).catch(function (e) { lock(false); say(e.message, true); }); }
+  }
 
   // ---------- ยังไม่เข้าสู่ระบบ ----------
   function authView() {
     var perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
+    if (mode === "forgot") return forgotView();
     var tabs = '<div class="tabs2"><button class="chip" type="button" data-mode="reg" aria-pressed="' + (mode === "reg") + '">สมัครสมาชิก</button><button class="chip" type="button" data-mode="in" aria-pressed="' + (mode === "in") + '">เข้าสู่ระบบ</button></div>';
-    var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>ตั้งรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)<input type="password" name="pass" minlength="8" maxlength="72" autocomplete="new-password" required></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label><label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label><button class="b pri" type="submit">สมัครสมาชิก</button></form>';
-    var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>รหัสผ่าน<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note">ลืมรหัสผ่าน: แจ้งร้านทางช่องทางในหน้าหลัก ด้วยอีเมลที่สมัครไว้ ร้านจะส่งรหัสผ่านชั่วคราวไปที่อีเมลนั้น</p></form>';
-    $("view").innerHTML = '<h1 style="font-size:30px;color:#0F2A44;margin:0 0 6px">สมาชิก</h1><p class="lead" style="margin:0 0 16px">สมัครฟรี ใช้อีเมลเดียว</p>' + (perks ? '<div class="card pad" style="margin-bottom:14px"><ul class="tick">' + perks + "</ul></div>" : "") + '<div class="card pad">' + tabs + (mode === "reg" ? reg : inn) + (gOn ? '<div class="or">หรือ</div><div id="g-btn" style="display:flex;justify-content:center"></div><p class="note" style="text-align:center">' + (mode === "reg" ? "สมัครด้วยบัญชี Google: ติ๊กยินยอมด้านบนก่อน แล้วกดปุ่ม" : "เข้าสู่ระบบด้วยบัญชี Google ที่เคยสมัครไว้") + "</p>" : "") + "</div>";
-    if (gOn) gDraw();
+    var consent = '<label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>';
+    var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>ตั้งรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)<input type="password" name="pass" minlength="8" maxlength="72" autocomplete="new-password" required></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label>' + consent + '<button class="b pri" type="submit">สมัครสมาชิกด้วยอีเมล</button></form>';
+    var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><label>รหัสผ่าน<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="forgot">ลืมรหัสผ่าน หรือสมัครด้วย Google LINE Facebook แล้วอยากตั้งรหัสผ่าน</button></p></form>';
+    var soc = socButtons("login");
+    $("view").innerHTML = '<h1 style="font-size:30px;color:#0F2A44;margin:0 0 6px">สมาชิก</h1><p class="lead" style="margin:0 0 16px">' + (ON.google || ON.line || ON.facebook ? "สมัครฟรี · ใช้บัญชีที่มีอยู่แล้วได้ ไม่ต้องจำรหัสผ่านใหม่" : "สมัครฟรีด้วยอีเมล ใช้เวลาไม่ถึง 1 นาที") + '</p>' + (perks ? '<div class="card pad" style="margin-bottom:14px"><ul class="tick">' + perks + "</ul></div>" : "") +
+      '<div class="card pad">' + tabs + (soc ? soc + '<p class="note" style="text-align:center;margin:8px 0 0">' + (mode === "reg" ? "สมัครครั้งแรกด้วยปุ่มด้านบน ระบบจะขอให้กดยินยอมก่อนสร้างบัญชี" : "เข้าสู่ระบบด้วยบัญชีที่เคยใช้สมัคร") + '</p><div class="or">หรือใช้อีเมล</div>' : "") + (mode === "reg" ? reg : inn) + "</div>";
+    gDraw();
+  }
+  function pendingView() {
+    var p = pending, need = !!p.needEmail;
+    $("view").innerHTML = '<h1 style="font-size:28px;color:#0F2A44;margin:0 0 6px">ยืนยันการสมัครสมาชิก</h1><p class="lead" style="margin:0 0 16px">ด้วยบัญชี ' + esc(PROV[p.provider] || p.provider) + "</p>" +
+      '<form class="f card pad" id="f-pend" novalidate><p style="margin:0">ชื่อ: <b>' + esc(p.name || "-") + "</b>" + (p.email ? "<br>อีเมล: <b>" + esc(p.email) + "</b>" : "") + "</p>" +
+      (need ? '<label>อีเมลสำหรับรับการแจ้งเตือนคำสั่งซื้อ<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label><p class="note" style="margin:0">บัญชี ' + esc(PROV[p.provider]) + " ไม่ได้ส่งอีเมลมาให้ร้าน จึงขออีเมลที่คุณใช้งาน</p>" : "") +
+      '<label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>' +
+      '<button class="b pri" type="submit">ยืนยันและสร้างบัญชี</button><p class="note" style="margin:0">ถ้ามีบัญชีด้วยอีเมลอยู่แล้ว ให้ <button type="button" class="linkbtn" data-mode="in">เข้าสู่ระบบด้วยอีเมล</button> แล้วกด เชื่อมบัญชี ในหน้าสมาชิก</p></form>';
+  }
+  function forgotView() {
+    var demoHint = "";
+    if (B.demo && forgot.step === 2) { var mm = B.demoMail(forgot.email); var mt = mm && /รหัสของคุณคือ (\d{6})/.exec(mm.body); demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>" + mt[1] + "</b>" : "ไม่มีบัญชีของอีเมลนี้ในเครื่อง ระบบจึงไม่ได้ส่งรหัส") + "</p>"; }
+    $("view").innerHTML = '<h1 style="font-size:28px;color:#0F2A44;margin:0 0 6px">ตั้งรหัสผ่านใหม่</h1><p class="lead" style="margin:0 0 16px">ระบบส่งรหัส 6 หลักไปที่อีเมลที่สมัครไว้ ใช้ได้ 15 นาที</p>' +
+      (forgot.step === 1 ? '<form class="f card pad" id="f-fg1" novalidate><label>อีเมลที่สมัครไว้<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required value="' + esc(forgot.email) + '"></label><button class="b pri" type="submit">ส่งรหัสไปที่อีเมล</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>'
+        : '<form class="f card pad" id="f-fg2" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัสไปที่ <b>' + esc(forgot.email) + '</b> แล้ว (ถ้าเป็นอีเมลสมาชิก) · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะ</p><label>รหัส 6 หลัก<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b pri" type="submit">ตั้งรหัสผ่านใหม่และเข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fg="again">ขอรหัสใหม่</button> · <button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>');
   }
 
   // ---------- เข้าสู่ระบบแล้ว ----------
+  function copyBtn(text, label) { return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก") + "</button>"; }
   function payBox(o) {
-    var rows = "<dt>ยอดที่ต้องโอน</dt><dd style=\"font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44\">" + B.baht(o.amount) + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + "</dd>";
-    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + (P.qr ? '<img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์รับเงินของร้าน">' : "") + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.baht(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
+    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + (P.qr ? '<div><img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์พร้อมเพย์รับเงินของร้าน"><p class="note" style="margin:4px 0 0"><a href="' + esc(P.qr) + '" download="BUILD_TH_QR.jpg">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคาร · ใส่ยอดให้ตรง</p></div>' : "") + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
       '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
+  }
+  // ตัวติดตาม 5 ขั้น: สั่งซื้อ → แนบสลิป → ร้านตรวจยอด → พร้อมดาวน์โหลด → ได้รับไฟล์แล้ว
+  function tracker(o) {
+    if (o.status === ST.cancel) return "";
+    var stp = o.status === ST.wait || o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid ? (o.dl1 ? 5 : 4) : 0;
+    var times = [o.created, o.slipAt, o.status === ST.paid ? o.okAt : "", o.okAt, o.dl1];
+    var sw = function (iso) { var w = B.when(iso); return w.replace(/ \d{4} /, " "); }; // วันที่สั้น: 18 ต.ค. 13:49 (ไม่มีปี) ให้พอดีจอมือถือ
+    return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "โอนและแนบสลิป", "ร้านตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
+      var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "", t = done && times[i] ? '<small>' + esc(sw(times[i])) + "</small>" : "";
+      return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + t + "</span>";
+    }).join("") + "</div>";
   }
   function orderCard(o) {
     var cls = o.status === ST.paid ? "ok" : o.status === ST.cancel ? "gray" : o.status === ST.reject ? "bad" : "";
     var body = "";
     if (o.status === ST.wait || o.status === ST.reject) body = P.on === true ? payBox(o) : '<p class="note">ร้านยังไม่เปิดรับชำระเงิน</p>';
-    else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt)) + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + "</p>" + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
-    else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + B.expand(o.items).map(function (id) { return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>"; }).join("") + "</div>";
-    var stp = o.status === ST.wait ? 1 : o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid ? 4 : -1;
-    var trk = stp < 0 ? "" : '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "โอนและแนบสลิป", "ร้านตรวจยอด", "ดาวน์โหลดได้"].map(function (nm, i) { var cl = i < stp ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : ""; return '<span class="' + cl + '"><b>' + (i < stp ? "✓" : i + 1) + "</b>" + nm + "</span>"; }).join("") + "</div>";
-    return '<div class="card ord"><div class="top"><b>' + esc(o.id) + '</b><span class="pill ' + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created)) + " · " + B.baht(o.amount) + "</span></div><ul>" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" + trk + body + "</div>";
+    else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt)) + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + " · ผลจะส่งไปที่อีเมลของคุณ</p>" + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
+    else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + B.expand(o.items).map(function (id) { return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>"; }).join("") + '<button class="b line sm" type="button" data-rcpt="' + esc(o.id) + '">พิมพ์หลักฐานการชำระเงิน</button></div>';
+    return '<div class="card ord"><div class="top"><b>' + esc(o.id) + '</b><span class="pill ' + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created)) + " · " + B.baht(o.amount) + "</span></div><ul>" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" + tracker(o) + body + "</div>";
+  }
+  function receipt(o) { // หลักฐานการชำระเงิน (ไม่ใช่ใบกำกับภาษี) เปิดหน้าต่างใหม่แล้วสั่งพิมพ์ หรือบันทึกเป็น PDF
+    var w = window.open("", "_blank", "width=720,height=900"); if (!w) { say("เบราว์เซอร์บล็อกหน้าต่างใหม่ อนุญาตป๊อปอัปของเว็บนี้แล้วลองอีกครั้ง", true); return; }
+    var m = me.member, rows = B.expand(o.items).map(function (id) { return "<tr><td>" + esc(title(id)) + "</td></tr>"; }).join("");
+    w.document.write('<!doctype html><html lang="th"><head><meta charset="utf-8"><title>หลักฐานการชำระเงิน ' + esc(o.id) + '</title><style>body{font:16px/1.6 "Leelawadee UI","Sarabun",sans-serif;color:#16202B;margin:40px}h1{font-size:22px;margin:0}table{width:100%;border-collapse:collapse;margin:14px 0}td,th{border:1px solid #C9D2DC;padding:6px 10px;text-align:left}.r{text-align:right}.mute{color:#5A6573;font-size:14px}</style></head><body><p style="font-weight:700;color:#0F2A44;margin:0">สร้าง | BUILD TH</p><h1>หลักฐานการชำระเงิน</h1><p class="mute">เอกสารนี้ไม่ใช่ใบกำกับภาษี</p><table><tr><th>เลขคำสั่งซื้อ</th><td>' + esc(o.id) + "</td></tr><tr><th>ชื่อผู้ซื้อ</th><td>" + esc(m.name) + "</td></tr><tr><th>อีเมล</th><td>" + esc(m.email) + "</td></tr><tr><th>วันที่สั่งซื้อ</th><td>" + esc(B.when(o.created)) + "</td></tr><tr><th>ร้านยืนยันยอดเมื่อ</th><td>" + esc(B.when(o.okAt) || "-") + "</td></tr><tr><th>ยอดชำระ</th><td><b>" + B.baht(o.amount) + '</b></td></tr></table><table><tr><th>รายการ (ไฟล์ PDF ดาวน์โหลดจากหน้าสมาชิก)</th></tr>' + rows + '</table><p class="mute">พิมพ์จากหน้าสมาชิก ' + esc(location.host) + " เมื่อ " + esc(B.when(new Date().toISOString())) + "</p><script>window.onload=function(){window.print()}<\/script></body></html>");
+    w.document.close();
   }
   function shopBox() {
     var owned = me.owned || [], list = B.bundles.concat(B.sheets).filter(function (x) { return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) { return owned.indexOf(id) >= 0; }) : owned.indexOf(x.id) < 0); });
     if (!list.length) return '<div class="card pad"><p style="margin:0">' + (B.sheets.some(function (x) { return owned.indexOf(x.id) < 0; }) ? "ฉบับมืออาชีพยังไม่เปิดขาย เมื่อเปิดจะแจ้งทางอีเมลที่สมัครไว้" : "คุณมีครบทุกใบแล้ว") + '</p><p class="note"><a href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div>';
     return '<form class="card pad" id="f-order"><div class="pick">' + list.map(function (x) {
       return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + B.memberPrice(x.price) + '"' + (wantList.indexOf(x.id) >= 0 ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(B.memberPrice(x.price)) + "</em></label>";
-    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">ชำระด้วยการโอนเงินแล้วแนบสลิป · ไฟล์ดิจิทัลเปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว</p></form>';
+    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">ชำระด้วยการโอนเงินหรือพร้อมเพย์แล้วแนบสลิป · ไฟล์ดิจิทัลเปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว ระบบส่งอีเมลแจ้งทุกขั้น</p></form>';
   }
   function dmy(iso) { var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || "")); return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || ""); }
-  /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบในชีต asks ของหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
+  /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
   function askBox() {
-    var list = (me.asks || []).map(function (q) {
-      return '<div class="card pad" style="margin-top:10px"><p style="margin:0;font-size:13.5px;color:#5A6573">' + esc(q.id) + " · " + esc(q.topic) + " · " + esc(B.when(q.created)) + '</p><p style="margin:6px 0 0;white-space:pre-wrap">' + esc(q.text) + "</p>" +
-        (q.answer ? '<div style="margin-top:10px;padding:10px 12px;border-left:4px solid #FF6B1A;background:#FFF6EF;border-radius:8px"><b style="color:#0F2A44">คำตอบจากร้าน</b>' + (q.answeredAt ? ' <span style="font-size:13px;color:#5A6573">' + esc(B.when(q.answeredAt)) + "</span>" : "") + '<p style="margin:4px 0 0;white-space:pre-wrap">' + esc(q.answer) + "</p></div>" : '<p class="note" style="margin:8px 0 0">รอร้านตอบ' + (B.demo ? ' · <button type="button" data-qa="' + esc(q.id) + '" style="background:none;border:0;padding:0;color:#0F2A44;text-decoration:underline;cursor:pointer;font:inherit">โหมดทดลอง: ดูตัวอย่างคำตอบ</button>' : "") + "</p>") + "</div>";
+    var list = (me.asks || []).map(function (a) {
+      return '<div class="card pad" style="margin-top:10px"><p style="margin:0;font-size:13.5px;color:#5A6573">' + esc(a.id) + " · " + esc(a.topic) + " · " + esc(B.when(a.created)) + '</p><p style="margin:6px 0 0;white-space:pre-wrap">' + esc(a.text) + "</p>" +
+        (a.answer ? '<div style="margin-top:10px;padding:10px 12px;border-left:4px solid #FF6B1A;background:#FFF6EF;border-radius:8px"><b style="color:#0F2A44">คำตอบจากร้าน</b>' + (a.answeredAt ? ' <span style="font-size:13px;color:#5A6573">' + esc(B.when(a.answeredAt)) + "</span>" : "") + '<p style="margin:4px 0 0;white-space:pre-wrap">' + esc(a.answer) + "</p></div>" : '<p class="note" style="margin:8px 0 0">รอร้านตอบ' + (B.demo ? ' · <button type="button" class="linkbtn" data-qa="' + esc(a.id) + '">โหมดทดลอง: จำลองว่าร้านตอบแล้ว</button>' : "") + "</p>") + "</div>";
     }).join("");
     return '<form class="f card pad" id="f-ask" novalidate><label>หัวข้อ<select name="topic" required><option value="">เลือกหัวข้อ</option>' + (B.ASK || []).map(function (t) { return "<option>" + esc(t) + "</option>"; }).join("") + '</select></label><label>คำถามของคุณ (10–1000 ตัวอักษร)<textarea name="text" rows="4" maxlength="1000" required></textarea></label><button class="b dark" type="submit">ส่งคำถาม</button><p class="note" style="margin:8px 0 0">ร้านตอบภายใน 2 วันทำการ คำตอบขึ้นที่หน้านี้และส่งไปที่อีเมลของคุณ · คำตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่ใช่การรับรองทางวิศวกรรมของงานคุณ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในคำถาม</p></form>' + list;
+  }
+  function profileBox() {
+    var m = me.member, L = m.linked || {}, has = ["google", "line", "facebook"].filter(function (p) { return L[p]; }), can = ["google", "line", "facebook"].filter(function (p) { return ON[p] && !L[p]; });
+    var linkBtns = "";
+    if (can.length) { var saveOn = ON; ON = {}; can.forEach(function (p) { ON[p] = true; }); linkBtns = socButtons("link"); ON = saveOn; }
+    return '<details class="card pad"' + (!m.email ? " open" : "") + '><summary style="cursor:pointer;font-weight:600;color:#0F2A44">ข้อมูลของฉันและบัญชีที่เชื่อมไว้</summary><form class="f" id="f-prof" style="margin-top:12px" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" value="' + esc(m.name) + '" required></label>' +
+      (m.email ? '<p style="margin:0">อีเมล: <b>' + esc(m.email) + "</b></p>" : '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือน (ต้องใส่ก่อนสั่งซื้อ)<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>') +
+      '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" value="' + esc(m.line) + '"></label><button class="b line" type="submit">บันทึกข้อมูล</button></form>' +
+      '<p style="margin:14px 0 6px;font-weight:600;color:#0F2A44">บัญชีที่เชื่อมไว้</p><div class="links">' + (has.length ? has.map(function (p) { return '<span class="pill ok">' + PROV[p] + "</span>"; }).join("") : '<span class="note" style="margin:0">ยังไม่ได้เชื่อม</span>') + "</div>" +
+      (linkBtns ? '<p class="note" style="margin:10px 0 6px">เชื่อมไว้แล้วเข้าสู่ระบบด้วยปุ่มนั้นได้ทันที บัญชีเดิมและไฟล์ที่ซื้อยังอยู่ครบ</p>' + linkBtns : "") + "</details>";
   }
   function homeView() {
     var m = me.member, owned = me.owned || [], perks = (M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
     var files = owned.length ? '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + owned.map(function (id) { var sx = B.find(id) || {}; return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">' + esc(title(id)) + (sx.revDate ? " · ฉบับวันที่ " + esc(dmy(sx.revDate)) : "") + "</button>"; }).join("") + '</div><p class="note">ไฟล์ที่ดาวน์โหลดเป็นฉบับล่าสุดเสมอ · เทียบวันที่กับมุมล่างซ้ายของไฟล์ที่คุณมี</p>' : '<p class="note" style="margin:0">ยังไม่มีไฟล์ฉบับมืออาชีพ</p>';
+    var social = m.via && m.via !== "email";
     $("view").innerHTML =
-      '<div class="card pad" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><div><h1 style="font-size:26px;color:#0F2A44;margin:0">สวัสดี ' + esc(m.name) + '</h1><p class="note" style="margin:2px 0 0">' + esc(m.email) + " · สมาชิกตั้งแต่ " + esc(B.when(m.created)) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>' +
+      '<div class="card pad" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><div><h1 style="font-size:26px;color:#0F2A44;margin:0">สวัสดี ' + esc(m.name) + '</h1><p class="note" style="margin:2px 0 0">' + esc(m.email || "ยังไม่มีอีเมล") + " · สมาชิกตั้งแต่ " + esc(B.when(m.created)) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>' +
+      (!m.email ? '<p class="msg bad" style="margin-top:12px">ใส่อีเมลในหัวข้อ ข้อมูลของฉัน ก่อนสั่งซื้อ เพื่อรับการแจ้งเตือนของคำสั่งซื้อ</p>' : "") +
       '<section><div class="head"><h2>สิทธิ์สมาชิก</h2></div><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button></p></div></section>' +
       '<section><div class="head"><h2>ไฟล์ของฉัน</h2></div><div class="card pad">' + files + "</div></section>" +
       '<section><div class="head"><h2>สั่งซื้อฉบับมืออาชีพ</h2></div>' + shopBox() + "</section>" +
       '<section><div class="head"><h2>คำสั่งซื้อของฉัน</h2></div><div style="display:grid;gap:12px">' + ((me.orders || []).map(orderCard).join("") || '<p class="note">ยังไม่มีคำสั่งซื้อ</p>') + "</div></section>" +
       '<section id="ask"><div class="head"><h2>สอบถามร้าน</h2></div>' + askBox() + "</section>" +
-      '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">เปลี่ยนรหัสผ่าน</summary><form class="f" id="f-pass" style="margin-top:12px" novalidate><label>รหัสผ่านเดิม<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form></details></section>' +
-      '<section><p class="note">ต้องการลบบัญชีและข้อมูลทั้งหมด:<button type="button" data-erase="1" style="background:none;border:0;padding:0;color:#B3261E;text-decoration:underline;cursor:pointer;font:inherit">ลบบัญชีของฉัน</button></p></section>';
-    [].forEach.call(document.querySelectorAll("img.qr"), function (im) { im.addEventListener("error", function () { im.remove(); }); });
-    total();
+      '<section>' + profileBox() + "</section>" +
+      '<section><details class="card pad"><summary style="cursor:pointer;font-weight:600;color:#0F2A44">' + (social ? "ตั้งหรือเปลี่ยนรหัสผ่าน" : "เปลี่ยนรหัสผ่าน") + '</summary>' + (social ? '<p class="note" style="margin:10px 0 0">บัญชีนี้สมัครด้วย ' + esc(PROV[m.via] || m.via) + ' · ถ้าอยากเข้าด้วยอีเมลและรหัสผ่านด้วย ให้ออกจากระบบ แล้วกด ลืมรหัสผ่าน ที่หน้าเข้าสู่ระบบ</p>' : '<form class="f" id="f-pass" style="margin-top:12px" novalidate><label>รหัสผ่านเดิม<input type="password" name="pass" maxlength="72" autocomplete="current-password" required></label><label>รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input type="password" name="newPass" minlength="8" maxlength="72" autocomplete="new-password" required></label><button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form>') + "</details></section>" +
+      '<section><p class="note">ต้องการลบบัญชีและข้อมูลทั้งหมด: <button type="button" data-erase="1" class="linkbtn" style="color:#B3261E">ลบบัญชีของฉัน</button></p></section>';
+    [].forEach.call(document.querySelectorAll("img.qr"), function (im) { im.addEventListener("error", function () { im.parentNode.remove(); }); });
+    total(); gDraw();
   }
   function total() { var t = 0; [].forEach.call(document.querySelectorAll("#f-order input[name=it]:checked"), function (c) { t += +c.dataset.price; }); var e = $("total"); if (e) e.textContent = B.baht(t); }
   function refresh(keepMsg) {
@@ -119,26 +247,40 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa]"); if (!t) return;
-    if (t.dataset.qa) { run(B.call("demoAnswer", { ask: t.dataset.qa }).then(function (r) { me.asks = r.asks; homeView(); var s = document.getElementById("ask"); if (s) s.scrollIntoView(); }), "โหมดทดลอง: ใส่ตัวอย่างคำตอบแล้ว"); return; }
-    if (t.dataset.mode) { mode = t.dataset.mode; say(""); authView(); return; }
-    if (t.dataset.out) { run(B.call("logout").then(function () { B.token.clear(); me = null; authView(); }), "ออกจากระบบแล้ว"); return; }
-    if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) { if (j.demo) say("โหมดทดลอง: สิทธิ์ถูกต้อง ไฟล์ " + j.name + " จะส่งจากหลังบ้านเมื่อต่อระบบจริงแล้ว"); else { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); } })); return; }
+    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg]"); if (!t) return;
+    if (t.dataset.soc) { socClick(t.dataset.soc, t.dataset.act || "login"); return; }
+    if (t.dataset.copy != null) { var tx = t.dataset.copy; if (navigator.clipboard) navigator.clipboard.writeText(tx).then(function () { t.textContent = "คัดลอกแล้ว"; }, function () {}); return; }
+    if (t.dataset.rcpt) { var o0 = (me.orders || []).filter(function (o) { return o.id === t.dataset.rcpt; })[0]; if (o0) receipt(o0); return; }
+    if (t.dataset.qa) { run(B.callAdmin("adminAnswer", { ask: t.dataset.qa, answer: "ตัวอย่างคำตอบในโหมดทดลอง: เมื่อต่อหลังบ้านแล้ว ร้านตอบจากหน้าหลังบ้าน แล้วคำตอบจะขึ้นที่นี่ และส่งไปที่อีเมลของคุณ" }).then(function () { return refresh(true); }), "โหมดทดลอง: ร้านตอบแล้ว"); return; }
+    if (t.dataset.fg) { forgot.step = 1; authView(); return; }
+    if (t.dataset.mode) { mode = t.dataset.mode; pending = null; if (mode === "forgot") forgot = { step: 1, email: "" }; say(""); authView(); return; }
+    if (t.dataset.out) { run(B.call("logout").then(function () { B.token.clear(); me = null; mode = "in"; authView(); }), "ออกจากระบบแล้ว"); return; }
+    if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) { if (B.demo) say("โหมดทดลอง: สิทธิ์ถูกต้อง ระบบบันทึกการดาวน์โหลดแล้ว · ไฟล์จริง " + j.name + " ส่งจากหลังบ้านเมื่อต่อระบบแล้ว"); else { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); } return me && id !== "FREE-ALL" ? refresh(true) : null; })); return; }
     if (t.dataset.cancel) { if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return; run(B.call("cancel", { order: t.dataset.cancel }).then(function () { return refresh(true); }), "ยกเลิกคำสั่งซื้อแล้ว"); return; }
-    if (t.dataset.approve) { run(B.call("demoApprove", { order: t.dataset.approve }).then(function () { return refresh(true); }), "โหมดทดลอง: เปิดสิทธิ์ดาวน์โหลดแล้ว"); return; }
+    if (t.dataset.approve) { run(B.callAdmin("adminOrder", { order: t.dataset.approve, status: ST.paid }).then(function () { return refresh(true); }), "โหมดทดลอง: ร้านยืนยันยอดแล้ว เปิดสิทธิ์ดาวน์โหลด"); return; }
     if (t.dataset.erase) { if (!confirm("ลบบัญชีและข้อมูลทั้งหมดของคุณ รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ ?")) return; run(B.call("erase").then(function () { B.token.clear(); me = null; authView(); }), "ลบบัญชีแล้ว"); }
   });
   $("view").addEventListener("change", function (ev) { if (ev.target.name === "it") total(); });
   $("view").addEventListener("submit", function (ev) {
     ev.preventDefault(); var f = ev.target, v = function (n) { return f.elements[n] ? f.elements[n].value : ""; };
-    if (f.id === "f-reg") { run(B.call("register", { name: v("name"), email: v("email"), pass: v("pass"), line: v("line"), consent: f.elements.consent.checked }).then(function (r) { B.token.set(r.token); return refresh(true); }), "สมัครสมาชิกแล้ว"); return; }
-    if (f.id === "f-in") { run(B.call("login", { email: v("email"), pass: v("pass") }).then(function (r) { B.token.set(r.token); return refresh(true); }), "เข้าสู่ระบบแล้ว"); return; }
+    if (f.id === "f-reg") { run(B.call("register", { name: v("name"), email: v("email"), pass: v("pass"), line: v("line"), consent: f.elements.consent.checked }).then(signedIn), "สมัครสมาชิกแล้ว"); return; }
+    if (f.id === "f-in") { run(B.call("login", { email: v("email"), pass: v("pass") }).then(signedIn), "เข้าสู่ระบบแล้ว"); return; }
+    if (f.id === "f-pend") { run(B.call("socialFinish", { ticket: pending.ticket || pending.pending, consent: f.elements.consent.checked, email: v("email") }).then(signedIn), "สมัครสมาชิกแล้ว"); return; }
+    if (f.id === "f-fg1") { var em = v("email").trim().toLowerCase(); run(B.call("resetRequest", { email: em }).then(function () { forgot = { step: 2, email: em }; authView(); }), "ถ้าอีเมลนี้เป็นสมาชิก ระบบส่งรหัสไปแล้ว"); return; }
+    if (f.id === "f-fg2") { run(B.call("resetConfirm", { email: forgot.email, code: v("code"), newPass: v("newPass") }).then(function (r) { mode = "in"; return signedIn(r); }), "ตั้งรหัสผ่านใหม่แล้ว"); return; }
     if (f.id === "f-ask") { run(B.call("ask", { topic: v("topic"), text: v("text") }).then(function (r) { me.asks = r.asks; homeView(); var s = document.getElementById("ask"); if (s) s.scrollIntoView(); }), "ส่งคำถามแล้ว ร้านจะตอบภายใน 2 วันทำการ"); return; }
+    if (f.id === "f-prof") { run(B.call("profile", { name: v("name"), line: v("line"), email: v("email") }).then(function (r) { me.member = r.member; homeView(); }), "บันทึกข้อมูลแล้ว"); return; }
     if (f.id === "f-pass") { run(B.call("passwd", { pass: v("pass"), newPass: v("newPass") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
     if (f.id === "f-order") { var ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value; }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true); }), "สร้างคำสั่งซื้อแล้ว โอนเงินและแนบสลิปได้ที่ด้านล่าง"); return; }
-    if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้"); }
+    if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้ ผลส่งไปที่อีเมล"); }
   });
-  refresh(true);
+
+  // เริ่มหน้า: ถ้ากลับมาจาก LINE ให้ส่งรหัสไปตรวจก่อน
+  var back = lineBack();
+  if (back) {
+    if (back.act === "link" && B.token.get()) refresh(true).then(function () { if (me) soc("line", "link", back.data); });
+    else { authView(); soc("line", "login", back.data); }
+  } else refresh(true);
 })();
 </script>
 <script src="extras.js"></script>
