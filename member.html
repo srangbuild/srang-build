@@ -45,7 +45,7 @@
   var me = null, mode = "reg", busy = false, pending = null, forgot = { step: 1, email: "" }, regWait = null, tab = "home", avDraft = null, payWatch = null;
   var want = (function () { try { return new URLSearchParams(location.search).get("buy") || ""; } catch (e) { return ""; } })();
   // รายการที่ติ๊กไว้ให้ก่อน: จากลิงก์ ?buy=F-01,B-ST (ตะกร้า) หรือจากตะกร้าที่ค้างในเครื่องนี้
-  var wantList = want ? want.split(",") : (B.cart ? B.cart.get() : []);
+  var wantList = (want ? want.split(",") : (B.cart ? B.cart.get() : [])).map(function (k) { return k === "F-01" ? "B-PL" : k; }); // ลิงก์เก่า F-01 (ก่อนแยกเข็มตอกและเข็มเจาะ 23 ต.ค. 2026) = ชุดเสาเข็ม
   var HERE = location.origin + location.pathname; // ที่อยู่กลับของ LINE และ TikTok ต้องตรงกับที่ตั้งในหน้าผู้พัฒนาของแต่ละค่าย
   var PROV = { google: "Google", line: "LINE", facebook: "Facebook", tiktok: "TikTok" }, PLIST = ["google", "line", "facebook", "tiktok"];
   var ON = { google: B.demo || /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""), line: B.demo || /^\d{8,12}$/.test(String(M.lineChannelId || "")), facebook: B.demo || /^\d{8,20}$/.test(String(M.facebookAppId || "")), tiktok: B.demo || /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey || "")) };
