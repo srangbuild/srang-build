@@ -82,7 +82,7 @@
       '<p class="lgd">ติ๊กช่อง “ทำแล้ว” ทีละข้อ · จดสิ่งที่เห็นในช่องบันทึก · เก็บแผ่นนี้ไว้กับเอกสารบ้าน</p>' +
       (f.note ? '<p class="note">' + esc(f.note) + en(f.noteEn) + "</p>" : "") +
       '<div class="sig"><div><h4>ผู้ตรวจ<span class="en">Checked by</span></h4><p>ลงชื่อ <i>Signature</i><span></span></p><p>วันที่ <i>Date</i><span></span></p></div><div><h4>ผู้รับทราบ<span class="en">Acknowledged by</span></h4><p>ลงชื่อ <i>Signature</i><span></span></p><p>วันที่ <i>Date</i><span></span></p></div></div>' +
-      ((S.sheets || []).length ? '<p class="more"><b>ต้องการตรวจงานก่อสร้างทีละขั้น</b> ดูใบตรวจงาน ' + (S.sheets || []).length + " งาน (เสาเข็ม ฐานราก เหล็กเสริม คอนกรีต หลังคา กันซึม ไฟฟ้า ประปา และอื่น ๆ) ที่หน้าใบตรวจงานของ " + esc(B.name) + "</p>" : "") +
+      ((S.sheets || []).length ? '<p class="more"><b>ต้องการตรวจงานก่อสร้างทีละขั้น</b> ดูใบตรวจงาน ' + (S.sheets || []).filter(function (x) { return x.hidden !== true; }).length + " งาน (เสาเข็ม ฐานราก เหล็กเสริม คอนกรีต หลังคา กันซึม ไฟฟ้า ประปา และอื่น ๆ) ที่หน้าใบตรวจงานของ " + esc(B.name) + "</p>" : "") +
       '<div class="foot"><b>' + esc(code) + " · ฉบับวันที่ " + esc(f.revDate || "12/10/2026") + "</b><span>© " + esc(B.name) + " · ใช้และส่งต่อได้โดยไม่ดัดแปลง · Free to share without changes</span><span>" + esc(where) + "</span></div></article>";
   }).join("") : '<article class="sheet"><h1>ไม่พบเช็กลิสต์นี้</h1><p><a href="free.html">ดูทุกชุด</a></p></article>';
   if (list.length === 1) document.title = list[0].title + " — " + (B.name || "");

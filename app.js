@@ -11,20 +11,24 @@
   var API = API_RX.test(M.api || "") && M.api.indexOf("/EMULATOR/") < 0 ? M.api : "";
   var EMU_API = "https://script.google.com/macros/s/EMULATOR/exec", EMU_KEY = "emu-admin-key-0123456789abcdef0123456789";
   var TK = "build_member_token";
-  var sheets = Array.isArray(S.sheets) ? S.sheets : [], bundles = Array.isArray(S.bundles) ? S.bundles : [];
+  // hidden = รายการทดสอบระบบ (เช่น X-05 ราคา 1 บาท) ไม่แสดงในรายการของหน้าร้าน แต่ find() ยังหาเจอ เมื่อเปิดลิงก์ ?buy=X-05 ของเจ้าของร้าน
+  var allSheets = Array.isArray(S.sheets) ? S.sheets : [], sheets = allSheets.filter(function (x) { return x.hidden !== true; }), bundles = Array.isArray(S.bundles) ? S.bundles : [];
   var ST = { wait: "รอชำระ", check: "รอตรวจ", paid: "ชำระแล้ว", reject: "สลิปไม่ผ่าน", cancel: "ยกเลิก" };
   /* หัวข้อที่สมาชิกถามร้านได้ (ตรงกับหลังบ้าน Code.gs ตัวแปร ASK_TOPICS) */
   var ASK = ["คำสั่งซื้อและการชำระเงิน", "ไฟล์และการดาวน์โหลด", "เนื้อหาของใบตรวจงาน", "บัญชีสมาชิก", "เรื่องอื่น"];
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function baht(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
-  function find(id) { return sheets.filter(function (x) { return x.id === id; })[0] || bundles.filter(function (x) { return x.id === id; })[0] || null; }
+  // +U = แบบรับฉบับใหม่ตลอด (คำสั่งผู้ใช้ 23 ต.ค. 2026) · รหัสปกติ = ซื้อฉบับนี้ เก็บได้ตลอด
+  function baseOf(id) { return String(id || "").replace(/\+U$/, ""); }
+  function isUpd(id) { return /\+U$/.test(String(id || "")); }
+  function find(id) { id = baseOf(id); return allSheets.filter(function (x) { return x.id === id; })[0] || bundles.filter(function (x) { return x.id === id; })[0] || null; }
   function isBundle(x) { return !!(x && Array.isArray(x.items)); }
   function memberPrice(p) { var d = Math.min(90, Math.max(0, +M.discount || 0)); return Math.max(1, Math.round((+p || 0) * (100 - d) / 100)); }
   // ขายได้เมื่อ: เปิดรับชำระเงิน + รายการนั้นเปิดขาย + ใบตรวจงานผ่านการตรวจรายการแล้ว (ชุดรวม = ทุกใบในชุดผ่านแล้ว)
   function reviewed(x) { if (!x) return false; if (isBundle(x)) return x.items.length > 0 && x.items.every(function (id) { var s = find(id); return !!(s && s.ok === true); }); return x.ok === true; }
   function canSell(x) { return !!(P.on === true && x && x.sale === true && +x.price > 0 && reviewed(x)); }
-  function expand(ids) { var o = {}; (ids || []).forEach(function (id) { var x = find(id); if (isBundle(x)) x.items.forEach(function (k) { o[k] = 1; }); else if (x) o[id] = 1; }); return Object.keys(o); }
+  function expand(ids) { var o = {}; (ids || []).forEach(function (id) { id = baseOf(id); var x = find(id); if (isBundle(x)) x.items.forEach(function (k) { o[k] = 1; }); else if (x) o[id] = 1; }); return Object.keys(o); }
 
   var token = {
     get: function () { try { return localStorage.getItem(TK) || ""; } catch (e) { return ""; } },
@@ -111,5 +115,5 @@
     saving: function (id) { var x = find(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(y.price) : 0); }, 0); return Math.max(0, s - memberPrice(x.price)); }
   };
 
-  window.BUILD = { S: S, M: M, P: P, ST: ST, ASK: ASK, demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
+  window.BUILD = { baseOf: baseOf, isUpd: isUpd, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();

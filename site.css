@@ -214,3 +214,13 @@ details.alt > summary { cursor:pointer; font-weight:600; color:var(--navy); font
 .steps { margin:6px 0 8px; padding-left:20px; font-size:15px; }
 @media (max-width:420px) { .tiles { gap:6px; } .tile { padding:10px 10px 8px; } .tile b { font-size:24px; } .tile span { font-size:12.5px; } .doc { grid-template-columns:1fr; } .doc .b { grid-column:1; grid-row:auto; } }
 @media print { .acct-nav, .modal { display:none !important; } }
+
+/* 2 แบบสิทธิ์ตอนซื้อ (23 ต.ค. 2026) */
+.plan { border: 1px solid #DDE2E8; border-radius: 14px; padding: 10px 14px 12px; margin: 0 0 14px; display: grid; gap: 8px; }
+.plan legend { font-weight: 700; color: #0F2A44; padding: 0 6px; } .plan legend small { font-weight: 400; color: #5A6573; margin-left: 6px; }
+.plan label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; padding: 8px 10px; border-radius: 10px; }
+.plan label:has(input:checked) { background: #FFF6EF; outline: 2px solid #FF6B1A; }
+.plan label span b { display: block; color: #0F2A44; } .plan label span small { display: block; color: #3F4A58; font-size: 13.5px; line-height: 1.45; }
+.plan input { margin-top: 4px; accent-color: #FF6B1A; width: 18px; height: 18px; }
+.pick em small.pu { display: block; font-size: 12.5px; font-style: normal; color: #5A6573; font-weight: 400; }
+.pick label.off { opacity: .45; }

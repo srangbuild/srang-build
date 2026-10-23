@@ -288,13 +288,13 @@
     : "<p><strong>ไฟล์พิมพ์ครบทุกชุด</strong><small>กด “เปิดฉบับพิมพ์” ของชุดที่ต้องการ แล้วสั่งพิมพ์หรือบันทึกเป็น PDF ได้เลย</small></p>" + '<a class="b pri" href="free.html">เปิดทุกชุด</a>';
 
   // ใบตรวจงานและสมาชิก (แสดงเมื่อมีใบตรวจงานใน data.js)
-  var shs = Array.isArray(S.sheets) ? S.sheets : [], pv = /[?&]preview=1/.test(location.search) ? "?preview=1" : "";
+  var shs = (Array.isArray(S.sheets) ? S.sheets : []).filter(function (x) { return x.hidden !== true; }), pv = /[?&]preview=1/.test(location.search) ? "?preview=1" : "";
   if (shs.length) {
     var rdy = shs.filter(function (x) { return x.ok === true; }).length, memOn = !S.member || S.member.on !== false;
     $("sheets").hidden = false;
 
     $("facts").innerHTML += "<li><b>" + shs.length + "</b>ใบตรวจงาน</li>";
-    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " งานหลัก: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรี 1 หน้า และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่า และใบข้อบกพร่อง" + (rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">ดูใบตรวจงาน</a>' + (memOn ? '<a class="b sec" href="member.html' + pv + '">สมัครสมาชิกฟรี</a>' : "") + "</span>";
+    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " งานหลัก: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า) และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง" + (rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">ดูใบตรวจงาน</a>' + (memOn ? '<a class="b sec" href="member.html' + pv + '">สมัครสมาชิกฟรี</a>' : "") + "</span>";
   }
 
   // ตอน

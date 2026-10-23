@@ -6,7 +6,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ใบตรวจงานก่อสร้างและติดตั้ง — สร้าง | BUILD TH</title>
-<meta name="description" content="ใบตรวจงานก่อสร้างและงานติดตั้ง แบ่งตามขั้นงาน มีจุดหยุดรอตรวจ เกณฑ์ยอมรับ และช่องลงชื่อ ฉบับฟรี 1 หน้า และฉบับมืออาชีพ">
+<meta name="description" content="ใบตรวจงานก่อสร้างและงานติดตั้ง แบ่งตามขั้นงาน มีจุดหยุดรอตรวจ เกณฑ์ยอมรับ และช่องลงชื่อ ฉบับฟรี 1–2 หน้า และฉบับมืออาชีพ">
 <meta name="theme-color" content="#0F2A44">
 <meta property="og:title" content="ใบตรวจงานก่อสร้างและติดตั้ง — สร้าง | BUILD TH">
 <meta property="og:image" content="https://srangbuild.github.io/srang-build/img/og.jpg">
@@ -80,10 +80,10 @@
     <div class="head"><h2>ซื้อและรับไฟล์อย่างไร</h2></div>
     <div class="card pad">
       <ol style="margin:0;padding-left:22px">
-        <li>สมัครสมาชิก (ฟรี) แล้วเลือกใบตรวจงานที่ต้องการ</li>
-        <li>โอนเงินตามยอดในคำสั่งซื้อ แล้วแนบรูปสลิปในหน้าสมาชิก</li>
-        <li id="how-wait">ร้านตรวจยอดเข้าบัญชี แล้วเปิดสิทธิ์ให้ดาวน์โหลด</li>
-        <li>ดาวน์โหลดไฟล์ PDF ได้จากหน้าสมาชิกทุกเมื่อ รวมฉบับปรับปรุงของรุ่นเดียวกัน</li>
+        <li>สมัครสมาชิก (ฟรี) แล้วเลือกใบตรวจงานที่ต้องการ และเลือกแบบการซื้อ: <b>ซื้อฉบับนี้</b> (ได้ฉบับวันที่ซื้อ เก็บได้ตลอด) หรือ <b>รับฉบับใหม่ตลอด</b> (ได้ฉบับล่าสุดทุกครั้งที่ร้านปรับปรุง)</li>
+        <li>ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงินแล้วแนบรูปสลิปในหน้าสมาชิก · ระบบส่งอีเมลทุกขั้น และมีลิงก์ติดตามสถานะ</li>
+        <li id="how-wait">ร้านตรวจยอดเข้าบัญชี แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)</li>
+        <li>ดาวน์โหลดไฟล์ PDF ได้จากหน้าสมาชิกทุกเมื่อ · ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ · เอกสารส่งมอบทางหน้าสมาชิก ไม่มีการส่งพัสดุ · ซื้อฉบับนี้แล้ว อัปเกรดเป็นรับฉบับใหม่ได้โดยจ่ายเฉพาะส่วนต่าง</li>
       </ol>
     </div>
   </section>
@@ -121,7 +121,7 @@
   function relabel() { try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} }
   function draw() {
     $("cards").innerHTML = sh.filter(function (x) { return cur === "ทั้งหมด" || x.group === cur; }).map(function (x) {
-      return '<article class="card sh">' + (x.ok === true ? '<div class="im"><img src="' + esc(x.img) + '" alt="ตัวอย่างหน้าแรกของ ' + esc(x.id) + '" loading="lazy" width="794" height="1123"></div>' : '<div class="im wait"><span>ตัวอย่างจะแสดงเมื่อตรวจรายการเสร็จ</span></div>') + '<div class="tx"><span class="code">' + esc(x.id) + " · " + esc(x.group) + "</span><h3>" + esc(x.title) + "</h3><p>" + esc(x.sum) + '</p><div class="two"><div class="ver"><b>ฉบับฟรี</b><small>' + esc(x.nFree) + " จุดสำคัญ · 1 หน้า</small>" + (x.ok === true ? '<a class="b line sm" href="' + esc(x.free) + '" download>ดาวน์โหลด</a>' : '<span class="pill gray">กำลังตรวจรายการ</span>') + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ " + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>" + buy(x) + "</div></div></div></article>";
+      return '<article class="card sh">' + (x.ok === true ? '<div class="im"><img src="' + esc(x.img) + '" alt="ตัวอย่างหน้าแรกของ ' + esc(x.id) + '" loading="lazy" width="794" height="1123"></div>' : '<div class="im wait"><span>ตัวอย่างจะแสดงเมื่อตรวจรายการเสร็จ</span></div>') + '<div class="tx"><span class="code">' + esc(x.id) + " · " + esc(x.group) + "</span><h3>" + esc(x.title) + "</h3><p>" + esc(x.sum) + '</p><div class="two"><div class="ver"><b>ฉบับฟรี</b><small>' + esc(x.nFree) + " จุดสำคัญ · " + (+x.freePages || 1) + " หน้า</small>" + (x.ok === true ? '<a class="b line sm" href="' + esc(x.free) + '" download>ดาวน์โหลด</a>' : '<span class="pill gray">กำลังตรวจรายการ</span>') + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ " + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>" + buy(x) + "</div></div></div></article>";
     }).join("") || '<p class="note">ยังไม่มีใบตรวจงานในกลุ่มนี้</p>';
     relabel();
   }
@@ -136,7 +136,7 @@
   $("perks").innerHTML = (B.M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
   if (B.M.on === false) $("member").hidden = true;
   var nx = S.sheetsNext || []; if (nx.length) { $("next").hidden = false; $("nextlist").innerHTML = nx.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join(""); }
-  if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด";
+  if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
 })();
 </script>
 <script src="cart.js"></script>

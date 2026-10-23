@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://connect.facebook.net https://cdn.omise.co https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://cdn.omise.co; font-src 'self' https://fonts.gstatic.com https://cdn.omise.co; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://graph.facebook.com https://www.facebook.com https://connect.facebook.net https://vault.omise.co https://api.omise.co https://cdn.omise.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com https://cdn.omise.co https://*.omise.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://connect.facebook.net https://cdn.omise.co https://cdnjs.cloudflare.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://cdn.omise.co; font-src 'self' https://fonts.gstatic.com https://cdn.omise.co; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://graph.facebook.com https://www.facebook.com https://connect.facebook.net https://vault.omise.co https://api.omise.co https://cdn.omise.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com https://cdn.omise.co https://*.omise.co; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สมาชิก — สร้าง | BUILD TH</title>
@@ -58,7 +58,7 @@
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
   function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
-  function title(id) { var x = B.find(id); return x ? x.id + " " + x.title : id; }
+  function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
   function signedIn(r) { B.token.set(r.token); pending = null; regWait = null; return refresh(true); }
   function dmy(iso) { var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || "")); return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || ""); }
 
@@ -237,6 +237,48 @@
   }
   // หลังบ้านรุ่น 2026-10-23 ขึ้นไปตอบ pay ใน me · รุ่นเก่ายังไม่มีโปรไฟล์เต็ม คลังเอกสาร และชำระออนไลน์ หน้าเว็บจึงซ่อนส่วนนั้นไว้ (ไม่มีปุ่มที่กดแล้วไม่บันทึก)
   function full() { return !!(me && me.pay); }
+  // ---------- ประทับสิทธิ์ผู้ซื้อลงไฟล์ฉบับมืออาชีพ (คำสั่งผู้ใช้ 23 ต.ค. 2026) ----------
+  // ข้อมูลผู้ซื้อและเวลามาจากหลังบ้าน (ไม่ใช่เครื่องลูกค้า) · เบราว์เซอร์วาดข้อความเป็นภาพ จึงพิมพ์ชื่อภาษาใดก็ได้ · บรรทัดเดียว ตัวเล็ก สีเทา ใต้หัวกระดาษท้ายหน้า ไม่บังเนื้อหา
+  var PDFLIB = { src: "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js", sri: "sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ==" }, pdfLibReady = null;
+  function loadPdfLib() {
+    if (window.PDFLib) return Promise.resolve();
+    if (!pdfLibReady) pdfLibReady = new Promise(function (res, rej) { var s = document.createElement("script"); s.src = PDFLIB.src; s.integrity = PDFLIB.sri; s.crossOrigin = "anonymous"; s.referrerPolicy = "no-referrer"; s.onload = res; s.onerror = function () { pdfLibReady = null; rej(new Error("pdf-lib")); }; document.head.appendChild(s); });
+    return pdfLibReady;
+  }
+  // 2 บรรทัด อังกฤษบน ไทยล่าง (แบบเดียวกับแบบฟอร์ม) · ตัวอักษรอย่างน้อยราว 5.5 pt อ่านได้เมื่อพิมพ์
+  function licLines(l) {
+    var no = l.no || l.order; // เลขสิทธิ์ = เลขคำสั่งซื้อ/รหัสเอกสาร (หลังบ้าน 24 ต.ค. 2026) · รุ่นก่อนหน้าใช้เลขคำสั่งซื้อ
+    return ["Licensed to " + l.name + " (" + l.email + ") · Licence " + no + " · " + (l.plan === "updates" ? "Updates plan" : "This edition") + (l.rev ? " " + dmy(l.rev) : "") + " · Downloaded " + l.at + " · Not for resale or sharing",
+      "สิทธิ์ใช้งานของ " + l.name + " · เลขสิทธิ์ " + no + " · " + (l.plan === "updates" ? "แบบรับฉบับใหม่" : "แบบฉบับนี้") + (l.rev ? " ฉบับ " + dmy(l.rev) : "") + " · ดาวน์โหลด " + l.at + " · ห้ามจำหน่ายหรือแจกจ่ายต่อ"];
+  }
+  function licText(l) { return licLines(l).join("  |  "); }
+  function licPng(lines, wPt, hPt) { // ภาพความละเอียด 4 เท่า ให้คมเมื่อพิมพ์ · พื้นโปร่งใส ไม่บังอะไรบนหน้า
+    var k = 4, c = document.createElement("canvas"); c.width = Math.round(wPt * k); c.height = Math.round(hPt * k);
+    var x = c.getContext("2d"), rowH = c.height / lines.length;
+    x.fillStyle = "#4A4A4A"; x.textAlign = "center"; x.textBaseline = "middle";
+    lines.forEach(function (t, i) {
+      var fs = 6.2 * k;
+      do { x.font = fs + 'px "Segoe UI", "Leelawadee UI", Tahoma, sans-serif'; if (x.measureText(t).width <= c.width - 8) break; fs -= 0.25 * k; } while (fs > 4.2 * k);
+      x.fillText(t, c.width / 2, rowH * i + rowH / 2 + 0.5);
+    });
+    return c.toDataURL("image/png");
+  }
+  function stampPdf(j) {
+    return loadPdfLib().then(function () {
+      var L = window.PDFLib, raw = atob(j.b64), u = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i);
+      return L.PDFDocument.load(u).then(function (doc) {
+        var text = licText(j.lic);
+        return doc.embedPng(licPng(licLines(j.lic), 560, 15)).then(function (img) {
+          // วางเหนือบรรทัดท้ายกระดาษเดิมของใบงาน (รหัส · ฉบับ · หน้า อยู่ที่ 22–30 pt จากขอบล่าง วัดจากไฟล์ขอบล่าง 19 มม. จริง 24 ต.ค. 2026) และใต้เนื้อหา (เริ่มเหนือ 54 pt)
+          // 32–47 pt จากขอบล่าง = 11.3–16.6 มม. อยู่ในพื้นที่ที่เครื่องพิมพ์ทั่วไปพิมพ์ได้ (ห่างขอบเกิน 4.2 มม.)
+          doc.getPages().forEach(function (pg) { var sz = pg.getSize(), w = Math.min(560, sz.width - 30); pg.drawImage(img, { x: (sz.width - w) / 2, y: 32, width: w, height: w * 15 / 560 }); });
+          doc.setSubject(text); doc.setKeywords(["BUILD TH", j.lic.order, j.lic.member]); doc.setProducer("สร้าง | BUILD TH"); doc.setModificationDate(new Date());
+          return doc.save();
+        });
+      });
+    });
+  }
+  function saveBytes(name, bytes) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
   function libOf() { return me.lib || (me.owned || []).map(function (id) { var s = B.find(id) || {}; return { id: id, title: s.title || id, rev: s.revDate || "", lastAt: "", lastRev: "", newer: false }; }); }
   function payOnline() { return !!(me && me.pay && me.pay.opn && (B.demo || /^pkey_/.test(String(P.opnKey || "")))); }
   function payMethods() { var on = (me && me.pay && me.pay.methods) || []; var want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(PAYM); return want.filter(function (k) { return PAYM[k] && on.indexOf(k) >= 0; }); }
@@ -277,13 +319,18 @@
     var cls = o.status === ST.paid ? "ok" : o.status === ST.cancel ? "gray" : o.status === ST.reject ? "bad" : "";
     var body = "";
     if (o.status === ST.wait || o.status === ST.reject) {
+      var minOn = +(me && me.minOnline) || 20;
       if (P.on !== true) body = '<p class="note">ร้านยังไม่เปิดรับชำระเงิน</p>';
-      else if (payOnline() && payMethods().length) body = payChooser(o) + '<details class="alt"><summary>หรือโอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ร้านตรวจยอดภายใน ' + esc(P.hours || 24) + ' ชั่วโมง)</summary>' + payBox(o) + "</details>";
-      else body = payBox(o);
+      else if (payOnline() && payMethods().length && o.amount >= minOn) body = payChooser(o) + '<details class="alt"><summary>หรือโอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ร้านตรวจยอดภายใน ' + esc(P.hours || 24) + ' ชั่วโมง)</summary>' + payBox(o) + "</details>";
+      else body = (payOnline() && payMethods().length ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : "") + payBox(o);
     } else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt)) + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + " · ผลจะส่งไปที่อีเมลของคุณ</p>" + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
     else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">' + B.expand(o.items).map(function (id) { return '<button class="b line sm" type="button" data-dl="' + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>"; }).join("") + '<button class="b line sm" type="button" data-rcpt="' + esc(o.id) + '">หลักฐานการชำระเงิน</button></div>';
     var how = o.method ? '<span class="note" style="margin:0"> · ' + esc(o.method) + "</span>" : "";
-    return '<div class="card ord" id="o-' + esc(o.id) + '"><div class="top"><b>' + esc(o.id) + '</b><span class="pill ' + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created)) + " · " + B.baht(o.amount) + "</span>" + how + "</div><ul>" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" + tracker(o) + body + "</div>";
+    // ลิงก์ติดตามส่วนตัว (เปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีหรือผู้ร่วมงานได้) + ข้อมูลพัสดุเมื่อร้านส่งของจริง
+    var tl = o.track ? location.origin + location.pathname.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k=" + encodeURIComponent(o.track) : "";
+    var trk2 = (o.ship ? '<p class="note" style="margin:8px 0 0">📦 ส่งพัสดุแล้ว · ' + esc(o.ship.carrier) + " เลขพัสดุ <b>" + esc(o.ship.no) + "</b>" + copyBtn(o.ship.no, "คัดลอกเลขพัสดุ") + (o.ship.at ? " · " + esc(o.ship.at) : "") + "</p>" : "") +
+      (tl && o.status !== ST.cancel ? '<p class="note" style="margin:8px 0 0">ติดตามสถานะแบบไม่ต้องเข้าระบบ: <a href="' + esc(tl) + '" target="_blank" rel="noopener">เปิดหน้าติดตาม</a> ' + copyBtn(tl, "คัดลอกลิงก์") + "</p>" : "");
+    return '<div class="card ord" id="o-' + esc(o.id) + '"><div class="top"><b>' + esc(o.id) + '</b><span class="pill ' + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created)) + " · " + B.baht(o.amount) + "</span>" + how + "</div><ul>" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" + tracker(o) + trk2 + body + "</div>";
   }
   function receipt(o) { // หลักฐานการชำระเงิน (ไม่ใช่ใบกำกับภาษี) เปิดหน้าต่างใหม่แล้วสั่งพิมพ์ หรือบันทึกเป็น PDF
     var w = window.open("", "_blank", "width=760,height=940"); if (!w) { say("เบราว์เซอร์บล็อกหน้าต่างใหม่ อนุญาตป๊อปอัปของเว็บนี้แล้วลองอีกครั้ง", true); return; }
@@ -292,13 +339,21 @@
     w.document.write('<!doctype html><html lang="th"><head><meta charset="utf-8"><title>หลักฐานการชำระเงิน ' + esc(o.id) + '</title><style>body{font:16px/1.6 "Leelawadee UI","Sarabun",sans-serif;color:#16202B;margin:40px}h1{font-size:22px;margin:0}table{width:100%;border-collapse:collapse;margin:14px 0}td,th{border:1px solid #C9D2DC;padding:6px 10px;text-align:left;vertical-align:top}th{width:32%;background:#F6F4EF}.mute{color:#5A6573;font-size:14px}</style></head><body><p style="font-weight:700;color:#0F2A44;margin:0">สร้าง | BUILD TH</p><h1>หลักฐานการชำระเงิน</h1><p class="mute">เอกสารนี้ไม่ใช่ใบกำกับภาษี</p><table><tr><th>เลขคำสั่งซื้อ</th><td>' + esc(o.id) + "</td></tr>" + buyer + "<tr><th>อีเมล</th><td>" + esc(m.email) + "</td></tr><tr><th>วันที่สั่งซื้อ</th><td>" + esc(B.when(o.created)) + "</td></tr><tr><th>ชำระด้วย</th><td>" + esc(o.method || "โอนเงินเข้าบัญชีร้าน") + "</td></tr><tr><th>ยืนยันยอดเมื่อ</th><td>" + esc(B.when(o.okAt) || "-") + "</td></tr><tr><th>ยอดชำระ</th><td><b>" + B.baht(o.amount) + '</b></td></tr></table><table><tr><th style="width:auto">รายการ (ไฟล์ PDF ดาวน์โหลดจากหน้าสมาชิก)</th></tr>' + rows + '</table><p class="mute">พิมพ์จากหน้าสมาชิก ' + esc(location.host) + " เมื่อ " + esc(B.when(new Date().toISOString())) + "</p><script>window.onload=function(){window.print()}<\/script></body></html>");
     w.document.close();
   }
+  // 2 แบบสิทธิ์ (คำสั่งผู้ใช้ 23 ต.ค. 2026): ซื้อฉบับนี้ (เก็บได้ตลอด) · รับฉบับใหม่ตลอด (อีกราคา) · ลูกค้าเลือกครั้งเดียวต่อคำสั่งซื้อ
+  function planOf() { var r = document.querySelector("#f-order input[name=plan]:checked"); return r ? r.value : "ed"; }
   function shopBox() {
-    var owned = me.owned || [], list = B.bundles.concat(B.sheets).filter(function (x) { return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) { return owned.indexOf(id) >= 0; }) : owned.indexOf(x.id) < 0); });
+    var owned = me.owned || [], hiddenWant = B.allSheets.filter(function (x) { return x.hidden === true && wantList.indexOf(x.id) >= 0; });
+    var list = B.bundles.concat(B.sheets, hiddenWant).filter(function (x) { return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) { return owned.indexOf(id) >= 0; }) : owned.indexOf(x.id) < 0); });
     if (!list.length) return '<div class="card pad"><p style="margin:0">' + (B.sheets.some(function (x) { return owned.indexOf(x.id) < 0; }) ? "ฉบับมืออาชีพยังไม่เปิดขาย เมื่อเปิดจะแจ้งทางอีเมลที่สมัครไว้" : "คุณมีครบทุกใบแล้ว") + '</p><p class="note"><a href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div>';
     var how = payOnline() && payMethods().length ? "ชำระด้วย" + payMethods().map(function (k) { return PAYM[k][0]; }).join(" ") + " เปิดไฟล์ได้ทันที หรือโอนเงินแล้วแนบสลิป" : "ชำระด้วยการโอนเงินหรือพร้อมเพย์แล้วแนบสลิป · ไฟล์เปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว";
-    return '<form class="card pad" id="f-order"><div class="pick">' + list.map(function (x) {
-      return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + B.memberPrice(x.price) + '"' + (wantList.indexOf(x.id) >= 0 ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(B.memberPrice(x.price)) + "</em></label>";
-    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">' + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น</p></form>";
+    var anyU = list.some(function (x) { return +x.priceU > 0; }), wantU = wantList.some(function (k) { return B.isUpd(k); });
+    var plans = anyU ? '<fieldset class="plan" role="radiogroup" aria-label="แบบสิทธิ์"><legend>เลือกแบบสิทธิ์ <small>ใช้กับทุกรายการในคำสั่งซื้อนี้</small></legend>' +
+      '<label><input type="radio" name="plan" value="ed"' + (wantU ? "" : " checked") + '><span><b>ซื้อฉบับนี้ เก็บได้ตลอด</b><small>ได้ไฟล์ฉบับวันที่ซื้อ เปิด ดาวน์โหลด และพิมพ์ได้ตลอด · ถ้าภายหลังมีฉบับใหม่ อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง</small></span></label>' +
+      '<label><input type="radio" name="plan" value="up"' + (wantU ? " checked" : "") + '><span><b>รับฉบับใหม่ตลอด</b><small>เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ฟรีทุกครั้ง และได้อีเมลแจ้ง</small></span></label></fieldset>' : "";
+    return '<form class="card pad" id="f-order">' + plans + '<div class="pick">' + list.map(function (x) {
+      var p = B.memberPrice(x.price), pu = +x.priceU > 0 ? B.memberPrice(x.priceU) : 0, want = wantList.indexOf(x.id) >= 0 || wantList.indexOf(x.id + "+U") >= 0;
+      return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + p + '" data-priceu="' + pu + '"' + (want ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(p) + (pu ? '<small class="pu">รับฉบับใหม่ ' + B.baht(pu) + "</small>" : "") + "</em></label>";
+    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">' + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ</p></form>";
   }
   /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
   function askBox() {
@@ -325,10 +380,13 @@
   function paneDocs() {
     var lib = libOf();
     var rows = lib.map(function (d) {
-      var st = d.newer ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">ฉบับล่าสุดแล้ว</span>' : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
-      return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + '<small>ฉบับวันที่ ' + esc(dmy(d.rev) || "-") + (d.lastAt ? " · ดาวน์โหลดล่าสุด " + esc(B.when(d.lastAt)) + (d.lastRev ? " (ฉบับ " + esc(dmy(d.lastRev)) + ")" : "") : "") + "</small></div>" + st + '<button class="b ' + (d.newer || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด' + (d.newer ? "ฉบับใหม่" : "") + "</button></div>";
+      var ed = d.plan === "edition", has = d.has || d.rev;
+      var st = ed && d.newer ? '<span class="pill">มีฉบับใหม่ ' + esc(dmy(d.rev)) + "</span>" : d.newer ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">' + (ed ? "ฉบับของคุณ" : "ฉบับล่าสุดแล้ว") + "</span>" : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
+      var planTx = ed ? "แบบฉบับนี้ (ฉบับ " + esc(dmy(has) || "-") + " เก็บได้ตลอด)" : d.plan === "updates" ? "แบบรับฉบับใหม่ตลอด" : "";
+      var upg = ed && d.upgrade ? '<button class="b line sm" type="button" data-upg="' + esc(d.id) + '">อัปเกรดเป็นรับฉบับใหม่ ' + B.baht(d.upgrade) + "</button>" : "";
+      return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + '<small>' + (planTx ? planTx + (ed && !d.lastAt ? "" : " · ") : "") + (ed ? "" : "ฉบับวันที่ " + esc(dmy(d.rev) || "-")) + (d.lastAt ? (ed ? "" : " · ") + "ดาวน์โหลดล่าสุด " + esc(B.when(d.lastAt)) + (d.lastRev ? " (ฉบับ " + esc(dmy(d.lastRev)) + ")" : "") : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">' + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b ' + ((d.newer && !ed) || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + "</span></div>";
     }).join("");
-    return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + (lib.length ? '<div class="docs">' + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ และได้ฉบับล่าสุดเสมอโดยไม่เสียเงินเพิ่ม · ไฟล์ลงวันที่ที่ดาวน์โหลด · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>') + "</section>" +
+    return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + (lib.length ? '<div class="docs">' + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>') + "</section>" +
       '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) และเช็กลิสต์ เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="free.html' + q + '">เช็กลิสต์ฟรีพิมพ์ได้</a></p></div></section>';
   }
   function paneOrders() {
@@ -379,7 +437,12 @@
     total(); gDraw(); taxHint();
   }
   function go(t) { if (location.hash !== "#" + t) location.hash = t; else { tab = t; paint(); } }
-  function total() { var t = 0; [].forEach.call(document.querySelectorAll("#f-order input[name=it]:checked"), function (c) { t += +c.dataset.price; }); var e = $("total"); if (e) e.textContent = B.baht(t); }
+  function total() {
+    var t = 0, up = planOf() === "up";
+    [].forEach.call(document.querySelectorAll("#f-order input[name=it]"), function (c) { var pu = +c.dataset.priceu; if (up && !pu) { c.checked = false; c.disabled = true; } else c.disabled = false; if (c.checked) t += up ? pu : +c.dataset.price; });
+    [].forEach.call(document.querySelectorAll("#f-order .pick label"), function (l) { var c = l.querySelector("input"); l.classList.toggle("off", !!(c && c.disabled)); });
+    var e = $("total"); if (e) e.textContent = B.baht(t);
+  }
   function taxHint() { var i = document.querySelector("#f-tax input[name=taxid]"), h = $("taxhint"); if (!i || !h) return; var d = i.value.replace(/\D/g, ""); h.textContent = !d ? "" : d.length < 13 ? "ยังไม่ครบ 13 หลัก" : taxOk(d) ? "รูปแบบเลขถูกต้อง" : "ตรวจเลขอีกครั้ง (เลขหลักสุดท้ายไม่ตรงกับสูตรตรวจของเลขประจำตัว)"; h.className = "hint" + (d.length === 13 ? (taxOk(d) ? " ok" : " bad") : ""); }
   function refresh(keepMsg) {
     if (!B.token.get()) { me = null; authView(); return Promise.resolve(); }
@@ -388,6 +451,7 @@
   function readHash() { var h = String(location.hash || "").replace(/^#/, ""); return TABS.some(function (t) { return t[0] === h; }) ? h : "home"; }
   window.addEventListener("hashchange", function () { if (!me) return; tab = readHash(); say(""); paint(); window.scrollTo({ top: 0 }); });
   tab = readHash();
+  if (want && !location.hash) tab = "shop"; // ลิงก์ซื้อ member.html?buy=รหัส เปิดหน้าซื้อทันทีหลังเข้าระบบหรือสมัคร
 
   // ---------- รูปโปรไฟล์: ตัดเป็นสี่เหลี่ยมจัตุรัส 256 จุดในเครื่องผู้ใช้ก่อนส่ง ----------
   function cropAvatar(file) {
@@ -504,14 +568,19 @@
     if (t.dataset.fill === "addr") { var fa = $("f-addr"); if (fa) { fa.elements.name.value = me.member.name || ""; fa.elements.phone.value = fmtPhone(me.member.phone || ""); } return; }
     if (t.dataset.fill === "tax") { var ft = $("f-tax"), ad = me.member.addr; if (ft && ad) ft.elements.addr.value = [ad.line1, ad.sub, ad.dist, ad.prov, ad.zip].filter(String).join(" "); else say("ยังไม่มีที่อยู่จัดส่ง", true); return; }
     if (t.dataset.clear) { if (!confirm(t.dataset.clear === "addr" ? "ลบที่อยู่จัดส่ง?" : "ลบข้อมูลออกใบเสร็จ?")) return; var body = {}; body[t.dataset.clear] = null; run(B.call("profile", body).then(function (r) { me.member = mergeMember(r.member); paint(); }), "ลบข้อมูลแล้ว"); return; }
-    if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) { if (B.demo) say("โหมดทดลอง: สิทธิ์ถูกต้อง ระบบบันทึกการดาวน์โหลดแล้ว · ไฟล์จริง " + j.name + " ส่งจากหลังบ้านเมื่อต่อระบบแล้ว"); else { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); } return me && id !== "FREE-ALL" ? B.call("me").then(function (r) { me = r; paint(); }) : null; })); return; }
+    if (t.dataset.dl) { var id = t.dataset.dl; run(B.call("download", { sheet: id }).then(function (j) {
+      if (B.demo && !/^JVBER/.test(String(j.b64 || ""))) { say("โหมดทดลอง: สิทธิ์ถูกต้อง ระบบบันทึกการดาวน์โหลดแล้ว · ไฟล์จริง " + j.name + " ส่งจากหลังบ้านเมื่อต่อระบบแล้ว"); return null; }
+      if (!j.lic) { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name); return null; }
+      return stampPdf(j).then(function (bytes) { saveBytes(j.name, bytes); say("เริ่มดาวน์โหลด " + j.name + " · ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลด"); }, function () { B.saveFile(j.name, j.b64, j.type); say("เริ่มดาวน์โหลด " + j.name + " · ประทับชื่อผู้ซื้อไม่สำเร็จ (เบราว์เซอร์โหลดตัวช่วยไม่ได้) ลองดาวน์โหลดใหม่ภายหลัง", true); });
+    }).then(function () { return me && id !== "FREE-ALL" ? B.call("me").then(function (r) { me = r; paint(); }) : null; })); return; }
+    if (t.dataset.upg) { var uid0 = t.dataset.upg; run(B.call("order", { items: [uid0 + "+U"] }).then(function () { return refresh(true).then(function () { go("orders"); say("สร้างคำสั่งซื้ออัปเกรด " + uid0 + " แล้ว จ่ายเฉพาะส่วนต่าง"); }); })); return; }
     if (t.dataset.cancel) { if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return; run(B.call("cancel", { order: t.dataset.cancel }).then(function () { return refresh(true); }), "ยกเลิกคำสั่งซื้อแล้ว"); return; }
     if (t.dataset.approve) { run(B.callAdmin("adminOrder", { order: t.dataset.approve, status: ST.paid }).then(function () { return refresh(true); }), "โหมดทดลอง: ร้านยืนยันยอดแล้ว เปิดสิทธิ์ดาวน์โหลด"); return; }
     if (t.dataset.erase) { if (!confirm("ลบบัญชีและข้อมูลทั้งหมดของคุณ รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ ?")) return; run(B.call("erase").then(function () { B.token.clear(); me = null; authView(); }), "ลบบัญชีแล้ว"); }
   });
   $("view").addEventListener("change", function (ev) {
     var e = ev.target;
-    if (e.name === "it") total();
+    if (e.name === "it" || e.name === "plan") total();
     if (e.form && e.form.id === "f-avatar" && e.name === "photo" && e.files && e.files[0]) { cropAvatar(e.files[0]).then(function (d) { avDraft = d; [].forEach.call(e.form.querySelectorAll("input[name=av]"), function (r) { r.checked = false; }); var holder = e.form.querySelector(".avnow"); if (holder) holder.firstElementChild.outerHTML = avatarHtml({ avatar: "photo", avatarSrc: d, name: me.member.name }, "xl"); say("ตรวจรูปตัวอย่าง แล้วกด บันทึกรูปโปรไฟล์"); }).catch(function (er) { say(er.message, true); }); }
     if (e.form && e.form.id === "f-avatar" && e.name === "av") { avDraft = null; var holder2 = e.form.querySelector(".avnow"); if (holder2) holder2.firstElementChild.outerHTML = avatarHtml({ avatar: e.value, name: me.member.name }, "xl"); }
     if (e.dataset && e.dataset.country) { var f = e.form, data = {}; ["name", "phone", "line1", "sub", "dist", "prov", "zip", "note"].forEach(function (k) { data[k] = f.elements[k] ? f.elements[k].value : ""; }); data.country = e.value; var keep = me.member.addr; me.member.addr = data; paint(); me.member.addr = keep; }
@@ -575,7 +644,7 @@
     }
     if (f.id === "f-prefs") { run(B.call("profile", { prefs: { newEdition: f.elements.newEdition.checked, news: f.elements.news.checked } }).then(saved("บันทึกการแจ้งเตือนแล้ว"))); return; }
     if (f.id === "f-pass") { var pe3 = pwOk(f, "newPass", "newPass2"); if (pe3) { say(pe3, true); return; } run(B.call("passwd", { pass: v("pass"), newPass: v("newPass"), newPass2: v("newPass2") }).then(function () { f.reset(); }), "เปลี่ยนรหัสผ่านแล้ว"); return; }
-    if (f.id === "f-order") { var ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value; }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true).then(function () { go("orders"); say("สร้างคำสั่งซื้อแล้ว เลือกวิธีชำระด้านล่าง"); }); })); return; }
+    if (f.id === "f-order") { var upP = planOf() === "up", ids = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) { return c.value + (upP ? "+U" : ""); }); if (!ids.length) { say("เลือกอย่างน้อย 1 รายการ", true); return; } want = ""; wantList = []; run(B.call("order", { items: ids }).then(function () { if (B.cart) B.cart.clear(); return refresh(true).then(function () { go("orders"); say("สร้างคำสั่งซื้อแล้ว เลือกวิธีชำระด้านล่าง"); }); })); return; }
     if (f.dataset.slip) { var file = f.elements.slip.files[0], at = v("paidAt"); if (!file || !at) { say("เลือกรูปสลิปและใส่เวลาที่โอน", true); return; } run(B.shrink(file).then(function (img) { return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at }); }).then(function () { return refresh(true); }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้ ผลส่งไปที่อีเมล"); }
   });
 

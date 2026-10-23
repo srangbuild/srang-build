@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ติดตามคำสั่งซื้อ — สร้าง | BUILD TH</title>
+<meta name="description" content="ติดตามสถานะคำสั่งซื้อของ สร้าง | BUILD TH ทุกขั้น ตั้งแต่สั่งซื้อ ชำระเงิน ตรวจยอด จนดาวน์โหลดไฟล์หรือส่งพัสดุ">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F2A44">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="data.js"></script>
+<script src="app.js"></script>
+<style>
+  .tl { list-style: none; margin: 18px 0 0; padding: 0; position: relative; }
+  .tl li { position: relative; padding: 0 0 22px 44px; }
+  .tl li::before { content: ""; position: absolute; left: 15px; top: 30px; bottom: -2px; width: 2px; background: #DDE2E8; }
+  .tl li:last-child::before { display: none; }
+  .tl li > b { position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 15px/1 "Kanit", sans-serif; background: #fff; border: 2px solid #C9D2DC; color: #5A6573; }
+  .tl li.d > b { background: #1F7A4C; border-color: #1F7A4C; color: #fff; } .tl li.d::before { background: #1F7A4C; }
+  .tl li.a > b { border-color: #FF6B1A; color: #C24A08; box-shadow: 0 0 0 4px rgba(255,107,26,.15); }
+  .tl li.x > b { border-color: #B3261E; color: #B3261E; }
+  .tl h3 { margin: 4px 0 2px; font-size: 17px; color: #0F2A44; } .tl li:not(.d):not(.a) h3 { color: #5A6573; }
+  .tl p { margin: 0; color: #3F4A58; font-size: 14.5px; } .tl time { display: block; font-size: 13.5px; color: #5A6573; }
+  .sumrow { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; } .sumrow b.big { font: 700 22px/1.2 "Kanit", sans-serif; color: #0F2A44; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<div id="hdr"></div><script src="nav.js"></script>
+<main class="wrap narrow" id="main" style="padding-top:26px">
+  <h1 style="margin:0">ติดตามคำสั่งซื้อ</h1>
+  <p class="note" style="margin:6px 0 0">หน้านี้แสดงเฉพาะสถานะและเวลา ไม่แสดงชื่อ อีเมล หรือไฟล์ · ดาวน์โหลดไฟล์ได้ที่หน้าสมาชิกเท่านั้น</p>
+  <p class="msg" id="msg" role="status" aria-live="polite" hidden></p>
+  <div id="view" style="margin-top:14px"><p class="note">กำลังโหลด…</p></div>
+</main>
+<footer><div class="wrap"><p>ลิงก์ติดตามนี้เป็นของคำสั่งซื้อเดียว ใครมีลิงก์ก็เห็นสถานะได้ ส่งต่อเฉพาะคนที่ไว้ใจ</p><p>© <span id="yr"></span> สร้าง | BUILD TH</p></div></footer>
+<script>
+(function () {
+  "use strict";
+  var B = window.BUILD, $ = function (id) { return document.getElementById(id); }, esc = B.esc, ST = B.ST;
+  var yr = $("yr"); if (yr) yr.textContent = new Date().getFullYear();
+  var q = new URLSearchParams(location.search), oid = q.get("o") || "", key = q.get("k") || "";
+  function say(t, bad) { var m = $("msg"); m.textContent = t; m.className = "msg" + (bad ? " bad" : ""); m.hidden = !t; }
+  function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
+  function paint(o) {
+    var paid = o.status === ST.paid, rej = o.status === ST.reject, can = o.status === ST.cancel;
+    // ขั้นตอนแบบระบบติดตามพัสดุ: แต่ละขั้นมีเวลาจริงจากหลังบ้าน
+    var steps = [
+      ["สั่งซื้อแล้ว", "ระบบสร้างคำสั่งซื้อ " + o.id, o.created, true],
+      [rej ? "สลิปไม่ผ่าน" : "ชำระเงิน", rej ? (o.note ? "เหตุผล: " + o.note : "รอแนบสลิปใหม่") : o.method ? "ช่องทาง: " + o.method : (o.slipAt ? "แนบสลิปแล้ว" : "รอชำระ"), o.slipAt || (paid ? o.okAt : ""), !!(o.slipAt || paid)],
+      ["ตรวจยอดแล้ว", paid ? "ยืนยันยอดเข้าบัญชีของร้าน" : o.status === ST.check ? "ร้านกำลังตรวจยอด" : "รอขั้นก่อนหน้า", paid ? o.okAt : "", paid],
+      // เอกสารส่งมอบแบบดิจิทัล (24 ต.ค. 2026): เปิดสิทธิ์ในหน้าสมาชิก + อีเมลแจ้งพร้อมเลขสิทธิ์ · ไม่มีขั้นส่งพัสดุ
+      ["ส่งมอบเอกสารแล้ว", paid ? "เปิดสิทธิ์ " + (o.nDocs || o.items.length) + " เอกสารในหน้าสมาชิก เมนู เอกสารของฉัน" + (o.mailedAt ? " · อีเมลแจ้งพร้อมเลขสิทธิ์แล้ว" : "") : "รอขั้นก่อนหน้า", paid ? (o.mailedAt || o.okAt) : "", paid],
+      ["ดาวน์โหลดแล้ว", o.dl1 ? "ดาวน์โหลด " + (o.dlN || 1) + " ครั้ง · ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์" : "ยังไม่ได้ดาวน์โหลด · ดาวน์โหลดซ้ำได้ทุกเมื่อ", o.dl1, !!o.dl1]
+    ];
+    if (o.digital === false && !o.ship && paid) steps.push(["ส่งพัสดุ", "ร้านกำลังจัดส่งสินค้า", "", false]);
+    if (o.ship) steps.push(["ส่งพัสดุแล้ว", o.ship.carrier + " เลขพัสดุ " + o.ship.no, o.ship.at, true, o.ship.link]);
+    var cur = -1; for (var i = 0; i < steps.length; i++) if (!steps[i][3]) { cur = i; break; }
+    var li = steps.map(function (s, i) {
+      var cl = s[3] ? "d" : i === cur ? (rej && i === 1 ? "x" : "a") : "";
+      return '<li class="' + cl + '"><b>' + (s[3] ? "✓" : i + 1) + "</b><h3>" + esc(s[0]) + "</h3><p>" + esc(s[1]) + (s[4] && /^https:\/\//.test(s[4]) ? ' · <a href="' + esc(s[4]) + '" target="_blank" rel="noopener noreferrer">ติดตามที่บริษัทขนส่ง</a>' : "") + "</p>" + (s[2] && s[3] ? "<time>" + esc(B.when(s[2])) + "</time>" : "") + "</li>";
+    }).join("");
+    $("view").innerHTML = '<div class="card pad"><div class="sumrow"><b class="big">' + esc(o.id) + '</b><span class="pill ' + (paid ? "ok" : can ? "gray" : rej ? "bad" : "") + '">' + esc(o.status) + "</span><span>" + B.baht(o.amount) + "</span><span class=\"note\" style=\"margin:0\">สั่งซื้อ " + esc(B.when(o.created)) + "</span></div>" +
+      "<ul style=\"margin:10px 0 0\">" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" +
+      (can ? '<p class="note">คำสั่งซื้อนี้ยกเลิกแล้ว</p>' : '<ol class="tl">' + li + "</ol>") +
+      '<p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="b pri sm" href="member.html#' + (paid ? "docs" : "orders") + '">' + (paid ? "เปิดเอกสารของฉัน" : "ไปชำระหรือแนบสลิป") + '</a><button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
+    var re = $("re"); if (re) re.onclick = load;
+  }
+  function load() {
+    if (!/^BT-\d{6}-\d{3}$/.test(oid) || !/^[0-9a-f]{16}$/.test(key)) { $("view").innerHTML = '<div class="card pad"><p style="margin:0">ลิงก์ติดตามไม่ครบ · เปิดลิงก์จากอีเมลของคำสั่งซื้อ หรือดูที่ <a href="member.html#orders">หน้าสมาชิก เมนู คำสั่งซื้อ</a></p></div>'; return; }
+    say("");
+    B.call("track", { order: oid, key: key }).then(function (r) { paint(r.order); }, function (e) { $("view").innerHTML = ""; say((e && e.message) || "เปิดสถานะไม่ได้ ลองใหม่อีกครั้ง", true); });
+  }
+  load();
+})();
+</script>
+<script src="extras.js"></script>
+</body>
+</html>
