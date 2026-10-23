@@ -1,5 +1,5 @@
 window.SITE = {
-  "version": "2026-10-18",
+  "version": "2026-10-23",
   "brand": {
     "name": "สร้าง | BUILD TH",
     "show": "เรื่องที่คนไม่เล่า",
@@ -869,7 +869,8 @@ window.SITE = {
     "facebookAppId": "",
     "googleClientId": "514263949305-6qth9e3ro6aecdcauoul2tflnegp0aa9.apps.googleusercontent.com",
     "fbVersion": "v26.0",
-    "lineBotPrompt": ""
+    "lineBotPrompt": "",
+    "tiktokClientKey": ""
   },
   "pay": {
     "on": true,
@@ -878,9 +879,15 @@ window.SITE = {
     "name": "Thanatat J",
     "acc": "1314132745",
     "hours": 24,
-    "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว"
+    "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
+    "opnKey": "",
+    "methods": [
+      "card",
+      "promptpay",
+      "truemoney_jumpapp"
+    ]
   },
-  "privacyDate": "18 ต.ค. 2026",
+  "privacyDate": "23 ต.ค. 2026",
   "bundles": [
     {
       "id": "B-ST",
@@ -1033,7 +1040,7 @@ window.SITE = {
       "url": ""
     }
   ],
-  "termsDate": "2026-10-13",
+  "termsDate": "23 ต.ค. 2026",
   "consent": {
     "on": true,
     "text": "เว็บนี้เก็บข้อมูลในเบราว์เซอร์ของคุณเท่าที่จำเป็นต่อการใช้งาน เช่น การเข้าสู่ระบบสมาชิกและตะกร้า"
