@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>หลังบ้าน — สร้าง | BUILD TH</title>
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F2A44; --orange:#FF6B1A; --ink:#16202B; --paper:#F3F5F8; --card:#fff; --line:#D8DEE6; --mute:#5A6573; --ok:#1E7D4F; --bad:#B42318; --warn:#9A5B00; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI",system-ui,sans-serif; font-size:16px; line-height:1.6; }
+  h1,h2,h3 { font-family:"Kanit","IBM Plex Sans Thai",sans-serif; line-height:1.3; margin:0; }
+  :focus-visible { outline:3px solid var(--orange); outline-offset:1px; }
+  .stick { position:sticky; top:0; z-index:10; }
+  header { background:var(--navy); color:#fff; }
+  .hd { max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; gap:10px 14px; align-items:center; flex-wrap:wrap; }
+  .hd h1 { font-size:19px; }
+  .hd h1 small { font-family:"IBM Plex Sans Thai",sans-serif; font-weight:400; font-size:13px; color:#B9CADB; display:block; }
+  .state { font-size:13.5px; padding:3px 10px; border-radius:999px; background:#1F4266; color:#D5E1EE; }
+  .state.dirty { background:#FFE9DC; color:#9A3A05; font-weight:600; }
+  .sp { flex:1; }
+  button, .btn { font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--ink); padding:8px 14px; min-height:40px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:14.5px; }
+  button.pri { background:var(--orange); border-color:var(--orange); color:#fff; }
+  button.dark { background:transparent; border-color:#476787; color:#fff; }
+  button.sm { min-height:32px; padding:3px 10px; font-size:13.5px; font-weight:500; }
+  button.del { color:var(--bad); }
+  nav { background:#fff; border-bottom:1px solid var(--line); }
+  .tabs { max-width:1100px; margin:0 auto; padding:0 10px; display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tabs button { border:0; border-radius:0; background:none; border-bottom:3px solid transparent; padding:11px 12px; white-space:nowrap; color:var(--mute); min-height:46px; }
+  .tabs button[aria-selected="true"] { color:var(--navy); border-bottom-color:var(--orange); }
+  main { max-width:1100px; margin:0 auto; padding:18px 16px 80px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:0 0 14px; }
+  .card > h2 { font-size:19px; color:var(--navy); margin:0 0 4px; }
+  .hint { color:var(--mute); font-size:14px; margin:0 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px 16px; }
+  label { display:block; font-size:13.5px; font-weight:600; color:#344054; }
+  label.full { grid-column:1 / -1; }
+  input[type=text], input[type=url], input[type=date], textarea, select { display:block; width:100%; margin-top:4px; font:inherit; padding:9px 11px; border:1px solid #BFC8D3; border-radius:9px; background:#fff; color:var(--ink); min-height:42px; }
+  textarea { min-height:84px; resize:vertical; }
+  input.bad { border-color:var(--bad); background:#FFF5F4; }
+  label.chk { display:flex; align-items:center; gap:8px; font-weight:500; font-size:15px; min-height:42px; }
+  label.chk input { width:20px; height:20px; }
+  details.it { border:1px solid var(--line); border-radius:12px; margin:0 0 8px; background:#FBFCFD; }
+  details.it > summary { cursor:pointer; padding:10px 14px; font-weight:600; display:flex; gap:8px; align-items:center; list-style:none; }
+  details.it > summary::-webkit-details-marker { display:none; }
+  details.it > summary::before { content:"▸"; color:var(--mute); }
+  details.it[open] > summary::before { content:"▾"; }
+  details.it > summary .t { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  details.it .bd { padding:4px 14px 14px; }
+  .tools { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .tag { font-size:12.5px; font-weight:600; padding:1px 9px; border-radius:999px; background:#E8ECF1; color:#475466; white-space:nowrap; }
+  .tag.ok { background:#DFF3E8; color:var(--ok); } .tag.no { background:#FFE9DC; color:#9A3A05; }
+  ul.chk { list-style:none; margin:0; padding:0; }
+  ul.chk li { padding:8px 0; border-bottom:1px solid #EEF1F4; display:grid; grid-template-columns:26px 1fr; gap:6px; }
+  ul.chk li:last-child { border:0; }
+  ul.chk .ok { color:var(--ok); } ul.chk .no { color:var(--bad); } ul.chk .wa { color:var(--warn); }
+  ul.chk small { color:var(--mute); display:block; }
+  .kit { margin:0 0 12px; }
+  .kit .top { display:flex; align-items:center; gap:8px; margin:0 0 4px; }
+  .kit .top b { flex:1; color:var(--navy); }
+  .kit textarea { background:#F8FAFC; }
+  .kit small { color:var(--mute); display:block; margin-top:4px; font-size:13.5px; }
+  table { width:100%; border-collapse:collapse; font-size:14.5px; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid #EEF1F4; vertical-align:top; }
+  th { color:var(--mute); font-weight:600; font-size:13px; }
+  code { background:#EEF2F6; padding:1px 6px; border-radius:6px; font-size:13.5px; word-break:break-all; }
+  .toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--navy); color:#fff; padding:10px 18px; border-radius:12px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:50; }
+  .toast.show { opacity:1; }
+  @media (max-width:640px) { .hd { padding:8px 12px; gap:6px 8px; } .hd h1 { font-size:16px; flex-basis:100%; } .hd h1 small { display:none; } .hd button { min-height:36px; padding:4px 10px; font-size:13.5px; } .sp { display:none; } .state { order:9; } }
+  /* แท็บ ร้าน */
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  .kpi b { display:block; font-family:"Kanit",sans-serif; font-size:24px; color:var(--navy); line-height:1.2; }
+  .kpi span { font-size:13px; color:var(--mute); }
+  .kpi.todo { border-color:var(--orange); background:#FFF6EF; }
+  .kpi small { display:block; font-size:12.5px; color:var(--mute); }
+  .st { font-size:12.5px; font-weight:700; padding:1px 9px; border-radius:999px; white-space:nowrap; background:#FFE9DC; color:#9A3A05; }
+  .st.paid { background:#DFF3E8; color:var(--ok); } .st.check { background:#FFF1C2; color:#7A5300; } .st.reject { background:#FBE4E2; color:var(--bad); } .st.cancel { background:#E8ECF1; color:#475466; }
+  .todo-it { border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0 0 8px; background:#FBFCFD; }
+  .todo-it .tools { margin-top:8px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 10px; }
+  .chips button[aria-pressed="true"] { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .tbl { overflow-x:auto; }
+  .tbl table { min-width:720px; }
+  .bars { width:100%; height:auto; display:block; }
+  .bars rect.bar { fill:var(--navy); }
+  .bars rect.bar:hover { fill:var(--orange); }
+  .bars text { fill:var(--mute); font-size:11px; font-family:"IBM Plex Sans Thai",sans-serif; }
+  .modal { position:fixed; inset:0; background:rgba(15,42,68,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal .box { background:#fff; border-radius:14px; max-width:520px; width:100%; max-height:92vh; overflow:auto; padding:16px 18px; }
+  .modal img { max-width:100%; border:1px solid var(--line); border-radius:10px; display:block; margin:8px 0; }
+  /* หลังบ้านออนไลน์ (27 ต.ค. 2026): เข้าระบบ · กลุ่มแท็บ · ทางลัดทุกระบบ */
+  [hidden] { display:none !important; }
+  .who { font-size:13px; color:#D5E1EE; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .login { max-width:520px; margin:24px auto; }
+  .login .or { display:flex; align-items:center; gap:10px; color:var(--mute); font-size:13.5px; margin:14px 0 6px; } .login .or::before, .login .or::after { content:""; flex:1; border-top:1px solid var(--line); }
+  .tabs .grp { align-self:center; font-size:11.5px; font-weight:700; letter-spacing:.3px; color:#8A95A3; padding:0 4px 0 14px; white-space:nowrap; }
+  .tabs .grp:first-child { padding-left:4px; }
+  .tabs button i { font-style:normal; display:inline-block; min-width:19px; height:19px; margin-left:5px; padding:0 5px; border-radius:999px; background:var(--orange); color:#fff; font:700 11.5px/19px "Kanit",sans-serif; text-align:center; }
+  .links { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:8px; }
+  .links a { display:block; border:1px solid var(--line); border-radius:11px; padding:9px 12px; text-decoration:none; color:var(--ink); background:#FBFCFD; }
+  .links a:hover { border-color:var(--navy); }
+  .links a b { display:block; color:var(--navy); font-size:14.5px; } .links a small { color:var(--mute); font-size:12.5px; }
+  .links a.off { opacity:.55; pointer-events:none; }
+  .pubbar { background:#DFF3E8; color:#14532D; border-bottom:1px solid #A7D7BC; padding:8px 16px; font-size:14px; text-align:center; }
+  .pubbar.err { background:#FBE4E2; color:#7A1A12; border-color:#F0B8B2; }
+  @media (max-width:640px) { .stick { position:static; } .kpis { grid-template-columns:repeat(2, minmax(0, 1fr)); } .kpi b { font-size:21px; } .links { grid-template-columns:1fr 1fr; } .links a { padding:8px 10px; } .links a small { display:none; } #b-imp, #b-reset { display:none; } }
+</style>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<div class="stick">
+<header>
+  <div class="hd">
+    <h1>หลังบ้าน · สร้าง | BUILD TH<small id="sub">ร้าน ลูกค้า และเนื้อหาเว็บในที่เดียว · ใช้ได้ทุกที่</small></h1>
+    <span class="state" id="state">ตรงกับไฟล์</span>
+    <span class="sp"></span>
+    <span class="who" id="who" hidden></span>
+    <button class="dark" id="b-prev" type="button">ดูตัวอย่าง</button>
+    <button class="dark" id="b-imp" type="button">นำเข้า</button>
+    <button class="dark" id="b-reset" type="button">ทิ้งที่แก้</button>
+    <button class="dark" id="b-save" type="button">ดาวน์โหลด data.js</button>
+    <button class="pri" id="b-pub" type="button" hidden>บันทึกขึ้นเว็บ</button>
+    <button class="dark" id="b-out" type="button" hidden>ออกจากระบบ</button>
+    <input type="file" id="file" accept=".js,.json,text/javascript,application/json" hidden>
+  </div>
+</header>
+<nav><div class="tabs" id="tabs" role="tablist"></div></nav></div>
+<main id="main"></main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+  var NEED_API = "2026-10-27"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var KEY = "build_site_draft";
+  var ORIG = JSON.stringify(window.SITE || {});
+  var S = JSON.parse(ORIG), dirty = false, staleNote = "";
+  // draft safety (18 Oct 2026): an old draft once replaced the whole data.js (links, tribute, schedule were lost).
+  // A draft is used only when it was made on the same data.js that is loaded now; any other draft is kept aside, not used.
+  function hashOf(s) { var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return String(h >>> 0) + ":" + s.length; }
+  var BASE = hashOf(ORIG);
+  try {
+    var dr = localStorage.getItem(KEY), dj = dr ? JSON.parse(dr) : null;
+    if (dj && dj.base === BASE && dj.data) { S = dj.data; dirty = JSON.stringify(S) !== ORIG; }
+    else if (dj) { localStorage.setItem(KEY + "_old", dr); localStorage.removeItem(KEY); staleNote = "พบร่างเก่าที่แก้บนข้อมูลรุ่นก่อน จึงไม่นำมาใช้ (กันข้อมูลใหม่หาย) · ใช้ค่าจากไฟล์ data.js แทน"; }
+  } catch (e) {}
+  function shape() {
+    ["brand", "site", "links", "announce", "posts", "member", "pay"].forEach(function (k) { if (!S[k] || typeof S[k] !== "object") S[k] = {}; });
+    ["episodes", "freebies", "products", "services", "shop", "music", "faq", "sheets", "bundles", "sheetsNext", "market"].forEach(function (k) { if (!Array.isArray(S[k])) S[k] = []; });
+    if (!Array.isArray(S.member.perks)) S.member.perks = [];
+  }
+  shape();
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var ok = function (u) { return /^https?:\/\//i.test(u || ""); };
+  function get(o, p) { return p.split(".").reduce(function (a, k) { return a == null ? undefined : a[k]; }, o); }
+  function set(o, p, v) { var ks = p.split("."), last = ks.pop(); var t = ks.reduce(function (a, k) { if (a[k] == null || typeof a[k] !== "object") a[k] = {}; return a[k]; }, o); t[last] = v; }
+  function toast(t) { var e = $("toast"); e.textContent = t; e.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove("show"); }, 2200); }
+  function touch() { dirty = JSON.stringify(S) !== ORIG; try { if (dirty) localStorage.setItem(KEY, JSON.stringify({ base: BASE, at: Date.now(), data: S })); else localStorage.removeItem(KEY); } catch (e) {} var st = $("state"); st.textContent = dirty ? "มีการแก้ที่ยังไม่บันทึก" : (GH && GH.on === true ? "ตรงกับบนเว็บ" : "ตรงกับไฟล์"); st.classList.toggle("dirty", dirty); }
+  var PL = [["tiktok", "TikTok"], ["youtube", "YouTube"], ["facebook", "Facebook"], ["instagram", "Instagram"]];
+
+  // ----- แบบฟอร์ม -----
+  var OBJ = {
+    brand: [["name", "ชื่อช่อง"], ["show", "ชื่อรายการ"], ["tagline", "สโลแกน"], ["schedule", "ตารางลงคลิป"], ["about", "แนะนำช่อง 1–2 บรรทัด", "long"]],
+    links: [["tiktok", "TikTok", "url"], ["youtube", "YouTube", "url"], ["facebook", "Facebook", "url"], ["instagram", "Instagram", "url"], ["x", "X", "url"], ["threads", "Threads", "url"], ["spotify", "Spotify (เพลงของช่อง)", "url"], ["line", "LINE: ลิงก์เพิ่มเพื่อน (ขึ้นต้น https://lin.ee/ หรือ https://line.me/)", "url"], ["lineId", "LINE ID ที่ขึ้นต้นด้วย @"], ["email", "อีเมลติดต่องานและสปอนเซอร์"], ["naihang", "เพจ นายห้าง AI Network", "url"]],
+    site: [["url", "ที่อยู่เว็บหลังเผยแพร่ (https://…)", "url"], ["ga4", "รหัส Google Analytics 4 (รูปแบบ G-XXXXXXX) ถ้าต้องการสถิติ"]],
+    announce: [["on", "เปิดแถบประกาศบนสุดของเว็บ", "bool"], ["text", "ข้อความประกาศ"], ["url", "ลิงก์ของประกาศ", "url"]],
+    member: [["on", "เปิดระบบสมาชิกบนเว็บ", "bool"], ["api", "ที่อยู่หลังบ้านสมาชิก (ลงท้ายด้วย /exec) เว้นว่าง = โหมดทดลอง", "url", "full"], ["googleClientId", "รหัส Google Client ID สำหรับปุ่มเข้าสู่ระบบด้วย Google (ลงท้ายด้วย .apps.googleusercontent.com · เว้นว่าง = ไม่แสดงปุ่ม)", "", "full"], ["lineChannelId", "LINE Login Channel ID (ตัวเลข 10 หลักจาก LINE Developers · เว้นว่าง = ไม่แสดงปุ่ม LINE)"], ["facebookAppId", "Facebook App ID (ตัวเลขจาก Meta for Developers · เว้นว่าง = ไม่แสดงปุ่ม Facebook)"], ["tiktokClientKey", "TikTok Client Key (จาก TikTok for Developers · เว้นว่าง = ไม่แสดงปุ่ม TikTok · Client Secret ใส่ใน Script properties ของหลังบ้านเท่านั้น)"], ["fbVersion", "รุ่น Facebook Graph API (ค่าเริ่มต้น v26.0)"], ["lineBotPrompt", "ชวนเพิ่มเพื่อน LINE OA ตอนเข้าสู่ระบบด้วย LINE (พิมพ์ normal หรือ aggressive · เว้นว่าง = ไม่ชวน · ต้องผูก LINE OA กับ Login channel ก่อน)"], ["perks", "สิทธิ์สมาชิก (บรรทัดละ 1 ข้อ ใส่เฉพาะสิ่งที่ให้ได้จริง)", "lines"], ["consent", "ข้อความขอความยินยอมตอนสมัคร", "long"]],
+    pay: [["on", "เปิดรับชำระเงิน (โอนแล้วแนบสลิป และชำระออนไลน์ถ้าใส่คีย์ Opn)", "bool"], ["opnKey", "Opn Payments public key ขึ้นต้น pkey_ (ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ระบบตรวจยอดเอง · เว้นว่าง = โอนแล้วแนบสลิปอย่างเดียว · ห้ามใส่คีย์ลับ skey_ ที่นี่)", "", "full"], ["methods", "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ บรรทัดละ 1 · เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริงให้เอง (promptpay พร้อมเพย์ · card บัตร · googlepay · alipay · mobile_banking_kbank / _scb / _bbl / _bay / _ktb แอปธนาคาร · truemoney_jumpapp · rabbit_linepay · shopeepay · grabpay)", "lines", "full"], ["googlePayId", "Google Pay merchant ID (ใช้กับคีย์จริงเท่านั้น · เว้นว่างในโหมดทดสอบ)"], ["bank", "ธนาคาร"], ["name", "ชื่อบัญชี"], ["acc", "เลขบัญชี (เว้นว่างได้ ถ้าใช้คิวอาร์อย่างเดียว)"], ["qr", "รูปคิวอาร์รับเงิน: วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่องนี้"], ["hours", "ตรวจยอดภายในกี่ชั่วโมง"], ["note", "ข้อความใต้ข้อมูลรับเงิน", "long", "full"]]
+  };
+  var W = PL.map(function (p) { return ["watch." + p[0], "ลิงก์คลิปเวอร์ชันเล่า · " + p[1], "url"]; }), SG = PL.map(function (p) { return ["song." + p[0], "ลิงก์เวอร์ชันเพลง · " + p[1], "url"]; });
+  var LIST = {
+    episodes: { name: "ตอน", label: function (e) { return "#" + (e.no || "?") + " " + (e.title || ""); }, flag: function (e) { return PL.some(function (p) { return ok((e.watch || {})[p[0]]); }) ? ["ok", "มีลิงก์คลิป"] : ["no", "ยังไม่มีลิงก์"]; }, blank: function () { var n = S.episodes.length + 1, no = (n < 10 ? "0" : "") + n; return { id: "E" + no, no: no, title: "", topic: "", date: "", cover: "img/E" + no + ".jpg", songTitle: "", songDate: "", watch: {}, song: {} }; },
+      fields: [["id", "รหัสผลิต (E01)"], ["no", "เลขตอนที่แสดง"], ["title", "ชื่อตอน", "", "full"], ["topic", "หัวข้อ (ใช้กรองบนเว็บ)"], ["date", "วันปล่อย", "date"], ["cover", "ไฟล์ปก (img/E01.jpg)"]].concat(W, [["songTitle", "ชื่อเพลง"], ["songDate", "วันปล่อยเวอร์ชันเพลง", "date"]], SG) },
+    freebies: { name: "เช็กลิสต์", label: function (f) { return f.title || "(ยังไม่ตั้งชื่อ)"; }, flag: function (f) { return f.keyword ? ["", "LINE: " + f.keyword] : ["no", "ไม่มีคำสั่ง LINE"]; }, blank: function () { return { id: "free" + (S.freebies.length + 1), title: "", from: "", keyword: "", items: [], note: "" }; },
+      fields: [["title", "ชื่อเช็กลิสต์", "", "full"], ["id", "รหัส (อังกฤษ ไม่เว้นวรรค ใช้ในลิงก์)"], ["from", "จากตอน (E02)"], ["keyword", "คำที่ให้คนพิมพ์ใน LINE เพื่อรับไฟล์"], ["items", "รายการ (บรรทัดละ 1 ข้อ)", "lines", "full"], ["note", "หมายเหตุท้ายแผ่น", "long", "full"]] },
+    products: { name: "ของแนะนำ", label: function (p) { return p.name || "(ยังไม่ตั้งชื่อ)"; }, flag: function (p) { return ok(p.url) ? (p.on === false ? ["", "ซ่อนอยู่"] : ["ok", p.network || "มีลิงก์"]) : ["no", "ยังไม่ใส่ลิงก์"]; }, blank: function () { return { id: "p" + Date.now(), name: "", why: "", ep: "", cat: "", network: "Shopee", url: "", on: true }; },
+      fields: [["name", "ชื่อของ"], ["cat", "หมวด"], ["why", "ใช้ทำอะไร (1 บรรทัด)", "", "full"], ["ep", "พูดถึงในตอน (E03)"], ["network", "ร้านหรือเครือข่าย", ["Shopee", "Lazada", "TikTok Shop", "ร้านอื่น"]], ["url", "ลิงก์แอฟฟิลิเอตของคุณ", "url", "full"], ["on", "แสดงบนเว็บ", "bool"]] },
+    services: { name: "บริการ", label: function (x) { return x.title || "(ยังไม่ตั้งชื่อ)"; }, flag: function (x) { return ok(x.url) ? ["ok", "เปิดแล้ว"] : ["", x.status || "ยังไม่เปิด"]; }, blank: function () { return { title: "", text: "", status: "ยังไม่เปิดรับ", price: "", url: "" }; }, fields: [["title", "ชื่อบริการ"], ["status", "ป้ายเมื่อยังไม่เปิด"], ["text", "รายละเอียดสั้น", "long", "full"], ["price", "ราคา (แสดงเมื่อเปิดแล้ว)"], ["url", "ลิงก์จอง (ใส่แล้ว = เปิดรับ)", "url"]] },
+    shop: { name: "สินค้าของช่อง", label: function (x) { return x.title || "(ยังไม่ตั้งชื่อ)"; }, flag: function (x) { return ok(x.url) ? ["ok", "เปิดขาย"] : ["", x.status || "ยังไม่เปิด"]; }, blank: function () { return { title: "", text: "", status: "กำลังทำ", price: "", url: "", page: "", cta: "" }; }, fields: [["title", "ชื่อสินค้า"], ["status", "ป้ายเมื่อยังไม่เปิดขาย"], ["page", "หน้าในเว็บนี้ที่มีรายละเอียด (เช่น sheets.html)"], ["cta", "ข้อความบนปุ่มไปหน้านั้น"], ["text", "รายละเอียดสั้น", "long", "full"], ["price", "ราคา (แสดงเมื่อเปิดขาย)"], ["url", "ลิงก์หน้าขาย (ใส่แล้ว = เปิดขาย)", "url"]] },
+    music: { name: "เพลง", label: function (x) { return x.title || "(ยังไม่ตั้งชื่อ)"; }, flag: function (x) { return ok(x.url) ? ["ok", "มีลิงก์"] : ["no", "ยังไม่มีลิงก์"]; }, blank: function () { return { title: "", text: "", url: "" }; }, fields: [["title", "ชื่อ"], ["text", "คำอธิบายสั้น"], ["url", "ลิงก์", "url", "full"]] },
+    faq: { name: "คำถาม", label: function (x) { return x.q || "(ยังไม่ตั้งคำถาม)"; }, blank: function () { return { q: "", a: "" }; }, fields: [["q", "คำถาม", "", "full"], ["a", "คำตอบ", "long", "full"]] },
+    // สินค้าฝากขาย (26 ต.ค. 2026): ขายผ่านตะกร้าเดียวกับใบตรวจงาน · ส่วนแบ่งผู้ขายเก็บในชีตของร้าน ไม่ใส่ในเว็บ
+    market: { name: "สินค้าฝากขาย", label: function (x) { return (x.id || "M-?") + " " + (x.title || "(ยังไม่ตั้งชื่อ)"); }, flag: function (x) { return x.sale === true && x.ok === true && +x.price > 0 ? ["ok", "วางขาย"] : x.ok === true ? ["", "ตรวจแล้ว ยังไม่เปิดขาย"] : ["no", "ยังไม่ตรวจสินค้า"]; },
+      blank: function () { var n = (S.market || []).length + 1, id = "M-" + ("00" + n).slice(-3); return { id: id, kind: "อีบุ๊ก", title: "", seller: "", sum: "", desc: "", price: "", img: "", delivery: "file", file: "MKT_" + id + ".pdf", format: "", consign: "", ok: false, sale: false }; },
+      fields: [["id", "รหัส (M-001 ห้ามซ้ำ)"], ["kind", "ประเภท", ["โปรแกรม", "หนังสือ", "อีบุ๊ก", "เทมเพลตหรือไฟล์", "คอร์สหรือคลิปสอน", "อื่น ๆ"]], ["title", "ชื่อสินค้า", "", "full"], ["seller", "ชื่อผู้ขาย (แสดงบนเว็บ)"], ["consign", "เลขใบสมัครฝากขาย (CS-…)"], ["sum", "สรุป 1 บรรทัด", "", "full"], ["desc", "รายละเอียด (ย่อหน้าละบรรทัด)", "long", "full"], ["format", "รูปแบบ เช่น PDF 120 หน้า · Windows 10 ขึ้นไป · ปกอ่อน A5"], ["price", "ราคา (บาท)"], ["img", "รูปสินค้า (img/market/M-001.jpg หรือ https://)"], ["delivery", "การส่งมอบ", ["file", "ship", "manual"]], ["file", "ชื่อไฟล์ในโฟลเดอร์ไดรฟ์ (เมื่อส่งมอบแบบ file เช่น MKT_M-001.pdf)"], ["ok", "ร้านตรวจสินค้าแล้ว", "bool"], ["sale", "เปิดขาย", "bool"]] }
+  };
+  function field(base, f) {
+    var p = base + "." + f[0], v = get(S, p), ty = f[2] || "", cls = f[3] === "full" || ty === "long" || ty === "lines" ? ' class="full"' : "";
+    if (ty === "bool") return '<label class="chk"><input type="checkbox" data-p="' + p + '" data-t="bool"' + (v !== false && v ? " checked" : "") + "> " + esc(f[1]) + "</label>";
+    if (Array.isArray(ty)) return "<label" + cls + ">" + esc(f[1]) + '<select data-p="' + p + '">' + ty.map(function (o) { return "<option" + (o === v ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></label>";
+    if (ty === "long") return "<label" + cls + ">" + esc(f[1]) + '<textarea data-p="' + p + '">' + esc(v) + "</textarea></label>";
+    if (ty === "lines") return "<label" + cls + ">" + esc(f[1]) + '<textarea data-p="' + p + '" data-t="lines" rows="6">' + esc((v || []).join("\n")) + "</textarea></label>";
+    return "<label" + cls + ">" + esc(f[1]) + '<input type="' + (ty === "date" ? "date" : ty === "url" ? "url" : "text") + '" data-p="' + p + '"' + (ty === "url" ? ' data-t="url" inputmode="url" placeholder="https://"' : "") + ' value="' + esc(v) + '"' + (ty === "url" && v && !ok(v) ? ' class="bad"' : "") + "></label>";
+  }
+  function objCard(key, title, hint) { return '<div class="card"><h2>' + title + "</h2>" + (hint ? '<p class="hint">' + hint + "</p>" : "") + '<div class="grid">' + OBJ[key].map(function (f) { return field(key, f); }).join("") + "</div></div>"; }
+  var openAt = {};
+  function listCard(key, title, hint) {
+    var L = LIST[key];
+    return '<div class="card"><h2>' + title + ' <span class="tag">' + S[key].length + " รายการ</span></h2>" + (hint ? '<p class="hint">' + hint + "</p>" : "") + S[key].map(function (it, i) {
+      var fl = L.flag ? L.flag(it) : null;
+      return '<details class="it" data-list="' + key + '" data-i="' + i + '"' + (openAt[key] === i ? " open" : "") + '><summary><span class="t">' + esc(L.label(it)) + "</span>" + (fl ? '<span class="tag ' + fl[0] + '">' + esc(fl[1]) + "</span>" : "") + '</summary><div class="bd"><div class="grid">' + L.fields.map(function (f) { return field(key + "." + i, f); }).join("") + '</div><div class="tools"><button class="sm" type="button" data-act="up" data-list="' + key + '" data-i="' + i + '">↑ เลื่อนขึ้น</button><button class="sm" type="button" data-act="down" data-list="' + key + '" data-i="' + i + '">↓ เลื่อนลง</button><button class="sm del" type="button" data-act="del" data-list="' + key + '" data-i="' + i + '">ลบรายการนี้</button></div></div></details>';
+    }).join("") + '<div class="tools"><button type="button" data-act="add" data-list="' + key + '">+ เพิ่ม' + L.name + "</button></div></div>";
+  }
+
+  // ----- ภาพรวม -----
+  function overview() {
+    var L = S.links, rows = [], add = function (cls, t, d) { rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!") + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>"); };
+    var ch = ["tiktok", "youtube", "facebook", "instagram", "x"].filter(function (k) { return ok(L[k]); });
+    add(ch.length >= 3 ? "ok" : ch.length ? "wa" : "no", "ช่องทาง " + ch.length + " จาก 5", ch.length < 5 ? "ช่องที่ยังว่างจะขึ้นว่า “เร็ว ๆ นี้” บนเว็บ" : "");
+    add(ok(L.line) ? "ok" : "no", "ลิงก์เพิ่มเพื่อน LINE", ok(L.line) ? "ปุ่มรับเช็กลิสต์ทาง LINE ทำงานแล้ว" : "ยังไม่ใส่ → เว็บจะให้เปิดฉบับพิมพ์เองแทน (ยังใช้ได้ แต่ไม่ได้รายชื่อผู้ติดตาม)");
+    add(ok(S.site.url) ? "ok" : "wa", "ที่อยู่เว็บ", ok(S.site.url) ? esc(S.site.url) : "ใส่หลังเผยแพร่ เพื่อให้ชุดโพสต์สร้างลิงก์ติดตามผลได้");
+    add(S.links.email ? "ok" : "wa", "อีเมลติดต่องาน", S.links.email ? "" : "สปอนเซอร์ติดต่อทางนี้");
+    var withLink = S.episodes.filter(function (e) { return PL.some(function (p) { return ok((e.watch || {})[p[0]]); }); });
+    var late = S.episodes.filter(function (e) { return e.date && new Date(e.date + "T00:00:00") <= new Date() && withLink.indexOf(e) < 0; });
+    add(late.length ? "no" : "ok", "ตอนที่มีลิงก์คลิป " + withLink.length + " จาก " + S.episodes.length, late.length ? "ถึงวันปล่อยแล้วแต่ยังไม่ใส่ลิงก์: " + late.map(function (e) { return "#" + esc(e.no); }).join(" ") : "ตอนที่ยังไม่ถึงวันปล่อยจะแสดงวันที่อัตโนมัติ");
+    var ids = {}, dup = []; S.freebies.forEach(function (f) { if (ids[f.id]) dup.push(f.id); ids[f.id] = 1; });
+    var kws = {}, dk = []; S.freebies.forEach(function (f) { if (f.keyword) { if (kws[f.keyword]) dk.push(f.keyword); kws[f.keyword] = 1; } });
+    add(dup.length || dk.length ? "no" : "ok", "เช็กลิสต์ " + S.freebies.length + " ชุด", dup.length ? "รหัสซ้ำ: " + esc(dup.join(", ")) : dk.length ? "คำสั่ง LINE ซ้ำ: " + esc(dk.join(", ")) : "รหัสและคำสั่ง LINE ไม่ซ้ำกัน");
+    var act = S.products.filter(function (p) { return p.on !== false && ok(p.url); }), nets = {}; act.forEach(function (p) { nets[p.network] = 1; });
+    add(act.length ? "ok" : "wa", "ของแนะนำที่ใส่ลิงก์แล้ว " + act.length + " จาก " + S.products.length, act.length ? "หมวด “ของที่ใช้ในคลิป” แสดงบนเว็บพร้อมข้อความเปิดเผยแอฟฟิลิเอต" : "ยังไม่ใส่ลิงก์ → หมวดนี้ถูกซ่อนจากเว็บ");
+    if (Object.keys(nets).length > 1 && nets.Shopee) add("no", "มีลิงก์ Shopee ปนกับร้านอื่นในหน้าเดียวกัน", "ข้อกำหนด Shopee Affiliate ห้ามเนื้อหาที่มีลิงก์ Shopee มีลิงก์ไปแพลตฟอร์มซื้อขายอื่น ให้เลือกร้านเดียวต่อหนึ่งหน้า");
+    var bad = []; (function walk(o, p) { if (o && typeof o === "object") Object.keys(o).forEach(function (k) { walk(o[k], p + "." + k); }); else if (typeof o === "string" && /(^|\.)(url|tiktok|youtube|facebook|instagram|x|line|naihang)$/.test(p) && o && !ok(o)) bad.push(p.slice(1)); })(S, "");
+    add(bad.length ? "no" : "ok", "รูปแบบลิงก์", bad.length ? "ลิงก์ที่ไม่ได้ขึ้นต้นด้วย https:// : " + esc(bad.join(", ")) : "ทุกลิงก์ขึ้นต้นด้วย http(s)");
+    var sh = S.sheets, rv = sh.filter(function (x) { return x.ok === true; }).length, sl = sh.filter(function (x) { return x.sale === true; }).length, apiOk = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(S.member.api || "");
+    if (sh.length) {
+      add(rv === sh.length ? "ok" : rv ? "wa" : "no", "ใบตรวจงาน " + sh.length + " งาน · ตรวจรายการแล้ว " + rv, rv < sh.length ? "ใบที่ยังไม่ตรวจจะขึ้นว่า “กำลังตรวจรายการ” และยังดาวน์โหลดไม่ได้ · ตรวจแล้วพิมพ์ ใช่ ในไฟล์ สินค้า\\เช็กชีต\\00_สถานะเช็กชีต.csv แล้วสั่ง Claude ว่า ทำเช็กชีต" : "ฉบับฟรีเปิดให้ดาวน์โหลดครบ");
+      add(S.member.on === false ? "wa" : apiOk ? "ok" : "no", "ระบบสมาชิก", S.member.on === false ? "ปิดอยู่" : apiOk ? "ต่อกับหลังบ้านแล้ว" : (S.member.api ? "ที่อยู่หลังบ้านไม่ถูกรูปแบบ ต้องเป็น https://script.google.com/macros/s/…/exec" : "ยังเป็นโหมดทดลอง (ข้อมูลอยู่ในเบราว์เซอร์ของผู้ใช้เท่านั้น) · ทำตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md"));
+      var lo = ["googleClientId", "lineChannelId", "facebookAppId", "tiktokClientKey"].filter(function (k) { return S.member[k]; });
+      add(/^skey_/.test(String(S.pay.opnKey || "")) ? "no" : /^pkey_/.test(String(S.pay.opnKey || "")) ? "ok" : "wa", "ชำระออนไลน์ (Opn Payments)", /^skey_/.test(String(S.pay.opnKey || "")) ? "ช่องนี้มีคีย์ลับ skey_ ลบออกทันที ห้ามขึ้นเว็บ · คีย์ลับใส่ใน Script properties ชื่อ OPN_SKEY เท่านั้น" : /^pkey_/.test(String(S.pay.opnKey || "")) ? (/^pkey_test_/.test(S.pay.opnKey) ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง") + " · ต้องใส่ OPN_SKEY ใน Script properties ด้วย" : "ยังไม่ใส่คีย์ ลูกค้าชำระด้วยการโอนแล้วแนบสลิปได้ตามเดิม · สมัคร Opn Payments ตามคู่มือ");
+      add(lo.length ? "ok" : "wa", "เข้าสู่ระบบด้วย Google LINE Facebook TikTok: เปิด " + lo.length + " จาก 4", lo.length < 4 ? "ทำตามคู่มือ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md ส่วนที่ 2 · ปุ่มที่ยังไม่ตั้งจะไม่แสดง สมัครด้วยอีเมลได้เสมอ" : "");
+      add(S.pay.qr ? "ok" : "wa", "รูปคิวอาร์รับเงิน", S.pay.qr ? esc(S.pay.qr) + " · ลูกค้าเห็นตอนชำระเงินเท่านั้น" : "วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในแท็บ สมาชิกและชำระเงิน");
+      add(S.pay.on === true && apiOk && sl ? "ok" : "wa", "รับชำระเงิน: " + (S.pay.on === true ? "เปิด" : "ปิด") + " · เปิดขาย " + sl + " ใบ", S.pay.on === true ? (!apiOk ? "เปิดรับเงินแต่ยังไม่ต่อหลังบ้าน ลูกค้าจะส่งสลิปถึงร้านไม่ได้" : !(S.pay.name && (S.pay.acc || S.pay.qr)) ? "ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl ? "พร้อมขาย" : "ยังไม่เปิดขายใบใด") : "ใบที่เปิดขายได้ต้องตรวจรายการแล้วเท่านั้น");
+    }
+    return todayCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">' + rows.join("") + "</ul></div>" +
+      '<div class="card"><h2>วิธีใช้ 4 ขั้น</h2><ul class="chk"><li><span>1</span><span>แก้ข้อมูลในแท็บด้านบน<small>ระบบจำร่างไว้ในเครื่องนี้ให้เอง ปิดหน้าแล้วเปิดใหม่ยังอยู่</small></span></li><li><span>2</span><span>กด “ดูตัวอย่าง” ตรวจหน้าเว็บด้วยข้อมูลร่าง</span></li><li><span>3</span><span>กด “บันทึกขึ้นเว็บ”<small>ใช้ได้ทุกที่ทุกเครื่อง เมื่อใส่ GITHUB_TOKEN ใน Script properties แล้ว (ข้อ D15) · ถ้ายังไม่ใส่ ปุ่มนี้ไม่แสดง ให้กด “ดาวน์โหลด data.js” นำไปวางทับในโฟลเดอร์ เว็บ แล้วอัปโหลดขึ้นโฮสต์</small></span></li><li><span>4</span><span>รอราว 1–2 นาที แล้วเปิดเว็บดู<small>ลิงก์ที่แปะไว้ตามช่องทางไม่ต้องแก้ เพราะชี้มาที่เว็บนี้ · ประวัติการแก้ทุกครั้งอยู่ใน GitHub ย้อนกลับได้</small></span></li></ul></div>';
+  }
+
+  // ----- ชุดโพสต์ -----
+  var kitEp = (S.episodes[0] || {}).id, kitVer = "voice";
+  var AI = "ภาพและเพลงสร้างด้วย AI · บทและข้อเท็จจริงเขียนและตรวจโดยคน";
+  function utm(src, med, camp) { var u = (S.site.url || "").replace(/\/+$/, ""); return ok(u) ? u + "/?utm_source=" + src + "&utm_medium=" + med + "&utm_campaign=" + camp : ""; }
+  function cut(s, n) { return s.length <= n ? s : s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…"; }
+  function kit() {
+    var e = S.episodes.filter(function (x) { return x.id === kitEp; })[0]; if (!e) return "";
+    if (!S.posts[e.id]) S.posts[e.id] = { caption: "", tags: "", question: "", free: "" };
+    var P = S.posts[e.id], song = kitVer === "song", L = S.links, show = S.brand.show || "", f = S.freebies.filter(function (x) { return x.id === P.free; })[0];
+    var camp = e.id + (song ? "s" : ""), cap = song ? "เวอร์ชันเพลงของตอน #" + e.no + " " + e.title + " · เพลง “" + (e.songTitle || "") + "” เนื้อร้องมาจากบทของตอน" : (P.caption || e.title);
+    var tags = (P.tags || "") + (song ? " #เพลงAI" : ""), q = P.question || "";
+    var lineKw = f && f.keyword && (L.lineId || ok(L.line)) ? "อยากได้เช็กลิสต์ของตอนนี้ พิมพ์คำว่า “" + f.keyword + "” ใน LINE" + (L.lineId ? " " + L.lineId : "") : "";
+    var out = [], add = function (t, v, tip) { v = v.trim(); out.push('<div class="kit"><div class="top"><b>' + t + '</b><span class="tag">' + v.length + ' ตัวอักษร</span><button class="sm" type="button" data-act="copy">คัดลอก</button></div><textarea readonly rows="' + Math.min(9, Math.max(2, Math.ceil(v.length / 60) + (v.match(/\n/g) || []).length)) + '">' + esc(v) + "</textarea>" + (tip ? "<small>" + tip + "</small>" : "") + "</div>"); };
+    var ytT = cut(song ? "เพลง “" + (e.songTitle || "") + "” | " + show + " #" + e.no + " เวอร์ชันเพลง" : e.title + " | " + show + " #" + e.no, 100);
+    add("YouTube Shorts · ชื่อคลิป", ytT, "ไม่เกิน 100 ตัวอักษร คำสำคัญอยู่ต้นชื่อ");
+    add("YouTube Shorts · คำอธิบาย", cap + (q && !song ? "\n\n" + q : "") + "\n\n" + (f ? "เช็กลิสต์ฟรีของตอนนี้อยู่ที่ลิงก์หน้าช่อง" : "ดูทุกตอนและเช็กลิสต์ฟรีที่ลิงก์หน้าช่อง") + "\n" + AI + "\n" + tags + " #Shorts", "ลิงก์ในคำอธิบายและคอมเมนต์ของ Shorts กดไม่ได้ ให้ใส่ลิงก์เว็บไว้ที่หน้าช่อง · ตอนอัปโหลดตอบ “ใช่” ที่ข้อเนื้อหาดัดแปลงหรือสังเคราะห์ · อัปโหลดปก " + e.id + (song ? "_ปก_เพลง.jpg" : "_ปก.jpg") + " ที่ YouTube Studio บนคอมพิวเตอร์");
+    add("TikTok · แคปชัน", cap + (q && !song ? " " + q : "") + "\n" + tags, "เปิดป้าย “สร้างโดย AI” · เลือกปกจากไฟล์ปก · ลิงก์เว็บใส่ที่โปรไฟล์ (ต้องมีผู้ติดตาม 1,000 คน หรือเป็นบัญชีธุรกิจ) · ถ้าคลิปพูดถึงสินค้าหรือมีลิงก์ขาย ให้เปิด “เปิดเผยเนื้อหาเชิงพาณิชย์”");
+    add("Facebook และ Instagram Reels · แคปชัน", cap + (q && !song ? "\n" + q : "") + "\n" + AI + "\n" + tags, "อัปโหลดปกเดียวกัน · เปิดป้าย AI · ไม่ใส่ลิงก์ในตัวโพสต์");
+    var fb = utm("facebook", "comment", camp);
+    add("Facebook · คอมเมนต์แรก (ปักหมุด)", (q && !song ? q + "\n" : "") + (lineKw ? lineKw + "\n" : "") + (fb ? (f ? "อ่านเช็กลิสต์บนเว็บ: " : "ดูทุกตอน: ") + fb : ""), "วางลิงก์ในคอมเมนต์แทนตัวโพสต์ เพราะเพจที่ไม่ได้สมัครสมาชิกยืนยันตัวตนอาจถูกจำกัดโพสต์ที่มีลิงก์เหลือเดือนละ 2 โพสต์");
+    var xl = utm("x", "post", camp); add("X · โพสต์", cut(cap, 280 - (xl ? xl.length + 1 : 0) - 1) + (xl ? "\n" + xl : ""), "ไม่เกิน 280 ตัวอักษรรวมลิงก์ · แนบคลิปหรือปก");
+    add("TikTok และ YouTube · คอมเมนต์ปักหมุด", (song ? "ฟังแล้วท่อนไหนติดหูที่สุด?" : q) + (lineKw ? "\n" + lineKw : ""), "ถามคำถามที่ตอบได้จริง ไม่ใช้ประโยคล่อให้พิมพ์คำเดียวเพื่อแลกของ");
+    var w = ""; ["tiktok", "youtube", "facebook", "instagram"].some(function (k) { var u = ((song ? e.song : e.watch) || {})[k]; if (ok(u)) { w = u; return true; } return false; });
+    add("LINE · ข้อความบรอดแคสต์", (song ? "เวอร์ชันเพลงมาแล้ว: “" + (e.songTitle || "") + "” จากตอน #" + e.no : "ตอนใหม่ #" + e.no + ": " + e.title) + (w ? "\n" + w : "") + (f && f.keyword && !song ? "\nอยากได้เช็กลิสต์ของตอนนี้ พิมพ์ “" + f.keyword + "” ได้เลย" : ""), "บรอดแคสต์ 1 ครั้งใช้โควตาเท่าจำนวนเพื่อนที่ได้รับ (แพ็กเกจฟรี 300 ข้อความต่อเดือน) · ถ้ายังไม่มีลิงก์คลิป ให้ใส่ลิงก์ในแท็บ ตอน ก่อน");
+    return out.join("");
+  }
+  function kitTab() {
+    var e = S.episodes.filter(function (x) { return x.id === kitEp; })[0] || {};
+    if (!S.posts[kitEp]) S.posts[kitEp] = { caption: "", tags: "", question: "", free: "" };
+    var base = "posts." + kitEp;
+    return '<div class="card"><h2>ชุดโพสต์พร้อมคัดลอก</h2><p class="hint">เลือกตอนและเวอร์ชัน ระบบประกอบข้อความของทุกแพลตฟอร์มให้ ตามกฎของแต่ละที่</p><div class="grid"><label>ตอน<select id="kit-ep">' + S.episodes.map(function (x) { return '<option value="' + esc(x.id) + '"' + (x.id === kitEp ? " selected" : "") + ">#" + esc(x.no) + " " + esc(x.title) + "</option>"; }).join("") + '</select></label><label>เวอร์ชัน<select id="kit-ver"><option value="voice"' + (kitVer === "voice" ? " selected" : "") + '>เวอร์ชันเล่า (พากย์)</option><option value="song"' + (kitVer === "song" ? " selected" : "") + ">เวอร์ชันเพลง</option></select></label></div></div>" +
+      '<div class="card"><h2>ข้อความต้นทางของตอน #' + esc(e.no) + '</h2><p class="hint">แก้ตรงนี้แล้วข้อความด้านล่างเปลี่ยนตาม</p><div class="grid">' + field(base, ["caption", "แคปชันหลัก", "long", "full"]) + field(base, ["question", "คำถามท้ายคลิป"]) + field(base, ["tags", "แฮชแท็ก 5 ตัว"]) + "<label>เช็กลิสต์ของตอนนี้<select data-p=\"" + base + '.free" data-re="1"><option value="">ไม่มี</option>' + S.freebies.map(function (f) { return '<option value="' + esc(f.id) + '"' + (f.id === S.posts[kitEp].free ? " selected" : "") + ">" + esc(f.title) + "</option>"; }).join("") + '</select></label></div></div><div class="card" id="kit-out">' + kit() + "</div>";
+  }
+
+  // ----- ลิงก์สั้นและติดตามผล -----
+  function linksTab() {
+    var u = (S.site.url || "").replace(/\/+$/, ""), base = ok(u) ? u : "https://เว็บของคุณ";
+    var rows = [["line", "เพิ่มเพื่อน LINE"], ["tiktok", "ช่อง TikTok"], ["youtube", "ช่อง YouTube"], ["facebook", "เพจ Facebook"]].concat(S.episodes.slice(0, 2).map(function (e) { return [e.id, "คลิปตอน #" + e.no + " (ใส่ s ต่อท้าย = เวอร์ชันเพลง)"]; }), S.freebies.slice(0, 2).map(function (f) { return ["free-" + f.id, "เช็กลิสต์: " + f.title]; }), [["shop-1", "สินค้าของช่องลำดับที่ 1"]]);
+    return '<div class="card"><h2>ลิงก์สั้นของช่อง</h2><p class="hint">ใช้หน้า go.html เป็นตัวกลาง: แปะลิงก์นี้ในโปรไฟล์ คำอธิบายคลิป หรือคิวอาร์ แล้วเปลี่ยนปลายทางได้จากหลังบ้านโดยไม่ต้องไล่แก้ทุกโพสต์ · ใช้กับลิงก์ของช่องเอง ส่วนลิงก์แอฟฟิลิเอตให้ใช้ลิงก์ตรงจากโปรแกรม</p><table><thead><tr><th>ปลายทาง</th><th>ลิงก์ที่ใช้แปะ</th></tr></thead><tbody>' + rows.map(function (r) { return "<tr><td>" + esc(r[1]) + "</td><td><code>" + esc(base + "/go.html?to=" + r[0] + "&from=tiktok") + "</code></td></tr>"; }).join("") + '</tbody></table><p class="hint" style="margin-top:10px">ค่า from = ที่มา เช่น tiktok, youtube, facebook, x, line, qr · ถ้าใส่รหัส GA4 ไว้ ระบบจะนับการกดแยกตามที่มาให้</p></div>' +
+      '<div class="card"><h2>ตัวสร้างลิงก์ติดตามผล (UTM)</h2><p class="hint">ต่อท้ายลิงก์เว็บ เพื่อดูใน Google Analytics ว่าคนมาจากช่องไหน โพสต์ไหน</p><div class="grid"><label>ลิงก์ปลายทาง<input type="url" id="u-base" value="' + esc(ok(u) ? u + "/" : "") + '" placeholder="https://"></label><label>ที่มา (source)<select id="u-src"><option>tiktok</option><option>youtube</option><option>facebook</option><option>instagram</option><option>x</option><option>line</option><option>qr</option></select></label><label>ตำแหน่ง (medium)<select id="u-med"><option>bio</option><option>comment</option><option>description</option><option>post</option><option>broadcast</option><option>richmenu</option></select></label><label>แคมเปญ (เช่น E03)<input type="text" id="u-camp" value="' + esc(kitEp || "") + '"></label><label class="full">ผลลัพธ์<input type="text" id="u-out" readonly></label></div><div class="tools"><button type="button" data-act="copyutm">คัดลอกลิงก์</button></div></div>' +
+      '<div class="card"><h2>ตั้งชื่อรหัสติดตามของโปรแกรมแอฟฟิลิเอต</h2><p class="hint">ตอนสร้างลิงก์ในหน้าโปรแกรม ให้ใส่รหัสย่อยแบบเดียวกันทุกครั้ง จะรู้ว่ารายได้มาจากช่องไหน ตอนไหน</p><table><thead><tr><th>ช่อง</th><th>รหัสย่อยที่ 1 (ช่อง)</th><th>รหัสย่อยที่ 2 (ตอน)</th><th>ตัวอย่าง</th></tr></thead><tbody><tr><td>เว็บ</td><td>web</td><td>E03</td><td><code>web-E03</code></td></tr><tr><td>YouTube</td><td>yt</td><td>E03</td><td><code>yt-E03</code></td></tr><tr><td>Facebook</td><td>fb</td><td>E03</td><td><code>fb-E03</code></td></tr><tr><td>X</td><td>x</td><td>E03</td><td><code>x-E03</code></td></tr><tr><td>LINE</td><td>line</td><td>E03</td><td><code>line-E03</code></td></tr></tbody></table></div>';
+  }
+  function drawUtm() { var b = $("u-base"); if (!b) return; var v = b.value.trim(); $("u-out").value = ok(v) ? v + (v.indexOf("?") < 0 ? "?" : "&") + "utm_source=" + $("u-src").value + "&utm_medium=" + $("u-med").value + "&utm_campaign=" + encodeURIComponent($("u-camp").value.trim()) : ""; }
+
+  // ----- ใบตรวจงาน (รายการสร้างจากไฟล์ต้นทางด้วย gen_sheets.ps1 · ที่นี่แก้ได้เฉพาะราคาและการเปิดขาย) -----
+  function sheetTab() {
+    var row = function (key, x, i, sub, flag) { return '<details class="it"' + (openAt[key] === i ? " open" : "") + ' data-list="' + key + '" data-i="' + i + '"><summary><span class="t">' + esc(x.id + " " + x.title) + '</span><span class="tag ' + flag[0] + '">' + esc(flag[1]) + '</span></summary><div class="bd"><p class="hint">' + esc(sub) + '</p><div class="grid">' + field(key + "." + i, ["price", "ราคาแบบซื้อฉบับนี้ เก็บได้ตลอด (บาท)"]) + field(key + "." + i, ["priceU", "ราคาแบบรับฉบับใหม่ตลอด (บาท · ว่าง = ไม่ขายแบบนี้)"]) + field(key + "." + i, ["sale", "เปิดขาย", "bool"]) + "</div></div></details>"; };
+    var pr = function (x) { return "฿" + x.price + (+x.priceU > 0 ? " / รับฉบับใหม่ ฿" + x.priceU : ""); };
+    var a = S.sheets.map(function (x, i) { return row("sheets", x, i, (x.hidden === true ? "รายการทดสอบของร้าน ซ่อนจากหน้าร้าน · ซื้อได้เฉพาะอีเมลใน ADMIN_EMAILS หรือ TEST_BUYERS · ไฟล์ที่ส่ง = ไฟล์ของ " + (x.of || "-") + " · ลิงก์ซื้อ member.html?buy=" + x.id : x.group + " · ฟรี " + x.nFree + " จุด · มืออาชีพ " + x.nPro + " ข้อ " + x.pages + " หน้า"), x.hidden === true ? ["", "ทดสอบ (ซ่อน) " + pr(x)] : x.ok === true ? (x.sale === true ? ["ok", "เปิดขาย " + pr(x)] : ["", "ตรวจแล้ว ยังไม่เปิดขาย"]) : ["no", "ร่าง รอตรวจรายการ"]); }).join("");
+    var b = S.bundles.map(function (x, i) { return row("bundles", x, i, (x.items || []).join(" · "), x.sale === true ? ["ok", "เปิดขาย " + pr(x)] : ["", "ยังไม่เปิดขาย " + pr(x)]); }).join("");
+    return '<div class="card"><h2>ใบตรวจงาน <span class="tag">' + S.sheets.filter(function (x) { return x.hidden !== true; }).length + ' งาน</span></h2><p class="hint">เนื้อหาแก้ที่ไฟล์ สินค้า\\เช็กชีต\\ต้นทาง แล้วสั่ง Claude ว่า “ทำเช็กชีต” · ใบที่เป็นร่างจะไม่ถูกขายแม้ติ๊กเปิดขาย · ราคาที่ตั้งไว้ตอนนี้เป็นราคาเสนอ</p>' + (a || '<p class="hint">ยังไม่มีใบตรวจงาน</p>') + "</div>" + '<div class="card"><h2>ชุดรวม <span class="tag">' + S.bundles.length + ' ชุด</span></h2><p class="hint">ชุดรวมขายได้เมื่อทุกใบในชุดตรวจรายการแล้ว</p>' + b + "</div>" +
+      '<div class="card"><h2>ใบที่กำลังทำ</h2><p class="hint">แสดงในหน้าใบตรวจงาน เพื่อบอกว่าจะมีอะไรเพิ่ม</p><label class="full">รายการ (บรรทัดละ 1 งาน)<textarea data-p="sheetsNext" data-t="lines" rows="6">' + esc(S.sheetsNext.join("\n")) + "</textarea></label></div>";
+  }
+
+  // ----- ร้าน: คำสั่งซื้อ ยอดขาย สมาชิก คำถาม สต็อก (ต่อหลังบ้าน Code.gs ด้วยรหัสหลังบ้าน) -----
+  var SHOP = null, shopErr = "", shopBusy = false, shopFilter = "ต้องทำ", shopQ = "", AK = "build_admin_key";
+  var STN = { "รอชำระ": "wait", "รอตรวจ": "check", "ชำระแล้ว": "paid", "สลิปไม่ผ่าน": "reject", "ยกเลิก": "cancel" };
+  // หลังบ้านออนไลน์ (27 ต.ค. 2026): ไม่จำรหัสหลังบ้านในเครื่องแล้ว · เข้าระบบครั้งเดียวได้บัตรผ่านชั่วคราว เก็บในแท็บนี้เท่านั้น (ปิดแท็บ = ออกจากระบบ)
+  try { localStorage.removeItem(AK); } catch (e) {}
+  var TK = "build_admin_tok", TW = "build_admin_who", loginErr = "", loginBusy = false, GH = { sha: "", on: null, at: "", err: "" };
+  function tokGet() { try { return sessionStorage.getItem(TK) || ""; } catch (e) { return ""; } }
+  function tokWho() { try { return sessionStorage.getItem(TW) || ""; } catch (e) { return ""; } }
+  function tokSet(t, who) { try { if (t) { sessionStorage.setItem(TK, t); sessionStorage.setItem(TW, who || ""); } else { sessionStorage.removeItem(TK); sessionStorage.removeItem(TW); } } catch (e) {} }
+  function akGet() { return tokGet(); }
+  function live() { return !!(BB() && !BB().demo); }
+  function gated() { return (live() || /[?&]gate=1/.test(location.search)) && !tokGet(); }
+  // ทุกคำสั่งหลังบ้านผ่านทางนี้: แนบบัตรผ่าน · บัตรหมดอายุ = กลับไปหน้าเข้าสู่ระบบ
+  function adm(action, data) {
+    var d = {}; Object.keys(data || {}).forEach(function (k) { d[k] = data[k]; }); if (tokGet()) d.adminToken = tokGet();
+    return BB().callAdmin(action, d, "").catch(function (e) { if (/หมดเวลาเข้าหลังบ้าน/.test(e.message || "")) { tokSet(""); SHOP = null; loginErr = e.message; render(); } throw e; });
+  }
+  function BB() { return window.BUILD; }
+  function money(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
+  function wh(iso) { return BB() && iso ? BB().when(iso) : ""; }
+  function stTag(s) { return '<span class="st ' + (STN[s] || "") + '">' + esc(s) + "</span>"; }
+  function sheetTitle(id) { var b = BB(), x = b ? b.find(id) : null, up = b && b.isUpd && b.isUpd(id); return (x ? b.baseOf(id) + " " + x.title : id) + (up ? " · แบบรับฉบับใหม่ตลอด" : ""); }
+  function shopLoad() {
+    if (!BB()) { shopErr = "โหลด app.js ไม่ได้"; render(); return; }
+    shopBusy = true; shopErr = ""; if (SHOPTABS.indexOf(tab) >= 0) render();
+    adm("adminSummary", {}).then(function (r) { SHOP = r; SHOP._at = new Date().toISOString(); shopBusy = false; if (SHOPTABS.indexOf(tab) >= 0) render(); })
+      .catch(function (e) { shopErr = e.message || "โหลดไม่สำเร็จ"; shopBusy = false; if (SHOPTABS.indexOf(tab) >= 0) render(); });
+  }
+  function shopAct(action, data, okText) {
+    if (shopBusy) return; shopBusy = true;
+    adm(action, data).then(function (r) { shopBusy = false; toast(okText + (r && r.mailed === false && /ชำระแล้ว|ไม่ผ่าน/.test(okText) ? " (ส่งอีเมลไม่สำเร็จ ดูชีต)" : "")); shopLoad(); })
+      .catch(function (e) { shopBusy = false; toast(e.message || "ทำรายการไม่สำเร็จ"); });
+  }
+  function chart(days) { // ยอดชำระแล้วรายวัน 30 วัน · แท่งเดียว สีเดียว ชี้ที่แท่งเพื่อดูค่า
+    var W = 600, H = 150, pad = 22, max = Math.max.apply(null, days.map(function (d) { return d.rev; }).concat([1])), bw = (W - pad) / days.length;
+    var bars = days.map(function (d, i) { var h = d.rev ? Math.max(3, (H - 30) * d.rev / max) : 0, x = pad + i * bw + 1, y = H - 18 - h; return '<rect class="bar" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + Math.max(1, bw - 2).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3"><title>' + esc(d.d) + " · ยอดชำระแล้ว " + money(d.rev) + " · คำสั่งซื้อใหม่ " + d.n + "</title></rect>"; }).join("");
+    var lab = [0, Math.floor(days.length / 2), days.length - 1].map(function (i) { return '<text x="' + (pad + i * bw + bw / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle">' + esc(days[i].d.slice(5)) + "</text>"; }).join("");
+    return '<svg class="bars" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="ยอดขายที่ชำระแล้วรายวัน 30 วัน สูงสุด ' + money(max) + '"><line x1="' + pad + '" x2="' + W + '" y1="' + (H - 18) + '" y2="' + (H - 18) + '" stroke="#D8DEE6"/><text x="0" y="12">' + esc(money(max)) + "</text>" + bars + lab + "</svg>";
+  }
+  function orderRowHtml(o) {
+    var acts = o.status === "รอตรวจ" ? '<button class="sm" type="button" data-sh="slip" data-id="' + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="' + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="' + esc(o.id) + '">สลิปไม่ผ่าน</button>'
+      : o.status === "รอชำระ" ? '<button class="sm" type="button" data-sh="cancel" data-id="' + esc(o.id) + '">ยกเลิก</button>'
+      : o.status === "สลิปไม่ผ่าน" ? '<button class="sm" type="button" data-sh="back" data-id="' + esc(o.id) + '">ย้อนเป็นรอตรวจ</button>'
+      : o.status === "ชำระแล้ว" && (o.shipTo || o.items.some(function (id) { return !(BB() && BB().find(id)); })) ? '<button class="sm" type="button" data-sh="ship" data-id="' + esc(o.id) + '">' + (o.ship ? "แก้เลขพัสดุ" : "ใส่เลขพัสดุ") + "</button>" : ""; // เลขพัสดุเฉพาะสินค้าจริง · เอกสารส่งมอบแบบดิจิทัล
+    if (o.receiptUrl && /\/receipt\.html\?/.test(o.receiptUrl)) acts += '<a class="btn sm" href="' + esc(o.receiptUrl) + '" target="_blank" rel="noopener">ใบเสร็จ' + (o.receipt ? " " + esc(o.receipt) : "") + "</a>";'<button class="sm" type="button" data-sh="trk" data-url="' + esc(o.trackUrl) + '">คัดลอกลิงก์ติดตาม</button>';
+    return "<tr><td><b>" + esc(o.id) + "</b><br><small>" + esc(wh(o.created)) + "</small></td><td>" + esc(o.email || "(ลบบัญชีแล้ว)") + "</td><td>" + o.items.map(function (id) { return esc(id); }).join(" ") + "</td><td>" + money(o.amount) + "</td><td>" + stTag(o.status) + (o.note ? "<br><small>" + esc(o.note) + "</small>" : "") + "</td><td><small>" + (o.method ? "ชำระด้วย " + esc(o.method) + (o.payState && o.status !== "ชำระแล้ว" ? " (" + esc({ pending: "รอผล", failed: "ไม่สำเร็จ", expired: "หมดอายุ", successful: "สำเร็จ" }[o.payState] || o.payState) + ")" : "") + "<br>" : "") + (o.okAt ? "ยืนยัน " + esc(wh(o.okAt)) + (o.okBy ? " โดย " + esc(o.okBy) : "") + "<br>" : "") + (o.dl1 ? "เปิดไฟล์ " + o.dlN + " ครั้ง ครั้งแรก " + esc(wh(o.dl1)) : o.status === "ชำระแล้ว" ? "ยังไม่เปิดไฟล์" : "") + (o.ship ? "<br>ส่งพัสดุ " + esc(o.ship.carrier) + " " + esc(o.ship.no) + " · " + esc(o.ship.at) : "") + (o.shipTo ? "<br><b>ส่งถึง</b> " + esc(o.shipTo) : "") + "</small></td><td><div class=\"tools\" style=\"margin:0\">" + acts + "</div></td></tr>";
+  }
+  function shopTab() {
+    var b = BB(), demo = !b || b.demo;
+    var conn = '<div class="card"><h2>ร้าน · คำสั่งซื้อ ยอดขาย สมาชิก</h2>' + (demo ? '<p class="hint">โหมดทดลอง: ยังไม่ได้ใส่ที่อยู่หลังบ้านในแท็บ สมาชิกและชำระเงิน · ข้อมูลด้านล่างมาจากโหมดทดลองในเบราว์เซอร์เครื่องนี้ (สร้างข้อมูลทดลองได้ที่หน้า member.html ที่อยู่เดียวกัน)</p>' : '<p class="hint">ต่อกับหลังบ้านจริง · เข้าระบบในชื่อ <b>' + esc(tokWho() || "ร้าน") + '</b> · ออกจากระบบเองเมื่อปิดแท็บ หรือไม่ได้ใช้ 6 ชั่วโมง</p>') +
+      '<div class="tools"><button type="button" class="pri" data-sh="load">' + (SHOP ? "โหลดข้อมูลใหม่" : "เชื่อมต่อและโหลดข้อมูล") + "</button>" + (SHOP ? '<button type="button" data-sh="csv">ส่งออกคำสั่งซื้อ (CSV)</button>' : "") + (SHOP ? '<span class="hint" style="margin:0;align-self:center">โหลดเมื่อ ' + esc(wh(SHOP._at)) + " · หลังบ้านรุ่น " + esc(SHOP.setup.version) + "</span>" : "") + "</div>" + (shopBusy ? '<p class="hint" style="margin:8px 0 0">กำลังโหลด…</p>' : "") + (shopErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0">' + esc(shopErr) + "</p>" : "") + "</div>";
+    if (!SHOP) return conn;
+    var k = SHOP.kpi, todoO = SHOP.orders.filter(function (o) { return o.status === "รอตรวจ"; }), todoQ = SHOP.asks.filter(function (a) { return !a.answer; });
+    var kp = [["ยอดขายเดือนนี้", money(k.revenueMonth)], ["30 วันล่าสุด", money(k.revenue30)], ["ยอดขายทั้งหมด", money(k.revenue), k.paid + " คำสั่งซื้อ · เฉลี่ย " + money(k.aov)], ["รอตรวจสลิป", k.check, k.check ? "ต้องทำ" : "", k.check > 0], ["รอลูกค้าชำระ", k.wait], ["คำถามรอตอบ", k.asksOpen, k.asksOpen ? "ต้องทำ" : "", k.asksOpen > 0], ["สมาชิก", k.members, "ใหม่ 30 วัน " + k.members30], ["ลูกค้าเปิดไฟล์แล้ว", k.downloaded + " / " + k.paid, "คำสั่งซื้อที่ชำระแล้ว"]];
+    var kpis = '<div class="card"><div class="kpis">' + kp.map(function (x) { return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>"; }).join("") + "</div></div>";
+    var todo = '<div class="card"><h2>ต้องทำตอนนี้ <span class="tag ' + (todoO.length + todoQ.length ? "no" : "ok") + '">' + (todoO.length + todoQ.length) + " งาน</span></h2>" + (todoO.length + todoQ.length ? "" : '<p class="hint" style="margin:0">ไม่มีสลิปรอตรวจ และไม่มีคำถามรอตอบ</p>') +
+      todoO.map(function (o) { return '<div class="todo-it"><b>' + esc(o.id) + "</b> " + stTag(o.status) + " · " + money(o.amount) + " · " + esc(o.email) + "<br><small>แนบสลิป " + esc(wh(o.slipAt)) + (o.paidAt ? " · ลูกค้าแจ้งโอน " + esc(o.paidAt.replace("T", " ")) : "") + " · " + o.items.map(function (id) { return esc(sheetTitle(id)); }).join(" · ") + '</small><div class="tools"><button class="sm" type="button" data-sh="slip" data-id="' + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="' + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="' + esc(o.id) + '">สลิปไม่ผ่าน</button></div><small>เปิดแอปธนาคารดูว่ายอด ' + money(o.amount) + " เข้าจริงก่อนกดยืนยัน (รูปสลิปปลอมได้)</small></div>"; }).join("") +
+      todoQ.map(function (a) { return '<div class="todo-it"><b>' + esc(a.id) + "</b> · " + esc(a.topic) + " · " + esc(a.email) + " · " + esc(wh(a.created)) + '<p style="margin:6px 0;white-space:pre-wrap">' + esc(a.text) + '</p><label>คำตอบของร้าน<textarea id="ans-' + esc(a.id) + '" rows="3"></textarea></label><div class="tools"><button class="sm pri" type="button" data-sh="ans" data-id="' + esc(a.id) + '">ส่งคำตอบ (ขึ้นหน้าสมาชิก + อีเมล)</button></div></div>'; }).join("") + "</div>";
+    var sales = '<div class="card"><h2>ยอดขายที่ชำระแล้ว 30 วัน</h2><p class="hint">ชี้ที่แท่งเพื่อดูยอดของวันนั้น · ตารางรายสินค้าอยู่ด้านล่าง</p>' + chart(SHOP.days) +
+      '<div class="tbl" style="margin-top:12px"><table><thead><tr><th>สินค้า</th><th>ขายได้ (คำสั่งซื้อ)</th><th>ยอดขาย</th></tr></thead><tbody>' + (SHOP.items.length ? SHOP.items.map(function (x) { return "<tr><td>" + esc(x.id + " " + x.title) + "</td><td>" + x.n + "</td><td>" + money(x.rev) + "</td></tr>"; }).join("") : '<tr><td colspan="3">ยังไม่มียอดขาย</td></tr>') + "</tbody></table></div></div>";
+    var FL = ["ต้องทำ", "ทั้งหมด", "รอชำระ", "รอตรวจ", "ชำระแล้ว", "สลิปไม่ผ่าน", "ยกเลิก"];
+    var list = SHOP.orders.filter(function (o) { return shopFilter === "ทั้งหมด" ? true : shopFilter === "ต้องทำ" ? (o.status === "รอตรวจ" || o.status === "รอชำระ") : o.status === shopFilter; }).filter(function (o) { var t = shopQ.toLowerCase(); return !t || (o.id + " " + o.email + " " + o.items.join(" ")).toLowerCase().indexOf(t) >= 0; });
+    var orders = '<div class="card"><h2>คำสั่งซื้อ <span class="tag">' + SHOP.orders.length + " รายการ</span></h2>" + '<div class="chips">' + FL.map(function (f) { return '<button class="sm" type="button" data-sh="f" data-v="' + f + '" aria-pressed="' + (f === shopFilter) + '">' + f + "</button>"; }).join("") + '</div><label>ค้นหาเลขคำสั่งซื้อ อีเมล หรือรหัสใบ<input type="text" id="shq" value="' + esc(shopQ) + '"></label>' +
+      '<div class="tbl" style="margin-top:10px"><table><thead><tr><th>เลขที่</th><th>อีเมล</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th><th>ยืนยัน · การส่งไฟล์</th><th></th></tr></thead><tbody>' + (list.length ? list.map(orderRowHtml).join("") : '<tr><td colspan="7">ไม่มีรายการในตัวกรองนี้</td></tr>') + "</tbody></table></div></div>";
+    var mem = '<div class="card"><h2>สมาชิกล่าสุด <span class="tag">' + k.members + " คน</span></h2><div class=\"tbl\"><table><thead><tr><th>ชื่อ</th><th>อีเมล</th><th>สมัครด้วย</th><th>เชื่อมไว้</th><th>สมัครเมื่อ</th><th>เข้าล่าสุด</th></tr></thead><tbody>" + (SHOP.members.length ? SHOP.members.map(function (m) { return "<tr><td>" + esc(m.name) + "</td><td>" + esc(m.email || "-") + "</td><td>" + esc({ email: "อีเมล", google: "Google", line: "LINE", facebook: "Facebook" }[m.via] || m.via) + "</td><td>" + esc(m.linked.join(" ") || "-") + "</td><td>" + esc(wh(m.created)) + "</td><td>" + esc(wh(m.last)) + "</td></tr>"; }).join("") : '<tr><td colspan="6">ยังไม่มีสมาชิก</td></tr>') + "</tbody></table></div></div>";
+    var stock = '<div class="card"><h2>สินค้าและสต็อก</h2><p class="hint">ใบตรวจงานเป็นไฟล์ดิจิทัล ไม่มีสต็อก · สินค้าจริง (เช่นสินค้าด้อม) เพิ่มทีละแถวในแผ่น stock ของชีต แล้วกดโหลดข้อมูลใหม่ · แถวที่คงเหลือถึงจุดสั่งซื้อเพิ่มจะขึ้นป้าย สั่งเพิ่ม</p>' + (SHOP.stock.length ? '<div class="tbl"><table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>ประเภท</th><th>ราคาขาย</th><th>ต้นทุน</th><th>กำไรต่อชิ้น</th><th>คงเหลือ</th><th>ผู้จำหน่าย</th></tr></thead><tbody>' + SHOP.stock.map(function (s) { var low = s.qty != null && s.reorder != null && s.qty <= s.reorder; return "<tr><td>" + esc(s.sku) + "</td><td>" + esc(s.name) + "</td><td>" + esc(s.kind) + "</td><td>" + money(s.price) + "</td><td>" + money(s.cost) + "</td><td>" + money(s.price - s.cost) + "</td><td>" + (s.qty == null ? "-" : s.qty) + (low ? ' <span class="tag no">สั่งเพิ่ม</span>' : "") + "</td><td>" + esc(s.supplier) + (s.lead ? "<br><small>ส่งของ " + esc(s.lead) + " วัน</small>" : "") + "</td></tr>"; }).join("") + "</tbody></table></div>" : '<p class="hint" style="margin:0">ยังไม่มีสินค้าจริงในแผ่น stock</p>') + "</div>";
+    var su = SHOP.setup, rows = [], add = function (cls, t, d) { rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!") + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>"); };
+    // รุ่นหลังบ้าน (23 ต.ค. 2026): เทียบรุ่นที่ทำงานอยู่จริงกับรุ่นล่าสุดในเครื่อง · ไม่ตรง = ต้องวาง Code.gs ใหม่แล้ว Deploy แบบ New version
+    add(su.version === NEED_API ? "ok" : "no", "รุ่นหลังบ้าน " + esc(su.version || "เก่ากว่า 2026-10-19"), su.version === NEED_API ? "ล่าสุดแล้ว" : "รุ่นล่าสุดคือ " + NEED_API + " · วางไฟล์ รายได้\\หลังบ้านสมาชิก\\Code.gs ทับในโปรเจกต์ Apps Script → บันทึก → รัน setup → Deploy → Manage deployments → New version");
+    add(su.site ? "ok" : "no", "SITE_URL ของหลังบ้าน", su.site ? esc(su.site) : "ตั้งใน Script properties ให้ตรงกับที่อยู่เว็บ");
+    add(su.payOn ? "ok" : "wa", "เปิดรับชำระเงินในเว็บ", su.payOn ? "" : "ติ๊กในแท็บ สมาชิกและชำระเงิน แล้วบันทึกและอัปโหลด data.js");
+    add(su.sellable.length ? "ok" : "wa", "ใบที่ขายได้ตอนนี้ " + su.sellable.length + " ใบ", su.sellable.length ? esc(su.sellable.join(" ")) : "ขายได้เมื่อตรวจรายการแล้ว + ติ๊กเปิดขาย + เปิดรับชำระ");
+    add(su.missingFiles.length ? "no" : "ok", "ไฟล์ฉบับมืออาชีพในโฟลเดอร์ไดรฟ์", su.missingFiles.length ? "ยังไม่มีไฟล์ของ: " + esc(su.missingFiles.join(" ")) + " · อัปโหลดจาก สินค้า\\เช็กชีต\\pro" : "ครบทุกใบที่เปิดขาย");
+    add(su.login.google || su.login.line || su.login.facebook || su.login.tiktok ? "ok" : "wa", "เข้าสู่ระบบด้วยบริการภายนอก", "Google " + (su.login.google ? "เปิด" : "ปิด") + " · LINE " + (su.login.line ? "เปิด" : "ปิด") + " · Facebook " + (su.login.facebook ? "เปิด" : "ปิด") + " · TikTok " + (su.login.tiktok ? "เปิด" : "ปิด") + " (ตั้งคีย์ใน Script properties ตามคู่มือ)");
+    if (su.pay) add(su.pay.opn ? "ok" : "wa", "ชำระออนไลน์ (Opn) ฝั่งหลังบ้าน", su.pay.opn ? (su.pay.test ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง ตัดเงินจริง") : "ยังไม่ใส่ OPN_SKEY ใน Script properties · ลูกค้าโอนแล้วแนบสลิปได้ตามเดิม");
+    add(su.slipAuto ? "ok" : "wa", "ตรวจสลิปอัตโนมัติ (EasySlip)", su.slipAuto ? "เปิดแล้ว ร้านไม่ต้องตรวจสลิปเอง · สลิปที่ระบบตรวจไม่ได้ จะมีอีเมลแจ้งร้าน" : "ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ตอนนี้ร้านตรวจสลิปเอง (ดูขั้นตอนใน 00_สิ่งที่คุณต้องทำ.md ข้อ D13)");
+    if (su.receipt) add(su.receipt.ready ? "ok" : "wa", "ใบเสร็จรับเงินอัตโนมัติ" + (su.receipt.vat ? " + ใบกำกับภาษี (VAT " + su.receipt.rate + "%)" : ""), su.receipt.ready ? "ออกเลขที่ใบเสร็จทุกคำสั่งซื้อที่ชำระแล้ว ลูกค้าเปิดและพิมพ์ได้จากหน้าสมาชิก อีเมล และหน้าติดตาม" : "ระบบออกเลขที่ใบเสร็จแล้ว แต่ยังขาดข้อมูลผู้ออก · ใส่ SHOP_LEGAL_NAME SHOP_TAX_ID SHOP_ADDRESS ใน Script properties (ข้อ D16)");
+    add(su.github ? "ok" : "wa", "แก้เว็บจากหลังบ้านออนไลน์ (GitHub)", su.github ? "เปิดแล้ว · กด บันทึกขึ้นเว็บ ได้จากทุกเครื่อง · ประวัติการแก้อยู่ใน GitHub" : "ยังไม่ใส่ GITHUB_TOKEN ใน Script properties · ตอนนี้แก้เนื้อหาแล้วต้องดาวน์โหลด data.js ไปอัปโหลดเอง (ข้อ D15)");
+    add(Array.isArray(S.pay.methods) && S.pay.methods.length ? "ok" : "wa", "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ " + ((S.pay.methods || []).length) + " ช่องทาง", "เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริง · ขอเปิดช่องทางเพิ่มที่ support@omise.co");
+    add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
+    var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("") + "</ul></div>";
+    return conn + kpis + todo + sales + orders + mem + stock + setup;
+  }
+  // ----- ลูกค้า (26 ต.ค. 2026): สถานะลูกค้าทุกคนในหน้าเดียว · ข้อมูลจากหลังบ้านรุ่น 2026-10-26 -----
+  var custQ = "", custSeg = "ทั้งหมด", custSort = "new";
+  var SEG = [["ทั้งหมด", function () { return true; }], ["ซื้อแล้ว", function (m) { return m.paid > 0; }], ["ลูกค้าประจำ (ซื้อ 2 ครั้งขึ้นไป)", function (m) { return m.paid >= 2; }], ["ค้างชำระ", function (m) { return m.open > 0; }], ["รอตรวจสลิป", function (m) { return m.check > 0; }], ["สมัครแล้วยังไม่ซื้อ", function (m) { return !m.orders; }], ["นิติบุคคล", function (m) { return !!m.company; }], ["มีคำถามรอตอบ", function (m) { return m.asksOpen > 0; }], ["รับข่าวสาร", function (m) { return m.news; }]];
+  function needShop(title) { return '<div class="card"><h2>' + title + '</h2><p class="hint">ข้อมูลมาจากหลังบ้านสมาชิก · กดโหลดครั้งเดียว ระบบใช้ข้อมูลชุดเดียวกับแท็บ ร้าน</p><div class="tools"><button type="button" class="pri" data-sh="load">เชื่อมต่อและโหลดข้อมูล</button></div>' + (shopBusy ? '<p class="hint">กำลังโหลด…</p>' : "") + (shopErr ? '<p class="hint" style="color:var(--bad)">' + esc(shopErr) + "</p>" : "") + "</div>"; }
+  function custTab() {
+    if (!SHOP) return needShop("ลูกค้า");
+    var all = SHOP.members || [], hasStats = all.length && "orders" in all[0];
+    if (!hasStats) return '<div class="card"><h2>ลูกค้า</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version) + ' ยังไม่ส่งข้อมูลยอดซื้อรายคน · วาง Code.gs รุ่น ' + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    var seg = SEG.filter(function (s) { return s[0] === custSeg; })[0] || SEG[0], t = custQ.toLowerCase();
+    var list = all.filter(seg[1]).filter(function (m) { return !t || [m.name, m.email, m.company, m.province, m.phone, m.line, m.id].join(" ").toLowerCase().indexOf(t) >= 0; });
+    list.sort(custSort === "spent" ? function (a, b) { return b.spent - a.spent; } : custSort === "last" ? function (a, b) { return String(b.last) < String(a.last) ? -1 : 1; } : custSort === "order" ? function (a, b) { return String(b.lastOrder) < String(a.lastOrder) ? -1 : 1; } : function (a, b) { return String(b.created) < String(a.created) ? -1 : 1; });
+    var buyers = all.filter(function (m) { return m.paid > 0; }), spent = buyers.reduce(function (s, m) { return s + m.spent; }, 0);
+    var kp = [["ลูกค้าทั้งหมด", all.length], ["ซื้อแล้ว", buyers.length, all.length ? Math.round(buyers.length * 100 / all.length) + "% ของสมาชิก" : ""], ["ลูกค้าประจำ", all.filter(function (m) { return m.paid >= 2; }).length, "ซื้อ 2 ครั้งขึ้นไป"], ["ยอดซื้อเฉลี่ยต่อคน", money(buyers.length ? Math.round(spent / buyers.length) : 0)], ["ค้างชำระ", all.filter(function (m) { return m.open > 0; }).length, "ส่งข้อความตามได้", false], ["รอตรวจสลิป", all.filter(function (m) { return m.check > 0; }).length, "", all.some(function (m) { return m.check > 0; })], ["สมัครแล้วยังไม่ซื้อ", all.filter(function (m) { return !m.orders; }).length], ["มีคำถามรอตอบ", all.filter(function (m) { return m.asksOpen > 0; }).length, "", all.some(function (m) { return m.asksOpen > 0; })]];
+    var st = function (m) { var s = []; if (m.check) s.push('<span class="tag no">รอตรวจ ' + m.check + "</span>"); if (m.open) s.push('<span class="tag">ค้างชำระ ' + m.open + "</span>"); if (m.paid >= 2) s.push('<span class="tag ok">ประจำ</span>'); else if (m.paid) s.push('<span class="tag ok">ซื้อแล้ว</span>'); if (!m.orders) s.push('<span class="tag">ยังไม่ซื้อ</span>'); if (m.asksOpen) s.push('<span class="tag no">คำถาม ' + m.asksOpen + "</span>"); return s.join(" "); };
+    var rows = list.slice(0, 300).map(function (m) {
+      return "<tr><td><b>" + esc(m.name || "-") + "</b>" + (m.company ? "<br><small>" + esc(m.company) + "</small>" : "") + (m.province ? "<br><small>" + esc(m.province) + "</small>" : "") + "</td><td><small>" + esc(m.email || "-") + (m.phone ? "<br>" + esc(m.phone) : "") + (m.line ? "<br>LINE " + esc(m.line) : "") + (m.linked.length ? "<br>เชื่อม " + esc(m.linked.join(" ")) : "") + "</small></td><td><small>สมัคร " + esc(wh(m.created)) + "<br>เข้าล่าสุด " + esc(wh(m.last) || "-") + "</small></td><td>" + m.orders + (m.paid ? " (ชำระ " + m.paid + ")" : "") + (m.lastOrder ? "<br><small>ล่าสุด " + esc(wh(m.lastOrder)) + "</small>" : "") + "</td><td>" + money(m.spent) + "</td><td>" + m.docs + "</td><td>" + st(m) + '</td><td><div class="tools" style="margin:0">' + (m.email ? '<button class="sm" type="button" data-sh="cord" data-v="' + esc(m.email) + '">คำสั่งซื้อ</button><button class="sm" type="button" data-sh="cmail" data-v="' + esc(m.email) + '">คัดลอกอีเมล</button>' : "") + "</div></td></tr>";
+    }).join("");
+    return '<div class="card"><h2>ลูกค้า <span class="tag">' + all.length + ' คน</span></h2><p class="hint">ข้อมูลส่วนบุคคล ใช้เพื่อดูแลคำสั่งซื้อเท่านั้น · ส่งข่าวสารได้เฉพาะคนที่ติ๊กรับข่าวสาร</p><div class="kpis">' + kp.map(function (x) { return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>"; }).join("") + "</div></div>" +
+      '<div class="card"><div class="chips">' + SEG.map(function (s) { var n = all.filter(s[1]).length; return '<button class="sm" type="button" data-sh="cseg" data-v="' + esc(s[0]) + '" aria-pressed="' + (s[0] === custSeg) + '">' + esc(s[0]) + " " + n + "</button>"; }).join("") + '</div><div class="grid"><label>ค้นหา ชื่อ อีเมล บริษัท จังหวัด โทรศัพท์<input type="text" id="cq" value="' + esc(custQ) + '"></label><label>เรียงตาม<select id="csort"><option value="new"' + (custSort === "new" ? " selected" : "") + '>สมัครล่าสุด</option><option value="spent"' + (custSort === "spent" ? " selected" : "") + '>ยอดซื้อมากที่สุด</option><option value="order"' + (custSort === "order" ? " selected" : "") + '>สั่งซื้อล่าสุด</option><option value="last"' + (custSort === "last" ? " selected" : "") + ">เข้าระบบล่าสุด</option></select></label></div>" +
+      '<div class="tools"><button type="button" data-sh="ccsv">ส่งออกรายชื่อในตัวกรองนี้ (CSV)</button></div><div class="tbl"><table><thead><tr><th>ลูกค้า</th><th>ติดต่อ</th><th>บัญชี</th><th>คำสั่งซื้อ</th><th>ยอดซื้อ</th><th>เอกสาร</th><th>สถานะ</th><th></th></tr></thead><tbody>' + (rows || '<tr><td colspan="8">ไม่มีลูกค้าในตัวกรองนี้</td></tr>') + "</tbody></table></div>" + (list.length > 300 ? '<p class="hint">แสดง 300 คนแรก · ใช้ค้นหาหรือส่งออก CSV เพื่อดูทั้งหมด</p>' : "") + "</div>";
+  }
+  function custCsv() {
+    var seg = SEG.filter(function (s) { return s[0] === custSeg; })[0] || SEG[0], t = custQ.toLowerCase(), q = function (v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+    var list = (SHOP.members || []).filter(seg[1]).filter(function (m) { return !t || [m.name, m.email, m.company, m.province, m.phone, m.line].join(" ").toLowerCase().indexOf(t) >= 0; });
+    var head = ["รหัสสมาชิก", "ชื่อ", "บริษัท", "อีเมล", "โทรศัพท์", "LINE", "จังหวัด", "สมัครเมื่อ", "เข้าล่าสุด", "คำสั่งซื้อ", "ชำระแล้ว", "ยอดซื้อ (บาท)", "ค้างชำระ", "รอตรวจ", "เอกสารที่มีสิทธิ์", "คำถามรอตอบ", "รับข่าวสาร"];
+    var lines = [head.map(q).join(",")].concat(list.map(function (m) { return [m.id, m.name, m.company, m.email, m.phone, m.line, m.province, m.created, m.last, m.orders, m.paid, m.spent, m.open, m.check, m.docs, m.asksOpen, m.news ? "ใช่" : ""].map(q).join(","); }));
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" })); a.download = "BUILD_ลูกค้า_" + custSeg + "_" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+  }
+  // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
+  var csSeg = "ใหม่";
+  function consignTab() {
+    var top = "";
+    if (!SHOP) top = needShop("ใบสมัครฝากขาย");
+    else if (!SHOP.consigns) top = '<div class="card"><h2>ใบสมัครฝากขาย</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version) + " ยังไม่รับใบสมัคร · วาง Code.gs รุ่น " + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    else {
+      var CSS = ["ใหม่", "กำลังคุย", "อนุมัติ", "วางขายแล้ว", "ไม่รับ", "ทั้งหมด"], list = SHOP.consigns.filter(function (c) { return csSeg === "ทั้งหมด" || c.status === csSeg; });
+      top = '<div class="card"><h2>ใบสมัครฝากขาย <span class="tag ' + (SHOP.consigns.some(function (c) { return c.status === "ใหม่"; }) ? "no" : "ok") + '">ใหม่ ' + SHOP.consigns.filter(function (c) { return c.status === "ใหม่"; }).length + '</span></h2><p class="hint">ขั้นตอน: อ่านใบสมัคร → คุยรายละเอียดและส่วนแบ่ง (ตอบอีเมลผู้สมัครได้จากปุ่มด้านล่าง) → ตรวจสินค้าและลิขสิทธิ์ → อนุมัติ → เพิ่มสินค้าในรายการด้านล่าง + อัปโหลดไฟล์เข้าโฟลเดอร์ไดรฟ์ → บันทึก data.js และอัปโหลดเว็บ → ตั้งสถานะ วางขายแล้ว</p><div class="chips">' + CSS.map(function (s) { return '<button class="sm" type="button" data-sh="csseg" data-v="' + s + '" aria-pressed="' + (s === csSeg) + '">' + s + " " + (s === "ทั้งหมด" ? SHOP.consigns.length : SHOP.consigns.filter(function (c) { return c.status === s; }).length) + "</button>"; }).join("") + "</div>" +
+        (list.length ? list.map(function (c) { return '<div class="todo-it"><b>' + esc(c.id) + "</b> " + esc(c.kind) + " · " + esc(c.title) + " · ราคาที่เสนอ " + money(c.price) + '<br><small>' + esc(c.name) + " · " + esc(c.email) + (c.contact ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.url ? ' · <a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer">ลิงก์ตัวอย่าง</a>' : "") + " · " + esc(c.own) + '</small><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.desc) + '</p><div class="grid"><label>สถานะ<select id="cs-st-' + esc(c.id) + '">' + CSS.slice(0, 5).map(function (s) { return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>"; }).join("") + '</select></label><label class="full">ข้อความถึงผู้สมัคร หรือบันทึกของร้าน<textarea id="cs-nt-' + esc(c.id) + '" rows="2">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="cs-tell-' + esc(c.id) + '"> ส่งอีเมลแจ้งผู้สมัคร</label></div><div class="tools"><button class="sm pri" type="button" data-sh="cssave" data-id="' + esc(c.id) + '">บันทึกสถานะ</button></div></div>'; }).join("") : '<p class="hint" style="margin:0">ไม่มีใบสมัครในตัวกรองนี้</p>') + "</div>";
+    }
+    return top + listCard("market", "สินค้าฝากขายบนเว็บ (หน้า market.html)", "เพิ่ม 1 รายการต่อ 1 สินค้า · ส่งมอบแบบ file = ลูกค้าดาวน์โหลดจากหน้าสมาชิก (อัปโหลดไฟล์ชื่อตามช่อง ชื่อไฟล์ เข้าโฟลเดอร์ไดรฟ์ BUILD TH ไฟล์ฉบับมืออาชีพ) · ship = ส่งพัสดุ ใส่เลขพัสดุในแท็บ ร้าน · manual = ร้านส่งลิงก์หรือคีย์ทางอีเมล · ติ๊ก ตรวจสินค้าแล้ว + เปิดขาย แล้วบันทึกและอัปโหลด data.js");
+  }
+  // คำขอสั่งทำ (27 ต.ค. 2026): ลูกค้าส่งจาก request.html → ร้านประเมิน เสนอราคา ตอบอีเมล และติดตามสถานะในแท็บนี้
+  var rqSeg = "ใหม่";
+  function requestTab() {
+    if (!SHOP) return needShop("คำขอสั่งทำ");
+    if (!SHOP.requests) return '<div class="card"><h2>คำขอสั่งทำ</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version) + " ยังไม่รับคำขอสั่งทำ · วาง Code.gs รุ่น " + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    var RS = ["ใหม่", "กำลังประเมิน", "ส่งใบเสนอราคาแล้ว", "ลูกค้าตกลง", "กำลังทำ", "ส่งมอบแล้ว", "ไม่รับ", "ทั้งหมด"], all = SHOP.requests, list = all.filter(function (c) { return rqSeg === "ทั้งหมด" || c.status === rqSeg; });
+    var nNew = all.filter(function (c) { return c.status === "ใหม่"; }).length;
+    return '<div class="card"><h2>คำขอสั่งทำ <span class="tag ' + (nNew ? "no" : "ok") + '">ใหม่ ' + nNew + '</span></h2><p class="hint">ขั้นตอน: อ่านคำขอ → ประเมินงาน (ภาษา มาตรฐานของประเทศ ต้องอ่านเล่มทางการก่อน) → ใส่ราคาที่เสนอ + ข้อความ แล้วติ๊กส่งอีเมล → ลูกค้าตกลง → ทำงาน → ส่งมอบ · ห้ามรับงานที่ต้องลงนามรับรองแทนผู้มีใบอนุญาต</p><div class="chips">' +
+      RS.map(function (s) { return '<button class="sm" type="button" data-sh="rqseg" data-v="' + s + '" aria-pressed="' + (s === rqSeg) + '">' + s + " " + (s === "ทั้งหมด" ? all.length : all.filter(function (c) { return c.status === s; }).length) + "</button>"; }).join("") + "</div>" +
+      (list.length ? list.map(function (c) {
+        return '<div class="todo-it"><b>' + esc(c.id) + "</b> " + esc(c.kind) + (c.items ? " · " + esc(c.items) : "") + " · ภาษา " + esc(c.lang1) + (c.lang2 ? " + " + esc(c.lang2) : " (1 ภาษา)") + (c.std ? " · มาตรฐาน " + esc(c.std) : "") + " · จำนวน " + esc(c.qty) + (c.due ? " · ต้องการภายใน " + esc(c.due) : "") +
+          "<br><small>" + esc(c.name) + (c.org ? " · " + esc(c.org) : "") + " · " + esc(c.email) + (c.contact ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.updated && c.updated !== c.created ? " · แก้ล่าสุด " + esc(wh(c.updated)) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.desc) + "</p>" +
+          '<div class="grid"><label>สถานะ<select id="rq-st-' + esc(c.id) + '">' + RS.slice(0, 7).map(function (s) { return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>"; }).join("") + '</select></label><label>ราคาที่เสนอ (บาท)<input type="text" inputmode="numeric" id="rq-q-' + esc(c.id) + '" value="' + (c.quote || "") + '"></label><label class="full">ข้อความถึงลูกค้า หรือบันทึกของร้าน (ขอบเขต ระยะเวลา เงื่อนไข)<textarea id="rq-nt-' + esc(c.id) + '" rows="3">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="rq-tell-' + esc(c.id) + '"> ส่งอีเมลแจ้งลูกค้า</label></div><div class="tools"><button class="sm pri" type="button" data-sh="rqsave" data-id="' + esc(c.id) + '">บันทึก</button><button class="sm" type="button" data-sh="cmail" data-v="' + esc(c.email) + '">คัดลอกอีเมล</button></div></div>';
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีคำขอในสถานะนี้</p>') + "</div>";
+  }
+  function modal(html) { var d = document.createElement("div"); d.className = "modal"; d.innerHTML = '<div class="box" role="dialog" aria-modal="true">' + html + '<div class="tools"><button type="button" data-close="1">ปิด</button></div></div>'; d.addEventListener("click", function (ev) { if (ev.target === d || ev.target.closest("[data-close]")) d.remove(); var b = ev.target.closest("[data-sh]"); if (b) { d.remove(); shopClick(b); } }); document.body.appendChild(d); }
+  function csv() {
+    var head = ["เลขคำสั่งซื้อ", "สร้างเมื่อ", "อีเมล", "รายการ", "ยอด (บาท)", "สถานะ", "หมายเหตุ", "แนบสลิปเมื่อ", "ลูกค้าแจ้งโอน", "ยืนยันเมื่อ", "ยืนยันโดย", "เปิดไฟล์ครั้งแรก", "เปิดไฟล์ (ครั้ง)", "ช่องทางชำระ", "รหัสรายการชำระ (Opn)", "ขนส่ง", "เลขพัสดุ", "ลิงก์ติดตามคำสั่งซื้อ", "เลขที่ใบเสร็จ"];
+    var q = function (v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+    var lines = [head.map(q).join(",")].concat(SHOP.orders.map(function (o) { return [o.id, o.created, o.email, o.items.join(" "), o.amount, o.status, o.note, o.slipAt, o.paidAt, o.okAt, o.okBy, o.dl1, o.dlN, o.method || "", o.charge || "", o.ship ? o.ship.carrier : "", o.ship ? o.ship.no : "", o.trackUrl || "", o.receipt || ""].map(q).join(","); }));
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" })); a.download = "BUILD_คำสั่งซื้อ_" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); a.remove();
+  }
+  function shopClick(b) {
+    var sh = b.dataset.sh, id = b.dataset.id;
+    if (sh === "load") { shopLoad(); return; }
+    if (sh === "login") { doLogin({ adminKey: ($("ak") || {}).value || "" }); return; }
+    if (sh === "rqseg") { rqSeg = b.dataset.v; render(); return; }
+    if (sh === "rqsave") { var rst = $("rq-st-" + id), rnt = $("rq-nt-" + id), rtl = $("rq-tell-" + id), rqv = (($("rq-q-" + id) || {}).value || "").replace(/[^\d]/g, ""); shopAct("adminRequest", { id: id, status: rst.value, note: rnt.value.trim(), quote: +rqv || 0, tell: !!(rtl && rtl.checked) }, "บันทึกคำขอ " + id + (rtl && rtl.checked ? " และส่งอีเมลแจ้งลูกค้าแล้ว" : "")); return; }
+    if (sh === "ghreload") { siteLoad(true); return; }
+    if (sh === "up") { upImg(); return; }
+    if (sh === "csv") { csv(); return; }
+    if (sh === "f") { shopFilter = b.dataset.v; render(); return; }
+    if (sh === "cseg") { custSeg = b.dataset.v; render(); return; }
+    if (sh === "ccsv") { custCsv(); return; }
+    if (sh === "cmail") { copy(b.dataset.v); return; }
+    if (sh === "cord") { shopFilter = "ทั้งหมด"; shopQ = b.dataset.v; tab = "shop"; render(); window.scrollTo(0, 0); return; }
+    if (sh === "csseg") { csSeg = b.dataset.v; render(); return; }
+    if (sh === "cssave") { var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id); shopAct("adminConsign", { id: id, status: cst.value, note: cnt.value.trim(), tell: !!(ctl && ctl.checked) }, "บันทึกใบสมัคร " + id + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : "")); return; }
+    if (sh === "ok") { if (confirm("ตรวจในแอปธนาคารแล้วว่ายอด " + money(b.dataset.amt) + " ของ " + id + " เข้าบัญชีจริง?\nกดตกลง = เปิดสิทธิ์ดาวน์โหลด และส่งอีเมลแจ้งลูกค้า")) shopAct("adminOrder", { order: id, status: "ชำระแล้ว" }, "ยืนยันชำระแล้ว " + id); return; }
+    if (sh === "no") { var why = prompt("เหตุผลที่สลิปของ " + id + " ไม่ผ่าน (ส่งถึงลูกค้า เช่น ยอดไม่ตรง ไม่พบยอดเข้า):", "ยอดโอนไม่ตรงกับคำสั่งซื้อ"); if (why && why.trim()) shopAct("adminOrder", { order: id, status: "สลิปไม่ผ่าน", note: why.trim() }, "แจ้งสลิปไม่ผ่าน " + id); return; }
+    if (sh === "cancel") { if (confirm("ยกเลิกคำสั่งซื้อ " + id + " ที่ยังไม่ชำระ?")) shopAct("adminOrder", { order: id, status: "ยกเลิก", note: "ร้านยกเลิก" }, "ยกเลิกแล้ว " + id); return; }
+    if (sh === "back") { shopAct("adminOrder", { order: id, status: "รอตรวจ" }, "ย้อนเป็นรอตรวจแล้ว " + id); return; }
+    // ส่งพัสดุ (สินค้าจริง เช่น สินค้าด้อม): ใส่บริษัทขนส่ง เลขพัสดุ และลิงก์ติดตามของบริษัท (ไม่บังคับ) · ระบบแสดงในหน้าติดตามและส่งอีเมลแจ้งลูกค้า
+    if (sh === "ship") {
+      var carrier = prompt("บริษัทขนส่งของ " + id + " (เช่น ไปรษณีย์ไทย, Flash Express, Kerry Express, J&T Express):", "ไปรษณีย์ไทย"); if (!carrier || !carrier.trim()) return;
+      var no = prompt("เลขพัสดุ (ตัวอักษรอังกฤษและตัวเลข 6–40 ตัว):", ""); if (!no || !no.trim()) return;
+      var lk = prompt("ลิงก์ติดตามของบริษัทขนส่ง (ไม่บังคับ ต้องขึ้นต้นด้วย https://):", "") || "";
+      shopAct("adminShip", { order: id, carrier: carrier.trim(), no: no.trim().replace(/\s+/g, ""), link: lk.trim() }, "บันทึกเลขพัสดุและแจ้งลูกค้าแล้ว " + id); return;
+    }
+    if (sh === "trk") { var u = b.dataset.url; try { navigator.clipboard.writeText(u).then(function () { toast("คัดลอกลิงก์ติดตามแล้ว"); }, function () { prompt("คัดลอกลิงก์นี้:", u); }); } catch (e) { prompt("คัดลอกลิงก์นี้:", u); } return; }
+    if (sh === "ans") { var t = $("ans-" + id); if (!t || t.value.trim().length < 2) { toast("พิมพ์คำตอบก่อน"); return; } shopAct("adminAnswer", { ask: id, answer: t.value.trim() }, "ส่งคำตอบแล้ว"); return; }
+    if (sh === "slip") {
+      adm("adminSlip", { order: id }).then(function (r) { var o = SHOP.orders.filter(function (x) { return x.id === id; })[0] || {}; modal("<h2 style=\"font-size:19px;color:var(--navy)\">สลิปของ " + esc(id) + "</h2><p class=\"hint\" style=\"margin:4px 0 0\">ยอดที่ต้องได้ <b>" + money(r.amount) + "</b> · ลูกค้าแจ้งโอน " + esc((r.paidAt || "").replace("T", " ")) + " · แนบเมื่อ " + esc(wh(r.at)) + '</p><img src="data:' + esc(r.type) + ";base64," + r.b64 + '" alt="รูปสลิป"><p class="hint">ตรวจยอดในแอปธนาคารก่อนทุกครั้ง</p><div class="tools"><button class="pri" type="button" data-sh="ok" data-id="' + esc(id) + '" data-amt="' + (o.amount || r.amount) + '">ยืนยันชำระแล้ว</button><button class="del" type="button" data-sh="no" data-id="' + esc(id) + '">สลิปไม่ผ่าน</button></div>'); }).catch(function (e) { toast(e.message || "เปิดสลิปไม่สำเร็จ"); });
+    }
+  }
+
+  // ----- หลังบ้านออนไลน์ (27 ต.ค. 2026): เข้าระบบ · โหลดข้อมูลล่าสุดจากเว็บ · บันทึกขึ้นเว็บ · อัปโหลดรูป · งานวันนี้ · ทางลัดทุกระบบ -----
+  function loginCard() {
+    var gid = (S.member || {}).googleClientId;
+    return '<div class="card login"><h2>เข้าสู่ระบบหลังบ้าน</h2><p class="hint">ร้าน ลูกค้า ฝากขาย และเนื้อหาเว็บอยู่ในหน้านี้ · เปิดได้ทุกเครื่อง · ข้อมูลร้านมาจากหลังบ้านหลังเข้าระบบเท่านั้น</p>' +
+      (gid && live() ? '<div id="g-btn" style="min-height:44px"></div><p class="hint" style="margin:6px 0 0">ใช้บัญชี Google ของอีเมลร้าน (อีเมลใน ADMIN_EMAILS หรือบัญชีเจ้าของหลังบ้าน)</p><div class="or">หรือ</div>' : "") +
+      '<label>รหัสหลังบ้าน (ADMIN_KEY)<input type="password" id="ak" autocomplete="current-password" spellcheck="false"></label><div class="tools"><button type="button" class="pri" data-sh="login"' + (loginBusy ? " disabled" : "") + ">" + (loginBusy ? "กำลังเข้า…" : "เข้าสู่ระบบ") + "</button></div>" +
+      (loginErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0" role="alert">' + esc(loginErr) + "</p>" : "") +
+      '<p class="hint" style="margin:12px 0 0">ปิดแท็บ = ออกจากระบบ · ไม่ได้ใช้ 6 ชั่วโมง ต้องเข้าใหม่ · ใส่รหัสผิด 10 ครั้ง ระบบพัก 15 นาที · อย่าเข้าหลังบ้านจากเครื่องสาธารณะ</p></div>';
+  }
+  var gReady = false;
+  function gDraw() {
+    var el = $("g-btn"), gid = (S.member || {}).googleClientId; if (!el || !gid) return;
+    if (!gReady) { if (!document.getElementById("gsi")) { var sc = document.createElement("script"); sc.id = "gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true; sc.onload = function () { gReady = true; google.accounts.id.initialize({ client_id: gid, callback: function (r) { doLogin({ credential: r.credential }); }, ux_mode: "popup" }); gDraw(); }; document.head.appendChild(sc); } return; }
+    google.accounts.id.renderButton(el, { theme: "outline", size: "large", width: Math.min(360, el.clientWidth || 320), text: "signin_with", locale: "th", shape: "rectangular" });
+  }
+  function doLogin(cred) {
+    if (loginBusy || !BB()) return;
+    var key = String(cred.adminKey || "").trim();
+    if (!cred.credential && !key) { loginErr = "ใส่รหัสหลังบ้าน หรือเข้าด้วย Google"; render(); return; }
+    loginBusy = true; loginErr = ""; render();
+    BB().callAdmin("adminLogin", cred.credential ? { credential: cred.credential } : {}, key)
+      .then(function (r) { loginBusy = false; tokSet(r.adminToken, r.who); GH.on = r.github ? null : false; tab = "ov"; render(); siteLoad(false); })
+      .catch(function (e) { loginBusy = false; loginErr = e.message || "เข้าสู่ระบบไม่สำเร็จ"; render(); });
+  }
+  // ข้อมูลเว็บล่าสุดจาก GitHub (data.js บนเว็บอาจค้างในแคชของเบราว์เซอร์ราว 10 นาที จึงไม่แก้บนข้อมูลเก่า)
+  function siteLoad(force) {
+    if (!BB() || (!tokGet() && !BB().demo)) return;
+    adm("adminSiteGet", {}).then(function (r) {
+      if (r.off) { GH.on = false; render(); if (force) toast("ยังไม่ได้ใส่ GITHUB_TOKEN จึงโหลดจากเว็บไม่ได้"); return; }
+      var o = JSON.parse(String(r.text || "").replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/, "")), fresh = JSON.stringify(o);
+      GH.sha = r.sha; GH.on = true; GH.err = "";
+      if (fresh !== ORIG) {
+        var useFresh = !dirty || confirm("ข้อมูลเว็บบน GitHub ใหม่กว่าข้อมูลที่หน้านี้โหลด\n\nตกลง = ใช้ข้อมูลล่าสุดบนเว็บ (ร่างที่แก้ในเครื่องนี้เก็บสำรองไว้)\nยกเลิก = ใช้ร่างในเครื่องนี้ต่อ และเมื่อบันทึกจะทับข้อมูลบนเว็บ");
+        if (useFresh) { if (dirty) { try { localStorage.setItem(KEY + "_old", localStorage.getItem(KEY) || ""); } catch (e) {} } window.SITE = o; ORIG = fresh; BASE = hashOf(ORIG); S = JSON.parse(fresh); shape(); dirty = false; }
+        else { window.SITE = o; ORIG = fresh; BASE = hashOf(ORIG); }
+      }
+      render(); if (force) toast("โหลดข้อมูลล่าสุดจากเว็บแล้ว");
+    }).catch(function (e) { GH.on = false; GH.err = e.message || ""; render(); bar("โหลดข้อมูลเว็บจาก GitHub ไม่ได้: " + (e.message || "") + " · ใช้ปุ่มดาวน์โหลด data.js ได้", true); });
+  }
+  function bar(msg, err) {
+    var b = $("pubbar"); if (!b) { b = document.createElement("div"); b.id = "pubbar"; b.setAttribute("role", "status"); document.querySelector(".stick").appendChild(b); }
+    b.className = "pubbar" + (err ? " err" : ""); b.innerHTML = esc(msg) + (err && /โหลดใหม่/.test(msg) ? ' <button type="button" class="sm" data-gh="reload">โหลดใหม่</button>' : "") + ' <button type="button" class="sm" data-gh="x" aria-label="ปิดข้อความ">✕</button>';
+  }
+  document.addEventListener("click", function (ev) { var g = ev.target.closest("[data-gh]"); if (!g) return; if (g.dataset.gh === "reload") siteLoad(true); var b = $("pubbar"); if (b) b.remove(); });
+  function upCard(hint) {
+    if (GH.on !== true) return "";
+    return '<div class="card"><h2>อัปโหลดรูปขึ้นเว็บ</h2><p class="hint">' + esc(hint) + ' · JPG PNG WEBP ไม่เกิน 2 MB · ชื่อไฟล์เดิมจะถูกแทนที่ (GitHub เก็บรุ่นเก่าไว้ในประวัติ)</p><div class="grid"><label>เลือกรูป<input type="file" id="up-f" accept="image/jpeg,image/png,image/webp"></label><label>บันทึกเป็น (โฟลเดอร์/ชื่อไฟล์ ตัวอังกฤษเล็ก ตัวเลข - _)<input type="text" id="up-p" placeholder="img/up/e01-cover.jpg" spellcheck="false"></label></div><div class="tools"><button type="button" class="pri" data-sh="up">อัปโหลด</button><span class="hint" id="up-r" style="margin:0;align-self:center"></span></div></div>';
+  }
+  function upImg() {
+    var f = ($("up-f") || {}).files, p = (($("up-p") || {}).value || "").trim().toLowerCase(); if (!f || !f[0]) { toast("เลือกรูปก่อน"); return; }
+    var ext = f[0].type === "image/png" ? "png" : f[0].type === "image/webp" ? "webp" : "jpg";
+    if (!p) { var nm = f[0].name.toLowerCase().replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); p = "img/up/" + (nm || "img-" + Date.now()) + "." + ext; }
+    if (f[0].size > 2 * 1024 * 1024) { toast("รูปใหญ่เกิน 2 MB ย่อรูปก่อน"); return; }
+    var rd = new FileReader(); rd.onload = function () { $("up-r").textContent = "กำลังอัปโหลด…"; adm("adminUpload", { path: p, data: String(rd.result) }).then(function (r) { $("up-r").innerHTML = "ขึ้นเว็บแล้ว · ใส่ในช่องรูปว่า <code>" + esc(r.path) + "</code>"; toast("อัปโหลดแล้ว"); }).catch(function (e) { $("up-r").textContent = e.message || "อัปโหลดไม่สำเร็จ"; }); }; rd.readAsDataURL(f[0]);
+  }
+  function todayCard() {
+    if (!SHOP) return BB() && (BB().demo || tokGet()) ? '<div class="card"><h2>ต้องทำวันนี้</h2><p class="hint" style="margin:0">' + (shopErr ? '<span style="color:var(--bad)">' + esc(shopErr) + "</span>" : "กำลังโหลดข้อมูลร้าน…") + "</p></div>" : "";
+    var k = SHOP.kpi, csNew = (SHOP.consigns || []).filter(function (c) { return c.status === "ใหม่"; }).length, ship = SHOP.orders.filter(function (o) { return o.status === "ชำระแล้ว" && o.shipTo && !o.ship; }).length;
+    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["shop", "คำถามรอตอบ", k.asksOpen, true], ["shop", "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req", "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) { return c.status === "ใหม่"; }).length, true], ["shop", "รอลูกค้าชำระ", k.wait, false], ["cust", "สมาชิกใหม่ 30 วัน", k.members30, false]];
+    return '<div class="card"><h2>ต้องทำวันนี้</h2><div class="kpis">' + it.map(function (x) { return '<button type="button" class="kpi' + (x[2] && x[3] ? " todo" : "") + '" data-go="' + x[0] + '" style="text-align:left;display:block;min-height:0;font:inherit;cursor:pointer"><span>' + esc(x[1]) + "</span><b>" + x[2] + "</b></button>"; }).join("") +
+      '</div><p class="hint" style="margin:8px 0 0">ยอดขายเดือนนี้ ' + money(k.revenueMonth) + " · ทั้งหมด " + money(k.revenue) + " · สมาชิก " + k.members + " คน · ข้อมูลเมื่อ " + esc(wh(SHOP._at)) + ' · ตรวจสลิป: ' + (SHOP.setup.slipAuto ? "อัตโนมัติ" : "ร้านตรวจเอง") + ' <button type="button" class="sm" data-sh="load">โหลดใหม่</button></p></div>';
+  }
+  function linksCard() {
+    var L = (SHOP && SHOP.setup && SHOP.setup.links) || {}, site = (S.site || {}).url || "";
+    var items = [[site, "เว็บไซต์", "หน้าร้านที่ลูกค้าเห็น"], [L.sheet, "ชีตข้อมูลร้าน", "คำสั่งซื้อ สมาชิก ทะเบียนสิทธิ์"], [L.files, "ไฟล์ฉบับมืออาชีพ", "โฟลเดอร์ไดรฟ์ที่ระบบส่งให้ผู้ซื้อ"], [L.slips, "สลิปลูกค้า", "โฟลเดอร์ไดรฟ์"],
+      [L.script, "โค้ดหลังบ้าน", "Apps Script · Script properties · Deploy"], [L.repo || "https://github.com/srangbuild/srang-build", "ที่เก็บเว็บ (GitHub)", "ไฟล์เว็บ และประวัติการแก้ทุกครั้ง"],
+      ["https://dashboard.omise.co/", "Opn Payments", "บัตร พร้อมเพย์ ยอดเงินเข้า"], ["https://easyslip.com/", "EasySlip", "ตรวจสลิปอัตโนมัติ และโควตา"], ["https://analytics.google.com/", "Google Analytics", "สถิติคนเข้าเว็บ"], ["https://search.google.com/search-console", "Search Console", "การค้นหาใน Google"],
+      ["https://manager.line.biz/", "LINE Official Account", "ข้อความและผู้ติดตาม"], ["https://studio.youtube.com/", "YouTube Studio", "คลิปและสถิติ"], ["https://www.tiktok.com/tiktokstudio", "TikTok Studio", "คลิปและสถิติ"], ["https://business.facebook.com/", "Meta Business Suite", "Facebook และ Instagram"]];
+    return '<div class="card"><h2>ทางลัดทุกระบบ</h2><p class="hint">ระบบหลังร้านทั้งหมดในที่เดียว · ชีตและไดรฟ์เปิดได้เฉพาะบัญชี Google ของร้าน' + (SHOP ? "" : " · ลิงก์ชีต ไดรฟ์ และโค้ดหลังบ้าน แสดงหลังโหลดข้อมูลร้าน") + '</p><div class="links">' +
+      items.map(function (x) { var u = /^https:\/\//.test(x[0] || "") ? x[0] : ""; return "<a" + (u ? ' href="' + esc(u) + '" target="_blank" rel="noopener"' : ' class="off" aria-disabled="true"') + "><b>" + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></a>"; }).join("") + "</div></div>";
+  }
+
+  // ----- แท็บ -----
+  var TABS = [
+    ["ov", "ภาพรวม", overview],
+    ["shop", "ร้าน (คำสั่งซื้อ)", shopTab],
+    ["cust", "ลูกค้า", custTab],
+    ["cons", "ฝากขาย", consignTab],
+    ["req", "สั่งทำ", requestTab],
+    ["brand", "แบรนด์และลิงก์", function () { return objCard("links", "ลิงก์ช่องทาง", "เว้นว่าง = ปุ่มบนเว็บขึ้นว่า “เร็ว ๆ นี้”") + objCard("brand", "แบรนด์") + objCard("site", "เว็บและสถิติ") + objCard("announce", "แถบประกาศ", "ใช้ตอนเปิดขาย เปิดรับงาน หรือปล่อยอัลบั้ม") + upCard("ปกตอน รูปสินค้า หรือรูปประกอบหน้าเว็บ · แล้วนำที่อยู่ไปใส่ในช่องรูปของรายการนั้น"); }],
+    ["ep", "ตอน", function () { return listCard("episodes", "ตอนทั้งหมด", "ปล่อยคลิปแล้วนำลิงก์มาใส่ที่นี่ ตอนที่ยังไม่มีลิงก์จะแสดงวันปล่อยแทน"); }],
+    ["free", "ของแจก", function () { return listCard("freebies", "เช็กลิสต์แจกฟรี", "เนื้อหาต้องมาจากบทของตอนนั้น · 1 ชุด = 1 แผ่น A4 (หน้า free.html พิมพ์หรือบันทึกเป็น PDF ได้) · คำสั่ง LINE ต้องตรงกับที่ตั้งไว้ในข้อความตอบกลับอัตโนมัติ"); }],
+    ["prod", "ของแนะนำ", function () { return '<div class="card"><h2>ข้อความเปิดเผยแอฟฟิลิเอต</h2><p class="hint">แสดงเหนือรายการของแนะนำและท้ายเว็บเสมอ</p><label class="full">ข้อความ<textarea data-p="disclosure">' + esc(S.disclosure) + "</textarea></label></div>" + listCard("products", "ของที่ใช้ในคลิป (ลิงก์แอฟฟิลิเอต)", "รายการที่ยังไม่ใส่ลิงก์จะไม่แสดงบนเว็บ · แนะนำเฉพาะของที่ใช้จริงหรือพูดถึงในคลิป · ใช้ร้านเดียวต่อหนึ่งหน้า"); }],
+    ["biz", "บริการ ร้าน เพลง", function () { return listCard("shop", "สินค้าของช่อง", "ใส่ลิงก์หน้าขายเมื่อพร้อม ป้ายจะเปลี่ยนเป็นเปิดขายเอง") + listCard("services", "บริการ") + listCard("music", "เพลง") + listCard("faq", "คำถามที่พบบ่อย"); }],
+    ["sheet", "ใบตรวจงาน", sheetTab],
+    ["mem", "สมาชิกและชำระเงิน", function () { return objCard("member", "ระบบสมาชิก", "สมัครฟรีด้วยอีเมล · ข้อมูลสมาชิกอยู่ในไฟล์ชีตของบัญชี Google ร้าน ไม่อยู่ในเว็บนี้") + objCard("pay", "รับชำระเงินด้วยการโอนและแนบสลิป", "ลูกค้าโอนตามยอด แนบรูปสลิปในหน้าสมาชิก ร้านตรวจยอดเข้าบัญชีจริงแล้วเปลี่ยนสถานะในไฟล์ชีต · ข้อมูลในช่องนี้แสดงต่อสาธารณะ ใส่เฉพาะที่ลูกค้าต้องใช้โอน") + '<div class="card"><h2>ขั้นตอนของร้าน</h2><ul class="chk"><li><span>1</span><span>ติดตั้งหลังบ้านตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md<small>ทำครั้งเดียว ใช้บัญชี Google ของร้าน</small></span></li><li><span>2</span><span>มีอีเมล “มีสลิปรอตรวจ” → เปิดแอปธนาคารดูว่ายอดเข้าจริง<small>อย่าเชื่อรูปสลิปอย่างเดียว</small></span></li><li><span>3</span><span>เปลี่ยนสถานะในแผ่น orders เป็น ชำระแล้ว<small>ลูกค้าได้อีเมลและดาวน์โหลดได้ทันที</small></span></li></ul></div>' + upCard("รูปคิวอาร์รับเงิน: บันทึกเป็น pay/qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่อง รูปคิวอาร์รับเงิน ด้านบน"); }],
+    ["kit", "ชุดโพสต์", kitTab],
+    ["lnk", "ลิงก์และติดตามผล", linksTab]
+  ];
+  var tab = "ov";
+  // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
+  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop", "cust", "cons", "req"];
+  function badge(id) { if (!SHOP) return ""; var n = id === "shop" ? (SHOP.kpi.check || 0) + (SHOP.kpi.asksOpen || 0) : id === "cons" ? (SHOP.consigns || []).filter(function (c) { return c.status === "ใหม่"; }).length : id === "req" ? (SHOP.requests || []).filter(function (c) { return c.status === "ใหม่"; }).length : 0; return n ? "<i>" + n + "</i>" : ""; }
+  function render() {
+    var g = gated(), on1 = !!tokGet();
+    $("tabs").parentNode.hidden = g; ["b-prev", "b-imp", "b-reset", "b-save", "state"].forEach(function (id) { $(id).hidden = g; });
+    $("b-pub").hidden = g || GH.on !== true; $("b-out").hidden = !on1; $("who").hidden = !on1; $("who").textContent = on1 ? tokWho() : "";
+    $("b-save").className = GH.on === true ? "dark" : "pri";
+    if (g) { $("main").innerHTML = loginCard(); gDraw(); var k0 = $("ak"); if (k0 && !loginBusy) k0.focus(); return; }
+    $("tabs").innerHTML = TABS.map(function (t) { return (GROUPS[t[0]] ? '<span class="grp" role="presentation">' + GROUPS[t[0]] + "</span>" : "") + '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab) + '">' + t[1] + badge(t[0]) + "</button>"; }).join("");
+    $("main").innerHTML = TABS.filter(function (t) { return t[0] === tab; })[0][2]();
+    drawUtm(); touch();
+    if (SHOPTABS.indexOf(tab) >= 0 && !SHOP && !shopBusy && !shopErr && BB() && (BB().demo || tokGet())) shopLoad();
+    var on = $("tabs").querySelector("[aria-selected=true]"); if (on && on.scrollIntoView) on.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+  $("tabs").addEventListener("click", function (ev) { var b = ev.target.closest("[data-tab]"); if (b) { tab = b.dataset.tab; render(); window.scrollTo(0, 0); } });
+
+  // ----- การแก้ไข -----
+  $("main").addEventListener("input", function (ev) {
+    var el = ev.target, p = el.dataset.p;
+    if (el.id && el.id.indexOf("u-") === 0) { drawUtm(); return; }
+    if (el.id === "cq") { custQ = el.value; clearTimeout(window.__cq); window.__cq = setTimeout(function () { render(); var s = $("cq"); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 350); return; }
+    if (el.id === "shq") { shopQ = el.value; clearTimeout(window.__shq); window.__shq = setTimeout(function () { render(); var s = $("shq"); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 350); return; }
+    if (el.id === "ak") return;
+    if (!p) return;
+    var v = el.dataset.t === "bool" ? el.checked : el.dataset.t === "lines" ? el.value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean) : el.value.trim();
+    set(S, p, v);
+    if (el.dataset.t === "url") el.classList.toggle("bad", !!v && !ok(v));
+    touch();
+    if (p.indexOf("posts.") === 0) { var o = $("kit-out"); if (o) o.innerHTML = kit(); }
+  });
+  $("main").addEventListener("change", function (ev) {
+    var el = ev.target;
+    if (el.id === "csort") { custSort = el.value; render(); return; }
+    if (el.id === "kit-ep") { kitEp = el.value; render(); } else if (el.id === "kit-ver") { kitVer = el.value; render(); }
+    else if (el.dataset.re) { var o = $("kit-out"); if (o) o.innerHTML = kit(); }
+  });
+  $("main").addEventListener("toggle", function (ev) { var d = ev.target; if (d.dataset && d.dataset.list && d.open) openAt[d.dataset.list] = +d.dataset.i; }, true);
+  function copy(text) { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { toast("คัดลอกแล้ว"); }, function () { toast("คัดลอกไม่สำเร็จ ให้เลือกข้อความแล้วกด Ctrl+C"); }); else toast("เลือกข้อความแล้วกด Ctrl+C"); }
+  $("main").addEventListener("click", function (ev) {
+    var go = ev.target.closest("[data-go]"); if (go) { tab = go.dataset.go; render(); window.scrollTo(0, 0); return; }
+    var sb = ev.target.closest("[data-sh]"); if (sb) { shopClick(sb); return; }
+    var b = ev.target.closest("[data-act]"); if (!b) return;
+    var act = b.dataset.act, key = b.dataset.list, i = +b.dataset.i, A = key ? S[key] : null;
+    if (act === "copy") { copy(b.closest(".kit").querySelector("textarea").value); return; }
+    if (act === "copyutm") { var v = $("u-out").value; if (v) copy(v); else toast("ใส่ลิงก์ปลายทางก่อน"); return; }
+    if (act === "add") { A.push(LIST[key].blank()); openAt[key] = A.length - 1; }
+    else if (act === "del") { if (!confirm("ลบ “" + LIST[key].label(A[i]) + "” ?")) return; A.splice(i, 1); openAt[key] = -1; }
+    else if (act === "up" && i > 0) { A.splice(i - 1, 0, A.splice(i, 1)[0]); openAt[key] = i - 1; }
+    else if (act === "down" && i < A.length - 1) { A.splice(i + 1, 0, A.splice(i, 1)[0]); openAt[key] = i + 1; }
+    render();
+  });
+
+  // ----- บันทึก นำเข้า ดูตัวอย่าง -----
+  // never drop a part of the data: sections or fields that exist in the loaded data.js but not in the edited copy are put back before saving
+  function keepAll(dst, src) { if (!src || typeof src !== "object" || Array.isArray(src)) return; Object.keys(src).forEach(function (k) { if (!(k in dst)) dst[k] = JSON.parse(JSON.stringify(src[k])); else if (dst[k] && typeof dst[k] === "object" && !Array.isArray(dst[k])) keepAll(dst[k], src[k]); }); }
+  function fileText() { keepAll(S, window.SITE || {}); S.version = new Date().toISOString().slice(0, 10); return "window.SITE = " + JSON.stringify(S, null, 2) + ";\n"; }
+  function saved() { ORIG = JSON.stringify(S); BASE = hashOf(ORIG); touch(); }
+  $("b-save").addEventListener("click", function () {
+    var text = fileText();
+    if (window.showSaveFilePicker) {
+      window.showSaveFilePicker({ suggestedName: "data.js", types: [{ description: "data.js", accept: { "text/javascript": [".js"] } }] }).then(function (h) { return h.createWritable().then(function (w) { return w.write(text).then(function () { return w.close(); }); }); }).then(function () { saved(); toast("บันทึกแล้ว อย่าลืมอัปโหลดขึ้นโฮสต์"); }).catch(function (e) { if (e && e.name !== "AbortError") dl(text); });
+    } else dl(text);
+  });
+  function dl(text) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" })); a.download = "data.js"; document.body.appendChild(a); a.click(); a.remove(); saved(); toast("ดาวน์โหลด data.js แล้ว นำไปวางทับไฟล์เดิมในโฟลเดอร์ เว็บ"); }
+  $("b-prev").addEventListener("click", function () { touch(); window.open("index.html?preview=1", "_blank"); });
+  $("b-imp").addEventListener("click", function () { $("file").click(); });
+  $("file").addEventListener("change", function () {
+    var f = this.files[0]; if (!f) return; var r = new FileReader();
+    r.onload = function () { try { var t = String(r.result).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/, ""); var o = JSON.parse(t); if (!o || !Array.isArray(o.episodes)) throw 0; S = o; shape(); render(); toast("นำเข้าแล้ว ตรวจแล้วกดบันทึก"); } catch (e) { toast("ไฟล์นี้ไม่ใช่ data.js ของเว็บ"); } };
+    r.readAsText(f, "utf-8"); this.value = "";
+  });
+  $("b-reset").addEventListener("click", function () { if (!dirty || confirm("ทิ้งทุกอย่างที่แก้ แล้วกลับไปใช้ค่าจากไฟล์ data.js ?")) { S = JSON.parse(JSON.stringify(window.SITE || {})); ORIG = JSON.stringify(S); shape(); try { localStorage.removeItem(KEY); } catch (e) {} render(); } });
+  window.addEventListener("beforeunload", function (ev) { if (dirty) { ev.preventDefault(); ev.returnValue = ""; } });
+  // บันทึกขึ้นเว็บ: หลังบ้านตรวจ data.js แล้วเขียนลง GitHub · ถ้ามีคนแก้จากที่อื่นหลังโหลด ระบบไม่ทับ ให้โหลดใหม่ก่อน
+  $("b-pub").addEventListener("click", function () {
+    var btn = this; if (btn.disabled) return;
+    if (!GH.sha) { toast("กำลังโหลดข้อมูลล่าสุดจากเว็บ ลองกดอีกครั้ง"); siteLoad(true); return; }
+    if (!dirty && !confirm("ข้อมูลตรงกับบนเว็บแล้ว บันทึกซ้ำหรือไม่?")) return;
+    btn.disabled = true; btn.textContent = "กำลังบันทึก…";
+    adm("adminSiteSave", { text: fileText(), sha: GH.sha }).then(function (r) { GH.sha = r.sha; GH.at = r.at; window.SITE = JSON.parse(JSON.stringify(S)); saved(); btn.disabled = false; btn.textContent = "บันทึกขึ้นเว็บ"; bar("ขึ้นเว็บแล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที", false); })
+      .catch(function (e) { btn.disabled = false; btn.textContent = "บันทึกขึ้นเว็บ"; bar(e.message || "บันทึกไม่สำเร็จ", true); });
+  });
+  $("b-out").addEventListener("click", function () {
+    if (dirty && !confirm("ยังมีการแก้ที่ยังไม่บันทึกขึ้นเว็บ (ร่างยังเก็บในเครื่องนี้) ออกจากระบบหรือไม่?")) return;
+    var t = tokGet(); if (t && BB()) BB().callAdmin("adminLogout", { adminToken: t }, "").catch(function () {});
+    tokSet(""); SHOP = null; shopErr = ""; GH = { sha: "", on: null, at: "", err: "" }; loginErr = ""; var pb = $("pubbar"); if (pb) pb.remove(); render(); toast("ออกจากระบบแล้ว");
+  });
+  $("main").addEventListener("keydown", function (ev) { if (ev.key === "Enter" && ev.target.id === "ak") { ev.preventDefault(); doLogin({ adminKey: ev.target.value }); } });
+  render();
+  if (tokGet() || (BB() && BB().demo)) siteLoad(false);
+  if (staleNote) { var bn = document.createElement("div"); bn.id = "stale-note"; bn.setAttribute("role", "status"); bn.style.cssText = "background:#fff3cd;color:#664d03;border-bottom:1px solid #e6c56f;padding:10px 16px;font-size:14px"; bn.textContent = staleNote; document.body.insertBefore(bn, document.body.firstChild); }
+})();
+</script>
+</body>
+</html>

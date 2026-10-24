@@ -58,7 +58,7 @@
       return { amt: 0, block: true, note: own === "updates" ? "คุณมีใบนี้แบบรับฉบับใหม่ตลอดแล้ว เอาออกจากตะกร้าได้" : "คุณมีใบนี้แล้ว · ถ้าต้องการรับฉบับใหม่ตลอด เลือกแบบนั้นเพื่ออัปเกรด จ่ายเฉพาะส่วนต่าง", cls: "bad" };
     }
     var info = { amt: B.cart.price(id) };
-    if (B.isBundle(x)) { var have = x.items.filter(function (k) { return R[k]; }); if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว", cls: "bad" }; if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า"; }
+    if (B.isBundle(x)) { var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) { return R[k + sfx]; }); if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว", cls: "bad" }; if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า"; }
     return info;
   }
   // ชุดรวมที่คุ้มกว่า: ใบเดี่ยวในตะกร้าครอบคลุมครึ่งหนึ่งของชุดขึ้นไป
@@ -87,11 +87,13 @@
       var x = B.find(id), info = lineInfo(id), hasU = +x.priceU > 0, s = B.cart.saving(id);
       if (info.block) blocked++; else total += info.amt;
       if (!info.block) sv += s;
-      var sel = '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="' + esc(x.id) + '" aria-label="แบบสิทธิ์ของ ' + esc(x.id) + '"><option value="ed"' + (B.isUpd(id) ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.memberPrice(x.price)) + "</option>" + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · " + B.baht(B.memberPrice(x.priceU)) + "</option>" : "") + "</select></label>";
+      var sel = B.isMarket(x) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="' + esc(x.id) + '" aria-label="แบบสิทธิ์ของ ' + esc(x.id) + '"><option value="ed"' + (B.isUpd(id) ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.memberPrice(x.price)) + "</option>" + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · " + B.baht(B.memberPrice(x.priceU)) + "</option>" : "") + "</select></label>";
+      // ภาษาบนใบ (โปรเจกต์กำแพง): เปลี่ยนได้ในตะกร้า ราคาเท่าเดิม · ภาษาอื่นหรือมาตรฐานประเทศอื่น = สั่งทำ
+      var lv = B.langsOf(x), lang = B.isMarket(x) ? "" : '<label class="ctl"><span class="note" style="margin:0">ภาษาบนใบ</span><select data-lang="' + esc(x.id) + '" aria-label="ภาษาบนใบของ ' + esc(x.id) + '"' + (lv.length < 2 ? " disabled" : "") + ">" + lv.map(function (v) { return '<option value="' + v + '"' + (B.varOf(id) === v ? " selected" : "") + ">" + esc(B.LANGS[v]) + (v ? " (1 ภาษา)" : " (2 ภาษา)") + "</option>"; }).join("") + "</select></label>";
       return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="' + L("product.html", "id=" + encodeURIComponent(x.id)) + '">' + esc(x.id + " " + x.title) + "</a><em>" + (info.block ? "–" : B.baht(info.amt)) + "</em></div>" +
-        "<small>" + (B.isBundle(x) ? "ชุดรวม " + x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " · " + esc(x.pages || "") + " หน้า A4") + " · ไฟล์ PDF อังกฤษ-ไทย</small>" +
+        "<small>" + (B.isMarket(x) ? "สินค้าฝากขาย · " + esc(x.kind || "") + (x.seller ? " โดย " + esc(x.seller) : "") + " · " + esc({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งรายละเอียดทางอีเมล" }[x.delivery] || "ร้านส่งรายละเอียดทางอีเมล") : (B.isBundle(x) ? "ชุดรวม " + x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " · " + esc(x.pages || "") + " หน้า A4") + " · ไฟล์ PDF " + esc(B.LANGS[B.varOf(id)])) + "</small>" +
         (s > 0 && !info.block ? '<small class="sv">ถูกกว่าซื้อแยก ' + B.baht(s) + "</small>" : "") + (info.note ? '<small class="' + (info.cls || "") + '">' + esc(info.note) + "</small>" : "") +
-        '<div class="ctl">' + sel + '<button class="rm" type="button" data-rm="' + esc(x.id) + '">เอาออก</button></div></div></article>';
+        '<div class="ctl">' + lang + sel + '<button class="rm" type="button" data-rm="' + esc(x.id) + '">เอาออก</button></div></div></article>';
     }).join("");
     var ups = upsell(ids).map(function (u) {
       return '<div class="upsell"><span><b>ซื้อเป็น ' + esc(u.b.id + " " + u.b.title) + "</b> ได้ครบ " + u.b.items.length + " ใบ " + B.baht(u.price) + " · " + (u.extra <= 0 ? "ถูกกว่าที่เลือกอยู่ " + B.baht(-u.extra) : "จ่ายเพิ่ม " + B.baht(u.extra) + " ได้อีก " + u.more + " ใบ") + '</span><span><button class="b line sm" type="button" data-swap="' + esc(u.b.id) + '" data-upd="' + (u.upd ? 1 : 0) + '">เปลี่ยนเป็นชุดนี้</button></span></div>';
@@ -104,7 +106,7 @@
       '<p class="note">ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์ · ดาวน์โหลดซ้ำได้ทุกเมื่อ</p>' +
       (me ? '<p class="note">ราคาคิดตามสิทธิ์ที่บัญชี ' + esc(me.member.email || me.member.name) + " มีอยู่แล้ว</p>" : '<p class="note">มีบัญชีอยู่แล้ว: ระบบตรวจใบที่คุณมีแล้วตอนชำระเงิน</p>') + "</div></aside></div>";
   }
-  $("view").addEventListener("change", function (ev) { var t = ev.target; if (t.dataset.plan) { B.cart.setPlan(t.dataset.plan, t.value === "up"); say(""); } });
+  $("view").addEventListener("change", function (ev) { var t = ev.target; if (t.dataset.plan) { B.cart.setPlan(t.dataset.plan, t.value === "up"); say(""); } else if (t.dataset.lang) { B.cart.setLang(t.dataset.lang, t.value); say("เปลี่ยนภาษาบนใบของ " + t.dataset.lang + " เป็น " + B.LANGS[t.value] + " แล้ว ราคาเท่าเดิม"); } });
   $("view").addEventListener("click", function (ev) {
     var t = ev.target.closest("[data-rm],[data-swap],[data-block]"); if (!t) return;
     if (t.dataset.block) { ev.preventDefault(); say("แก้รายการที่มีป้ายสีแดงก่อน แล้วกดอีกครั้ง", true); return; }

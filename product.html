@@ -59,7 +59,8 @@
     $("pd").innerHTML = '<div class="card empty" style="margin-top:14px"><h1 class="kn" style="color:var(--navy);margin:0 0 8px">ไม่พบสินค้านี้</h1><p>ลิงก์อาจพิมพ์ไม่ครบ หรือสินค้านี้ไม่มีแล้ว</p><a class="b pri" href="' + L("sheets.html") + '">ดูใบตรวจงานทั้งหมด</a></div>';
     return;
   }
-  var bundle = B.isBundle(x), sell = B.canSell(x), hasU = +x.priceU > 0;
+  var bundle = B.isBundle(x), mk = B.isMarket(x), sell = B.canSell(x), hasU = +x.priceU > 0 && !mk;
+  var DEL = { file: "ดาวน์โหลดได้ทันทีหลังชำระ", ship: "ส่งพัสดุตามที่อยู่ในโปรไฟล์", manual: "ร้านส่งรายละเอียดทางอีเมลภายใน 1 วันทำการ" };
   var pE = B.memberPrice(x.price), pU = hasU ? B.memberPrice(x.priceU) : 0;
   var items = bundle ? x.items.map(B.find).filter(Boolean) : [];
   var sumOf = function (k) { return items.reduce(function (t, s) { return t + (+s[k] || 0); }, 0); };
@@ -67,10 +68,11 @@
   document.title = x.id + " " + title + " — สร้าง | BUILD TH";
   var md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute("content", (bundle ? x.text : src.sum) || md.getAttribute("content"));
 
-  $("crumbs").innerHTML = '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("sheets.html") + '">ใบตรวจงาน</a><span aria-hidden="true">›</span>' + (bundle ? '<a href="' + L("sheets.html") + '#bundle">ชุดรวม</a>' : '<span>' + esc(src.group || "") + "</span>") + '<span aria-hidden="true">›</span><span aria-current="page">' + esc(x.id) + "</span>";
+  $("crumbs").innerHTML = mk ? '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("market.html") + '">ร้านฝากขาย</a><span aria-hidden="true">›</span><span>' + esc(x.kind || "") + '</span><span aria-hidden="true">›</span><span aria-current="page">' + esc(x.id) + "</span>" : '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("sheets.html") + '">ใบตรวจงาน</a><span aria-hidden="true">›</span>' + (bundle ? '<a href="' + L("sheets.html") + '#bundle">ชุดรวม</a>' : '<span>' + esc(src.group || "") + "</span>") + '<span aria-hidden="true">›</span><span aria-current="page">' + esc(x.id) + "</span>";
 
   // ---------- ภาพ ----------
   function media() {
+    if (mk) return '<figure class="pd-media">' + (x.img ? '<div class="frame"><img src="' + esc(x.img) + '" alt="' + esc(x.title) + '"></div>' : '<div class="frame wait" style="background:linear-gradient(160deg,#16395C,#0F2A44);color:#fff;font:700 22px/1.3 Kanit,sans-serif">' + esc(x.kind || "สินค้า") + "</div>") + '<figcaption>สินค้าฝากขาย' + (x.seller ? " โดย " + esc(x.seller) : "") + " · ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย</figcaption></figure>";
     if (bundle) return '<figure class="pd-media"><div class="frame set" aria-hidden="true">' + items.slice(0, 9).map(function (s) { return "<span>" + esc(s.id) + "</span>"; }).join("") + '</div><figcaption>ชุดนี้มี ' + items.length + " ใบ · กดชื่อใบด้านล่างเพื่อดูรายละเอียดแต่ละใบ</figcaption></figure>";
     var img = src.ok === true && src.img ? src.img : "";
     if (!img) return '<figure class="pd-media"><div class="frame wait"><span>ภาพตัวอย่างหน้าแรกจะแสดง<br>เมื่อร้านตรวจรายการของใบนี้เสร็จ</span></div></figure>';
@@ -78,31 +80,43 @@
   }
   // ---------- ข้อมูลหลัก ----------
   function facts() {
+    if (mk) { var g = [[x.kind || "–", "ประเภท"], [x.format || "–", "รูปแบบ"], [x.seller || "–", "ผู้ขาย"]]; return '<dl class="facts">' + g.map(function (a) { return "<div><dt>" + esc(a[1]) + "</dt><dd style=\"font-size:16px\">" + esc(a[0]) + "</dd></div>"; }).join("") + '</dl><p class="note" style="margin:-6px 0 14px">การส่งมอบ: ' + esc(DEL[x.delivery] || DEL.manual) + "</p>"; }
     var f = bundle ? [[items.length, "ใบในชุด"], [sumOf("nPro"), "รายการตรวจรวม"], [sumOf("nHold"), "จุดหยุดรอตรวจ (H)"], [sumOf("pages"), "หน้า A4 รวม"], ["2", "ภาษา อังกฤษ-ไทย"], ["PDF", "ไฟล์พิมพ์ได้"]]
       : [[src.nPro, "รายการตรวจ"], [src.nHold, "จุดหยุดรอตรวจ (H)"], [(src.recs || []).length || "–", "ตารางบันทึก"], [src.pages || "–", "หน้า A4"], [langTx(src.langs), "ภาษา"], [dmy(src.revDate) || "–", "ฉบับวันที่"]];
     return '<dl class="facts">' + f.map(function (a) { return "<div><dt>" + esc(a[1]) + "</dt><dd>" + esc(a[0]) + "</dd></div>"; }).join("") + "</dl>";
   }
   function cur() { var l = B.cart.line(x.id); return l ? (B.isUpd(l) ? "up" : "ed") : ""; }
   function plan() { var r = document.querySelector("input[name=plan]:checked"); return r ? r.value : "ed"; }
+  // ภาษาบนใบ (โปรเจกต์กำแพง 24 ต.ค. 2026): 2 ภาษา อังกฤษ + ไทย หรือ 1 ภาษา · ราคาเท่ากัน · ภาษาอื่นและมาตรฐานประเทศอื่น = สั่งทำ
+  function lang() { var r = document.querySelector("input[name=lang]:checked"); if (r) return r.value; var l = B.cart.line(x.id); return l ? B.varOf(l) : ""; }
+  function langSel(dis) {
+    if (mk) return ""; var lv = B.langsOf(x), c = lang();
+    var tx = { "": ["2 ภาษา: อังกฤษ + ไทย", "บรรทัดบนอังกฤษมีช่องกรอก บรรทัดล่างไทย · ใช้ได้ทั้งทีมไทยและทีมต่างชาติ"], EN: ["1 ภาษา: อังกฤษ", "ทั้งใบเป็นภาษาอังกฤษ · สำหรับโครงการและผู้ตรวจต่างประเทศ"], TH: ["1 ภาษา: ไทย", "ทั้งใบเป็นภาษาไทย ตัวอักษรใหญ่ขึ้น อ่านง่าย"] };
+    return '<fieldset class="opts"' + (dis ? " disabled" : "") + '><legend>ภาษาบนใบ</legend>' + lv.map(function (v) { return '<label class="opt"><input type="radio" name="lang" value="' + v + '"' + (v === c ? " checked" : "") + "><span><b>" + tx[v][0] + "</b><small>" + tx[v][1] + "</small></span><em>ราคาเท่ากัน</em></label>"; }).join("") +
+      '<p class="note" style="margin:8px 2px 0">ต้องการภาษาอื่น (เช่น เมียนมา เขมร ลาว จีน) หรือเกณฑ์ตามมาตรฐานของประเทศอื่น: <a href="' + L("request.html", "item=" + encodeURIComponent(x.id)) + '">สั่งทำ ขอใบเสนอราคา</a></p></fieldset>';
+  }
   function opts() {
+    if (mk) return '<p style="margin:0 0 14px"><span class="price" style="font-size:30px">' + B.baht(pE) + "</span></p>";
     var c = cur() || "ed";
     var rows = [["ed", "ซื้อฉบับนี้ เก็บได้ตลอด", "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง", pE]];
     if (hasU) rows.push(["up", "รับฉบับใหม่ตลอด", "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง", pU]);
-    return '<fieldset class="opts"><legend>เลือกแบบสิทธิ์</legend>' + rows.map(function (r) { return '<label class="opt"><input type="radio" name="plan" value="' + r[0] + '"' + (r[0] === c ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + "</small></span><em>" + B.baht(r[3]) + "</em></label>"; }).join("") + "</fieldset>";
+    return langSel(false) + '<fieldset class="opts"><legend>เลือกแบบสิทธิ์</legend>' + rows.map(function (r) { return '<label class="opt"><input type="radio" name="plan" value="' + r[0] + '"' + (r[0] === c ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + "</small></span><em>" + B.baht(r[3]) + "</em></label>"; }).join("") + "</fieldset>";
   }
   var own = ""; // สิทธิ์ที่บัญชีนี้มีอยู่แล้ว: "edition" | "updates" (โหลดหลังหน้าเปิด ถ้าเข้าระบบอยู่)
   function ownBox() {
     var diff = hasU ? Math.max(1, pU - pE) : 0, inC = B.cart.line(x.id);
     var lib = '<a class="b line sm" href="' + L("member.html") + '#docs">เปิดเอกสารของฉัน</a>';
-    if (own === "updates") return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> แบบรับฉบับใหม่ตลอด · ดาวน์โหลดฉบับล่าสุดได้ทุกเมื่อ</span><div class="buy">' + lib + "</div></div>";
-    return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> แบบซื้อฉบับนี้ เก็บได้ตลอด' + (diff ? " · อัปเกรดเป็นรับฉบับใหม่ตลอด จ่ายเฉพาะส่วนต่าง " + B.baht(diff) : "") + '</span><div class="buy">' + lib + (diff && sell ? (inC === x.id + "+U" ? '<a class="b pri sm" href="' + L("checkout.html") + '">อัปเกรดอยู่ในตะกร้า · ชำระเงิน</a>' : '<button class="b pri sm" type="button" data-act="upg">อัปเกรด ' + B.baht(diff) + "</button>") : "") + "</div></div>";
+    if (mk) return '<div class="own"><span><b>คุณซื้อสินค้านี้แล้ว</b> · ' + esc(DEL[x.delivery] || DEL.manual) + '</span><div class="buy">' + (x.delivery === "file" ? lib : '<a class="b line sm" href="' + L("member.html") + '#orders">ดูคำสั่งซื้อของฉัน</a>') + "</div></div>";
+    var lvx = B.langsOf(x).filter(String), more = lvx.length && sell ? '<p class="note" style="margin:8px 0 0">ต้องการฉบับภาษาเดียวด้วย: ' + lvx.map(function (v) { return '<button class="b line sm" type="button" data-act="addv" data-v="' + v + '">' + esc(B.LANGS[v]) + " " + B.baht(pE) + "</button>"; }).join(" ") + "</p>" : "";
+    if (own === "updates") return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> (อังกฤษ + ไทย) แบบรับฉบับใหม่ตลอด · ดาวน์โหลดฉบับล่าสุดได้ทุกเมื่อ</span><div class="buy">' + lib + "</div>" + more + "</div>";
+    return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> (อังกฤษ + ไทย) แบบซื้อฉบับนี้ เก็บได้ตลอด' + (diff ? " · อัปเกรดเป็นรับฉบับใหม่ตลอด จ่ายเฉพาะส่วนต่าง " + B.baht(diff) : "") + '</span><div class="buy">' + lib + (diff && sell ? (inC === x.id + "+U" ? '<a class="b pri sm" href="' + L("checkout.html") + '">อัปเกรดอยู่ในตะกร้า · ชำระเงิน</a>' : '<button class="b pri sm" type="button" data-act="upg">อัปเกรด ' + B.baht(diff) + "</button>") : "") + "</div>" + more + "</div>";
   }
   function buyBox() {
     if (own && !bundle) return ownBox();
     if (!sell) {
       var why = B.P.on !== true ? "ร้านยังไม่เปิดรับชำระเงิน" : B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "ร้านกำลังตรวจรายการของ" + (bundle ? "ใบในชุดนี้" : "ใบนี้") + " เปิดขายเมื่อตรวจครบ";
       var inAcc = !!B.token.get();
-      return opts().replace('<fieldset class="opts">', '<fieldset class="opts" disabled>') + '<div class="soon"><b>' + esc(why) + "</b><br>" + (inAcc ? "ร้านส่งอีเมลแจ้งสมาชิกเมื่อเปิดขาย (ตั้งค่าได้ที่หน้าสมาชิก เมนู โปรไฟล์)" : "สมัครสมาชิกฟรี แล้วระบบส่งอีเมลแจ้งเมื่อเปิดขาย") + '</div><div class="buy"><a class="b pri" href="' + L("member.html") + (inAcc ? "#profile" : "") + '">' + (inAcc ? "ไปหน้าสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" + (!bundle && src.ok === true && src.free ? '<a class="b line" href="' + esc(src.free) + '" download>ดาวน์โหลดฉบับฟรี</a>' : "") + "</div>";
+      return opts().replace(/<fieldset class="opts">/g, '<fieldset class="opts" disabled>') + '<div class="soon"><b>' + esc(why) + "</b><br>" + (inAcc ? "ร้านส่งอีเมลแจ้งสมาชิกเมื่อเปิดขาย (ตั้งค่าได้ที่หน้าสมาชิก เมนู โปรไฟล์)" : "สมัครสมาชิกฟรี แล้วระบบส่งอีเมลแจ้งเมื่อเปิดขาย") + '</div><div class="buy"><a class="b pri" href="' + L("member.html") + (inAcc ? "#profile" : "") + '">' + (inAcc ? "ไปหน้าสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" + (!bundle && src.ok === true && src.free ? '<a class="b line" href="' + esc(src.free) + '" download>ดาวน์โหลดฉบับฟรี</a>' : "") + "</div>";
     }
     var inC = B.cart.has(x.id), cov = !inC && B.cart.covered(x.id);
     var btns = cov ? '<p class="soon" style="margin:0 0 12px">ใบนี้อยู่ในชุดรวมที่อยู่ในตะกร้าแล้ว ไม่ต้องซื้อแยก · <a href="' + L("cart.html") + '">ดูตะกร้า</a></p>'
@@ -111,7 +125,8 @@
   }
   function trust() {
     var h = +P.hours || 24;
-    return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน ' + h + ' ชั่วโมง</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
+    if (mk) return '<ul class="trust"><li><i>✓</i><span>ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · ร้านรับชำระและดูแลการส่งมอบ</span></li><li><i>✓</i><span>ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร กระเป๋าเงินออนไลน์ หรือโอนเงิน</span></li><li><i>✓</i><span>' + esc(DEL[x.delivery] || DEL.manual) + "</span></li>" + (x.delivery === "file" ? "<li><i>✓</i><span>ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li>" : "") + "</ul>";
+    return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน ' + h + ' ชั่วโมง</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
   }
   // ---------- ส่วนรายละเอียด ----------
   function secOutline() {
@@ -143,13 +158,24 @@
       return '<a class="bcard" href="' + L("product.html", "id=" + encodeURIComponent(b.id)) + '"><b>' + esc(b.id + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(b.items.join(" · ")) + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p ? ' <span class="sv">ถูกกว่าซื้อแยก ' + B.baht(s - p) + "</span>" : "") + "</span></a>";
     }).join("") + "</div></section>";
   }
+  // สินค้าฝากขาย: รายละเอียดจากผู้ขาย + ข้อมูลผู้ขาย
+  function secMarket() {
+    var paras = String(x.desc || "").split(/\n+/).map(function (p) { return p.trim(); }).filter(Boolean);
+    return '<section class="pd-sec" id="detail"><h2>รายละเอียดสินค้า</h2><div class="card pad">' + (paras.length ? paras.map(function (p) { return '<p style="margin:0 0 10px">' + esc(p) + "</p>"; }).join("") : '<p class="note" style="margin:0">ผู้ขายยังไม่ได้ใส่รายละเอียดเพิ่ม</p>') + "</div>" +
+      (x.seller ? '<div class="card pad" style="margin-top:12px"><h3 class="kn" style="margin:0 0 6px;color:var(--navy)">ผู้ขาย: ' + esc(x.seller) + '</h3><p class="note" style="margin:0">สินค้าฝากขายเป็นผลงานของผู้ขาย · ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · คำถามเรื่องการสั่งซื้อและส่งมอบ ถามร้านได้ที่หน้าสมาชิก เมนู ถามร้าน</p></div>' : "") +
+      '<p class="note"><a href="' + L("market.html") + '">← ดูสินค้าฝากขายทั้งหมด</a> · <a href="' + L("market.html") + '#sell">สนใจฝากขาย</a></p></section>';
+  }
   function secFaq() {
     var h = +P.hours || 24;
+    if (mk) {
+      var qm = [["ได้รับสินค้าอย่างไร", DEL[x.delivery] || DEL.manual], ["ขอคืนเงินได้ไหม", "เป็นไปตามข้อตกลงการใช้งานของร้าน ข้อ การคืนเงิน · สินค้าดิจิทัลที่ดาวน์โหลดหรือส่งให้แล้ว ไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง"], ["ใครดูแลการใช้งานสินค้า", "ผู้ขายดูแลการใช้งานโปรแกรมหรือเนื้อหาของตนเอง · ร้านดูแลเรื่องการชำระเงินและการส่งมอบ"]];
+      return '<section class="pd-sec faq" id="faq"><h2>คำถามที่พบบ่อย</h2>' + qm.map(function (a) { return "<details><summary>" + esc(a[0]) + "</summary><p>" + esc(a[1]) + "</p></details>"; }).join("") + '<p class="note">อ่านข้อตกลงเต็มที่ <a href="' + L("terms.html") + '">ข้อตกลงการใช้งาน</a></p></section>';
+    }
     var qa = [
       ["แบบ ซื้อฉบับนี้ กับ รับฉบับใหม่ตลอด ต่างกันอย่างไร", "ซื้อฉบับนี้: ได้ไฟล์ฉบับวันที่ซื้อ เก็บและดาวน์โหลดซ้ำได้ตลอด · รับฉบับใหม่ตลอด: เมื่อร้านปรับใบตามกฎหมาย มาตรฐาน หรือข้อกำหนดที่เปลี่ยน คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง · ซื้อฉบับนี้ไปแล้ว อัปเกรดภายหลังได้โดยจ่ายเฉพาะส่วนต่าง"],
       ["ได้ไฟล์อย่างไร", "ชำระออนไลน์ ระบบเปิดสิทธิ์ทันที · โอนเงินแล้วแนบสลิป ร้านตรวจยอดภายใน " + h + " ชั่วโมง · กดดาวน์โหลดได้ที่หน้าสมาชิก เมนู เอกสารของฉัน ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ"],
       ["ใช้กับหลายโครงการได้ไหม", "ได้ ผู้ซื้อใช้ในงานของตนเองและของหน่วยงานที่ตนทำงานอยู่ได้ไม่จำกัดจำนวนครั้ง พิมพ์ได้ · ไม่อนุญาตให้ขาย แจกจ่าย เผยแพร่ต่อสาธารณะ หรือดัดแปลงแล้วนำไปขาย"],
-      ["ออกใบเสร็จได้ไหม", "ได้ หลักฐานการชำระเงินออกในนามบุคคลหรือบริษัท พร้อมเลขประจำตัวผู้เสียภาษี (ใส่ได้ตอนชำระเงิน) · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารจึงไม่ใช่ใบกำกับภาษี"],
+      ["ออกใบเสร็จได้ไหม", "ได้ ระบบออกใบเสร็จรับเงินให้อัตโนมัติทุกคำสั่งซื้อที่ชำระแล้ว ในนามบุคคลหรือบริษัท พร้อมเลขประจำตัวผู้เสียภาษี (ใส่ได้ตอนชำระเงิน) · เปิดและพิมพ์เป็น PDF ได้จากหน้าสมาชิกและอีเมล · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารจึงไม่ใช่ใบกำกับภาษี"],
       ["ขอคืนเงินได้ไหม", "ยังไม่ได้ดาวน์โหลดไฟล์: แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · ดาวน์โหลดแล้ว: ไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านส่งไฟล์ที่ถูกต้องให้หรือคืนเงิน)"],
       ["ใบตรวจงานแทนการตรวจของวิศวกรได้ไหม", "ไม่ได้ ใบตรวจงานเป็นเครื่องมือช่วยตรวจและบันทึก งานจริงให้ยึดแบบ ข้อกำหนด และมาตรฐานที่สัญญาอ้างอิง งานที่กฎหมายกำหนดให้ผู้มีใบอนุญาตทำ ต้องให้ผู้มีใบอนุญาตเป็นผู้ทำและรับรอง"]
     ];
@@ -157,8 +183,8 @@
   }
 
   function draw() {
-    $("pd").innerHTML = '<div class="pd">' + media() + '<div class="pd-info"><span class="code">' + esc(code) + (bundle ? " · ชุดรวม" : " · " + esc(src.group || "")) + "</span><h1>" + esc(title) + "</h1>" + (!bundle && src.titleEn ? '<p class="en" lang="en">' + esc(src.titleEn) + "</p>" : "") + '<p class="lede">' + esc(bundle ? x.text : src.sum) + "</p>" + facts() + '<div id="buybox">' + buyBox() + "</div>" + trust() + "</div></div>" +
-      (bundle ? secIncluded() : secOutline() + secRecords()) + secBundles() + secFaq();
+    $("pd").innerHTML = '<div class="pd">' + media() + '<div class="pd-info"><span class="code">' + esc(mk ? x.id : code) + (mk ? " · " + esc(x.kind || "สินค้าฝากขาย") : bundle ? " · ชุดรวม" : " · " + esc(src.group || "")) + "</span><h1>" + esc(title) + "</h1>" + (!bundle && src.titleEn ? '<p class="en" lang="en">' + esc(src.titleEn) + "</p>" : "") + '<p class="lede">' + esc(bundle ? x.text : src.sum) + "</p>" + facts() + '<div id="buybox">' + buyBox() + "</div>" + trust() + "</div></div>" +
+      (mk ? secMarket() : (bundle ? secIncluded() : secOutline() + secRecords()) + secBundles()) + secFaq();
     mbar();
   }
   function redrawBuy() { var bb = $("buybox"); if (bb) bb.innerHTML = buyBox(); mbar(); }
@@ -176,16 +202,17 @@
     var a = ev.target.closest("[data-act]"); if (!a) return;
     ev.stopPropagation();
     var up = plan() === "up", act = a.getAttribute("data-act");
+    if (act === "addv") { var ev0 = B.cart.add(x.id + "." + a.getAttribute("data-v"), false); toast(ev0 || "ใส่ " + x.id + " " + B.LANGS[a.getAttribute("data-v")] + " ลงตะกร้าแล้ว"); return; }
     if (act === "upg") { var e0 = B.cart.has(x.id) ? (B.cart.setPlan(x.id, true), "") : B.cart.add(x.id, true); if (e0) { toast(e0); return; } location.href = L("checkout.html"); return; }
     if (B.cart.has(x.id)) { if (act === "now") location.href = L("checkout.html"); else location.href = L("cart.html"); return; }
-    var err = B.cart.add(x.id, up);
+    var lv0 = lang(), err = B.cart.add(x.id + (lv0 ? "." + lv0 : ""), up);
     if (err) { toast(err); return; }
     if (act === "now") { location.href = L("checkout.html"); return; }
-    toast("ใส่ " + x.id + " ลงตะกร้าแล้ว · " + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้"));
+    toast("ใส่ " + x.id + " ลงตะกร้าแล้ว · " + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้") + " · " + B.LANGS[lv0]);
     redrawBuy();
   }, true);
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { var l0 = document.querySelector(".lightbox"); if (l0) l0.remove(); } });
-  document.addEventListener("change", function (ev) { if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
+  document.addEventListener("change", function (ev) { if (ev.target.name === "lang") { if (B.cart.has(x.id)) { B.cart.setLang(x.id, ev.target.value); toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว"); } return; } if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
   window.addEventListener("build-cart", function () { if ($("buybox") && !$("buybox").contains(document.activeElement)) redrawBuy(); });
   draw();
   if (B.token.get() && !bundle) B.call("me").then(function (r) { var d = (r.lib || []).filter(function (k) { return k.id === x.id; })[0]; if (d) { own = d.plan === "edition" ? "edition" : "updates"; redrawBuy(); } }).catch(function () {});

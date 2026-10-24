@@ -145,6 +145,9 @@
 .paym label small { color:var(--mute); font-size:13.5px; line-height:1.45; }
 .paym label:has(input:checked) { border-color:var(--orange); background:#FFFAF6; box-shadow:0 0 0 1px var(--orange) inset; }
 .paym label.off { opacity:.5; cursor:not-allowed; }
+.paym .pmh, .pmh { margin:8px 0 0; font-size:14px; font-weight:700; color:var(--navy); }
+.paym .pmh:first-of-type { margin-top:0; }
+.pmh2 { margin:10px 0 6px !important; font-weight:700; color:var(--navy) !important; }
 .mini { list-style:none; margin:0; padding:0; display:grid; gap:10px; font-size:14.5px; }
 .mini li { display:flex; justify-content:space-between; gap:10px; }
 .mini li span { line-height:1.45; }

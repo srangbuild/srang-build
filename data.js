@@ -882,10 +882,21 @@ window.SITE = {
     "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
     "opnKey": "pkey_test_69fymwz5y4m08hm1zyl",
     "methods": [
-      "card",
       "promptpay",
-      "truemoney_jumpapp"
-    ]
+      "card",
+      "googlepay",
+      "mobile_banking_kbank",
+      "mobile_banking_scb",
+      "mobile_banking_bbl",
+      "mobile_banking_bay",
+      "mobile_banking_ktb",
+      "truemoney_jumpapp",
+      "rabbit_linepay",
+      "shopeepay",
+      "grabpay",
+      "alipay"
+    ],
+    "googlePayId": ""
   },
   "privacyDate": "23 ต.ค. 2026",
   "sheetsNext": [
@@ -3669,5 +3680,6 @@ window.SITE = {
       "hidden": true,
       "of": "F-05"
     }
-  ]
+  ],
+  "market": []
 };

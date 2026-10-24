@@ -30,14 +30,14 @@
   var timer = 0;
   function say(t) { msg.textContent = t; msg.classList.add("on"); clearTimeout(timer); timer = setTimeout(function () { msg.classList.remove("on"); }, 2600); }
   function open(o) { bg.classList.toggle("on", o); box.classList.toggle("on", o); if (o) { var c = box.querySelector("[data-bc-close]"); if (c) c.focus(); } else { fab.focus(); } }
-  function planTx(id) { return B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด"; }
+  function planTx(id) { return B.isMarket(B.find(id)) ? "สินค้าฝากขาย" : (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด") + " · " + B.LANGS[B.varOf(id)]; }
   function draw() {
     var ids = B.cart.get(), n = ids.length, total = B.cart.total();
     fab.classList.toggle("on", n > 0 && !onCartPage); fab.innerHTML = "ตะกร้า <i>" + n + "</i> " + esc(B.baht(total)); fab.setAttribute("aria-label", "เปิดตะกร้า มี " + n + " รายการ รวม " + total + " บาท");
     [].forEach.call(document.querySelectorAll(".navcart i"), function (b) { b.textContent = n; b.hidden = !n; });
     var rows = ids.map(function (id) {
       var x = B.find(id), bd = B.isBundle(x), sv = B.cart.saving(id);
-      return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id)) + '">' + esc(x.id + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small><small>" + (bd ? "ชุดรวม " + x.items.length + " ใบ · ไฟล์ PDF" : esc(x.nPro) + " ข้อ · " + esc(x.pages || "") + " หน้า · ไฟล์ PDF") + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก ' + esc(B.baht(sv)) + "</small>" : "") + "</div><em>" + esc(B.baht(B.cart.price(id))) + '</em><button type="button" data-bc-del="' + esc(id) + '" aria-label="เอา ' + esc(x.id) + ' ออกจากตะกร้า">×</button></li>';
+      return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id)) + '">' + esc(x.id + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small><small>" + (B.isMarket(x) ? esc(x.kind || "สินค้าฝากขาย") + (x.seller ? " โดย " + esc(x.seller) : "") : bd ? "ชุดรวม " + x.items.length + " ใบ · ไฟล์ PDF" : esc(x.nPro) + " ข้อ · " + esc(x.pages || "") + " หน้า · ไฟล์ PDF") + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก ' + esc(B.baht(sv)) + "</small>" : "") + "</div><em>" + esc(B.baht(B.cart.price(id))) + '</em><button type="button" data-bc-del="' + esc(id) + '" aria-label="เอา ' + esc(x.id) + ' ออกจากตะกร้า">×</button></li>';
     }).join("");
     box.innerHTML = '<div class="bc-hd"><h2>ตะกร้า (' + n + ')</h2><button type="button" data-bc-close="1" aria-label="ปิดตะกร้า">✕</button></div>' +
       (n ? '<ul class="bc-li">' + rows + "</ul>" : '<p class="bc-emp">ยังไม่มีรายการในตะกร้า</p>') +

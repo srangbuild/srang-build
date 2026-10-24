@@ -13,6 +13,8 @@
   var TK = "build_member_token";
   // hidden = รายการทดสอบระบบ (เช่น X-05 ราคา 1 บาท) ไม่แสดงในรายการของหน้าร้าน แต่ find() ยังหาเจอ เมื่อเปิดลิงก์ ?buy=X-05 ของเจ้าของร้าน
   var allSheets = Array.isArray(S.sheets) ? S.sheets : [], sheets = allSheets.filter(function (x) { return x.hidden !== true; }), bundles = Array.isArray(S.bundles) ? S.bundles : [];
+  // สินค้าฝากขาย (รุ่น 26 ต.ค. 2026): โปรแกรม หนังสือ อีบุ๊ก เทมเพลต · รหัส M-001 · ซื้อผ่านตะกร้าเดียวกัน
+  var market = Array.isArray(S.market) ? S.market : [];
   var ST = { wait: "รอชำระ", check: "รอตรวจ", paid: "ชำระแล้ว", reject: "สลิปไม่ผ่าน", cancel: "ยกเลิก" };
   /* หัวข้อที่สมาชิกถามร้านได้ (ตรงกับหลังบ้าน Code.gs ตัวแปร ASK_TOPICS) */
   var ASK = ["คำสั่งซื้อและการชำระเงิน", "ไฟล์และการดาวน์โหลด", "เนื้อหาของใบตรวจงาน", "บัญชีสมาชิก", "เรื่องอื่น"];
@@ -22,13 +24,21 @@
   // +U = แบบรับฉบับใหม่ตลอด (คำสั่งผู้ใช้ 23 ต.ค. 2026) · รหัสปกติ = ซื้อฉบับนี้ เก็บได้ตลอด
   function baseOf(id) { return String(id || "").replace(/\+U$/, ""); }
   function isUpd(id) { return /\+U$/.test(String(id || "")); }
-  function find(id) { id = baseOf(id); return allSheets.filter(function (x) { return x.id === id; })[0] || bundles.filter(function (x) { return x.id === id; })[0] || null; }
+  // ฉบับภาษา (โปรเจกต์กำแพง 24 ต.ค. 2026): ไม่มีท้ายรหัส = อังกฤษ + ไทย · .EN = อังกฤษอย่างเดียว · .TH = ไทยอย่างเดียว · ราคาเท่ากัน (ตรงกับหลังบ้าน VARS)
+  var LANGS = { "": "อังกฤษ + ไทย", EN: "อังกฤษอย่างเดียว", TH: "ไทยอย่างเดียว" }, LANGS_EN = { "": "English + Thai", EN: "English only", TH: "Thai only" };
+  function varOf(id) { var m = /\.([A-Z]{2})(\+U)?$/.exec(String(id || "")); return m && LANGS[m[1]] ? m[1] : ""; }
+  function rootOf(id) { return baseOf(id).replace(/\.[A-Z]{2}$/, ""); }
+  function find0(id) { return allSheets.filter(function (x) { return x.id === id; })[0] || bundles.filter(function (x) { return x.id === id; })[0] || market.filter(function (x) { return x.id === id; })[0] || null; }
+  function langsOf(x) { if (!x || isMarket(x)) return [""]; var vs = isBundle(x) ? Object.keys(LANGS).filter(function (v) { return v && x.items.length && x.items.every(function (k) { var s = find0(k); return s && (s.vars || []).indexOf(v) >= 0; }); }) : (x.vars || []).filter(function (v) { return !!LANGS[v]; }); return [""].concat(vs); }
+  function find(id) { var b = baseOf(id), hit = find0(b); if (hit) return hit; var v = varOf(b), x = v ? find0(rootOf(b)) : null; return x && x.hidden !== true && langsOf(x).indexOf(v) > 0 ? x : null; }
+  function langLabel(id) { var v = varOf(id); return v ? LANGS[v] : ""; }
+  function isMarket(x) { return !!(x && /^M-\d{3}$/.test(String(x.id))); }
   function isBundle(x) { return !!(x && Array.isArray(x.items)); }
   function memberPrice(p) { var d = Math.min(90, Math.max(0, +M.discount || 0)); return Math.max(1, Math.round((+p || 0) * (100 - d) / 100)); }
   // ขายได้เมื่อ: เปิดรับชำระเงิน + รายการนั้นเปิดขาย + ใบตรวจงานผ่านการตรวจรายการแล้ว (ชุดรวม = ทุกใบในชุดผ่านแล้ว)
   function reviewed(x) { if (!x) return false; if (isBundle(x)) return x.items.length > 0 && x.items.every(function (id) { var s = find(id); return !!(s && s.ok === true); }); return x.ok === true; }
   function canSell(x) { return !!(P.on === true && x && x.sale === true && +x.price > 0 && reviewed(x)); }
-  function expand(ids) { var o = {}; (ids || []).forEach(function (id) { id = baseOf(id); var x = find(id); if (isBundle(x)) x.items.forEach(function (k) { o[k] = 1; }); else if (x) o[id] = 1; }); return Object.keys(o); }
+  function expand(ids) { var o = {}; (ids || []).forEach(function (id) { id = baseOf(id); var v = varOf(id), x = find(id); if (isBundle(x)) x.items.forEach(function (k) { o[k + (v ? "." + v : "")] = 1; }); else if (x) o[id] = 1; }); return Object.keys(o); }
 
   var token = {
     get: function () { try { return localStorage.getItem(TK) || ""; } catch (e) { return ""; } },
@@ -97,26 +107,28 @@
   function planOk(id) { var x = find(id); return !!(x && canSell(x) && (!isUpd(id) || +x.priceU > 0)); }
   function unitPrice(id) { var x = find(id); return x ? memberPrice(isUpd(id) ? x.priceU : x.price) : 0; }
   var cart = {
-    get: function () { try { var a = JSON.parse(localStorage.getItem(CK) || "[]"), seen = {}; return Array.isArray(a) ? a.filter(function (id) { if (typeof id !== "string" || seen[baseOf(id)] || !planOk(id)) return false; seen[baseOf(id)] = 1; return true; }) : []; } catch (e) { return []; } },
+    get: function () { try { var a = JSON.parse(localStorage.getItem(CK) || "[]"), seen = {}; return Array.isArray(a) ? a.filter(function (id) { if (typeof id !== "string" || seen[rootOf(id)] || !planOk(id)) return false; seen[rootOf(id)] = 1; return true; }) : []; } catch (e) { return []; } },
     put: function (a) { try { localStorage.setItem(CK, JSON.stringify(a)); } catch (e) {} try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} },
-    line: function (id) { var b = baseOf(id); return cart.get().filter(function (k) { return baseOf(k) === b; })[0] || ""; },
+    line: function (id) { var b = rootOf(id); return cart.get().filter(function (k) { return rootOf(k) === b; })[0] || ""; },
     has: function (id) { return !!cart.line(id); },
-    covered: function (id) { var b = baseOf(id); return cart.get().some(function (k) { var y = find(k); return isBundle(y) && y.items.indexOf(b) >= 0; }); },
+    covered: function (id) { var b = rootOf(id); return cart.get().some(function (k) { var y = find(k); return isBundle(y) && y.items.indexOf(b) >= 0; }); },
     add: function (id, upd) {
-      var b = baseOf(id), want = upd === undefined ? id : b + (upd ? "+U" : ""), x = find(b);
+      var b = baseOf(id), want = upd === undefined ? id : b + (upd ? "+U" : ""), x = find(b), r0 = rootOf(id);
       if (!x || !canSell(x)) return "รายการนี้ยังไม่เปิดขาย";
       if (isUpd(want) && !(+x.priceU > 0)) return "รายการนี้ไม่มีแบบรับฉบับใหม่ตลอด";
       var a = cart.get(), cur = cart.line(b);
-      if (cur) { if (cur !== want) cart.setPlan(b, isUpd(want)); return ""; }
-      if (!isBundle(x) && cart.covered(b)) return "ใบนี้อยู่ในชุดที่อยู่ในตะกร้าแล้ว";
+      if (cur) { if (cur !== want) cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? want : k; })); return ""; }
+      if (!isBundle(x) && cart.covered(r0)) return "ใบนี้อยู่ในชุดที่อยู่ในตะกร้าแล้ว";
       if (isBundle(x)) {
         if (a.some(function (k) { var y = find(k); return isBundle(y) && x.items.every(function (s) { return y.items.indexOf(s) >= 0; }); })) return "ชุดนี้อยู่ในชุดใหญ่ที่อยู่ในตะกร้าแล้ว";
-        a = a.filter(function (k) { var y = find(k); return isBundle(y) ? !y.items.every(function (s) { return x.items.indexOf(s) >= 0; }) : x.items.indexOf(baseOf(k)) < 0; });
+        a = a.filter(function (k) { var y = find(k); return isBundle(y) ? !y.items.every(function (s) { return x.items.indexOf(s) >= 0; }) : x.items.indexOf(rootOf(k)) < 0; });
       }
       a.push(want); cart.put(a); return "";
     },
-    setPlan: function (id, upd) { var b = baseOf(id), x = find(b); if (upd && !(x && +x.priceU > 0)) return; cart.put(cart.get().map(function (k) { return baseOf(k) === b ? b + (upd ? "+U" : "") : k; })); },
-    remove: function (id) { var b = baseOf(id); cart.put(cart.get().filter(function (k) { return baseOf(k) !== b; })); },
+    setPlan: function (id, upd) { var r0 = rootOf(id), x = find(id); if (upd && !(x && +x.priceU > 0)) return; cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? baseOf(k) + (upd ? "+U" : "") : k; })); },
+    // เปลี่ยนภาษาของบรรทัดในตะกร้า (คำสั่งผู้ใช้ 24 ต.ค. 2026: ในตะกร้าปรับตัวเลือกของสินค้าได้) · ราคาเท่าเดิม
+    setLang: function (id, v) { var r0 = rootOf(id), x = find(r0); if (!x || langsOf(x).indexOf(v || "") < 0) return; cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? r0 + (v ? "." + v : "") + (isUpd(k) ? "+U" : "") : k; })); },
+    remove: function (id) { var b = rootOf(id); cart.put(cart.get().filter(function (k) { return rootOf(k) !== b; })); },
     clear: function () { cart.put([]); },
     price: unitPrice,
     total: function () { return cart.get().reduce(function (t, id) { return t + unitPrice(id); }, 0); },
@@ -124,7 +136,7 @@
     saving: function (id) { var x = find(id), u = isUpd(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(u && +y.priceU > 0 ? y.priceU : y.price) : 0); }, 0); return Math.max(0, s - unitPrice(id)); }
   };
   // ชุดรวมที่มีใบนี้ (หน้าสินค้าและตะกร้าใช้แนะนำ ซื้อเป็นชุดถูกกว่า)
-  function bundlesOf(id) { var b = baseOf(id); return bundles.filter(function (x) { return x.items.indexOf(b) >= 0; }); }
+  function bundlesOf(id) { var b = rootOf(id); return bundles.filter(function (x) { return x.items.indexOf(b) >= 0; }); }
 
-  window.BUILD = { baseOf: baseOf, isUpd: isUpd, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
+  window.BUILD = { baseOf: baseOf, isUpd: isUpd, rootOf: rootOf, varOf: varOf, langsOf: langsOf, langLabel: langLabel, LANGS: LANGS, LANGS_EN: LANGS_EN, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, market: market, isMarket: isMarket, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();

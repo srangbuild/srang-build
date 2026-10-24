@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบเสร็จรับเงิน — สร้าง | BUILD TH</title>
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F2A44; --orange:#FF6B1A; --ink:#16202B; --line:#C9D1D9; --mute:#5A6573; --paper:#EEF1F5; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 "IBM Plex Sans Thai","Leelawadee UI",Tahoma,sans-serif; }
+  .bar { max-width:840px; margin:0 auto; padding:14px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .bar a, .bar button { font:inherit; font-weight:600; border-radius:10px; padding:9px 16px; border:1px solid var(--line); background:#fff; color:var(--ink); text-decoration:none; cursor:pointer; min-height:42px; }
+  .bar .pri { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .bar small { color:var(--mute); flex-basis:100%; }
+  .doc { max-width:840px; margin:0 auto 32px; background:#fff; border:1px solid var(--line); border-radius:6px; padding:34px 38px; }
+  .hd { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; border-bottom:2px solid var(--navy); padding-bottom:14px; }
+  .brand { display:flex; gap:12px; align-items:center; } .brand img { width:46px; height:46px; object-fit:contain; }
+  .brand b { font:700 19px/1.2 "Kanit",sans-serif; color:var(--navy); display:block; } .brand span { font-size:13px; color:var(--mute); }
+  .ttl { text-align:right; } .ttl h1 { margin:0; font:700 22px/1.25 "Kanit",sans-serif; color:var(--navy); } .ttl .en { font-size:13px; letter-spacing:.6px; color:var(--mute); text-transform:uppercase; }
+  .ttl .orig { display:inline-block; margin-top:6px; font-size:12.5px; border:1px solid var(--navy); color:var(--navy); padding:1px 10px; border-radius:999px; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:16px 26px; margin:16px 0; }
+  .blk h2 { margin:0 0 4px; font-size:12.5px; letter-spacing:.4px; color:var(--mute); font-weight:700; text-transform:uppercase; }
+  .blk p { margin:0; font-size:14.5px; } .blk b { color:var(--navy); }
+  dl.meta { margin:0; display:grid; grid-template-columns:auto 1fr; gap:3px 14px; font-size:14.5px; } dl.meta dt { color:var(--mute); } dl.meta dd { margin:0; font-weight:600; }
+  table { width:100%; border-collapse:collapse; margin:8px 0 0; font-size:14.5px; }
+  th, td { border-bottom:1px solid #E1E6EC; padding:8px 6px; text-align:left; vertical-align:top; }
+  th { background:#F3F5F8; color:#344054; font-size:12.5px; font-weight:700; } th small { display:block; font-weight:500; color:var(--mute); }
+  td.n, th.n { text-align:right; white-space:nowrap; } td small { color:var(--mute); display:block; }
+  .tot { margin:10px 0 0 auto; width:min(360px,100%); font-size:14.5px; } .tot div { display:flex; justify-content:space-between; padding:4px 6px; } .tot .g { border-top:2px solid var(--navy); font-weight:700; font-size:17px; color:var(--navy); margin-top:4px; padding-top:8px; }
+  .words { margin:8px 0 0; padding:8px 12px; background:#F3F5F8; border-radius:6px; font-weight:600; }
+  .ft { margin-top:22px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end; font-size:13px; color:var(--mute); }
+  .sig { text-align:center; min-width:220px; color:var(--ink); } .sig .ln { border-top:1px solid var(--ink); margin-top:36px; padding-top:4px; } .sig .paid { display:inline-block; border:2px solid #1E7D4F; color:#1E7D4F; font:700 16px/1 "Kanit",sans-serif; padding:6px 14px; border-radius:6px; transform:rotate(-4deg); }
+  .msg { max-width:840px; margin:0 auto 16px; padding:14px 16px; border-radius:10px; background:#FFF6EF; border:1px solid #FFC9A8; }
+  .msg.bad { background:#FBE4E2; border-color:#F0B8B2; color:#7A1A12; }
+  @media (max-width:640px) { .doc { padding:20px 16px; } .two { grid-template-columns:1fr; } .hd { flex-direction:column; } .ttl { text-align:left; } th.hide, td.hide { display:none; } }
+  @media print { @page { size:A4; margin:12mm; } body { background:#fff; } .bar, .msg.noprint { display:none !important; } .doc { border:0; padding:0; margin:0; max-width:none; } }
+</style>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<div class="bar"><button class="pri" type="button" id="print" disabled>พิมพ์ หรือบันทึกเป็น PDF</button><a href="member.html#orders">คำสั่งซื้อของฉัน</a><a href="index.html">หน้าหลัก</a><small>บันทึกเป็น PDF: กดพิมพ์ แล้วเลือกเครื่องพิมพ์ “บันทึกเป็น PDF” (Save as PDF)</small></div>
+<div id="out"><p class="msg noprint">กำลังโหลดใบเสร็จ…</p></div>
+
+<script>
+(function () {
+  "use strict";
+  var B = window.BUILD, esc = B.esc, $ = function (id) { return document.getElementById(id); };
+  var P = new URLSearchParams(location.search), order = String(P.get("o") || ""), key = String(P.get("k") || "");
+  // จำนวนเงินเป็นตัวอักษรไทย (บาทถ้วน / สตางค์) · หน่วยหลักที่ 1 อ่าน "เอ็ด" เมื่อมีหลักที่สูงกว่า
+  var D = ["", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"], U = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน"];
+  function six(s, hasHigher) { var o = "", n = s.length; for (var i = 0; i < n; i++) { var d = +s[i], p = n - i - 1; if (!d) continue; if (p === 1 && d === 1) o += "สิบ"; else if (p === 1 && d === 2) o += "ยี่สิบ"; else if (p === 0 && d === 1 && (hasHigher || /[1-9]/.test(s.slice(0, n - 1)))) o += "เอ็ด"; else o += D[d] + U[p]; } return o; }
+  function intText(s) { s = String(s).replace(/^0+/, ""); if (!s) return "ศูนย์"; var parts = []; while (s.length > 6) { parts.unshift(s.slice(-6)); s = s.slice(0, -6); } parts.unshift(s); var o = ""; parts.forEach(function (g, i) { o += six(g, i > 0 && /[1-9]/.test(parts.slice(0, i).join(""))); if (i < parts.length - 1) o += "ล้าน"; }); return o; }
+  function bahtText(x) { var c = Math.round(+x * 100), b = Math.floor(c / 100), st = c % 100; return intText(String(b)) + "บาท" + (st ? intText(String(st)) + "สตางค์" : "ถ้วน"); }
+  function money(n) { return Number(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function thDate(iso) { if (!iso) return ""; var d = new Date(iso); if (isNaN(d)) return esc(iso); return d.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Bangkok" }); }
+  function fail(t) { $("out").innerHTML = '<p class="msg bad">' + esc(t) + '</p>'; }
+  if (!/^BT-\d{6}-\d{3}$/.test(order)) { fail("ลิงก์ใบเสร็จไม่ครบ · เปิดจากหน้าสมาชิก เมนู คำสั่งซื้อของฉัน หรือจากลิงก์ในอีเมล"); return; }
+  B.call("receipt", { order: order, key: key }).then(function (r) {
+    var S = r.shop, rc = r.receipt || {}, by = rc.buyer || {}, tax = r.kind === "tax";
+    var title = tax ? "ใบเสร็จรับเงิน / ใบกำกับภาษี" : "ใบเสร็จรับเงิน", titleEn = tax ? "Receipt / Tax invoice" : "Receipt";
+    var note = !r.ready ? '<p class="msg noprint">ร้านกำลังตั้งค่าข้อมูลผู้ออกใบเสร็จ (ชื่อตามกฎหมายและเลขประจำตัวผู้เสียภาษี) · เลขที่ใบเสร็จและรายการด้านล่างบันทึกไว้แล้ว เปิดลิงก์นี้อีกครั้งภายหลังเพื่อได้ใบเสร็จฉบับสมบูรณ์</p>' : "";
+    var rows = (rc.lines || []).map(function (l, i) { return "<tr><td class=\"n hide\">" + (i + 1) + "</td><td>" + (l.id ? "<b>" + esc(l.id) + "</b> " : "") + esc(l.title || "") + (l.plan ? "<small>" + esc(l.plan) + "</small>" : "") + '</td><td class="n hide">1</td><td class="n">' + money(l.amt) + "</td></tr>"; }).join("");
+    var totals = tax ? "<div><span>มูลค่าก่อนภาษี <small>(Net)</small></span><span>" + money(r.net) + "</span></div><div><span>ภาษีมูลค่าเพิ่ม " + esc(S.rate) + "% <small>(VAT)</small></span><span>" + money(r.vat) + '</span></div><div class="g"><span>รวมทั้งสิ้น <small>(Total)</small></span><span>' + money(r.order.amount) + "</span></div>"
+      : '<div class="g"><span>รวมทั้งสิ้น <small>(Total)</small></span><span>' + money(r.order.amount) + "</span></div>" + (S.vat ? '<div style="font-size:13px;color:var(--mute)"><span>ราคานี้รวมภาษีมูลค่าเพิ่ม ' + esc(S.rate) + "% แล้ว</span></div>" : '<div style="font-size:13px;color:var(--mute)"><span>ร้านยังไม่ได้จดทะเบียนภาษีมูลค่าเพิ่ม ราคานี้ไม่มีภาษีมูลค่าเพิ่ม</span></div>');
+    $("out").innerHTML = note + '<article class="doc">' +
+      '<div class="hd"><div class="brand"><img src="img/logo.png" alt=""><div><b>' + esc(S.name || S.brand) + "</b><span>" + esc(S.brand) + "</span></div></div>" +
+      '<div class="ttl"><h1>' + esc(title) + '</h1><div class="en">' + esc(titleEn) + '</div><span class="orig">ต้นฉบับ · Original</span></div></div>' +
+      '<div class="two"><div class="blk"><h2>ผู้ขาย / ผู้ออกใบเสร็จ</h2><p><b>' + esc(S.name || "(รอร้านตั้งค่า)") + "</b>" + (tax ? " (" + esc(S.branch) + ")" : "") + "<br>" + esc(S.addr || "") + "<br>เลขประจำตัวผู้เสียภาษีอากร " + esc(S.id || "(รอร้านตั้งค่า)") + "</p></div>" +
+      '<div class="blk"><dl class="meta"><dt>เล่มที่</dt><dd>' + esc(rc.book || "") + "</dd><dt>เลขที่</dt><dd>" + esc(rc.no || "") + "</dd><dt>วันที่</dt><dd>" + thDate(rc.at) + "</dd><dt>คำสั่งซื้อ</dt><dd>" + esc(r.order.id) + "</dd><dt>ชำระด้วย</dt><dd>" + esc(r.order.method || "โอนเงิน") + "</dd></dl></div></div>" +
+      '<div class="blk" style="margin:0 0 6px"><h2>ผู้ซื้อ / ลูกค้า</h2><p><b>' + esc(by.name || by.email || "") + "</b>" + (by.type === "company" && by.branch ? " (" + esc(by.branch) + ")" : "") + (by.addr ? "<br>" + esc(by.addr) : "") + (by.id ? "<br>เลขประจำตัวผู้เสียภาษีอากร " + esc(by.id) : "") + (by.email ? "<br>" + esc(by.email) : "") + "</p></div>" +
+      '<table><thead><tr><th class="n hide">ลำดับ<small>No.</small></th><th>รายการ<small>Description</small></th><th class="n hide">จำนวน<small>Qty</small></th><th class="n">จำนวนเงิน (บาท)<small>Amount (THB)</small></th></tr></thead><tbody>' + rows + "</tbody></table>" +
+      '<div class="tot">' + totals + '</div><p class="words">(' + esc(bahtText(r.order.amount)) + ")</p>" +
+      '<div class="ft"><div>ได้รับเงินตามรายการข้างต้นถูกต้องแล้ว · เอกสารนี้ออกโดยระบบของร้านเมื่อได้รับชำระเงิน · สินค้าเป็นไฟล์ดิจิทัล ส่งมอบในบัญชีสมาชิกของผู้ซื้อ<br>ตรวจสอบเอกสารนี้กับร้านได้ด้วยเลขที่ ' + esc(rc.no || r.order.id) + '</div><div class="sig"><span class="paid">ชำระแล้ว · PAID</span><div class="ln">ผู้รับเงิน · ' + esc(S.name || S.brand) + "</div></div></div></article>";
+    $("print").disabled = false; document.title = (rc.no || "ใบเสร็จ") + " — " + (S.name || S.brand);
+  }).catch(function (e) { fail(e && e.message ? e.message : "เปิดใบเสร็จไม่ได้ ลองใหม่อีกครั้ง"); });
+  $("print").addEventListener("click", function () { window.print(); });
+})();
+</script>
+</body>
+</html>

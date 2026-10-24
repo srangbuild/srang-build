@@ -7,11 +7,40 @@
   "use strict";
   var B = window.BUILD; if (!B) return;
   var esc = B.esc, P = B.P;
-  var LABEL = { card: ["บัตรเครดิต / เดบิต", "Visa Mastercard JCB ของไทยและต่างประเทศ"], promptpay: ["พร้อมเพย์", "สแกนคิวอาร์ด้วยแอปธนาคาร ยอดขึ้นเอง"], truemoney_jumpapp: ["ทรูมันนี่", "จ่ายผ่านแอป TrueMoney"] };
-  var watch = null, omiseReady = null;
+  // ช่องทางของ Opn ที่ฟอร์มสำเร็จรูปรองรับในไทย (docs.omise.co/omise-js อ่าน 25 ต.ค. 2026) · [ชื่อ, คำอธิบาย, กลุ่ม]
+  var LABEL = {
+    promptpay: ["พร้อมเพย์", "สแกนคิวอาร์ด้วยแอปธนาคารใดก็ได้ ยอดขึ้นเอง ระบบตรวจยอดอัตโนมัติ", "th"],
+    card: ["บัตรเครดิต / เดบิต", "Visa Mastercard JCB ออกในไทยหรือต่างประเทศ · ตัดเป็นบาท ธนาคารผู้ออกบัตรแปลงสกุลเงินให้", "intl"],
+    googlepay: ["Google Pay", "จ่ายด้วยบัตรที่บันทึกไว้ใน Google (Android และ Chrome)", "intl"],
+    alipay: ["Alipay", "สำหรับลูกค้าที่ใช้ Alipay (จีน)", "intl"],
+    mobile_banking_kbank: ["K PLUS", "กสิกรไทย · เปิดแอปจ่ายทันที", "bank"],
+    mobile_banking_scb: ["SCB EASY", "ไทยพาณิชย์ · เปิดแอปจ่ายทันที", "bank"],
+    mobile_banking_bbl: ["Bualuang mBanking", "กรุงเทพ · เปิดแอปจ่ายทันที", "bank"],
+    mobile_banking_bay: ["KMA", "กรุงศรีอยุธยา · เปิดแอปจ่ายทันที", "bank"],
+    mobile_banking_ktb: ["Krungthai NEXT", "กรุงไทย · เปิดแอปจ่ายทันที", "bank"],
+    truemoney_jumpapp: ["ทรูมันนี่", "จ่ายผ่านแอป TrueMoney", "wallet"],
+    rabbit_linepay: ["Rabbit LINE Pay", "จ่ายผ่าน LINE", "wallet"],
+    shopeepay: ["ShopeePay", "จ่ายผ่านแอป Shopee", "wallet"],
+    grabpay: ["GrabPay", "จ่ายผ่านแอป Grab", "wallet"]
+  };
+  var GROUPS = [["th", "แนะนำ · ตรวจยอดอัตโนมัติ"], ["intl", "บัตรและช่องทางสากล (ลูกค้าต่างประเทศใช้ได้)"], ["bank", "แอปธนาคารในไทย"], ["wallet", "กระเป๋าเงินออนไลน์"]];
+  var watch = null, omiseReady = null, cap = null;
 
-  // วิธีชำระออนไลน์ที่ใช้ได้: หลังบ้านเปิด (me.pay) และร้านเลือกไว้ใน data.js (pay.methods)
-  function methods(me) { var on = (me && me.pay && me.pay.methods) || [], want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(LABEL); return want.filter(function (k) { return LABEL[k] && on.indexOf(k) >= 0; }); }
+  // ช่องทางที่บัญชี Opn ของร้านเปิดอยู่จริง (Capability API ใช้คีย์สาธารณะ · docs.omise.co/capability-api) · อ่านครั้งเดียวต่อการเปิดหน้า
+  function capability() {
+    if (cap) return cap;
+    cap = (B.demo || !/^pkey_/.test(String(P.opnKey || "")) ? Promise.resolve(null) : fetch("https://api.omise.co/capability", { headers: { Authorization: "Basic " + btoa(P.opnKey + ":") } }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }))
+      .then(function (c) {
+        if (!c || !Array.isArray(c.payment_methods)) return null;
+        var names = c.payment_methods.map(function (m) { return m.name; });
+        if (names.indexOf("truemoney") >= 0) names.push("truemoney_jumpapp");
+        if ((c.tokenization_methods || []).indexOf("googlepay") >= 0) names.push("googlepay");
+        return { names: names, min: c.limits && c.limits.charge_amount ? +c.limits.charge_amount.min / 100 : 0 };
+      });
+    return cap;
+  }
+  // วิธีชำระออนไลน์ที่ใช้ได้: หลังบ้านรองรับ (me.pay.methods) + ร้านเลือกไว้ใน data.js (pay.methods) + บัญชี Opn เปิดแล้ว (ถ้าอ่านได้)
+  function methods(me, capNames) { var on = (me && me.pay && me.pay.methods) || [], want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(LABEL); return want.filter(function (k) { return LABEL[k] && on.indexOf(k) >= 0 && (!capNames || capNames.indexOf(k) >= 0); }); }
   // โหมดทดสอบของ Opn กับหลังบ้านรุ่นเก่า (ไม่มี guard): ซ่อนการชำระออนไลน์ เพราะบัตรทดสอบที่เผยแพร่ "ชำระผ่าน" ได้โดยไม่มีเงินจริง
   function online(me) { var p = me && me.pay; return !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || ""))) && !(p.test && !p.guard && !B.demo) && methods(me).length); }
   function minOnline(me) { return +(me && me.minOnline) || 20; }
@@ -33,14 +62,16 @@
     ui = ui || {};
     var done = function (r) { return finish(order, r, ui); };
     if (B.demo) { // โหมดทดลอง: ตัวจำลองของ Opn ตอบแทน (บัตร = ผ่านทันที · พร้อมเพย์ = คิวอาร์ทดลอง · ทรูมันนี่ = ไปหน้ายืนยันแล้วกลับมา)
-      var n = method === "card" ? "tokn_test_emuok" : method === "promptpay" ? "src_test_emupromptpay" : "src_test_emutruemoney";
+      var n = method === "card" || method === "googlepay" ? "tokn_test_emuok" : method === "promptpay" ? "src_test_emupromptpay" : "src_test_emutruemoney";
       return charge(order, n + B.rand(4), ui).then(done);
     }
     if (ui.lock) ui.lock(true);
     return omiseLoad().then(function (OC) {
       if (ui.lock) ui.lock(false);
       return new Promise(function (res) {
-        OC.configure({ publicKey: P.opnKey, currency: "THB", frameLabel: "สร้าง | BUILD TH", frameDescription: "คำสั่งซื้อ " + order.id, submitLabel: "ชำระเงิน", buttonLabel: "ชำระเงิน", locale: "th", image: new URL("img/logo.png", location.href).href });
+        var cfg = { publicKey: P.opnKey, currency: "THB", frameLabel: "สร้าง | BUILD TH", frameDescription: "คำสั่งซื้อ " + order.id, submitLabel: "ชำระเงิน", buttonLabel: "ชำระเงิน", locale: /^en/i.test(navigator.language || "") && !/^th/i.test(document.documentElement.lang) ? "en" : "th", image: new URL("img/logo.png", location.href).href };
+        if (P.googlePayId) cfg.googlepayMerchantId = P.googlePayId; // คีย์จริงต้องมีรหัสร้านค้า Google Pay (โหมดทดสอบไม่ต้องมี)
+        OC.configure(cfg);
         OC.open({ amount: Math.round(order.amount * 100), currency: "THB", defaultPaymentMethod: method === "card" ? "credit_card" : method, otherPaymentMethods: "",
           onCreateTokenSuccess: function (nonce) { res(charge(order, nonce, ui).then(done)); }, onFormClosed: function () { res(null); } });
       });
@@ -96,5 +127,5 @@
     var p = (B.demo && emu ? B.ensureEmu().then(function () { window.EMU.payDone(emu); }) : Promise.resolve()).then(function () { return check(oid); });
     return { oid: oid, check: p };
   }
-  B.pay = { LABEL: LABEL, methods: methods, online: online, minOnline: minOnline, start: start, check: check, stop: stop, returned: returned };
+  B.pay = { LABEL: LABEL, GROUPS: GROUPS, methods: methods, capability: capability, online: online, minOnline: minOnline, start: start, check: check, stop: stop, returned: returned };
 })();

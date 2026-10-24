@@ -11,7 +11,7 @@
   var gear = (S.products || []).some(function (p) { return p.on !== false && /^https?:\/\//i.test(p.url || ""); });
   // เมนูรุ่น 3 (24 ต.ค. 2026): ร้านใบตรวจงานอยู่ลำดับที่ 2 · ไม่มีเมนู "ร้าน" ซ้ำกับ "ใบตรวจงาน" (หัวข้อร้านในหน้าหลักยังอยู่)
   var items = [["index.html", "", "หน้าหลัก"]];
-  if (hasSheets) items.push(["sheets.html", "", "ร้านใบตรวจงาน"]);
+  if (hasSheets) items.push(["sheets.html", "", "ร้านใบตรวจงาน"], ["market.html", "", "ร้านฝากขาย"], ["request.html", "", "สั่งทำ"]);
   items.push(["index.html", "free", "เช็กลิสต์ฟรี"], ["index.html", "episodes", "คลิป"]);
   if (gear) items.push(["index.html", "gear", "ของที่ใช้ในคลิป"]);
   items.push(["index.html", "music", "เพลง"], ["index.html", "service", "บริการ"], ["index.html", "about", "เกี่ยวกับ"]);
@@ -27,11 +27,11 @@
     ".bh-nav a:hover,.bh-nav a[aria-current]{background:rgba(255,255,255,.13);color:#fff}" +
     ".bh-nav a.cta{background:#FF6B1A;color:#fff;font-weight:700;margin-left:6px}.bh-nav a.cta:hover{background:#FF7C33}" +
     ".bh-btn{display:none;margin-left:auto;background:none;border:1.5px solid rgba(255,255,255,.45);color:#fff;border-radius:11px;min-width:46px;min-height:42px;font-size:20px;line-height:1;cursor:pointer;font-family:inherit}" +
-    "@media(max-width:920px){.bh-btn{display:block}.bh-nav{display:none;position:absolute;left:0;right:0;top:58px;background:#0F2A44;flex-direction:column;align-items:stretch;gap:0;padding:6px 12px 14px;border-top:1px solid rgba(255,255,255,.14);box-shadow:0 14px 30px rgba(0,0,0,.3);max-height:calc(100vh - 58px);overflow:auto}" +
+    "@media(max-width:1180px){.bh-btn{display:block}.bh-nav{display:none;position:absolute;left:0;right:0;top:58px;background:#0F2A44;flex-direction:column;align-items:stretch;gap:0;padding:6px 12px 14px;border-top:1px solid rgba(255,255,255,.14);box-shadow:0 14px 30px rgba(0,0,0,.3);max-height:calc(100vh - 58px);overflow:auto}" +
     ".bh.open .bh-nav{display:flex}.bh-nav a{font-size:17px;padding:13px 12px;border-radius:12px;border-bottom:1px solid rgba(255,255,255,.07)}.bh-nav a.cta{margin:10px 0 0;text-align:center;border-bottom:0}}" +
     ".bh-cart{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:11px;min-height:42px;padding:0 12px;font-size:14.5px;font-weight:600;margin-left:6px}.bh-cart:hover,.bh-cart[aria-current]{background:rgba(255,255,255,.13)}" +
     ".bh-cart svg{width:20px;height:20px}.bh-cart i{font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#FF6B1A;color:#fff;font:700 12px/20px \"Kanit\",sans-serif;text-align:center}" +
-    "@media(max-width:920px){.bh-cart{margin-left:auto}.bh-cart+.bh-btn{margin-left:8px}.bh-cart span{display:none}}" +
+    "@media(max-width:1180px){.bh-cart{margin-left:auto}.bh-cart+.bh-btn{margin-left:8px}.bh-cart span{display:none}}" +
     "@media print{.bh{display:none!important}}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   var box = document.getElementById("hdr"); if (!box) return;
@@ -46,7 +46,7 @@
   box.innerHTML = h + "</nav>" + cartBtn + "</div>";
   // จอแคบ: ปุ่มตะกร้าอยู่ก่อนปุ่มเมนู · จอกว้าง: อยู่ท้ายเมนู
   var cb = box.querySelector(".bh-cart"), mb = box.querySelector(".bh-btn");
-  function place() { if (!cb) return; var narrow = window.matchMedia("(max-width:920px)").matches; if (narrow && cb.nextElementSibling !== mb) mb.parentNode.insertBefore(cb, mb); else if (!narrow && cb.previousElementSibling !== box.querySelector(".bh-nav")) box.querySelector(".bh-in").appendChild(cb); }
+  function place() { if (!cb) return; var narrow = window.matchMedia("(max-width:1180px)").matches; if (narrow && cb.nextElementSibling !== mb) mb.parentNode.insertBefore(cb, mb); else if (!narrow && cb.previousElementSibling !== box.querySelector(".bh-nav")) box.querySelector(".bh-in").appendChild(cb); }
   place(); window.addEventListener("resize", place);
   var btn = box.querySelector(".bh-btn");
   function setOpen(o) { box.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); btn.textContent = o ? "✕" : "☰"; btn.setAttribute("aria-label", o ? "ปิดเมนู" : "เปิดเมนู"); }

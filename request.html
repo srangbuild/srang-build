@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สั่งทำเอกสาร ภาษาและมาตรฐานของแต่ละประเทศ — สร้าง | BUILD TH</title>
+<meta name="description" content="สั่งทำใบตรวจงาน 1 หรือ 2 ภาษา ภาษาใดก็ได้ เกณฑ์ตามมาตรฐานของประเทศที่ใช้งาน ใบตรวจงานตามแบบของโครงการ Method statement และเช็กลิสต์เอกสารขออนุญาต · ขอใบเสนอราคาฟรี">
+<meta name="theme-color" content="#0F2A44">
+<meta property="og:title" content="สั่งทำเอกสาร — สร้าง | BUILD TH">
+<meta property="og:image" content="https://srangbuild.github.io/srang-build/img/og.jpg">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="shop.css">
+<style>
+.hero-cta { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 0 !important; }
+.hero-cta .b.line { background:transparent; color:#fff; border-color:rgba(255,255,255,.45); }
+.kinds { display:grid; gap:12px; } @media (min-width:760px) { .kinds { grid-template-columns:repeat(3,1fr); } }
+.kinds .card { padding:16px; display:flex; flex-direction:column; gap:6px; }
+.kinds h3 { margin:0; font-size:17.5px; color:var(--navy); line-height:1.4; }
+.kinds p { margin:0; font-size:15px; color:#3B4654; }
+.kinds .ex { font-size:13.5px; color:var(--mute); }
+.kinds .b { margin-top:auto; align-self:flex-start; }
+.steps4 { counter-reset:s; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+@media (min-width:760px) { .steps4 { grid-template-columns:repeat(4,1fr); } }
+.steps4 li { background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px; font-size:15px; }
+.steps4 li::before { counter-increment:s; content:counter(s); display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:var(--orange); color:#fff; font:700 15px/1 "Kanit",sans-serif; margin-bottom:8px; }
+.steps4 li b { display:block; color:var(--navy); margin-bottom:2px; }
+.terms2 { display:grid; gap:12px; } @media (min-width:760px) { .terms2 { grid-template-columns:1fr 1fr; } }
+.terms2 ul { margin:0; padding-left:20px; font-size:15px; display:grid; gap:4px; }
+.langpick { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 2px; }
+.langpick label { display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); border-radius:12px; padding:9px 14px; cursor:pointer; font-weight:600; background:#fff; }
+.langpick label:has(input:checked) { border-color:var(--orange); background:#FFF6EF; }
+.preview { border:1px dashed #B9C3CF; border-radius:12px; padding:10px 14px; background:#FBFCFD; font-size:14.5px; }
+.preview b { color:var(--navy); } .preview .l2 { color:#3F4A58; font-size:13.5px; display:block; }
+</style>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<link rel="canonical" href="https://srangbuild.github.io/srang-build/request.html"><meta property="og:url" content="https://srangbuild.github.io/srang-build/request.html"><meta name="twitter:card" content="summary_large_image"></head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<div id="hdr"></div><script src="nav.js"></script>
+<div class="demo" id="demo" hidden>โหมดทดลอง: ระบบสมาชิกยังไม่ได้ต่อกับหลังบ้าน ข้อมูลที่กรอกอยู่ในเบราว์เซอร์เครื่องนี้เท่านั้น</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">สั่งทำเอกสาร</span>
+    <h1>ภาษาไหนก็ได้ <em>มาตรฐานประเทศไหนก็ได้</em></h1>
+    <p>ใบตรวจงาน 1 หรือ 2 ภาษา เลือกภาษาเองทีละบรรทัด · เกณฑ์ตามมาตรฐานของประเทศที่ใช้งาน · ใบตรวจงานตามแบบของโครงการ · Method statement · เช็กลิสต์เอกสารขออนุญาต · ขอใบเสนอราคาฟรี ร้านตอบภายใน 3 วันทำการ</p>
+    <p class="hero-cta"><a class="b pri" href="#form">ขอใบเสนอราคา</a><a class="b line" href="sheets.html">ดูใบตรวจงานพร้อมขาย</a></p>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section id="what">
+    <div class="head"><h2>สั่งทำอะไรได้บ้าง</h2><p class="lead">ฉบับอังกฤษ + ไทย ซื้อได้ทันทีที่หน้าร้าน · ฉบับภาษาเดียว (อังกฤษ หรือ ไทย) เปิดขายเร็ว ๆ นี้ · งานด้านล่างทำตามคำขอ</p></div>
+    <div class="kinds">
+      <article class="card"><h3>ใบตรวจงานภาษาอื่น</h3><p>เลือก 1 หรือ 2 ภาษา เช่น อังกฤษ + เมียนมา สำหรับทีมช่างต่างชาติ หรือ ไทย + จีน สำหรับเจ้าของงาน</p><span class="ex">ผู้แปลที่ใช้ภาษานั้นเป็นภาษาแม่และรู้งานก่อสร้างตรวจทุกฉบับ</span><a class="b line sm" href="#form" data-kind="ใบตรวจงานภาษาอื่น">ขอใบเสนอราคา</a></article>
+      <article class="card"><h3>เกณฑ์ตามมาตรฐานของประเทศอื่น</h3><p>ค่าเกณฑ์ ค่าความคลาดเคลื่อน ความถี่ทดสอบ และผู้ลงนาม ตามมาตรฐานทางการของประเทศที่โครงการตั้งอยู่</p><span class="ex">ใช้เฉพาะค่าที่อ่านจากเล่มทางการ พร้อมเลขข้อและปีของเล่ม</span><a class="b line sm" href="#form" data-kind="เกณฑ์ตามมาตรฐานของประเทศอื่น">ขอใบเสนอราคา</a></article>
+      <article class="card"><h3>ใบตรวจงานตามแบบของโครงการ</h3><p>ใส่ชื่อโครงการ โลโก้ รายการตรวจ และค่าเกณฑ์จากแบบและข้อกำหนดของงานคุณ</p><span class="ex">เหมาะกับผู้รับเหมาและบริษัทที่ใช้หลายโครงการ</span><a class="b line sm" href="#form" data-kind="ใบตรวจงานตามแบบของโครงการ">ขอใบเสนอราคา</a></article>
+      <article class="card"><h3>Method statement</h3><p>ขั้นตอนการทำงาน ทรัพยากร จุดหยุดรอตรวจ ความปลอดภัย และใบตรวจที่ใช้คู่กัน สำหรับยื่นผู้ควบคุมงาน</p><span class="ex">ผู้ควบคุมงานหรือวิศวกรของโครงการตรวจและอนุมัติก่อนใช้</span><a class="b line sm" href="#form" data-kind="Method statement">ขอใบเสนอราคา</a></article>
+      <article class="card"><h3>เช็กลิสต์เอกสารขออนุญาต</h3><p>รายการเอกสารที่ต้องเตรียม สำหรับขออนุญาตก่อสร้าง ต่อเติม บ้าน อาคาร หรือโรงงานแต่ละประเภท</p><span class="ex">ตามกฎหมายและประกาศที่มีผลอยู่ของพื้นที่นั้น · ยืนยันกับหน่วยงานท้องถิ่นก่อนยื่น</span><a class="b line sm" href="#form" data-kind="เช็กลิสต์เอกสารขออนุญาต">ขอใบเสนอราคา</a></article>
+      <article class="card"><h3>แบบฟอร์มอื่น</h3><p>ใบบันทึกทดสอบ ใบส่งมอบงาน ตารางตรวจรับวัสดุ หรือแบบฟอร์มที่ทีมคุณใช้ประจำ</p><span class="ex">บอกตัวอย่างที่ใช้อยู่ แล้วร้านเสนอรูปแบบให้</span><a class="b line sm" href="#form" data-kind="แบบฟอร์มอื่น">ขอใบเสนอราคา</a></article>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="head"><h2>ขั้นตอน</h2></div>
+    <ol class="steps4">
+      <li><b>ส่งคำขอ</b>บอกงาน ภาษา มาตรฐานของประเทศ และกำหนดเวลา (แบบฟอร์มด้านล่าง)</li>
+      <li><b>รับใบเสนอราคา</b>ร้านประเมินงาน แล้วส่งราคาและระยะเวลาทางอีเมลภายใน 3 วันทำการ</li>
+      <li><b>ตกลงและชำระเงิน</b>ตอบรับใบเสนอราคา ร้านเปิดรายการให้ชำระในบัญชีของคุณ ชำระได้ทุกช่องทาง</li>
+      <li><b>รับไฟล์</b>ไฟล์อยู่ในหน้าสมาชิก เมนู เอกสารของฉัน ดาวน์โหลดซ้ำได้ และแจ้งแก้ได้ตามที่ตกลง</li>
+    </ol>
+  </section>
+
+  <section id="terms">
+    <div class="head"><h2>กติกาของงานสั่งทำ</h2></div>
+    <div class="terms2">
+      <div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">ร้านทำ</h3><ul>
+        <li>เอกสารช่วยตรวจ บันทึก และเตรียมงาน ในรูปแบบเดียวกับใบตรวจงานของร้าน</li>
+        <li>ค่าเกณฑ์จากเล่มมาตรฐานทางการที่อ่านแล้ว พร้อมเลขข้อและปีของเล่ม · ข้อที่ไม่มีค่าในเล่ม เว้นช่องให้กรอกตามข้อกำหนดของโครงการ</li>
+        <li>คำแปลตรวจโดยผู้ใช้ภาษานั้นเป็นภาษาแม่ ก่อนส่งมอบ</li>
+      </ul></div>
+      <div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">ร้านไม่ทำ</h3><ul>
+        <li>ลงนามรับรอง ออกแบบ คำนวณ หรือควบคุมงาน ที่กฎหมายกำหนดให้ผู้มีใบอนุญาตทำ</li>
+        <li>ยื่นขออนุญาตแทนผู้ขอ หรือรับรองว่าหน่วยงานจะอนุมัติ</li>
+        <li>คัดลอกเนื้อหาของมาตรฐานหรือหนังสือที่มีลิขสิทธิ์ลงในเอกสาร</li>
+      </ul></div>
+    </div>
+    <p class="note">เอกสารทุกฉบับเป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด หรือการตรวจโดยผู้มีใบอนุญาตตามกฎหมายของประเทศนั้น · ดู <a href="terms.html">ข้อตกลงการใช้งาน</a></p>
+  </section>
+
+  <section id="form" class="narrow">
+    <div class="head"><h2>ขอใบเสนอราคา</h2><p class="lead">ฟรี ไม่มีข้อผูกมัด · ยังไม่ต้องชำระเงินจนกว่าจะตกลงราคา</p></div>
+    <p class="msg" id="msg" role="status" aria-live="polite" hidden></p>
+    <form class="f card pad" id="f-rq" novalidate>
+      <div class="g2"><label>ชื่อผู้ติดต่อ<input type="text" name="name" maxlength="80" autocomplete="name" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label></div>
+      <div class="g2"><label>โทรศัพท์หรือ LINE ID (ไม่บังคับ)<input type="text" name="contact" maxlength="80"></label><label>บริษัทหรือโครงการ (ไม่บังคับ)<input type="text" name="org" maxlength="120" autocomplete="organization"></label></div>
+      <div class="g2"><label>ประเภทงาน<select name="kind" id="kind" required><option value="">เลือกประเภทงาน</option></select></label><label>ใบตรวจงานที่อ้างอิง (ไม่บังคับ เช่น F-02 F-05)<input type="text" name="items" id="items" maxlength="300"></label></div>
+      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">จำนวนภาษาบนเอกสาร</legend>
+        <div class="langpick"><label><input type="radio" name="n" value="1">1 ภาษา</label><label><input type="radio" name="n" value="2" checked>2 ภาษา</label></div>
+      </fieldset>
+      <div class="g2"><label><span id="l1t">ภาษาบรรทัดบน (มีช่องกรอก)</span><select name="lang1" id="lang1" required></select></label><label id="l2w">ภาษาบรรทัดล่าง<select name="lang2" id="lang2"></select></label></div>
+      <div class="preview" id="pv" aria-live="polite"></div>
+      <div class="g2"><label>เกณฑ์ตามมาตรฐานของประเทศ<input type="text" name="std" maxlength="120" list="countries" placeholder="เช่น ไทย สิงคโปร์ เวียดนาม"></label><label>จำนวน (ฉบับ ชุด หรือโครงการ)<input type="number" name="qty" min="1" max="10000" step="1" value="1" inputmode="numeric"></label></div>
+      <datalist id="countries"><option value="ไทย"><option value="สิงคโปร์"><option value="มาเลเซีย"><option value="เวียดนาม"><option value="ลาว"><option value="กัมพูชา"><option value="เมียนมา"><option value="อินโดนีเซีย"><option value="ฟิลิปปินส์"><option value="ฮ่องกง"><option value="จีน"><option value="ญี่ปุ่น"><option value="สหราชอาณาจักร"><option value="สหรัฐอเมริกา"><option value="ออสเตรเลีย"><option value="ตามข้อกำหนดของโครงการ (ฉบับสากล)"></datalist>
+      <label>ต้องการภายใน (ไม่บังคับ)<input type="text" name="due" maxlength="40" placeholder="เช่น ภายใน 2 สัปดาห์ หรือ 30 พ.ย. 2026"></label>
+      <label>รายละเอียดของงาน: ใช้กับงานอะไร ใครเป็นผู้ใช้ มีแบบหรือตัวอย่างที่ใช้อยู่หรือไม่ (10–3000 ตัวอักษร)<textarea name="desc" rows="5" maxlength="3000" required></textarea></label>
+      <label class="ck"><input type="checkbox" name="consent" required><span>ยินยอมให้ร้านใช้ข้อมูลนี้เพื่อติดต่อเรื่องคำขอนี้ และรับทราบกติกาของงานสั่งทำด้านบน</span></label>
+      <button class="b pri" type="submit">ส่งคำขอ</button>
+      <p class="note" style="margin:0">ร้านส่งอีเมลยืนยันให้ทันที และตอบใบเสนอราคาภายใน 3 วันทำการ · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>เอกสารสั่งทำเป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด หรือการตรวจโดยผู้มีใบอนุญาต</p>
+    <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var B = window.BUILD, esc = B.esc, q = B.preview;
+  var $ = function (id) { return document.getElementById(id); };
+  $("yr").textContent = new Date().getFullYear();
+  if (B.demo) $("demo").hidden = false;
+  if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
+  // รายการเดียวกับหลังบ้าน (Code.gs ตัวแปร RQ_KINDS และ RQ_LANGS)
+  var KINDS = ["ใบตรวจงานภาษาอื่น", "เกณฑ์ตามมาตรฐานของประเทศอื่น", "ใบตรวจงานตามแบบของโครงการ", "Method statement", "เช็กลิสต์เอกสารขออนุญาต", "แบบฟอร์มอื่น"];
+  var LANGS = ["ไทย", "อังกฤษ", "เมียนมา", "เขมร", "ลาว", "เวียดนาม", "จีน", "ญี่ปุ่น", "เกาหลี", "มลายู", "อินโดนีเซีย", "ฟิลิปปินส์", "ฮินดี", "อาหรับ", "อื่น ๆ"];
+  var SAMPLE = { "ไทย": "ระยะหุ้มคอนกรีต", "อังกฤษ": "Concrete cover", "เมียนมา": "(ภาษาเมียนมา)", "เขมร": "(ภาษาเขมร)", "ลาว": "(ภาษาลาว)", "เวียดนาม": "(ภาษาเวียดนาม)", "จีน": "(ภาษาจีน)", "ญี่ปุ่น": "(ภาษาญี่ปุ่น)", "เกาหลี": "(ภาษาเกาหลี)", "มลายู": "(ภาษามลายู)", "อินโดนีเซีย": "(ภาษาอินโดนีเซีย)", "ฟิลิปปินส์": "(ภาษาฟิลิปปินส์)", "ฮินดี": "(ภาษาฮินดี)", "อาหรับ": "(ภาษาอาหรับ)", "อื่น ๆ": "(ภาษาที่ระบุในรายละเอียด)" };
+  $("kind").innerHTML = '<option value="">เลือกประเภทงาน</option>' + KINDS.map(function (k) { return "<option>" + esc(k) + "</option>"; }).join("");
+  $("lang1").innerHTML = LANGS.map(function (l) { return "<option" + (l === "อังกฤษ" ? " selected" : "") + ">" + esc(l) + "</option>"; }).join("");
+  $("lang2").innerHTML = LANGS.map(function (l) { return "<option" + (l === "ไทย" ? " selected" : "") + ">" + esc(l) + "</option>"; }).join("");
+  var P = new URLSearchParams(location.search);
+  if (P.get("item")) { $("items").value = String(P.get("item")).replace(/[^\w .,+-]/g, "").slice(0, 300); $("kind").value = "ใบตรวจงานภาษาอื่น"; }
+  if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
+  function nLang() { var r = document.querySelector("input[name=n]:checked"); return r ? +r.value : 2; }
+  function draw() {
+    var two = nLang() === 2; $("l2w").hidden = !two; $("l1t").textContent = two ? "ภาษาบรรทัดบน (มีช่องกรอก)" : "ภาษาของเอกสาร";
+    var a = $("lang1").value, b = $("lang2").value;
+    $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + esc(SAMPLE[a] || a) + " [ ช่องกรอก ] มม." + (two ? '<span class="l2">' + esc(SAMPLE[b] || b) + " ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
+  }
+  document.addEventListener("change", function (ev) { if (ev.target.name === "n" || ev.target.id === "lang1" || ev.target.id === "lang2") draw(); });
+  document.addEventListener("click", function (ev) { var k = ev.target.closest("[data-kind]"); if (k) { $("kind").value = k.getAttribute("data-kind"); } });
+  draw();
+  function say(t, bad) { var m = $("msg"); m.hidden = !t; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t || ""; if (t) m.scrollIntoView({ block: "nearest" }); }
+  var busy = false;
+  $("f-rq").addEventListener("submit", function (ev) {
+    ev.preventDefault(); if (busy) return;
+    var f = ev.target, v = function (n) { return String(f.elements[n].value || "").trim(); }, two = nLang() === 2;
+    if (!v("name") || !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v("email"))) { say("กรอกชื่อและอีเมลให้ถูกต้อง", true); return; }
+    if (!v("kind")) { say("เลือกประเภทงาน", true); return; }
+    if (two && v("lang1") === v("lang2")) { say("ภาษาบรรทัดล่างต้องต่างจากบรรทัดบน หรือเลือก 1 ภาษา", true); return; }
+    if (v("desc").length < 10) { say("เล่ารายละเอียดของงานอย่างน้อย 10 ตัวอักษร", true); return; }
+    if (!f.elements.consent.checked) { say("ติ๊กยินยอมก่อนส่งคำขอ", true); return; }
+    busy = true; var btn = f.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "กำลังส่ง…";
+    B.call("request", { name: v("name"), email: v("email").toLowerCase(), contact: v("contact"), org: v("org"), kind: v("kind"), items: v("items"), lang1: v("lang1"), lang2: two ? v("lang2") : "", std: v("std"), qty: +v("qty") || 1, due: v("due"), desc: v("desc"), consent: true })
+      .then(function (r) { f.reset(); draw(); say("ส่งคำขอ " + r.request.id + " แล้ว · ร้านส่งอีเมลยืนยันให้แล้ว และตอบใบเสนอราคาภายใน 3 วันทำการ"); })
+      .catch(function (e) { say(e && e.message ? e.message : "ส่งไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
+      .then(function () { busy = false; btn.disabled = false; btn.textContent = "ส่งคำขอ"; });
+  });
+})();
+</script>
+<script src="cart.js"></script>
+<script src="extras.js"></script>
+</body>
+</html>
