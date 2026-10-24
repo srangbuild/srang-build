@@ -1,5 +1,5 @@
 window.SITE = {
-  "version": "2026-10-23",
+  "version": "2026-10-24",
   "brand": {
     "name": "สร้าง | BUILD TH",
     "show": "เรื่องที่คนไม่เล่า",
@@ -865,12 +865,12 @@ window.SITE = {
       "แจ้งใบตรวจงานใหม่และฉบับใหม่ทางอีเมล"
     ],
     "consent": "ฉันยินยอมให้ สร้าง | BUILD TH เก็บชื่อและอีเมลของฉัน เพื่อดูแลบัญชีสมาชิก ส่งไฟล์ที่สั่งซื้อ และแจ้งใบตรวจงานใหม่ ตามนโยบายความเป็นส่วนตัว",
-    "lineChannelId": "",
-    "facebookAppId": "",
+    "lineChannelId": "2005670253",
+    "facebookAppId": "1813403056480097",
     "googleClientId": "514263949305-6qth9e3ro6aecdcauoul2tflnegp0aa9.apps.googleusercontent.com",
     "fbVersion": "v26.0",
-    "lineBotPrompt": "",
-    "tiktokClientKey": ""
+    "lineBotPrompt": "normal",
+    "tiktokClientKey": "aww8eep06fb3u6ob"
   },
   "pay": {
     "on": true,
@@ -880,7 +880,7 @@ window.SITE = {
     "acc": "1314132745",
     "hours": 24,
     "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
-    "opnKey": "",
+    "opnKey": "pkey_test_69fymwz5y4m08hm1zyl",
     "methods": [
       "card",
       "promptpay",
