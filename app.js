@@ -91,29 +91,40 @@
   function rand(n) { var a = new Uint8Array(n || 16); (window.crypto || window.msCrypto).getRandomValues(a); return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
 
   // ---------- ตะกร้า (เก็บในเบราว์เซอร์เครื่องนี้ จนกว่าจะสร้างคำสั่งซื้อ ไม่มีข้อมูลส่วนตัว) ----------
+  // 1 บรรทัด = รหัสสินค้า 1 รายการ · ต่อท้าย +U = แบบรับฉบับใหม่ตลอด (เลือกแยกได้ทีละบรรทัด รุ่น 3 · 24 ต.ค. 2026)
   // กติกา: ใส่ชุดรวมแล้ว ใบเดี่ยวและชุดย่อยที่อยู่ในชุดนั้นจะถูกเอาออก (ไม่จ่ายซ้ำ) · ใบที่อยู่ในชุดซึ่งอยู่ในตะกร้าแล้ว ใส่ซ้ำไม่ได้
   var CK = "build_cart";
+  function planOk(id) { var x = find(id); return !!(x && canSell(x) && (!isUpd(id) || +x.priceU > 0)); }
+  function unitPrice(id) { var x = find(id); return x ? memberPrice(isUpd(id) ? x.priceU : x.price) : 0; }
   var cart = {
-    get: function () { try { var a = JSON.parse(localStorage.getItem(CK) || "[]"); return Array.isArray(a) ? a.filter(function (id, i, arr) { return typeof id === "string" && arr.indexOf(id) === i && canSell(find(id)); }) : []; } catch (e) { return []; } },
+    get: function () { try { var a = JSON.parse(localStorage.getItem(CK) || "[]"), seen = {}; return Array.isArray(a) ? a.filter(function (id) { if (typeof id !== "string" || seen[baseOf(id)] || !planOk(id)) return false; seen[baseOf(id)] = 1; return true; }) : []; } catch (e) { return []; } },
     put: function (a) { try { localStorage.setItem(CK, JSON.stringify(a)); } catch (e) {} try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} },
-    has: function (id) { return cart.get().indexOf(id) >= 0; },
-    covered: function (id) { return cart.get().some(function (k) { var b = find(k); return isBundle(b) && b.items.indexOf(id) >= 0; }); },
-    add: function (id) {
-      var x = find(id); if (!canSell(x)) return "รายการนี้ยังไม่เปิดขาย";
-      var a = cart.get(); if (a.indexOf(id) >= 0) return "";
-      if (!isBundle(x) && cart.covered(id)) return "ใบนี้อยู่ในชุดที่อยู่ในตะกร้าแล้ว";
+    line: function (id) { var b = baseOf(id); return cart.get().filter(function (k) { return baseOf(k) === b; })[0] || ""; },
+    has: function (id) { return !!cart.line(id); },
+    covered: function (id) { var b = baseOf(id); return cart.get().some(function (k) { var y = find(k); return isBundle(y) && y.items.indexOf(b) >= 0; }); },
+    add: function (id, upd) {
+      var b = baseOf(id), want = upd === undefined ? id : b + (upd ? "+U" : ""), x = find(b);
+      if (!x || !canSell(x)) return "รายการนี้ยังไม่เปิดขาย";
+      if (isUpd(want) && !(+x.priceU > 0)) return "รายการนี้ไม่มีแบบรับฉบับใหม่ตลอด";
+      var a = cart.get(), cur = cart.line(b);
+      if (cur) { if (cur !== want) cart.setPlan(b, isUpd(want)); return ""; }
+      if (!isBundle(x) && cart.covered(b)) return "ใบนี้อยู่ในชุดที่อยู่ในตะกร้าแล้ว";
       if (isBundle(x)) {
         if (a.some(function (k) { var y = find(k); return isBundle(y) && x.items.every(function (s) { return y.items.indexOf(s) >= 0; }); })) return "ชุดนี้อยู่ในชุดใหญ่ที่อยู่ในตะกร้าแล้ว";
-        a = a.filter(function (k) { var y = find(k); return isBundle(y) ? !y.items.every(function (s) { return x.items.indexOf(s) >= 0; }) : x.items.indexOf(k) < 0; });
+        a = a.filter(function (k) { var y = find(k); return isBundle(y) ? !y.items.every(function (s) { return x.items.indexOf(s) >= 0; }) : x.items.indexOf(baseOf(k)) < 0; });
       }
-      a.push(id); cart.put(a); return "";
+      a.push(want); cart.put(a); return "";
     },
-    remove: function (id) { cart.put(cart.get().filter(function (k) { return k !== id; })); },
+    setPlan: function (id, upd) { var b = baseOf(id), x = find(b); if (upd && !(x && +x.priceU > 0)) return; cart.put(cart.get().map(function (k) { return baseOf(k) === b ? b + (upd ? "+U" : "") : k; })); },
+    remove: function (id) { var b = baseOf(id); cart.put(cart.get().filter(function (k) { return baseOf(k) !== b; })); },
     clear: function () { cart.put([]); },
-    total: function () { return cart.get().reduce(function (t, id) { return t + memberPrice(find(id).price); }, 0); },
-    // ส่วนต่างจริงของชุดรวมเทียบกับราคารายใบของใบในชุด (ใช้บอก ประหยัด ไม่ใช่ราคาขีดฆ่า)
-    saving: function (id) { var x = find(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(y.price) : 0); }, 0); return Math.max(0, s - memberPrice(x.price)); }
+    price: unitPrice,
+    total: function () { return cart.get().reduce(function (t, id) { return t + unitPrice(id); }, 0); },
+    // ส่วนต่างจริงของชุดรวมเทียบกับราคารายใบของใบในชุด แบบเดียวกัน (ใช้บอก ประหยัด ไม่ใช่ราคาขีดฆ่า)
+    saving: function (id) { var x = find(id), u = isUpd(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(u && +y.priceU > 0 ? y.priceU : y.price) : 0); }, 0); return Math.max(0, s - unitPrice(id)); }
   };
+  // ชุดรวมที่มีใบนี้ (หน้าสินค้าและตะกร้าใช้แนะนำ ซื้อเป็นชุดถูกกว่า)
+  function bundlesOf(id) { var b = baseOf(id); return bundles.filter(function (x) { return x.items.indexOf(b) >= 0; }); }
 
-  window.BUILD = { baseOf: baseOf, isUpd: isUpd, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
+  window.BUILD = { baseOf: baseOf, isUpd: isUpd, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();

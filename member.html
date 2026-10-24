@@ -59,7 +59,9 @@
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
   function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
   function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
-  function signedIn(r) { B.token.set(r.token); pending = null; regWait = null; return refresh(true); }
+  // เข้าระบบสำเร็จ: ถ้ามาจากหน้าชำระเงิน (ร้านแบบอีคอมเมิร์ซ 24 ต.ค. 2026) พากลับไปหน้านั้น ตะกร้ายังอยู่ครบ
+  function nextPage() { var n = ""; try { n = sessionStorage.getItem("build_next") || ""; sessionStorage.removeItem("build_next"); } catch (e) {} return /^checkout\.html(\?preview=1)?$/.test(n) ? n : ""; }
+  function signedIn(r) { B.token.set(r.token); pending = null; regWait = null; var nx = nextPage(); if (nx) { location.replace(nx); return new Promise(function () {}); } return refresh(true); }
   function dmy(iso) { var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || "")); return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || ""); }
 
   // ---------- รหัสผ่าน (กติกาเดียวกับหลังบ้าน · ผู้ใช้เลือก 18 ต.ค. 2026: มาตรฐานทั่วไป) ----------
@@ -280,7 +282,7 @@
   }
   function saveBytes(name, bytes) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
   function libOf() { return me.lib || (me.owned || []).map(function (id) { var s = B.find(id) || {}; return { id: id, title: s.title || id, rev: s.revDate || "", lastAt: "", lastRev: "", newer: false }; }); }
-  function payOnline() { return !!(me && me.pay && me.pay.opn && (B.demo || /^pkey_/.test(String(P.opnKey || "")))); }
+  function payOnline() { var p = me && me.pay; return !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || ""))) && !(p.test && !p.guard && !B.demo)); } // โหมดทดสอบ + หลังบ้านรุ่นเก่า = ไม่แสดงการชำระออนไลน์ (กันบัตรทดสอบ)
   function payMethods() { var on = (me && me.pay && me.pay.methods) || []; var want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(PAYM); return want.filter(function (k) { return PAYM[k] && on.indexOf(k) >= 0; }); }
   function counts() {
     var o = me.orders || [], lib = libOf();
@@ -393,7 +395,7 @@
     var list = me.orders || [];
     return '<section class="sec"><h2>คำสั่งซื้อของฉัน</h2><div style="display:grid;gap:12px">' + (list.map(orderCard).join("") || '<div class="card pad"><p style="margin:0">ยังไม่มีคำสั่งซื้อ</p><p class="note"><a href="#shop">ซื้อฉบับมืออาชีพ</a></p></div>') + "</div></section>";
   }
-  function paneShop() { return '<section class="sec"><h2>ซื้อฉบับมืออาชีพ</h2>' + shopBox() + "</section>"; }
+  function paneShop() { var n = B.cart ? B.cart.get().length : 0; return '<section class="sec"><h2>ซื้อฉบับมืออาชีพ</h2><div class="card pad" style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span style="flex:1;min-width:200px">เลือกดูรายละเอียดทีละใบ เลือกแบบสิทธิ์ แล้วชำระในหน้าชำระเงิน</span><a class="b line sm" href="sheets.html' + q + '">ดูร้านใบตรวจงาน</a>' + (n ? '<a class="b pri sm" href="checkout.html' + q + '">ชำระเงิน (' + n + " รายการในตะกร้า)</a>" : "") + "</div>" + shopBox() + "</section>"; }
   function paneAsk() { return '<section class="sec" id="askbox"><h2>ถามร้าน</h2>' + askBox() + "</section>"; }
   function provOptions(sel) { return '<option value="">เลือกจังหวัด</option>' + PROVINCES.map(function (p) { return "<option" + (p === sel ? " selected" : "") + ">" + esc(p) + "</option>"; }).join(""); }
   function paneProfile() {
@@ -529,6 +531,8 @@
   function payReturn() { // กลับจากหน้ายืนยันของธนาคาร ทรูมันนี่ หรือ 3-D Secure
     var sp; try { sp = new URLSearchParams(location.search); } catch (e) { return null; }
     var oid = sp.get("pay"); if (!oid) return null;
+    var from = ""; try { from = sessionStorage.getItem("build_pay_from") || ""; } catch (e) {}
+    if (from === "checkout") { location.replace("checkout.html" + location.search); return true; } // หลังบ้านรุ่นก่อน 2026-10-25 ส่งกลับมาหน้านี้เสมอ
     var emu = sp.get("emudone");
     try { sessionStorage.removeItem("build_pay_wait"); history.replaceState(null, "", HERE + (q || "") + "#orders"); } catch (e) {}
     tab = "orders";

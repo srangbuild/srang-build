@@ -263,6 +263,8 @@
   var cta = "";
   if (ok(L.line)) cta += '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">รับเช็กลิสต์ฟรีทาง LINE</a>"; else cta += '<a class="b pri" href="#free">อ่านเช็กลิสต์ฟรี</a>';
   if (firstCh) cta += '<a class="b sec" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ดูคลิปบน " + firstCh[1] + "</a>"; else cta += '<a class="b sec" href="#episodes">ดูตอนทั้งหมด</a>';
+  var anySale = (S.pay || {}).on === true && (S.sheets || []).some(function (x) { return x.hidden !== true && x.ok === true && x.sale === true; });
+  if (anySale) cta += '<a class="b sec" href="sheets.html' + (/[?&]preview=1/.test(location.search) ? "?preview=1" : "") + '">ร้านใบตรวจงาน</a>'; // เปิดขายแล้ว: ปุ่มเข้าร้านบนหน้าแรก
   $("hero-cta").innerHTML = cta;
   var eps = S.episodes || [], frees = S.freebies || [];
   // แสดงเฉพาะตอนที่ปล่อยแล้ว กับตอนของสัปดาห์ถัดไป (2 ตอนที่ใกล้ที่สุด)
@@ -294,7 +296,10 @@
     $("sheets").hidden = false;
 
     $("facts").innerHTML += "<li><b>" + shs.length + "</b>ใบตรวจงาน</li>";
-    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " งานหลัก: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า) และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง" + (rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">ดูใบตรวจงาน</a>' + (memOn ? '<a class="b sec" href="member.html' + pv + '">สมัครสมาชิกฟรี</a>' : "") + "</span>";
+    // เปิดขายแล้ว (24 ต.ค. 2026): บอกราคาเริ่มต้นและปุ่มเข้าร้าน
+    var onSale = (S.pay || {}).on === true ? shs.filter(function (x) { return x.ok === true && x.sale === true && +x.price > 0; }) : [];
+    var minP = onSale.map(function (x) { return +x.price; }).sort(function (a, b) { return a - b; })[0];
+    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " ใบ อังกฤษ-ไทย: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า) และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง" + (onSale.length ? " · เปิดขายแล้ว " + onSale.length + " ใบ ราคาเริ่มต้น ฿" + Number(minP).toLocaleString("th-TH") + " · ชุดรวมถูกกว่าซื้อแยก · ชำระแล้วดาวน์โหลดได้ทันที" : rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">' + (onSale.length ? "เลือกซื้อใบตรวจงาน" : "ดูใบตรวจงาน") + "</a>" + (memOn ? '<a class="b sec" href="member.html' + pv + '">' + (onSale.length ? "บัญชีสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" : "") + "</span>";
   }
 
   // ตอน

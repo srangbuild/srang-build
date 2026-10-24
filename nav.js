@@ -9,10 +9,13 @@
   var logged = false; try { logged = !!localStorage.getItem("build_member_token"); } catch (e) {}
   var hasSheets = Array.isArray(S.sheets) && S.sheets.length > 0, memOn = !S.member || S.member.on !== false;
   var gear = (S.products || []).some(function (p) { return p.on !== false && /^https?:\/\//i.test(p.url || ""); });
-  var items = [["index.html", "", "หน้าหลัก"], ["index.html", "episodes", "คลิป"], ["index.html", "free", "เช็กลิสต์ฟรี"]];
-  if (hasSheets) items.push(["sheets.html", "", "ใบตรวจงาน"]);
+  // เมนูรุ่น 3 (24 ต.ค. 2026): ร้านใบตรวจงานอยู่ลำดับที่ 2 · ไม่มีเมนู "ร้าน" ซ้ำกับ "ใบตรวจงาน" (หัวข้อร้านในหน้าหลักยังอยู่)
+  var items = [["index.html", "", "หน้าหลัก"]];
+  if (hasSheets) items.push(["sheets.html", "", "ร้านใบตรวจงาน"]);
+  items.push(["index.html", "free", "เช็กลิสต์ฟรี"], ["index.html", "episodes", "คลิป"]);
   if (gear) items.push(["index.html", "gear", "ของที่ใช้ในคลิป"]);
-  items.push(["index.html", "service", "บริการ"], ["index.html", "shop", "ร้าน"], ["index.html", "music", "เพลง"], ["index.html", "about", "เกี่ยวกับ"]);
+  items.push(["index.html", "music", "เพลง"], ["index.html", "service", "บริการ"], ["index.html", "about", "เกี่ยวกับ"]);
+  var shopPages = ["sheets.html", "product.html", "cart.html", "checkout.html"];
   if (hasSheets && memOn) items.push(["member.html", "", logged ? "บัญชีของฉัน" : "สมาชิก", "cta"]);
   function href(it) { if (it[0] === here && it[1]) return "#" + it[1]; return it[0] + pv + (it[1] ? "#" + it[1] : ""); }
   var css = ".bh{position:sticky;top:0;z-index:40;background:rgba(15,42,68,.96);backdrop-filter:blur(8px);color:#fff;font-family:\"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif}" +
@@ -26,15 +29,25 @@
     ".bh-btn{display:none;margin-left:auto;background:none;border:1.5px solid rgba(255,255,255,.45);color:#fff;border-radius:11px;min-width:46px;min-height:42px;font-size:20px;line-height:1;cursor:pointer;font-family:inherit}" +
     "@media(max-width:920px){.bh-btn{display:block}.bh-nav{display:none;position:absolute;left:0;right:0;top:58px;background:#0F2A44;flex-direction:column;align-items:stretch;gap:0;padding:6px 12px 14px;border-top:1px solid rgba(255,255,255,.14);box-shadow:0 14px 30px rgba(0,0,0,.3);max-height:calc(100vh - 58px);overflow:auto}" +
     ".bh.open .bh-nav{display:flex}.bh-nav a{font-size:17px;padding:13px 12px;border-radius:12px;border-bottom:1px solid rgba(255,255,255,.07)}.bh-nav a.cta{margin:10px 0 0;text-align:center;border-bottom:0}}" +
+    ".bh-cart{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:11px;min-height:42px;padding:0 12px;font-size:14.5px;font-weight:600;margin-left:6px}.bh-cart:hover,.bh-cart[aria-current]{background:rgba(255,255,255,.13)}" +
+    ".bh-cart svg{width:20px;height:20px}.bh-cart i{font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#FF6B1A;color:#fff;font:700 12px/20px \"Kanit\",sans-serif;text-align:center}" +
+    "@media(max-width:920px){.bh-cart{margin-left:auto}.bh-cart+.bh-btn{margin-left:8px}.bh-cart span{display:none}}" +
     "@media print{.bh{display:none!important}}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   var box = document.getElementById("hdr"); if (!box) return;
 
   box.className = "bh";
+  // ปุ่มตะกร้าอยู่นอกเมนูพับ เห็นทุกขนาดจอ (24 ต.ค. 2026) · จำนวนรายการอัปเดตโดย cart.js
+  var nCart = 0; try { if (window.BUILD && window.BUILD.cart) nCart = window.BUILD.cart.get().length; else { var raw = JSON.parse(localStorage.getItem("build_cart") || "[]"); nCart = Array.isArray(raw) ? raw.length : 0; } } catch (e) {}
+  var cartBtn = hasSheets ? '<a class="bh-cart navcart" href="cart.html' + pv + '"' + (here === "cart.html" ? ' aria-current="page"' : "") + ' aria-label="ตะกร้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L22 7H6"/></svg><span>ตะกร้า</span><i' + (nCart ? "" : " hidden") + ">" + nCart + "</i></a>" : "";
   var h = '<div class="bh-in"><a class="bh-logo" href="' + (here === "index.html" ? "#top" : "index.html" + pv) + '"><img src="img/logo.png" alt="" width="34" height="34"><span>สร้าง <b>|</b> BUILD TH</span></a>' +
     '<button class="bh-btn" type="button" aria-expanded="false" aria-controls="bh-nav" aria-label="เปิดเมนู">☰</button><nav class="bh-nav" id="bh-nav" aria-label="เมนูหลัก">';
-  items.forEach(function (it) { var on = it[0] === here && !it[1]; h += '<a href="' + href(it) + '"' + (it[3] ? ' class="' + it[3] + '"' : "") + (on ? ' aria-current="page"' : "") + ">" + it[2] + "</a>"; });
-  box.innerHTML = h + "</nav></div>";
+  items.forEach(function (it) { var on = (it[0] === here && !it[1]) || (it[0] === "sheets.html" && shopPages.indexOf(here) > 0); h +='<a href="' + href(it) + '"' + (it[3] ? ' class="' + it[3] + '"' : "") + (on ? ' aria-current="page"' : "") + ">" + it[2] + "</a>"; });
+  box.innerHTML = h + "</nav>" + cartBtn + "</div>";
+  // จอแคบ: ปุ่มตะกร้าอยู่ก่อนปุ่มเมนู · จอกว้าง: อยู่ท้ายเมนู
+  var cb = box.querySelector(".bh-cart"), mb = box.querySelector(".bh-btn");
+  function place() { if (!cb) return; var narrow = window.matchMedia("(max-width:920px)").matches; if (narrow && cb.nextElementSibling !== mb) mb.parentNode.insertBefore(cb, mb); else if (!narrow && cb.previousElementSibling !== box.querySelector(".bh-nav")) box.querySelector(".bh-in").appendChild(cb); }
+  place(); window.addEventListener("resize", place);
   var btn = box.querySelector(".bh-btn");
   function setOpen(o) { box.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); btn.textContent = o ? "✕" : "☰"; btn.setAttribute("aria-label", o ? "ปิดเมนู" : "เปิดเมนู"); }
   btn.addEventListener("click", function () { setOpen(!box.classList.contains("open")); });

@@ -1026,21 +1026,21 @@ window.SITE = {
   "shop": [
     {
       "title": "ใบตรวจงานฉบับมืออาชีพ รายใบ (ไฟล์ PDF)",
-      "text": "25 งาน 2 ภาษา อังกฤษ-ไทย: โครงสร้าง สถาปัตย์ งานระบบ ตกแต่ง พลังงานในบ้าน งานเหล็กและเครื่องจักร และตรวจรับบ้านก่อนโอน · มีจุดหยุดรอตรวจ ตารางบันทึกค่า และใบข้อบกพร่อง",
-      "price": "",
-      "status": "กำลังตรวจรายการ",
+      "text": "29 ใบ อังกฤษ-ไทย: ใบตรวจงาน 25 งาน (โครงสร้าง สถาปัตย์ งานระบบ ตกแต่ง พลังงานในบ้าน งานเหล็กและเครื่องจักร ตรวจรับบ้านก่อนโอน) และแบบฟอร์มทดสอบ 4 แบบ · มีจุดหยุดรอตรวจ ตารางบันทึกค่า และใบข้อบกพร่อง · ชำระแล้วดาวน์โหลดได้ทันที",
+      "price": "เริ่มต้น ฿59",
+      "status": "เปิดขายแล้ว",
       "url": "",
       "page": "sheets.html",
-      "cta": "ดูรายการและราคา"
+      "cta": "เลือกซื้อ"
     },
     {
-      "title": "ชุดรวมใบตรวจงาน 7 แบบ (ไฟล์ PDF)",
-      "text": "ชุดโครงสร้าง · ชุดสถาปัตย์ · ชุดงานระบบ · ชุดตกแต่งและช่องเปิด · ชุดพลังงานในบ้าน · ชุดงานเหล็กและเครื่องจักร · ครบชุด 24 ใบ · ทุกชุดถูกกว่าซื้อแยก",
-      "price": "",
-      "status": "กำลังตรวจรายการ",
+      "title": "ชุดรวมใบตรวจงาน 9 ชุด (ไฟล์ PDF)",
+      "text": "ชุดงานโครงสร้าง · ชุดเสาเข็ม · ชุดงานสถาปัตย์ · ชุดงานระบบและติดตั้ง · ชุดงานตกแต่งและช่องเปิด · ชุดพลังงานในบ้าน · ชุดงานเหล็กและเครื่องจักร · ชุดทดสอบและเก็บตัวอย่าง · ครบชุด 29 ใบ · ทุกชุดถูกกว่าซื้อแยก",
+      "price": "ครบชุด ฿2,390",
+      "status": "เปิดขายแล้ว",
       "url": "",
-      "page": "sheets.html",
-      "cta": "ดูชุดรวมและราคา"
+      "page": "sheets.html#bundle",
+      "cta": "ดูชุดรวม"
     },
     {
       "title": "เทมเพลตอ่าน BOQ (ไฟล์)",
@@ -1075,7 +1075,7 @@ window.SITE = {
         "F-05"
       ],
       "price": 499,
-      "sale": false,
+      "sale": true,
       "priceU": 749
     },
     {
@@ -1087,7 +1087,7 @@ window.SITE = {
         "F-01B"
       ],
       "price": 169,
-      "sale": false,
+      "sale": true,
       "priceU": 259
     },
     {
@@ -1101,7 +1101,7 @@ window.SITE = {
         "F-09"
       ],
       "price": 339,
-      "sale": false,
+      "sale": true,
       "priceU": 509
     },
     {
@@ -1114,7 +1114,7 @@ window.SITE = {
         "F-12"
       ],
       "price": 249,
-      "sale": false,
+      "sale": true,
       "priceU": 379
     },
     {
@@ -1127,7 +1127,7 @@ window.SITE = {
         "F-15"
       ],
       "price": 249,
-      "sale": false,
+      "sale": true,
       "priceU": 379
     },
     {
@@ -1139,7 +1139,7 @@ window.SITE = {
         "F-17"
       ],
       "price": 169,
-      "sale": false,
+      "sale": true,
       "priceU": 259
     },
     {
@@ -1155,7 +1155,7 @@ window.SITE = {
         "F-24"
       ],
       "price": 669,
-      "sale": false,
+      "sale": true,
       "priceU": 1090
     },
     {
@@ -1169,7 +1169,7 @@ window.SITE = {
         "T-04"
       ],
       "price": 199,
-      "sale": false,
+      "sale": true,
       "priceU": 299
     },
     {
@@ -1208,7 +1208,7 @@ window.SITE = {
         "T-04"
       ],
       "price": 2390,
-      "sale": false,
+      "sale": true,
       "priceU": 3590
     }
   ],
@@ -1220,6 +1220,7 @@ window.SITE = {
       "titleEn": "Driven Piling Works",
       "group": "โครงสร้าง",
       "sum": "ตรวจตั้งแต่เข็มมาถึงหน้างาน ตอกจนได้ระยะจม จนตัดหัวเข็มและเก็บผลทดสอบครบ",
+      "sumEn": "From pile delivery and driving to the final set, cut-off and complete test records",
       "nFree": 8,
       "freePages": 2,
       "nPro": 21,
@@ -1232,8 +1233,88 @@ window.SITE = {
       "img": "sheets/img/F-01A.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเริ่มงาน",
+          "en": "Before work starts",
+          "n": 9,
+          "h": 2
+        },
+        {
+          "th": "ระหว่างตอก",
+          "en": "During driving",
+          "n": 6,
+          "h": 2
+        },
+        {
+          "th": "หลังตอก",
+          "en": "After driving",
+          "n": 6,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกการตอกเข็มทุกต้น",
+          "en": "PILE DRIVING LOG, EVERY PILE",
+          "cols": 8
+        },
+        {
+          "th": "บันทึกการต่อเข็ม",
+          "en": "PILE SPLICE LOG",
+          "cols": 6
+        },
+        {
+          "th": "ตำแหน่งเข็มหลังตอก",
+          "en": "PILE POSITION AFTER DRIVING",
+          "cols": 7
+        },
+        {
+          "th": "ผลทดสอบความสมบูรณ์ของเข็ม",
+          "en": "PILE INTEGRITY TEST RESULTS",
+          "cols": 6
+        },
+        {
+          "th": "เข็มที่ต้องแก้ไข",
+          "en": "PILES NEEDING CORRECTION",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1106-64",
+          "th": "มาตรฐานงานเสาเข็ม",
+          "en": "Standard for Piling Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "มยผ. 1105-64",
+          "th": "มาตรฐานงานฐานราก",
+          "en": "Standard for Foundation Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร",
+          "en": "Building Control Act, B.E. 2522",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "มยผ. 1551-51",
+          "th": "มาตรฐานการตรวจสอบความสมบูรณ์ของเสาเข็มด้วยวิธี Seismic Test",
+          "en": "Standard for Pile Integrity Testing by the Seismic Test Method",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "F-01B",
@@ -1242,6 +1323,7 @@ window.SITE = {
       "titleEn": "Bored Piling Works",
       "group": "โครงสร้าง",
       "sum": "ตรวจตั้งแต่วางหมุดเข็ม เจาะ ลงเหล็ก เทคอนกรีต จนตัดหัวเข็มและเก็บผลทดสอบครบ",
+      "sumEn": "From setting out, boring and the cage to concreting, cut-off and complete test records",
       "nFree": 8,
       "freePages": 2,
       "nPro": 18,
@@ -1254,8 +1336,100 @@ window.SITE = {
       "img": "sheets/img/F-01B.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเริ่มงาน",
+          "en": "Before work starts",
+          "n": 7,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างเจาะและเทคอนกรีต",
+          "en": "During boring and concreting",
+          "n": 5,
+          "h": 2
+        },
+        {
+          "th": "หลังเทคอนกรีต",
+          "en": "After concreting",
+          "n": 6,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกเข็มเจาะทุกต้น",
+          "en": "BORED PILE LOG, EVERY PILE",
+          "cols": 8
+        },
+        {
+          "th": "การเทคอนกรีตเข็ม (ใช้คู่กับ T-01)",
+          "en": "PILE CONCRETING (use with T-01)",
+          "cols": 7
+        },
+        {
+          "th": "สารละลายพยุงหลุม (เฉพาะเข็มเจาะแบบเปียก)",
+          "en": "SUPPORT FLUID (wet-process bored piles only)",
+          "cols": 6
+        },
+        {
+          "th": "ตำแหน่งเข็มหลังทำเสร็จ",
+          "en": "PILE POSITION AFTER CONSTRUCTION",
+          "cols": 7
+        },
+        {
+          "th": "ผลทดสอบความสมบูรณ์ของเข็ม",
+          "en": "PILE INTEGRITY TEST RESULTS",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1106-64",
+          "th": "มาตรฐานงานเสาเข็ม",
+          "en": "Standard for Piling Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "มยผ. 1105-64",
+          "th": "มาตรฐานงานฐานราก",
+          "en": "Standard for Foundation Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร",
+          "en": "Building Control Act, B.E. 2522",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มยผ. 1551-51",
+          "th": "มาตรฐานการตรวจสอบความสมบูรณ์ของเสาเข็มด้วยวิธี Seismic Test",
+          "en": "Standard for Pile Integrity Testing by the Seismic Test Method",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "วสท. 1019",
+          "th": "มาตรฐานที่ มยผ. 1106-64 ข้อ 3.1.12 อ้างถึงสำหรับเข็มเจาะแบบเปียก (Claude ยังไม่ได้อ่านเล่มนี้ ผู้ตรวจยืนยันชื่อและฉบับ)",
+          "en": "EIT standard cited by DPT 1106-64 cl. 3.1.12 for wet-process bored piles (not yet read; the inspector confirms title and edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย"
+        }
+      ]
     },
     {
       "id": "F-02",
@@ -1264,6 +1438,7 @@ window.SITE = {
       "titleEn": "Footings, Stub Columns and Ground Beams",
       "group": "โครงสร้าง",
       "sum": "ตรวจตั้งแต่ขุดดิน วางเหล็ก เทคอนกรีต จนอนุมัติถมดินกลับ",
+      "sumEn": "From excavation and rebar to concrete and approval for backfill",
       "nFree": 10,
       "freePages": 1,
       "nPro": 24,
@@ -1276,8 +1451,88 @@ window.SITE = {
       "img": "sheets/img/F-02.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเริ่มงาน",
+          "en": "Before work starts",
+          "n": 6,
+          "h": 2
+        },
+        {
+          "th": "เหล็กเสริมและไม้แบบ",
+          "en": "Reinforcement and formwork",
+          "n": 8,
+          "h": 5
+        },
+        {
+          "th": "เทคอนกรีต",
+          "en": "Concrete pour",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "หลังเท",
+          "en": "After the pour",
+          "n": 6,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกขนาด ตำแหน่ง และระดับฐานราก",
+          "en": "FOOTING SIZE, POSITION AND LEVEL LOG",
+          "cols": 6
+        },
+        {
+          "th": "หัวเข็มในฐานราก",
+          "en": "PILE HEADS IN THE FOOTING",
+          "cols": 6
+        },
+        {
+          "th": "เหล็กเสริมและระยะหุ้มก่อนเท",
+          "en": "REBAR AND COVER BEFORE THE POUR",
+          "cols": 6
+        },
+        {
+          "th": "การเทและก้อนตัวอย่าง (ใช้คู่กับ T-01)",
+          "en": "POUR AND SPECIMENS (use with T-01)",
+          "cols": 6
+        },
+        {
+          "th": "ถมดินกลับเป็นชั้น",
+          "en": "BACKFILL IN LAYERS",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1105-64",
+          "th": "มาตรฐานงานฐานราก",
+          "en": "Standard for Foundation Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มยผ. 1103-64",
+          "th": "มาตรฐานงานเหล็กเสริมคอนกรีต",
+          "en": "Standard for Reinforcing Steel Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        }
+      ]
     },
     {
       "id": "F-03",
@@ -1286,6 +1541,7 @@ window.SITE = {
       "titleEn": "Reinforcement Works (Columns, Beams, Slabs)",
       "group": "โครงสร้าง",
       "sum": "ตรวจเหล็กตั้งแต่รับเข้าหน้างาน จนลงชื่ออนุมัติก่อนเทคอนกรีต",
+      "sumEn": "From delivery of steel to signed approval before the pour",
       "nFree": 9,
       "freePages": 1,
       "nPro": 22,
@@ -1298,8 +1554,78 @@ window.SITE = {
       "img": "sheets/img/F-03.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุ",
+          "en": "Material",
+          "n": 6,
+          "h": 0
+        },
+        {
+          "th": "การดัดและประกอบ",
+          "en": "Bending and fixing",
+          "n": 10,
+          "h": 5
+        },
+        {
+          "th": "ก่อนเท",
+          "en": "Before the pour",
+          "n": 6,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกเหล็กเสริมแต่ละชิ้นส่วน",
+          "en": "REINFORCEMENT LOG BY MEMBER",
+          "cols": 7
+        },
+        {
+          "th": "รับเหล็กเข้าหน้างาน",
+          "en": "STEEL DELIVERY",
+          "cols": 6
+        },
+        {
+          "th": "ส่งตัวอย่างทดสอบแรงดึง (ใช้คู่กับ T-03)",
+          "en": "TENSILE TEST SAMPLES (use with T-03)",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1103-64",
+          "th": "มาตรฐานงานเหล็กเสริมคอนกรีต",
+          "en": "Standard for Reinforcing Steel Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มอก. 24-2559",
+          "th": "เหล็กเส้นเสริมคอนกรีต: เหล็กข้ออ้อย",
+          "en": "Steel Bars for Reinforced Concrete: Deformed Bars",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "มอก. 20-2559",
+          "th": "เหล็กเส้นเสริมคอนกรีต: เหล็กเส้นกลม",
+          "en": "Steel Bars for Reinforced Concrete: Round Bars",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "F-04",
@@ -1308,6 +1634,7 @@ window.SITE = {
       "titleEn": "Formwork and Falsework",
       "group": "โครงสร้าง",
       "sum": "ตรวจแบบและค้ำยันก่อนเท ระหว่างเท และจังหวะถอดแบบ",
+      "sumEn": "Before the pour, during the pour, and the timing of stripping",
       "nFree": 10,
       "freePages": 1,
       "nPro": 22,
@@ -1320,8 +1647,72 @@ window.SITE = {
       "img": "sheets/img/F-04.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนประกอบ",
+          "en": "Before assembly",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างประกอบ",
+          "en": "During assembly",
+          "n": 11,
+          "h": 3
+        },
+        {
+          "th": "ระหว่างเท",
+          "en": "During the pour",
+          "n": 2,
+          "h": 0
+        },
+        {
+          "th": "การถอดแบบ",
+          "en": "Stripping",
+          "n": 4,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกขนาด ดิ่ง และระดับของแบบ",
+          "en": "FORMWORK SIZE, PLUMB AND LEVEL LOG",
+          "cols": 6
+        },
+        {
+          "th": "เฝ้าแบบระหว่างเท",
+          "en": "FORMWORK WATCH DURING THE POUR",
+          "cols": 6
+        },
+        {
+          "th": "ถอดแบบและค้ำกลับ",
+          "en": "STRIPPING AND BACK-PROPPING",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มยผ. 1104-64",
+          "th": "มาตรฐานงานไม้",
+          "en": "Standard for Timber Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        }
+      ]
     },
     {
       "id": "F-05",
@@ -1330,6 +1721,7 @@ window.SITE = {
       "titleEn": "Concrete Pouring and Curing",
       "group": "โครงสร้าง",
       "sum": "ตรวจวันเทคอนกรีต ตั้งแต่ใบส่งคอนกรีตคันแรก จนบ่มครบและได้ผลกำลังอัด",
+      "sumEn": "Pour day, from the first delivery ticket to full curing and strength results",
       "nFree": 9,
       "freePages": 2,
       "nPro": 25,
@@ -1342,8 +1734,71 @@ window.SITE = {
       "img": "sheets/img/F-05.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเท",
+          "en": "Before the pour",
+          "n": 7,
+          "h": 2
+        },
+        {
+          "th": "ระหว่างเท",
+          "en": "During the pour",
+          "n": 11,
+          "h": 1
+        },
+        {
+          "th": "หลังเท",
+          "en": "After the pour",
+          "n": 7,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกรับคอนกรีตทุกคัน (ใช้คู่กับ T-01)",
+          "en": "CONCRETE DELIVERY LOG (use with T-01)",
+          "cols": 9
+        },
+        {
+          "th": "สรุปการเทแต่ละส่วน",
+          "en": "POUR SUMMARY BY SECTION",
+          "cols": 7
+        },
+        {
+          "th": "บันทึกการบ่ม",
+          "en": "CURING LOG",
+          "cols": 6
+        },
+        {
+          "th": "ติดตามผลกำลังอัด (ใช้คู่กับ T-02)",
+          "en": "STRENGTH RESULT TRACKING (use with T-02)",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "มอก. 213",
+          "th": "คอนกรีตผสมเสร็จ",
+          "en": "Ready-Mixed Concrete",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        }
+      ]
     },
     {
       "id": "F-06",
@@ -1352,6 +1807,7 @@ window.SITE = {
       "titleEn": "Masonry and Plastering",
       "group": "สถาปัตย์",
       "sum": "ตรวจแนวผนัง เสาเอ็น ทับหลัง จนผิวฉาบแห้งและเคาะไม่พบโพรง",
+      "sumEn": "Wall lines, stiffener columns and lintels, to a dry plaster surface with no hollow sound",
       "nFree": 11,
       "freePages": 1,
       "nPro": 22,
@@ -1364,8 +1820,66 @@ window.SITE = {
       "img": "sheets/img/F-06.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนก่อ",
+          "en": "Before laying",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างก่อ",
+          "en": "During laying",
+          "n": 6,
+          "h": 1
+        },
+        {
+          "th": "ก่อนฉาบ",
+          "en": "Before plastering",
+          "n": 4,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างและหลังฉาบ",
+          "en": "During and after plastering",
+          "n": 7,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกดิ่ง ความเรียบ และจุดโพรงของผนัง",
+          "en": "WALL PLUMB, FLATNESS AND HOLLOW SPOT LOG",
+          "cols": 5
+        },
+        {
+          "th": "เสาเอ็น ทับหลัง และเหล็กยึดผนัง",
+          "en": "STIFFENER COLUMNS, LINTELS AND WALL TIES",
+          "cols": 6
+        },
+        {
+          "th": "ความหนาปูนฉาบ",
+          "en": "PLASTER THICKNESS",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร และกฎกระทรวงที่ออกตามพระราชบัญญัตินี้",
+          "en": "Building Control Act, B.E. 2522, and its ministerial regulations",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบก่อสร้าง รายการประกอบแบบ และคู่มือของผู้ผลิตวัสดุ",
+          "en": "Project drawings, specification and manufacturer's instructions",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-07",
@@ -1374,6 +1888,7 @@ window.SITE = {
       "titleEn": "Roofing Works (Roof Structure and Covering)",
       "group": "สถาปัตย์",
       "sum": "ตรวจโครงเหล็ก ระยะแป การทับซ้อน ครอบและรางน้ำ จนทดสอบไม่รั่ว",
+      "sumEn": "Steel frame, purlin spacing, laps, flashings and gutters, to a leak test",
       "nFree": 9,
       "freePages": 1,
       "nPro": 22,
@@ -1386,8 +1901,66 @@ window.SITE = {
       "img": "sheets/img/F-07.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "โครงหลังคา",
+          "en": "Roof structure",
+          "n": 9,
+          "h": 4
+        },
+        {
+          "th": "วัสดุมุงและอุปกรณ์",
+          "en": "Covering and accessories",
+          "n": 8,
+          "h": 1
+        },
+        {
+          "th": "ทดสอบและส่งงาน",
+          "en": "Test and handover",
+          "n": 5,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "บันทึกโครงหลังคาและวัสดุมุง",
+          "en": "ROOF STRUCTURE AND COVERING LOG",
+          "cols": 5
+        },
+        {
+          "th": "ระยะแปและการยึดแผ่น",
+          "en": "PURLIN SPACING AND SHEET FIXING",
+          "cols": 6
+        },
+        {
+          "th": "ทดสอบฉีดน้ำหลังคา",
+          "en": "ROOF WATER SPRAY TEST",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มอก. 1227-2558",
+          "th": "เหล็กโครงสร้างรูปพรรณรีดร้อน",
+          "en": "Hot-Rolled Structural Steel Sections",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบก่อสร้าง รายการประกอบแบบ และคู่มือติดตั้งของผู้ผลิตวัสดุมุง",
+          "en": "Project drawings, specification and the roofing manufacturer's installation manual",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-08",
@@ -1396,6 +1969,7 @@ window.SITE = {
       "titleEn": "Waterproofing (Bathroom, Balcony, Roof Deck)",
       "group": "สถาปัตย์",
       "sum": "ตรวจผิวพื้น จำนวนชั้น ความสูงขึ้นผนัง และการทดสอบขังน้ำ ก่อนปูทับ",
+      "sumEn": "Substrate, number of coats, upturn height and flood test before covering",
       "nFree": 10,
       "freePages": 2,
       "nPro": 22,
@@ -1408,8 +1982,66 @@ window.SITE = {
       "img": "sheets/img/F-08.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนทำ",
+          "en": "Before application",
+          "n": 7,
+          "h": 2
+        },
+        {
+          "th": "ระหว่างทำ",
+          "en": "During application",
+          "n": 7,
+          "h": 2
+        },
+        {
+          "th": "ทดสอบ",
+          "en": "Test",
+          "n": 3,
+          "h": 2
+        },
+        {
+          "th": "หลังทดสอบ",
+          "en": "After the test",
+          "n": 5,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ทดสอบขังน้ำ",
+          "en": "FLOOD TEST",
+          "cols": 7
+        },
+        {
+          "th": "ชั้นกันซึม",
+          "en": "WATERPROOFING LAYERS",
+          "cols": 6
+        },
+        {
+          "th": "มุม ท่อทะลุ และรอยต่อ",
+          "en": "CORNERS, PIPE PENETRATIONS AND JOINTS",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบก่อสร้าง รายการประกอบแบบ และคู่มือของผู้ผลิตระบบกันซึม",
+          "en": "Project drawings, specification and the waterproofing manufacturer's instructions",
+          "by": "โครงการ"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร และกฎกระทรวงที่ออกตามพระราชบัญญัตินี้",
+          "en": "Building Control Act, B.E. 2522, and its ministerial regulations",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-09",
@@ -1418,6 +2050,7 @@ window.SITE = {
       "titleEn": "Floor and Wall Tiling",
       "group": "สถาปัตย์",
       "sum": "ตรวจเฉดสี แนวเริ่มปู ปูนกาวเต็มแผ่น ความลาด และเคาะทุกแผ่นก่อนรับงาน",
+      "sumEn": "Shade and batch, setting-out line, full adhesive bed, falls, and tap test of every tile",
       "nFree": 10,
       "freePages": 1,
       "nPro": 22,
@@ -1430,8 +2063,60 @@ window.SITE = {
       "img": "sheets/img/F-09.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนปู",
+          "en": "Before tiling",
+          "n": 6,
+          "h": 2
+        },
+        {
+          "th": "ระหว่างปู",
+          "en": "During tiling",
+          "n": 8,
+          "h": 0
+        },
+        {
+          "th": "หลังปู",
+          "en": "After tiling",
+          "n": 8,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "เคาะหาโพรงและต่างระดับต่อห้อง",
+          "en": "TAP TEST AND LIPPAGE BY ROOM",
+          "cols": 5
+        },
+        {
+          "th": "ความลาดลงท่อระบาย",
+          "en": "FALL TO FLOOR DRAIN",
+          "cols": 5
+        },
+        {
+          "th": "ทดสอบขังน้ำพื้นเปียก",
+          "en": "WET-AREA FLOOD TEST",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "มอก. 2508-2555",
+          "th": "กระเบื้องเซรามิก",
+          "en": "Ceramic Tiles",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบก่อสร้าง รายการประกอบแบบ และคู่มือของผู้ผลิตกาวซีเมนต์และยาแนว",
+          "en": "Project drawings, specification and the adhesive and grout manufacturer's instructions",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-10",
@@ -1440,6 +2125,7 @@ window.SITE = {
       "titleEn": "Residential Electrical System",
       "group": "งานระบบ",
       "sum": "ตรวจท่อและสายก่อนปิดงาน ตู้ไฟ สายดิน เครื่องตัดไฟรั่ว และผลทดสอบก่อนจ่ายไฟ",
+      "sumEn": "Conduits and cables before cover-up, panel, earthing, RCDs, and tests before energising",
       "nFree": 12,
       "freePages": 2,
       "nPro": 23,
@@ -1452,8 +2138,72 @@ window.SITE = {
       "img": "sheets/img/F-10.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุและแบบ",
+          "en": "Material and drawings",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "งานท่อและเดินสาย",
+          "en": "Conduit and wiring",
+          "n": 7,
+          "h": 3
+        },
+        {
+          "th": "ตู้ไฟและระบบป้องกัน",
+          "en": "Panel and protection",
+          "n": 5,
+          "h": 3
+        },
+        {
+          "th": "ทดสอบ",
+          "en": "Tests",
+          "n": 8,
+          "h": 3
+        }
+      ],
+      "recs": [
+        {
+          "th": "ค่าที่วัดได้ต่อวงจร",
+          "en": "MEASURED VALUES BY CIRCUIT",
+          "cols": 5
+        },
+        {
+          "th": "ตารางวงจรในตู้",
+          "en": "PANEL CIRCUIT SCHEDULE",
+          "cols": 6
+        },
+        {
+          "th": "จุดต่อลงดิน",
+          "en": "EARTHING POINTS",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
+          "en": "Thai Electrical Code (latest edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
+        },
+        {
+          "code": "ระเบียบการไฟฟ้า",
+          "th": "ระเบียบและข้อกำหนดการใช้ไฟฟ้าของการไฟฟ้าในพื้นที่ (กฟน. หรือ กฟภ.)",
+          "en": "Rules of the local electricity authority (MEA or PEA)",
+          "by": "การไฟฟ้านครหลวง · การไฟฟ้าส่วนภูมิภาค"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2542",
+          "th": "พระราชบัญญัติวิศวกร และกฎกระทรวงกำหนดสาขาวิชาชีพวิศวกรรมและวิชาชีพวิศวกรรมควบคุม พ.ศ. 2565",
+          "en": "Engineer Act, B.E. 2542, and the Ministerial Regulation on Controlled Engineering Professions, B.E. 2565",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-11",
@@ -1462,6 +2212,7 @@ window.SITE = {
       "titleEn": "Plumbing and Sanitary System",
       "group": "งานระบบ",
       "sum": "ตรวจแนวท่อ ความลาด ทดสอบแรงดันและการรั่วก่อนปิดงาน จนเปิดใช้ทุกจุด",
+      "sumEn": "Pipe routes, falls, pressure and leak tests before cover-up, to every outlet in use",
       "nFree": 10,
       "freePages": 2,
       "nPro": 23,
@@ -1474,8 +2225,66 @@ window.SITE = {
       "img": "sheets/img/F-11.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุและแนวท่อ",
+          "en": "Material and pipe routes",
+          "n": 9,
+          "h": 2
+        },
+        {
+          "th": "ทดสอบก่อนปิดงาน",
+          "en": "Tests before cover-up",
+          "n": 4,
+          "h": 2
+        },
+        {
+          "th": "ถังและอุปกรณ์",
+          "en": "Tanks and equipment",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "สุขภัณฑ์และส่งงาน",
+          "en": "Sanitary ware and handover",
+          "n": 7,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ทดสอบแรงดันท่อต่อแนว",
+          "en": "PIPE PRESSURE TEST BY RUN",
+          "cols": 7
+        },
+        {
+          "th": "ทดสอบการระบายน้ำ",
+          "en": "DRAINAGE TEST",
+          "cols": 5
+        },
+        {
+          "th": "ความลาดท่อระบาย",
+          "en": "DRAIN PIPE FALL",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการเดินท่อภายในอาคาร",
+          "en": "Standard for Pipe Installation in Buildings",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร และกฎกระทรวงที่ออกตามพระราชบัญญัตินี้",
+          "en": "Building Control Act, B.E. 2522, and its ministerial regulations",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-12",
@@ -1484,6 +2293,7 @@ window.SITE = {
       "titleEn": "Split-Type Air Conditioner Installation",
       "group": "งานติดตั้ง",
       "sum": "ตรวจตำแหน่ง ท่อน้ำยา ท่อน้ำทิ้ง การทำสุญญากาศ และการเดินเครื่องก่อนรับงาน",
+      "sumEn": "Location, refrigerant pipes, drain, vacuum and test run before acceptance",
       "nFree": 12,
       "freePages": 1,
       "nPro": 22,
@@ -1496,8 +2306,66 @@ window.SITE = {
       "img": "sheets/img/F-12.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนติดตั้ง",
+          "en": "Before installation",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างติดตั้ง",
+          "en": "During installation",
+          "n": 7,
+          "h": 1
+        },
+        {
+          "th": "ทดสอบระบบ",
+          "en": "System tests",
+          "n": 4,
+          "h": 2
+        },
+        {
+          "th": "เดินเครื่องและส่งงาน",
+          "en": "Test run and handover",
+          "n": 6,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ค่าที่วัดได้ต่อเครื่อง",
+          "en": "MEASURED VALUES BY UNIT",
+          "cols": 5
+        },
+        {
+          "th": "ทดสอบรั่วและทำสุญญากาศ",
+          "en": "LEAK TEST AND EVACUATION",
+          "cols": 6
+        },
+        {
+          "th": "ท่อน้ำทิ้ง",
+          "en": "CONDENSATE DRAIN",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "คู่มือผู้ผลิต",
+          "th": "คู่มือติดตั้งของผู้ผลิตเครื่องปรับอากาศรุ่นที่ติดตั้ง",
+          "en": "Installation manual of the air conditioner manufacturer",
+          "by": "ผู้ผลิต"
+        },
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
+          "en": "Thai Electrical Code (latest edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
+        }
+      ]
     },
     {
       "id": "F-13",
@@ -1506,6 +2374,7 @@ window.SITE = {
       "titleEn": "Ceiling and Drywall Partition",
       "group": "ตกแต่งและช่องเปิด",
       "sum": "ตรวจโครงคร่าว ระยะยึด งานระบบเหนือฝ้าก่อนปิดแผ่น รอยต่อ และความเรียบก่อนทาสี",
+      "sumEn": "Framing, fixing spacing, services above the ceiling before boarding, joints, and flatness before painting",
       "nFree": 11,
       "freePages": 1,
       "nPro": 22,
@@ -1518,8 +2387,72 @@ window.SITE = {
       "img": "sheets/img/F-13.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุและแบบ",
+          "en": "Material and drawings",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "โครงคร่าว",
+          "en": "Framing",
+          "n": 6,
+          "h": 1
+        },
+        {
+          "th": "ก่อนปิดแผ่น",
+          "en": "Before boarding",
+          "n": 3,
+          "h": 2
+        },
+        {
+          "th": "ติดตั้งแผ่นและรอยต่อ",
+          "en": "Boarding and joints",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "ตรวจรับ",
+          "en": "Acceptance",
+          "n": 5,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ระดับและความเรียบต่อห้อง",
+          "en": "LEVEL AND FLATNESS BY ROOM",
+          "cols": 5
+        },
+        {
+          "th": "ระยะโครงคร่าวและที่แขวน",
+          "en": "FRAMING AND HANGER SPACING",
+          "cols": 5
+        },
+        {
+          "th": "ช่องเซอร์วิสและช่องดวงโคม",
+          "en": "ACCESS PANELS AND LIGHT OPENINGS",
+          "cols": 4
+        }
+      ],
+      "refs": [
+        {
+          "code": "มอก. 219-2552",
+          "th": "แผ่นยิปซัม",
+          "en": "Gypsum Plasterboards",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบก่อสร้าง รายการประกอบแบบ และคู่มือติดตั้งของผู้ผลิตระบบฝ้าและผนัง",
+          "en": "Project drawings, specification and the system manufacturer's installation manual",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-14",
@@ -1528,6 +2461,7 @@ window.SITE = {
       "titleEn": "Interior and Exterior Painting",
       "group": "ตกแต่งและช่องเปิด",
       "sum": "ตรวจความพร้อมของผิว ความชื้น ระบบสี จำนวนชั้น และผิวสำเร็จ ก่อนรับงาน",
+      "sumEn": "Surface readiness, moisture, paint system, number of coats, and finish before acceptance",
       "nFree": 11,
       "freePages": 1,
       "nPro": 21,
@@ -1540,8 +2474,55 @@ window.SITE = {
       "img": "sheets/img/F-14.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุและแบบ",
+          "en": "Material and drawings",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "เตรียมผิว",
+          "en": "Surface preparation",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ทาสี",
+          "en": "Painting",
+          "n": 6,
+          "h": 2
+        },
+        {
+          "th": "ตรวจรับ",
+          "en": "Acceptance",
+          "n": 6,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ความชื้นพื้นผิวและจำนวนชั้นสีต่อผนัง",
+          "en": "SURFACE MOISTURE AND COATS BY WALL",
+          "cols": 5
+        },
+        {
+          "th": "ล็อตสีและวันที่ทา",
+          "en": "PAINT LOT AND DATES",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "รายการประกอบแบบ และเอกสารข้อมูลผลิตภัณฑ์ของผู้ผลิตสี",
+          "en": "Project specification and the paint manufacturer's product data sheet",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-15",
@@ -1550,6 +2531,7 @@ window.SITE = {
       "titleEn": "Doors, Windows, Aluminium and Glazing",
       "group": "ตกแต่งและช่องเปิด",
       "sum": "ตรวจขนาดช่องเปิด การยึดวงกบ การอุดรอบวงกบ กระจก อุปกรณ์ และทดสอบน้ำรั่วก่อนรับงาน",
+      "sumEn": "Opening sizes, frame fixing, perimeter sealing, glass, hardware, and water test before acceptance",
       "nFree": 12,
       "freePages": 1,
       "nPro": 21,
@@ -1562,8 +2544,66 @@ window.SITE = {
       "img": "sheets/img/F-15.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "วัสดุและแบบ",
+          "en": "Material and drawings",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "ช่องเปิดและการติดตั้งวงกบ",
+          "en": "Openings and frame installation",
+          "n": 6,
+          "h": 2
+        },
+        {
+          "th": "บาน กระจก และอุปกรณ์",
+          "en": "Sashes, glass and hardware",
+          "n": 6,
+          "h": 0
+        },
+        {
+          "th": "ทดสอบและตรวจรับ",
+          "en": "Tests and acceptance",
+          "n": 5,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ดิ่ง ฉาก และค่าที่วัดต่อบาน",
+          "en": "PLUMB, SQUARE AND MEASURED VALUES BY SASH",
+          "cols": 5
+        },
+        {
+          "th": "อุปกรณ์และการล็อก",
+          "en": "HARDWARE AND LOCKING",
+          "cols": 5
+        },
+        {
+          "th": "ทดสอบฉีดน้ำ",
+          "en": "WATER SPRAY TEST",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบขยายประตูหน้าต่าง รายการประกอบแบบ และคู่มือของผู้ผลิต",
+          "en": "Door and window details, specification and manufacturer's instructions",
+          "by": "โครงการ"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร และกฎกระทรวงที่ออกตามพระราชบัญญัตินี้",
+          "en": "Building Control Act, B.E. 2522, and its ministerial regulations",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-16",
@@ -1572,6 +2612,7 @@ window.SITE = {
       "titleEn": "Residential Solar Rooftop Installation",
       "group": "พลังงานในบ้าน",
       "sum": "ตรวจเอกสารอนุญาต โครงสร้างหลังคา การยึดแผง การกันรั่ว งานไฟฟ้ากระแสตรงและกระแสสลับ และผลทดสอบก่อนเปิดระบบ",
+      "sumEn": "Permits, roof structure, panel fixing, waterproofing, DC and AC electrical work, and tests before start-up",
       "nFree": 12,
       "freePages": 2,
       "nPro": 24,
@@ -1584,8 +2625,78 @@ window.SITE = {
       "img": "sheets/img/F-16.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสารและแบบ",
+          "en": "Documents and drawings",
+          "n": 5,
+          "h": 2
+        },
+        {
+          "th": "โครงยึดและหลังคา",
+          "en": "Mounting and roof",
+          "n": 5,
+          "h": 2
+        },
+        {
+          "th": "งานไฟฟ้า",
+          "en": "Electrical work",
+          "n": 7,
+          "h": 3
+        },
+        {
+          "th": "ทดสอบและส่งมอบ",
+          "en": "Tests and handover",
+          "n": 7,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "ค่าที่วัดได้ต่อสตริง",
+          "en": "MEASURED VALUES BY STRING",
+          "cols": 5
+        },
+        {
+          "th": "จุดยึดบนหลังคา",
+          "en": "ROOF ATTACHMENTS",
+          "cols": 6
+        },
+        {
+          "th": "ป้ายเตือนและอุปกรณ์ตัดตอน",
+          "en": "WARNING LABELS AND ISOLATORS",
+          "cols": 4
+        }
+      ],
+      "refs": [
+        {
+          "code": "มาตรฐาน วสท. พ.ศ. 2565",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย: ระบบการผลิตไฟฟ้าจากพลังงานแสงอาทิตย์ที่ติดตั้งบนหลังคา",
+          "en": "Thai Electrical Code: Rooftop Solar PV Power Supply Installations, B.E. 2565",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย"
+        },
+        {
+          "code": "ข้อกำหนดการไฟฟ้า",
+          "th": "ข้อกำหนดการเชื่อมต่อระบบโครงข่ายไฟฟ้าของการไฟฟ้าในพื้นที่ และการแจ้งยกเว้นใบอนุญาตต่อ กกพ.",
+          "en": "Grid connection rules of the local electricity authority and the ERC exemption notice",
+          "by": "กฟน. · กฟภ. · สำนักงาน กกพ."
+        },
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
+          "en": "Thai Electrical Code (latest edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร (ตรวจกับเจ้าพนักงานท้องถิ่นว่าต้องขออนุญาตหรือแจ้งหรือไม่)",
+          "en": "Building Control Act, B.E. 2522 (check with the local authority whether a permit or notice is needed)",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-17",
@@ -1594,6 +2705,7 @@ window.SITE = {
       "titleEn": "Home EV Charger Installation",
       "group": "พลังงานในบ้าน",
       "sum": "ตรวจขนาดมิเตอร์และสายเมน วงจรเฉพาะ เครื่องตัดไฟรั่ว สายดิน ตำแหน่งติดตั้ง และผลทดสอบก่อนใช้งาน",
+      "sumEn": "Meter and main cable size, dedicated circuit, RCD, earthing, mounting position, and tests before use",
       "nFree": 13,
       "freePages": 2,
       "nPro": 23,
@@ -1606,8 +2718,61 @@ window.SITE = {
       "img": "sheets/img/F-17.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนติดตั้ง",
+          "en": "Before installation",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "วงจรและการเดินสาย",
+          "en": "Circuit and wiring",
+          "n": 7,
+          "h": 4
+        },
+        {
+          "th": "ตำแหน่งและการติดตั้งเครื่อง",
+          "en": "Position and mounting",
+          "n": 5,
+          "h": 0
+        },
+        {
+          "th": "ทดสอบและส่งมอบ",
+          "en": "Tests and handover",
+          "n": 6,
+          "h": 2
+        }
+      ],
+      "recs": [
+        {
+          "th": "ค่าที่วัดได้ต่อจุด",
+          "en": "MEASURED VALUES BY POINT",
+          "cols": 5
+        },
+        {
+          "th": "ทดสอบชาร์จจริง",
+          "en": "LIVE CHARGING TEST",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "MPESTD-001:2563",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับบริภัณฑ์จ่ายไฟยานยนต์ไฟฟ้า สำหรับบ้านอยู่อาศัย อาคารชุด อาคารสำนักงาน",
+          "en": "Electrical Installation Standard for EV Supply Equipment in Houses, Condominiums and Offices",
+          "by": "กฟน. · กฟภ. · สำนักงาน กกพ."
+        },
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
+          "en": "Thai Electrical Code (latest edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
+        }
+      ]
     },
     {
       "id": "F-18",
@@ -1616,6 +2781,7 @@ window.SITE = {
       "titleEn": "Home Handover Inspection Before Transfer",
       "group": "รับมอบบ้าน",
       "sum": "ตรวจบ้านหรือห้องชุดทีละหมวดก่อนเซ็นรับโอน: เอกสาร โครงสร้างที่มองเห็น หลังคา ผนัง พื้น ประตูหน้าต่าง ไฟฟ้า ประปา และภายนอก",
+      "sumEn": "A house or condominium unit checked section by section before signing: documents, visible structure, roof, walls, floors, doors and windows, electrical, plumbing, and external works",
       "nFree": 13,
       "freePages": 1,
       "nPro": 27,
@@ -1628,8 +2794,102 @@ window.SITE = {
       "img": "sheets/img/F-18.png",
       "price": 149,
       "priceU": 229,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสารและภาพรวม",
+          "en": "Documents and overview",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "โครงสร้างที่มองเห็นและหลังคา",
+          "en": "Visible structure and roof",
+          "n": 4,
+          "h": 1
+        },
+        {
+          "th": "ผนัง พื้น ฝ้า",
+          "en": "Walls, floors, ceilings",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "ประตู หน้าต่าง",
+          "en": "Doors and windows",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "ไฟฟ้า",
+          "en": "Electrical",
+          "n": 3,
+          "h": 1
+        },
+        {
+          "th": "ประปาและสุขาภิบาล",
+          "en": "Plumbing and sanitary",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ภายนอกและส่งมอบ",
+          "en": "External works and handover",
+          "n": 4,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "สิ่งที่พบต่อห้อง",
+          "en": "FINDINGS BY ROOM",
+          "cols": 5
+        },
+        {
+          "th": "นัดซ่อมและตรวจซ้ำ",
+          "en": "REPAIR AND RE-INSPECTION",
+          "cols": 6
+        },
+        {
+          "th": "ส่งมอบกุญแจและเอกสาร",
+          "en": "HANDOVER OF KEYS AND DOCUMENTS",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "ป.พ.พ. มาตรา 472",
+          "th": "ประมวลกฎหมายแพ่งและพาณิชย์ ว่าด้วยความรับผิดของผู้ขายเมื่อทรัพย์สินชำรุดบกพร่อง",
+          "en": "Civil and Commercial Code, Section 472: seller's liability for defects",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "สัญญาของคุณ",
+          "th": "สัญญาจะซื้อจะขาย แบบบ้านหรือห้องชุด และรายการวัสดุที่แนบสัญญา",
+          "en": "Your sale contract, the drawings and the material list attached to it",
+          "by": "ผู้ขายและผู้ซื้อ"
+        },
+        {
+          "code": "ประกาศ สคบ. พ.ศ. 2559",
+          "th": "ประกาศคณะกรรมการว่าด้วยสัญญา เรื่อง ให้ธุรกิจรับจ้างก่อสร้างอาคารเพื่อการอยู่อาศัยเป็นธุรกิจที่ควบคุมสัญญา",
+          "en": "Contract Committee Notification on Residential Building Construction as a Contract-Controlled Business, B.E. 2559",
+          "by": "สำนักงานคณะกรรมการคุ้มครองผู้บริโภค"
+        },
+        {
+          "code": "แบบ อ.ช. 22",
+          "th": "แบบสัญญาจะซื้อจะขายห้องชุด ตามพระราชบัญญัติอาคารชุด",
+          "en": "Standard condominium sale contract form (Or.Chor. 22) under the Condominium Act",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "พ.ร.บ. พ.ศ. 2543",
+          "th": "พระราชบัญญัติการจัดสรรที่ดิน และฉบับแก้ไขเพิ่มเติม",
+          "en": "Land Allotment Act, B.E. 2543, as amended",
+          "by": "ราชอาณาจักรไทย"
+        }
+      ]
     },
     {
       "id": "F-19",
@@ -1638,6 +2898,7 @@ window.SITE = {
       "titleEn": "Structural Steelwork (Fabrication and Erection)",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจตั้งแต่เหล็กมาถึงหน้างาน การยกติดตั้ง แนว ดิ่ง ระดับ จนทาสีกันสนิมและรับงาน",
+      "sumEn": "From delivery to site through lifting, line, plumb and level, to protective coating and acceptance",
       "nFree": 10,
       "freePages": 1,
       "nPro": 18,
@@ -1650,8 +2911,72 @@ window.SITE = {
       "img": "sheets/img/F-19.png",
       "price": 129,
       "priceU": 199,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสารและวัสดุ",
+          "en": "Documents and material",
+          "n": 5,
+          "h": 0
+        },
+        {
+          "th": "ก่อนยกติดตั้ง",
+          "en": "Before erection",
+          "n": 3,
+          "h": 1
+        },
+        {
+          "th": "ระหว่างติดตั้ง",
+          "en": "During erection",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "กันสนิมและรับงาน",
+          "en": "Coating and acceptance",
+          "n": 5,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตำแหน่งและดิ่งต่อชิ้นส่วน",
+          "en": "POSITION AND PLUMB BY MEMBER",
+          "cols": 5
+        },
+        {
+          "th": "รับวัสดุและใบรับรอง",
+          "en": "MATERIAL RECEIPT AND CERTIFICATES",
+          "cols": 6
+        },
+        {
+          "th": "สีกันสนิม",
+          "en": "ANTI-CORROSION COATING",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "มอก. 1227-2558",
+          "th": "เหล็กโครงสร้างรูปพรรณรีดร้อน",
+          "en": "Hot-Rolled Structural Steel Sections",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "OSHA 29 CFR 1926.501",
+          "th": "การป้องกันการตกจากที่สูงตั้งแต่ 1.8 ม. ในงานก่อสร้าง (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
+          "en": "Duty to have fall protection at 6 ft (1.8 m) and above in construction (US, for comparison)",
+          "by": "OSHA"
+        }
+      ]
     },
     {
       "id": "F-20",
@@ -1660,6 +2985,7 @@ window.SITE = {
       "titleEn": "Welding and Bolting of Structural Steel",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจคุณสมบัติช่างเชื่อม วิธีเชื่อม รอยเชื่อม และการขันสลักเกลียว ก่อนปิดงานหรือทาสี",
+      "sumEn": "Welder qualification, welding procedure, welds and bolt tightening before covering or coating",
       "nFree": 8,
       "freePages": 2,
       "nPro": 18,
@@ -1672,8 +2998,66 @@ window.SITE = {
       "img": "sheets/img/F-20.png",
       "price": 129,
       "priceU": 199,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสารและคน",
+          "en": "Documents and people",
+          "n": 5,
+          "h": 0
+        },
+        {
+          "th": "ก่อนเชื่อม",
+          "en": "Before welding",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "หลังเชื่อม",
+          "en": "After welding",
+          "n": 3,
+          "h": 1
+        },
+        {
+          "th": "สลักเกลียว",
+          "en": "Bolts",
+          "n": 5,
+          "h": 1
+        },
+        {
+          "th": "ความปลอดภัย",
+          "en": "Safety",
+          "n": 2,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตรวจรอยเชื่อมและแรงขันต่อรอยต่อ",
+          "en": "WELD AND BOLT CHECK BY JOINT",
+          "cols": 5
+        },
+        {
+          "th": "ช่างเชื่อมและใบรับรอง",
+          "en": "WELDERS AND CERTIFICATES",
+          "cols": 5
+        },
+        {
+          "th": "ทดสอบแบบไม่ทำลาย",
+          "en": "NON-DESTRUCTIVE TESTING",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "ข้อกำหนดวิธีเชื่อม (WPS) แบบรอยต่อ และข้อกำหนดการขันสลักเกลียวของโครงการ",
+          "en": "Project WPS, joint details and bolting specification",
+          "by": "โครงการ"
+        }
+      ]
     },
     {
       "id": "F-21",
@@ -1682,6 +3066,7 @@ window.SITE = {
       "titleEn": "Machine Foundations and Machine Installation",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจฐานรากรับเครื่องจักร สลักยึด การวางและปรับระดับเครื่อง การเทปูนรองฐาน และการทดลองเดินเครื่อง",
+      "sumEn": "Machine foundation, anchor bolts, setting and levelling, grouting and trial run",
       "nFree": 8,
       "freePages": 1,
       "nPro": 18,
@@ -1694,8 +3079,61 @@ window.SITE = {
       "img": "sheets/img/F-21.png",
       "price": 149,
       "priceU": 229,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสาร",
+          "en": "Documents",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "ฐานรากและสลักยึด",
+          "en": "Foundation and anchor bolts",
+          "n": 4,
+          "h": 1
+        },
+        {
+          "th": "วางและปรับระดับเครื่อง",
+          "en": "Setting and levelling the machine",
+          "n": 4,
+          "h": 1
+        },
+        {
+          "th": "ก่อนเดินเครื่องและทดลองเดินเครื่อง",
+          "en": "Before start-up and trial run",
+          "n": 6,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ระดับและแนวต่อเครื่อง",
+          "en": "LEVEL AND ALIGNMENT BY MACHINE",
+          "cols": 5
+        },
+        {
+          "th": "สลักยึดและการเกราต์",
+          "en": "ANCHOR BOLTS AND GROUTING",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "แบบและรายการประกอบแบบ",
+          "th": "แบบฐานรากเครื่องจักร และคู่มือติดตั้งของผู้ผลิตเครื่อง",
+          "en": "Machine foundation drawing and the maker's installation manual",
+          "by": "โครงการ"
+        },
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "F-22",
@@ -1704,6 +3142,7 @@ window.SITE = {
       "titleEn": "Scaffolding and Temporary Shoring",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจนั่งร้านและค้ำยันแบบหล่อก่อนใช้งาน ระหว่างใช้งาน และก่อนรื้อถอน",
+      "sumEn": "Scaffolds and formwork props before use, during use and before dismantling",
       "nFree": 8,
       "freePages": 1,
       "nPro": 18,
@@ -1716,8 +3155,73 @@ window.SITE = {
       "img": "sheets/img/F-22.png",
       "price": 99,
       "priceU": 149,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนใช้งาน",
+          "en": "Before use",
+          "n": 7,
+          "h": 0
+        },
+        {
+          "th": "ความปลอดภัยของคนทำงาน",
+          "en": "Safety of the workers",
+          "n": 5,
+          "h": 0
+        },
+        {
+          "th": "ค้ำยันแบบหล่อ",
+          "en": "Formwork shoring",
+          "n": 3,
+          "h": 2
+        },
+        {
+          "th": "ระหว่างใช้งานและรื้อถอน",
+          "en": "During use and dismantling",
+          "n": 3,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตรวจประจำวันต่อชั้น",
+          "en": "DAILY CHECK BY LEVEL",
+          "cols": 5
+        },
+        {
+          "th": "ป้ายสถานะนั่งร้าน",
+          "en": "SCAFFOLD STATUS TAG LOG",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "ประกาศกรมสวัสดิการและคุ้มครองแรงงาน 2564",
+          "th": "หลักเกณฑ์ วิธีการ และเงื่อนไขการคำนวณออกแบบและควบคุมการใช้นั่งร้านโดยวิศวกร (ราชกิจจานุเบกษา เล่ม 138 ตอนพิเศษ 293 ง 30 พ.ย. 2564 · ออกตามกฎกระทรวงความปลอดภัยเกี่ยวกับนั่งร้านและค้ำยัน พ.ศ. 2564)",
+          "en": "Department of Labour Protection and Welfare notification on engineer design and control of scaffolds (Royal Gazette vol. 138, special part 293 D, 30 Nov 2021)",
+          "by": "กรมสวัสดิการและคุ้มครองแรงงาน"
+        },
+        {
+          "code": "มยผ. 1571-62",
+          "th": "มาตรฐานการติดตั้งและการตรวจสอบโครงสร้างนั่งร้าน",
+          "en": "Standard for Erection and Inspection of Scaffolding (DPT 1571-62)",
+          "by": "กรมโยธาธิการและผังเมือง"
+        },
+        {
+          "code": "OSHA 29 CFR 1926.451",
+          "th": "ข้อกำหนดทั่วไปของนั่งร้าน (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
+          "en": "Scaffolds: general requirements (US, for comparison)",
+          "by": "OSHA"
+        },
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก (เวลาถอดแบบและค้ำยันกลับ ข้อ 5.11.8–5.11.10)",
+          "en": "Standard for Concrete and Reinforced Concrete Works (striking and re-propping, cl. 5.11.8–5.11.10)",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "F-23",
@@ -1726,6 +3230,7 @@ window.SITE = {
       "titleEn": "Review of Structural Drawings and Calculations",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจความครบถ้วนของชุดแบบและรายการคำนวณโครงสร้างก่อนยื่นขออนุญาตหรือก่อนก่อสร้าง (ตรวจความครบและความสอดคล้อง ไม่ใช่ตรวจทานการคำนวณแทนวิศวกรผู้ออกแบบ)",
+      "sumEn": "Completeness and consistency of the structural drawing set and calculations before the permit or construction (a completeness check, not a re-check of the design engineer's calculations)",
       "nFree": 8,
       "freePages": 1,
       "nPro": 18,
@@ -1738,8 +3243,67 @@ window.SITE = {
       "img": "sheets/img/F-23.png",
       "price": 149,
       "priceU": 229,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ความครบของชุดเอกสาร",
+          "en": "Completeness of the document set",
+          "n": 6,
+          "h": 0
+        },
+        {
+          "th": "รายการคำนวณ",
+          "en": "Calculations",
+          "n": 6,
+          "h": 0
+        },
+        {
+          "th": "ความสอดคล้องกับงานอื่น",
+          "en": "Consistency with other trades",
+          "n": 4,
+          "h": 0
+        },
+        {
+          "th": "สรุป",
+          "en": "Summary",
+          "n": 2,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "สิ่งที่พบต่อแผ่นแบบ",
+          "en": "FINDINGS BY DRAWING SHEET",
+          "cols": 5
+        },
+        {
+          "th": "คำถามถึงผู้ออกแบบ",
+          "en": "QUERIES TO THE DESIGNER",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร และกฎกระทรวงที่ออกตามพระราชบัญญัตินี้",
+          "en": "Building Control Act, B.E. 2522, and its ministerial regulations",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2566",
+          "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
+          "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
+          "by": "กระทรวงมหาดไทย"
+        },
+        {
+          "code": "กฎกระทรวง พ.ศ. 2565",
+          "th": "กฎกระทรวงกำหนดสาขาวิชาชีพวิศวกรรมและวิชาชีพวิศวกรรมควบคุม",
+          "en": "Ministerial Regulation on Engineering Branches and Controlled Engineering Professions, B.E. 2565",
+          "by": "กระทรวงมหาดไทย"
+        }
+      ]
     },
     {
       "id": "F-24",
@@ -1748,6 +3312,7 @@ window.SITE = {
       "titleEn": "Signs and Sign Structures",
       "group": "งานเหล็กและเครื่องจักร",
       "sum": "ตรวจเอกสาร ฐานราก โครงเหล็ก การยึด ระบบไฟ และความปลอดภัยของป้ายก่อนใช้งาน",
+      "sumEn": "Documents, foundation, steel frame, fixing, electrical system and safety of a sign before use",
       "nFree": 8,
       "freePages": 1,
       "nPro": 18,
@@ -1760,8 +3325,61 @@ window.SITE = {
       "img": "sheets/img/F-24.png",
       "price": 129,
       "priceU": 199,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "เอกสาร",
+          "en": "Documents",
+          "n": 5,
+          "h": 0
+        },
+        {
+          "th": "ฐานรากและโครงสร้าง",
+          "en": "Foundation and structure",
+          "n": 7,
+          "h": 1
+        },
+        {
+          "th": "ไฟฟ้าและความปลอดภัย",
+          "en": "Electrical and safety",
+          "n": 6,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตรวจโครงสร้างป้ายต่อจุด",
+          "en": "SIGN STRUCTURE CHECK BY POINT",
+          "cols": 5
+        },
+        {
+          "th": "ผู้ตรวจสอบอาคารและวันที่ตรวจ",
+          "en": "BUILDING INSPECTOR AND INSPECTION DATES",
+          "cols": 5
+        }
+      ],
+      "refs": [
+        {
+          "code": "พ.ร.บ. พ.ศ. 2522",
+          "th": "พระราชบัญญัติควบคุมอาคาร (ตรวจกับเจ้าพนักงานท้องถิ่นว่าป้ายนี้ต้องขออนุญาตหรือไม่)",
+          "en": "Building Control Act, B.E. 2522 (check with the local authority whether this sign needs a permit)",
+          "by": "ราชอาณาจักรไทย"
+        },
+        {
+          "code": "มาตรฐาน วสท.",
+          "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
+          "en": "Thai Electrical Code (latest edition)",
+          "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
+        },
+        {
+          "code": "OSHA 29 CFR 1926.501",
+          "th": "การป้องกันการตกจากที่สูงตั้งแต่ 1.8 ม. ในงานก่อสร้าง (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
+          "en": "Duty to have fall protection at 6 ft (1.8 m) and above in construction (US, for comparison)",
+          "by": "OSHA"
+        }
+      ]
     },
     {
       "id": "T-01",
@@ -1770,6 +3388,7 @@ window.SITE = {
       "titleEn": "Ready-Mixed Concrete Delivery, Slump and Sampling Record",
       "group": "ทดสอบและเก็บตัวอย่าง",
       "sum": "บันทึกทุกคันรถ ตั้งแต่ใบส่งคอนกรีต ค่ายุบตัว จนเก็บก้อนตัวอย่างส่งห้องทดสอบ",
+      "sumEn": "Every truck, from the delivery ticket and slump test to the specimens sent to the laboratory",
       "nFree": 4,
       "freePages": 1,
       "nPro": 9,
@@ -1782,8 +3401,44 @@ window.SITE = {
       "img": "sheets/img/T-01.png",
       "price": 59,
       "priceU": 89,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเท",
+          "en": "Before pouring",
+          "n": 2,
+          "h": 0
+        },
+        {
+          "th": "ทุกคันรถ",
+          "en": "Every truck",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "เก็บตัวอย่าง",
+          "en": "Sampling",
+          "n": 4,
+          "h": 1
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตารางบันทึกค่าที่วัด",
+          "en": "Measurement record",
+          "cols": 6
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "T-02",
@@ -1792,6 +3447,7 @@ window.SITE = {
       "titleEn": "Concrete Compressive Strength Results",
       "group": "ทดสอบและเก็บตัวอย่าง",
       "sum": "อ่านผลจากห้องทดสอบทีละชุด เทียบกำลังอัดที่กำหนด และติดตามชุดที่ไม่ผ่านจนจบ",
+      "sumEn": "Read every set from the laboratory against the specified strength and follow each failed set to closure",
       "nFree": 4,
       "freePages": 1,
       "nPro": 7,
@@ -1804,8 +3460,44 @@ window.SITE = {
       "img": "sheets/img/T-02.png",
       "price": 59,
       "priceU": 89,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนอ่านผล",
+          "en": "Before reading results",
+          "n": 2,
+          "h": 0
+        },
+        {
+          "th": "ตรวจผล",
+          "en": "Check results",
+          "n": 3,
+          "h": 2
+        },
+        {
+          "th": "ถ้าไม่ผ่าน",
+          "en": "If a set fails",
+          "n": 2,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตารางบันทึกค่าที่วัด",
+          "en": "Measurement record",
+          "cols": 8
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "T-03",
@@ -1814,6 +3506,7 @@ window.SITE = {
       "titleEn": "Reinforcing Steel Sampling for Testing",
       "group": "ทดสอบและเก็บตัวอย่าง",
       "sum": "เก็บตัวอย่างเหล็กแต่ละล็อตต่อหน้าผู้ควบคุมงาน ส่งทดสอบ และกันล็อตที่ไม่ผ่านออกจากงาน",
+      "sumEn": "Sample each lot in front of the supervisor, send it for testing, and keep failed lots out of the work",
       "nFree": 5,
       "freePages": 1,
       "nPro": 8,
@@ -1826,8 +3519,50 @@ window.SITE = {
       "img": "sheets/img/T-03.png",
       "price": 59,
       "priceU": 89,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ก่อนเก็บตัวอย่าง",
+          "en": "Before sampling",
+          "n": 2,
+          "h": 0
+        },
+        {
+          "th": "เก็บตัวอย่าง",
+          "en": "Sampling",
+          "n": 3,
+          "h": 1
+        },
+        {
+          "th": "ผลทดสอบ",
+          "en": "Test results",
+          "n": 3,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตารางบันทึกค่าที่วัด",
+          "en": "Measurement record",
+          "cols": 7
+        }
+      ],
+      "refs": [
+        {
+          "code": "มอก. 24-2559",
+          "th": "เหล็กเส้นเสริมคอนกรีต: เหล็กข้ออ้อย",
+          "en": "Steel Bars for Reinforced Concrete: Deformed Bars",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        },
+        {
+          "code": "มอก. 20-2559",
+          "th": "เหล็กเส้นเสริมคอนกรีต: เหล็กเส้นกลม",
+          "en": "Steel Bars for Reinforced Concrete: Round Bars",
+          "by": "สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม"
+        }
+      ]
     },
     {
       "id": "T-04",
@@ -1836,6 +3571,7 @@ window.SITE = {
       "titleEn": "Sample and Test Register",
       "group": "ทดสอบและเก็บตัวอย่าง",
       "sum": "ทะเบียนเดียวของทุกตัวอย่างในโครงการ: ใครเก็บ ส่งที่ไหน ได้ผลเมื่อไร ผ่านหรือไม่",
+      "sumEn": "One register for every sample on the project: who took it, where it went, when the result came, pass or fail",
       "nFree": 4,
       "freePages": 1,
       "nPro": 7,
@@ -1848,8 +3584,44 @@ window.SITE = {
       "img": "sheets/img/T-04.png",
       "price": 59,
       "priceU": 89,
-      "sale": false,
-      "ok": false
+      "sale": true,
+      "ok": true,
+      "langs": "EN-TH",
+      "outline": [
+        {
+          "th": "ตั้งทะเบียน",
+          "en": "Set up the register",
+          "n": 2,
+          "h": 0
+        },
+        {
+          "th": "ทุกตัวอย่าง",
+          "en": "Every sample",
+          "n": 3,
+          "h": 0
+        },
+        {
+          "th": "สรุป",
+          "en": "Close-out",
+          "n": 2,
+          "h": 0
+        }
+      ],
+      "recs": [
+        {
+          "th": "ตารางบันทึกค่าที่วัด",
+          "en": "Measurement record",
+          "cols": 7
+        }
+      ],
+      "refs": [
+        {
+          "code": "มยผ. 1101-64",
+          "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก",
+          "en": "Standard for Concrete and Reinforced Concrete Works",
+          "by": "กรมโยธาธิการและผังเมือง"
+        }
+      ]
     },
     {
       "id": "X-05",
@@ -1876,7 +3648,7 @@ window.SITE = {
     },
     {
       "id": "X-06",
-      "code": "BTH-X-06-P",
+      "code": "BTH-X06-P",
       "title": "ทดสอบชำระออนไลน์ 20 บาท (สำเนา F-05 งานเทคอนกรีตและบ่ม)",
       "titleEn": "Online payment test 20 THB (copy of F-05 Concrete Pouring and Curing)",
       "group": "โครงสร้าง",

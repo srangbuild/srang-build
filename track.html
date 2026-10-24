@@ -69,7 +69,7 @@
     $("view").innerHTML = '<div class="card pad"><div class="sumrow"><b class="big">' + esc(o.id) + '</b><span class="pill ' + (paid ? "ok" : can ? "gray" : rej ? "bad" : "") + '">' + esc(o.status) + "</span><span>" + B.baht(o.amount) + "</span><span class=\"note\" style=\"margin:0\">สั่งซื้อ " + esc(B.when(o.created)) + "</span></div>" +
       "<ul style=\"margin:10px 0 0\">" + o.items.map(function (id) { return "<li>" + esc(title(id)) + "</li>"; }).join("") + "</ul>" +
       (can ? '<p class="note">คำสั่งซื้อนี้ยกเลิกแล้ว</p>' : '<ol class="tl">' + li + "</ol>") +
-      '<p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="b pri sm" href="member.html#' + (paid ? "docs" : "orders") + '">' + (paid ? "เปิดเอกสารของฉัน" : "ไปชำระหรือแนบสลิป") + '</a><button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
+      '<p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap">' + (can ? '<a class="b pri sm" href="sheets.html">เลือกซื้อใหม่</a>' : '<a class="b pri sm" href="' + (paid ? "member.html#docs" : o.status === ST.check ? "member.html#orders" : "checkout.html?done=" + encodeURIComponent(o.id)) + '">' + (paid ? "เปิดเอกสารของฉัน" : o.status === ST.check ? "ดูคำสั่งซื้อของฉัน" : "ไปชำระหรือแนบสลิป") + "</a>") + '<button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
     var re = $("re"); if (re) re.onclick = load;
   }
   function load() {

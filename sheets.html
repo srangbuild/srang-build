@@ -15,6 +15,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
+<style>
+.hero-pts { list-style:none; margin:14px 0 0; padding:0; display:grid; gap:6px; color:#D5E1EE; font-size:15.5px; }
+.hero-pts li { padding-left:26px; position:relative; } .hero-pts li::before { content:"✓"; position:absolute; left:0; color:#FF9A5C; font-weight:700; }
+.hero-cta { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 0 !important; }
+.hero-cta .b.line { background:transparent; color:#fff; border-color:rgba(255,255,255,.45); }
+.tools2 { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 10px; }
+.tools2 .srch { flex:1 1 260px; }
+.tools2 input, .tools2 select { font:inherit; font-size:16px; padding:10px 12px; border:1.5px solid var(--line); border-radius:12px; background:#fff; width:100%; color:var(--ink); }
+.tools2 input:focus, .tools2 select:focus { border-color:var(--orange); outline:none; }
+.tools2 .srt { display:flex; align-items:center; gap:8px; font-size:14.5px; color:var(--mute); }
+.tools2 .srt select { width:auto; }
+.sr { position:absolute; left:-9999px; }
+</style>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <link rel="canonical" href="https://srangbuild.github.io/srang-build/sheets.html"><meta property="og:url" content="https://srangbuild.github.io/srang-build/sheets.html"><meta name="twitter:card" content="summary_large_image"></head>
@@ -28,10 +41,24 @@
     <span class="eyebrow">ใบตรวจงานก่อสร้างและติดตั้ง</span>
     <h1>ตรวจงานทีละขั้น <em>ก่อนถูกปิดทับ</em></h1>
     <p>งานที่เทคอนกรีตทับ ฉาบปิด หรือปูทับไปแล้ว ตรวจย้อนหลังไม่ได้ ใบตรวจงานบอกว่าต้องดูอะไร ดูตอนไหน และผ่านเมื่อไร พิมพ์ไปใช้หน้างานได้เลย</p>
+    <ul class="hero-pts" id="hero-pts"></ul>
+    <p class="hero-cta"><a class="b pri" href="#list">เลือกใบตรวจงาน</a><a class="b line" href="#bundle">ชุดรวม ถูกกว่าซื้อแยก</a></p>
   </div>
 </header>
 
 <main class="wrap" id="main">
+
+  <section id="list">
+    <div class="head"><h2>ใบตรวจงานทั้งหมด</h2><p class="lead" id="list-lead"></p></div>
+    <div class="tools2"><label class="srch"><span class="sr">ค้นหาใบตรวจงาน</span><input type="search" id="q" placeholder="ค้นหา เช่น เสาเข็ม กันซึม แอร์ F-05" autocomplete="off"></label><label class="srt">เรียง<select id="sort"><option value="code">ตามรหัส</option><option value="price">ราคาน้อยไปมาก</option><option value="priceD">ราคามากไปน้อย</option><option value="items">จำนวนรายการตรวจ</option></select></label></div>
+    <div class="chips" id="chips" role="group" aria-label="กรองตามกลุ่มงาน" style="margin:0 0 14px"></div>
+    <div class="grid g3" id="cards"></div>
+  </section>
+
+  <section id="bundle">
+    <div class="head"><h2>ชุดรวม</h2><p class="lead">ซื้อเป็นชุดสำหรับงานสร้างบ้านทั้งหลัง</p></div>
+    <div class="grid" id="bundles"></div>
+  </section>
 
   <section id="compare">
     <div class="head"><h2>สองฉบับต่างกันอย่างไร</h2></div>
@@ -46,21 +73,14 @@
           <tr><td>ใบรายการข้อบกพร่องและการตรวจซ้ำ</td><td>–</td><td>✓</td></tr>
           <tr><td>บันทึกรูปถ่ายอ้างอิงรายข้อ</td><td>–</td><td>✓</td></tr>
           <tr><td>ช่องลงชื่อ</td><td>2 ฝ่าย</td><td>3 ฝ่าย</td></tr>
-          <tr><td>จำนวนหน้า A4</td><td>1</td><td id="cmp-pages">3</td></tr>
+          <tr><td>ภาษา อังกฤษ-ไทย ในใบเดียว</td><td>✓</td><td>✓</td></tr>
+          <tr><td>ชื่อผู้ซื้อและเลขสิทธิ์ท้ายทุกหน้า</td><td>–</td><td>✓</td></tr>
+          <tr><td>จำนวนหน้า A4</td><td>1–2</td><td id="cmp-pages">3</td></tr>
+          <tr><td>ราคา</td><td>ฟรี</td><td id="cmp-price">–</td></tr>
         </tbody>
       </table>
     </div>
     <p class="note">เกณฑ์ยอมรับทุกข้อเว้นช่องให้เติมค่าจากแบบและข้อกำหนดของงานคุณ ใบตรวจงานไม่ใส่ตัวเลขแทนแบบ</p>
-  </section>
-
-  <section id="list">
-    <div class="head"><h2>ใบตรวจงานทั้งหมด</h2><div class="chips" id="chips" role="group" aria-label="กรองตามกลุ่มงาน"></div><p class="lead" id="list-lead"></p></div>
-    <div class="grid g3" id="cards"></div>
-  </section>
-
-  <section id="bundle">
-    <div class="head"><h2>ชุดรวม</h2><p class="lead">ซื้อเป็นชุดสำหรับงานสร้างบ้านทั้งหลัง</p></div>
-    <div class="grid" id="bundles"></div>
   </section>
 
   <section id="member">
@@ -80,8 +100,9 @@
     <div class="head"><h2>ซื้อและรับไฟล์อย่างไร</h2></div>
     <div class="card pad">
       <ol style="margin:0;padding-left:22px">
-        <li>สมัครสมาชิก (ฟรี) แล้วเลือกใบตรวจงานที่ต้องการ และเลือกแบบการซื้อ: <b>ซื้อฉบับนี้</b> (ได้ฉบับวันที่ซื้อ เก็บได้ตลอด) หรือ <b>รับฉบับใหม่ตลอด</b> (ได้ฉบับล่าสุดทุกครั้งที่ร้านปรับปรุง)</li>
-        <li>ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงินแล้วแนบรูปสลิปในหน้าสมาชิก · ระบบส่งอีเมลทุกขั้น และมีลิงก์ติดตามสถานะ</li>
+        <li>เปิดหน้าสินค้า เลือกแบบสิทธิ์: <b>ซื้อฉบับนี้</b> (ได้ฉบับวันที่ซื้อ เก็บได้ตลอด) หรือ <b>รับฉบับใหม่ตลอด</b> (ได้ฉบับล่าสุดทุกครั้งที่ร้านปรับปรุง) แล้วกด ใส่ตะกร้า</li>
+        <li id="how-guide" hidden>ก่อนซื้อ อ่าน <a href="sheets/guide/BUILD_how-to-fill_p1.pdf" target="_blank" rel="noopener">วิธีกรอกใบตรวจงาน</a> และ <a href="sheets/guide/BUILD_how-to-fill_p2_example.pdf" target="_blank" rel="noopener">ตัวอย่างหน้าที่กรอกแล้ว</a> ได้ฟรี</li>
+        <li>เปิดตะกร้า ตรวจรายการ แล้วกด ชำระเงิน · เข้าสู่ระบบหรือสมัครสมาชิก (ฟรี) · ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงินแล้วแนบสลิป · ระบบส่งอีเมลทุกขั้น และมีลิงก์ติดตามสถานะ</li>
         <li id="how-wait">ร้านตรวจยอดเข้าบัญชี แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)</li>
         <li>ดาวน์โหลดไฟล์ PDF ได้จากหน้าสมาชิกทุกเมื่อ · ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ · เอกสารส่งมอบทางหน้าสมาชิก ไม่มีการส่งพัสดุ · ซื้อฉบับนี้แล้ว อัปเกรดเป็นรับฉบับใหม่ได้โดยจ่ายเฉพาะส่วนต่าง</li>
       </ol>
@@ -107,7 +128,15 @@
   if (B.demo) $("demo").hidden = false;
   if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
   if (B.token.get()) { $("join").textContent = "ไปหน้าสมาชิก"; }
-  var sh = B.sheets, groups = [], cur = "ทั้งหมด";
+  var sh = B.sheets, groups = [], cur = "ทั้งหมด", term = "", sortBy = "code";
+  var low = sh.filter(B.canSell).map(function (x) { return B.memberPrice(x.price); }).sort(function (a, b) { return a - b; })[0];
+  if (low) $("cmp-price").textContent = "เริ่มต้น " + B.baht(low);
+  $("hero-pts").innerHTML = ["อังกฤษ-ไทย ในใบเดียว ใช้กับทีมช่างและผู้ควบคุมงานได้", "จุดหยุดรอตรวจ (H) ตารางบันทึกค่า ใบข้อบกพร่อง ลงชื่อ 3 ฝ่าย", "ชำระแล้วดาวน์โหลดได้ทันที · ดาวน์โหลดซ้ำได้ทุกเมื่อ"].map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+  function norm(s) { return String(s || "").toLowerCase().replace(/[\s\-]/g, ""); }
+  function hit(x) { if (!term) return true; var t = norm(term); return [x.id, x.title, x.titleEn, x.group, x.sum].some(function (v) { return norm(v).indexOf(t) >= 0; }); }
+  function order(a, b) { if (sortBy === "price") return a.price - b.price || (a.id < b.id ? -1 : 1); if (sortBy === "priceD") return b.price - a.price || (a.id < b.id ? -1 : 1); if (sortBy === "items") return b.nPro - a.nPro; return 0; }
+  $("q").addEventListener("input", function () { term = this.value.trim(); draw(); });
+  $("sort").addEventListener("change", function () { sortBy = this.value; draw(); });
   sh.forEach(function (x) { if (x.group && groups.indexOf(x.group) < 0) groups.push(x.group); });
   var ready = sh.filter(function (x) { return x.ok === true; }).length;
   $("list-lead").textContent = sh.length + " งาน · พร้อมดาวน์โหลด " + ready + " งาน" + (ready < sh.length ? " · ที่เหลือกำลังตรวจรายการ" : "");
@@ -119,10 +148,11 @@
     return B.canSell(x) ? save + pr + '<button class="b pri sm" type="button" data-add="' + esc(x.id) + '">ใส่ตะกร้า</button>' : save + pr + '<span class="pill">' + (B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "กำลังตรวจรายการ") + "</span>";
   }
   function relabel() { try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} }
+  function pLink(id) { return "product.html" + (q ? q + "&" : "?") + "id=" + encodeURIComponent(id); } // หน้าสินค้ารายใบ (24 ต.ค. 2026)
   function draw() {
-    $("cards").innerHTML = sh.filter(function (x) { return cur === "ทั้งหมด" || x.group === cur; }).map(function (x) {
-      return '<article class="card sh">' + (x.ok === true ? '<div class="im"><img src="' + esc(x.img) + '" alt="ตัวอย่างหน้าแรกของ ' + esc(x.id) + '" loading="lazy" width="794" height="1123"></div>' : '<div class="im wait"><span>ตัวอย่างจะแสดงเมื่อตรวจรายการเสร็จ</span></div>') + '<div class="tx"><span class="code">' + esc(x.id) + " · " + esc(x.group) + "</span><h3>" + esc(x.title) + "</h3><p>" + esc(x.sum) + '</p><div class="two"><div class="ver"><b>ฉบับฟรี</b><small>' + esc(x.nFree) + " จุดสำคัญ · " + (+x.freePages || 1) + " หน้า</small>" + (x.ok === true ? '<a class="b line sm" href="' + esc(x.free) + '" download>ดาวน์โหลด</a>' : '<span class="pill gray">กำลังตรวจรายการ</span>') + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ " + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>" + buy(x) + "</div></div></div></article>";
-    }).join("") || '<p class="note">ยังไม่มีใบตรวจงานในกลุ่มนี้</p>';
+    $("cards").innerHTML = sh.filter(function (x) { return (cur === "ทั้งหมด" || x.group === cur) && hit(x); }).slice().sort(order).map(function (x) {
+      return '<article class="card sh">' + (x.ok === true ? '<a class="im" style="display:block" href="' + esc(pLink(x.id)) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(x.img) + '" alt="" loading="lazy" width="794" height="1123"></a>' : '<div class="im wait"><span>ตัวอย่างจะแสดงเมื่อตรวจรายการเสร็จ</span></div>') + '<div class="tx"><span class="code">' + esc(x.id) + " · " + esc(x.group) + '</span><h3><a href="' + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + "</a></h3>" + (x.titleEn ? '<p lang="en" style="color:var(--mute);font-size:14px;margin-top:-4px">' + esc(x.titleEn) + "</p>" : "") + "<p>" + esc(x.sum) + '</p><div class="two"><div class="ver"><b>ฉบับฟรี</b><small>' + esc(x.nFree) + " จุดสำคัญ · " + (+x.freePages || 1) + " หน้า</small>" + (x.ok === true ? '<a class="b line sm" href="' + esc(x.free) + '" download>ดาวน์โหลด</a>' : '<span class="pill gray">กำลังตรวจรายการ</span>') + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ " + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>" + buy(x) + '<a class="note" style="margin:0" href="' + esc(pLink(x.id)) + '">ดูรายละเอียด แบบสิทธิ์ และมาตรฐานอ้างอิง ›</a></div></div></div></article>';
+    }).join("") || '<p class="note">' + (term ? "ไม่พบใบตรวจงานที่ตรงกับ “" + esc(term) + "” ลองคำอื่น หรือเลือกกลุ่ม ทั้งหมด" : "ยังไม่มีใบตรวจงานในกลุ่มนี้") + "</p>";
     relabel();
   }
   $("chips").innerHTML = ["ทั้งหมด"].concat(groups).map(function (g) { return '<button class="chip" type="button" aria-pressed="' + (g === cur) + '">' + esc(g) + "</button>"; }).join("");
@@ -130,12 +160,13 @@
   draw();
   $("bundles").innerHTML = B.bundles.map(function (x) {
     var names = x.items.map(function (id) { var s = B.find(id); return s ? s.id : id; }).join(" · ");
-    return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">' + esc(x.id) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit">' + esc(x.title) + '</h3><p style="margin:0 0 4px;font-size:15.5px">' + esc(x.text) + '</p><p class="note" style="margin:0 0 12px">' + esc(names) + '</p><div class="sum" style="margin:0">' + buy(x) + "</div></div>";
+    return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">' + esc(x.id) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit"><a href="' + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0 0 4px;font-size:15.5px">' + esc(x.text) + '</p><p class="note" style="margin:0 0 12px">' + esc(names) + ' · <a href="' + esc(pLink(x.id)) + '">ดูรายละเอียดชุด ›</a></p><div class="sum" style="margin:0">' + buy(x) + "</div></div>";
   }).join("");
   if (!B.bundles.length) $("bundle").hidden = true;
   $("perks").innerHTML = (B.M.perks || []).map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("");
   if (B.M.on === false) $("member").hidden = true;
   var nx = S.sheetsNext || []; if (nx.length) { $("next").hidden = false; $("nextlist").innerHTML = nx.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join(""); }
+  var f02 = B.find("F-02"); if (f02 && f02.ok === true) $("how-guide").hidden = false;
   if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
 })();
 </script>
