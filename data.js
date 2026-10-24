@@ -865,7 +865,7 @@ window.SITE = {
       "แจ้งใบตรวจงานใหม่และฉบับใหม่ทางอีเมล"
     ],
     "consent": "ฉันยินยอมให้ สร้าง | BUILD TH เก็บชื่อและอีเมลของฉัน เพื่อดูแลบัญชีสมาชิก ส่งไฟล์ที่สั่งซื้อ และแจ้งใบตรวจงานใหม่ ตามนโยบายความเป็นส่วนตัว",
-    "lineChannelId": "2005670253",
+    "lineChannelId": "2012184351",
     "facebookAppId": "1813403056480097",
     "googleClientId": "514263949305-6qth9e3ro6aecdcauoul2tflnegp0aa9.apps.googleusercontent.com",
     "fbVersion": "v26.0",
