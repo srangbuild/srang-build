@@ -27,6 +27,7 @@
 .tools2 .srt { display:flex; align-items:center; gap:8px; font-size:14.5px; color:var(--mute); }
 .tools2 .srt select { width:auto; }
 .sr { position:absolute; left:-9999px; }
+@media (max-width:640px) { .hero { padding:22px 0 24px; } .hero p { font-size:16px; } .hero-pts { font-size:14px; gap:4px; } .hero-cta .b { flex:1 1 140px; min-height:44px; padding:8px 12px; font-size:15px; } }
 </style>
 <script src="data.js"></script>
 <script src="app.js"></script>
@@ -139,7 +140,8 @@
   $("sort").addEventListener("change", function () { sortBy = this.value; draw(); });
   sh.forEach(function (x) { if (x.group && groups.indexOf(x.group) < 0) groups.push(x.group); });
   var ready = sh.filter(function (x) { return x.ok === true; }).length;
-  $("list-lead").textContent = sh.length + " งาน · พร้อมดาวน์โหลด " + ready + " งาน" + (ready < sh.length ? " · ที่เหลือกำลังตรวจรายการ" : "");
+  var nSell = sh.filter(B.canSell).length;
+  $("list-lead").textContent = sh.length + " ใบ อังกฤษ-ไทย · " + (nSell === sh.length ? "เปิดขายทุกใบ" : nSell ? "เปิดขาย " + nSell + " ใบ" : "ยังไม่เปิดขาย") + " · ฉบับฟรีดาวน์โหลดได้ " + ready + " ใบ" + (ready < sh.length ? " · ที่เหลือกำลังตรวจรายการ" : "") + " · กดชื่อใบเพื่อดูรายละเอียด";
   var pg = sh.map(function (x) { return +x.pages || 0; }).filter(Boolean); if (pg.length) { var lo = Math.min.apply(0, pg), hi = Math.max.apply(0, pg); $("cmp-pages").textContent = lo === hi ? String(lo) : lo + "–" + hi; }
   // ราคาแสดงทุกใบ · ปุ่มใส่ตะกร้ามีเฉพาะรายการที่เปิดขายแล้ว (ตรวจรายการแล้ว + เปิดขาย + เปิดรับชำระ) · ชุดรวมบอกส่วนที่ถูกกว่าซื้อแยก
   function buy(x) {

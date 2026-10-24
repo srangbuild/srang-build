@@ -118,6 +118,13 @@
     var mail = (S.links && S.links.email) || "", adOn = !(S.ads && S.ads.on === false);
     var p = el("p", "bx-fl", '<a href="terms.html' + pv + '">ข้อตกลงการใช้งาน</a> · <a href="privacy.html' + pv + '">นโยบายความเป็นส่วนตัว</a>' + (S.consent && S.consent.on === false ? "" : ' · <button type="button" data-ck="1">ตั้งค่าคุกกี้</button>') + (adOn && mail ? ' · <a href="mailto:' + esc(mail) + "?subject=" + encodeURIComponent("สนใจลงโฆษณากับ สร้าง | BUILD TH") + '">ลงโฆษณา</a>' : ""));
     p.addEventListener("click", function (ev) { if (ev.target && ev.target.getAttribute && ev.target.getAttribute("data-ck")) consent(true); });
+    // แถวร้านและช่วยเหลือ (24 ต.ค. 2026): เข้าร้าน ตะกร้า บัญชี และช่องทางติดต่อ จากท้ายทุกหน้า
+    var L = S.links || {}, shop = Array.isArray(S.sheets) && S.sheets.length;
+    var help = [];
+    if (shop) help.push('<a href="sheets.html' + pv + '">ร้านใบตรวจงาน</a>', '<a href="cart.html' + pv + '">ตะกร้า</a>', '<a href="member.html' + pv + '">บัญชีของฉัน และคำสั่งซื้อ</a>');
+    if (/^https:\/\//.test(L.line || "")) help.push('<a href="' + esc(L.line) + '" target="_blank" rel="noopener">ติดต่อร้านทาง LINE' + (L.lineId ? " " + esc(L.lineId) : "") + "</a>");
+    if (mail) help.push('<a href="mailto:' + esc(mail) + '">' + esc(mail) + "</a>");
+    if (help.length) w.appendChild(el("p", "bx-fl", help.join(" · ")));
     w.appendChild(p);
   }
 

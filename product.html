@@ -190,6 +190,13 @@
   draw();
   if (B.token.get() && !bundle) B.call("me").then(function (r) { var d = (r.lib || []).filter(function (k) { return k.id === x.id; })[0]; if (d) { own = d.plan === "edition" ? "edition" : "updates"; redrawBuy(); } }).catch(function () {});
 
+  // ที่อยู่หลักของหน้านี้ (1 หน้าต่อ 1 สินค้า) และภาพตัวอย่างตอนแชร์
+  var siteUrl = String((B.S.site || {}).url || "").replace(/\/+$/, "");
+  if (/^https:\/\//.test(siteUrl) && !x.hidden) {
+    var cl = document.createElement("link"); cl.rel = "canonical"; cl.href = siteUrl + "/product.html?id=" + encodeURIComponent(x.id); document.head.appendChild(cl);
+    var og = document.querySelector('meta[property="og:title"]'); if (og) og.setAttribute("content", document.title);
+    if (!bundle && src.ok === true && src.img) { var oi = document.querySelector('meta[property="og:image"]'); if (oi) oi.setAttribute("content", siteUrl + "/" + src.img); }
+  }
   // ข้อมูลสินค้าสำหรับเครื่องมือค้นหา (เฉพาะรายการที่เปิดขาย)
   if (sell && !x.hidden) {
     var ld = { "@context": "https://schema.org", "@type": "Product", name: x.id + " " + title, sku: code, description: bundle ? x.text : src.sum, brand: { "@type": "Brand", name: "สร้าง | BUILD TH" },
