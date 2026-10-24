@@ -1873,6 +1873,29 @@ window.SITE = {
       "ok": true,
       "hidden": true,
       "of": "F-05"
+    },
+    {
+      "id": "X-06",
+      "code": "BTH-X-06-P",
+      "title": "ทดสอบชำระออนไลน์ 20 บาท (สำเนา F-05 งานเทคอนกรีตและบ่ม)",
+      "titleEn": "Online payment test 20 THB (copy of F-05 Concrete Pouring and Curing)",
+      "group": "โครงสร้าง",
+      "sum": "ตรวจวันเทคอนกรีต ตั้งแต่ใบส่งคอนกรีตคันแรก จนบ่มครบและได้ผลกำลังอัด",
+      "nFree": 9,
+      "nPro": 25,
+      "nHold": 4,
+      "pages": 6,
+      "rev": "C",
+      "revDate": "2026-10-18",
+      "edition": 2569,
+      "free": "",
+      "img": "",
+      "price": 20,
+      "priceU": 20,
+      "sale": true,
+      "ok": true,
+      "hidden": true,
+      "of": "F-05"
     }
   ]
 };
