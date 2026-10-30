@@ -4,7 +4,7 @@ window.SITE = {
     "name": "สร้าง | BUILD TH",
     "show": "เรื่องที่คนไม่เล่า",
     "tagline": "เข้าใจโลกที่มนุษย์กำลังสร้าง",
-    "about": "เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม ในคลิป 70 วินาที พร้อมเช็กลิสต์ที่หยิบไปใช้ได้จริง",
+    "about": "เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม พร้อมใบตรวจงานที่พิมพ์ไปใช้ได้จริง",
     "schedule": "ลงคลิปใหม่ทุกวันอังคาร 18:00"
   },
   "site": {
@@ -728,8 +728,8 @@ window.SITE = {
       "a": "ใช้เป็นความรู้ตั้งต้นและคำถามที่ควรถามได้ แต่ไม่แทนการตรวจหน้างานโดยวิศวกรผู้มีใบอนุญาต"
     },
     {
-      "q": "เช็กลิสต์ฟรีจริงไหม",
-      "a": "ฟรี อ่านบนหน้านี้ได้เลย ถ้าอยากได้ไฟล์พิมพ์และชุดใหม่ทุกครั้งที่ออก ให้เพิ่มเพื่อนทาง LINE"
+      "q": "ใบตรวจงานฟรีจริงไหม",
+      "a": "ฟรีจริง ดาวน์โหลดฉบับฟรีได้ทุกใบโดยไม่ต้องสมัคร ฉบับมืออาชีพมีรายการครบกว่าและมีค่าใช้จ่าย ดูความต่างได้ที่หน้าใบตรวจงาน"
     }
   ],
   "posts": {
@@ -885,6 +885,7 @@ window.SITE = {
       "promptpay",
       "card",
       "googlepay",
+      "paypal",
       "mobile_banking_kbank",
       "mobile_banking_scb",
       "mobile_banking_bbl",
@@ -894,11 +895,16 @@ window.SITE = {
       "rabbit_linepay",
       "shopeepay",
       "grabpay",
-      "alipay"
+      "alipay",
+      "wechat_pay",
+      "alipay_hk",
+      "kakaopay",
+      "touch_n_go"
     ],
-    "googlePayId": ""
+    "googlePayId": "",
+    "usdRate": 0.0296,
+    "usdDate": "2026-10-28"
   },
-  "privacyDate": "23 ต.ค. 2026",
   "sheetsNext": [
     "งานรั้วและประตูรั้ว",
     "งานถมดินและบดอัด",
@@ -907,39 +913,6 @@ window.SITE = {
     "งานถังบำบัดและระบายน้ำรอบบ้าน",
     "งานพื้นไม้และลามิเนต"
   ],
-  "services": [
-    {
-      "title": "ตรวจรับคอนโดก่อนโอน",
-      "text": "ตรวจห้องชุดทีละหมวดตามใบตรวจงาน F-18 พร้อมรายงานรูปถ่ายและรายการแก้ไข รวมการตรวจซ้ำ 1 ครั้งหลังแก้ไข · ราคาตามขนาดห้อง แจ้งเมื่อเปิดรับ",
-      "status": "ยังไม่เปิดรับ",
-      "url": ""
-    },
-    {
-      "title": "ตรวจรับบ้านและทาวน์โฮมก่อนโอน",
-      "text": "ตรวจโครงสร้างที่มองเห็น หลังคา ผนัง พื้น ประตูหน้าต่าง ไฟฟ้า และประปา พร้อมรายงานรูปถ่าย รวมการตรวจซ้ำ 1 ครั้ง · ราคาตามพื้นที่ใช้สอย แจ้งเมื่อเปิดรับ",
-      "status": "ยังไม่เปิดรับ",
-      "url": ""
-    },
-    {
-      "title": "ตรวจงานก่อสร้างรายงวด",
-      "text": "เข้าตรวจหน้างานก่อนจ่ายเงินแต่ละงวด ใช้ใบตรวจงานของช่องตามชนิดงาน ได้รายงานข้อที่ผ่านและข้อที่ต้องแก้",
-      "status": "ยังไม่เปิดรับ",
-      "url": ""
-    },
-    {
-      "title": "ปรึกษาจากรูปถ่าย: รอยร้าวและน้ำท่วมบ้าน",
-      "text": "ส่งรูปและข้อมูลไม่เกิน 10 รูป ได้คำตอบเป็นข้อเขียน: เฝ้าดู แก้เอง หรือควรให้วิศวกรเข้าตรวจ",
-      "status": "ยังไม่เปิดรับ",
-      "url": ""
-    },
-    {
-      "title": "อ่านใบเสนอราคาและ BOQ",
-      "text": "เทียบใบเสนอราคา 2 เจ้า บอกว่าแต่ละเจ้ารวมอะไร ขาดอะไร และคำถามที่ควรถามผู้รับเหมาก่อนเซ็นสัญญา",
-      "status": "ยังไม่เปิดรับ",
-      "url": ""
-    }
-  ],
-  "termsDate": "23 ต.ค. 2026",
   "consent": {
     "on": true,
     "text": "เว็บนี้เก็บข้อมูลในเบราว์เซอร์ของคุณเท่าที่จำเป็นต่อการใช้งาน เช่น การเข้าสู่ระบบสมาชิกและตะกร้า"
@@ -969,10 +942,11 @@ window.SITE = {
         },
         {
           "on": true,
-          "title": "เช็กลิสต์ฟรี 6 ชุดจากในคลิป",
-          "text": "เปิดอ่านและพิมพ์ได้เลย ไม่ต้องสมัครอะไร",
-          "page": "free.html",
-          "cta": "เปิดเช็กลิสต์"
+          "title": "ใบตรวจงานฉบับฟรี",
+          "text": "พิมพ์ไปตรวจงานเองได้ ไม่ต้องสมัคร",
+          "page": "sheets.html#compare",
+          "cta": "ดูเลย",
+          "link": ""
         },
         {
           "on": true,
@@ -1045,13 +1019,13 @@ window.SITE = {
       "cta": "เลือกซื้อ"
     },
     {
-      "title": "ชุดรวมใบตรวจงาน 9 ชุด (ไฟล์ PDF)",
-      "text": "ชุดงานโครงสร้าง · ชุดเสาเข็ม · ชุดงานสถาปัตย์ · ชุดงานระบบและติดตั้ง · ชุดงานตกแต่งและช่องเปิด · ชุดพลังงานในบ้าน · ชุดงานเหล็กและเครื่องจักร · ชุดทดสอบและเก็บตัวอย่าง · ครบชุด 29 ใบ · ทุกชุดถูกกว่าซื้อแยก",
+      "title": "แพ็กเกจและชุดรวมใบตรวจงาน (ไฟล์ PDF)",
+      "text": "เลือกตามงาน: รับโอนบ้านและคอนโด · สร้างบ้านใหม่ · ต่อเติมและรีโนเวท · ตกแต่งคอนโด · อาคาร · โรงงานและโกดัง · หรือชุดตามหมวดงาน และครบชุด 29 ใบ · ทุกชุดถูกกว่าซื้อแยก",
       "price": "ครบชุด ฿2,390",
       "status": "เปิดขายแล้ว",
       "url": "",
-      "page": "sheets.html#bundle",
-      "cta": "ดูชุดรวม"
+      "page": "sheets.html#packs",
+      "cta": "เลือกแพ็กเกจ"
     },
     {
       "title": "เทมเพลตอ่าน BOQ (ไฟล์)",
@@ -1070,157 +1044,6 @@ window.SITE = {
       "url": "",
       "page": "",
       "cta": ""
-    }
-  ],
-  "bundles": [
-    {
-      "id": "B-ST",
-      "title": "ชุดงานโครงสร้าง",
-      "text": "เสาเข็มตอก เสาเข็มเจาะ ฐานราก เหล็กเสริม ไม้แบบ เทคอนกรีต",
-      "items": [
-        "F-01A",
-        "F-01B",
-        "F-02",
-        "F-03",
-        "F-04",
-        "F-05"
-      ],
-      "price": 499,
-      "sale": true,
-      "priceU": 749
-    },
-    {
-      "id": "B-PL",
-      "title": "ชุดเสาเข็ม",
-      "text": "เสาเข็มตอก และเสาเข็มเจาะ ใช้ได้ทั้ง 2 แบบในโครงการเดียว",
-      "items": [
-        "F-01A",
-        "F-01B"
-      ],
-      "price": 169,
-      "sale": true,
-      "priceU": 259
-    },
-    {
-      "id": "B-AR",
-      "title": "ชุดงานสถาปัตย์",
-      "text": "ก่อฉาบ หลังคา กันซึม ปูกระเบื้อง",
-      "items": [
-        "F-06",
-        "F-07",
-        "F-08",
-        "F-09"
-      ],
-      "price": 339,
-      "sale": true,
-      "priceU": 509
-    },
-    {
-      "id": "B-ME",
-      "title": "ชุดงานระบบและติดตั้ง",
-      "text": "ไฟฟ้า ประปา เครื่องปรับอากาศ",
-      "items": [
-        "F-10",
-        "F-11",
-        "F-12"
-      ],
-      "price": 249,
-      "sale": true,
-      "priceU": 379
-    },
-    {
-      "id": "B-FN",
-      "title": "ชุดงานตกแต่งและช่องเปิด",
-      "text": "ฝ้าและผนังเบา ทาสี ประตู หน้าต่าง และกระจก",
-      "items": [
-        "F-13",
-        "F-14",
-        "F-15"
-      ],
-      "price": 249,
-      "sale": true,
-      "priceU": 379
-    },
-    {
-      "id": "B-EN",
-      "title": "ชุดพลังงานในบ้าน",
-      "text": "โซลาร์รูฟท็อป และเครื่องชาร์จรถยนต์ไฟฟ้า",
-      "items": [
-        "F-16",
-        "F-17"
-      ],
-      "price": 169,
-      "sale": true,
-      "priceU": 259
-    },
-    {
-      "id": "B-SM",
-      "title": "ชุดงานเหล็กและเครื่องจักร",
-      "text": "โครงสร้างเหล็กรูปพรรณ เชื่อมและสลักเกลียว ฐานเครื่องจักร นั่งร้านและค้ำยัน ตรวจรับแบบและรายการคำนวณ ป้าย",
-      "items": [
-        "F-19",
-        "F-20",
-        "F-21",
-        "F-22",
-        "F-23",
-        "F-24"
-      ],
-      "price": 669,
-      "sale": true,
-      "priceU": 1090
-    },
-    {
-      "id": "B-QT",
-      "title": "ชุดทดสอบและเก็บตัวอย่าง",
-      "text": "ใบรับคอนกรีตและเก็บก้อนตัวอย่าง · ผลกำลังอัด · ตัวอย่างเหล็กเสริม · ทะเบียนตัวอย่าง",
-      "items": [
-        "T-01",
-        "T-02",
-        "T-03",
-        "T-04"
-      ],
-      "price": 199,
-      "sale": true,
-      "priceU": 299
-    },
-    {
-      "id": "B-ALL",
-      "title": "ครบชุด ฉบับปี 2569",
-      "text": "ทุกใบตรวจงานและใบบันทึกทดสอบฉบับมืออาชีพของฉบับปี 2569 ครบ 29 ใบ (ใบตรวจงาน 25 ใบ + ใบบันทึกทดสอบ 4 ใบ) รวมใบที่ออกเพิ่มและฉบับปรับปรุงภายในปีนี้",
-      "items": [
-        "F-01A",
-        "F-01B",
-        "F-02",
-        "F-03",
-        "F-04",
-        "F-05",
-        "F-06",
-        "F-07",
-        "F-08",
-        "F-09",
-        "F-10",
-        "F-11",
-        "F-12",
-        "F-13",
-        "F-14",
-        "F-15",
-        "F-16",
-        "F-17",
-        "F-18",
-        "F-19",
-        "F-20",
-        "F-21",
-        "F-22",
-        "F-23",
-        "F-24",
-        "T-01",
-        "T-02",
-        "T-03",
-        "T-04"
-      ],
-      "price": 2390,
-      "sale": true,
-      "priceU": 3590
     }
   ],
   "sheets": [
@@ -3681,5 +3504,585 @@ window.SITE = {
       "of": "F-05"
     }
   ],
-  "market": []
+  "market": [],
+  "bundles": [
+    {
+      "id": "B-HO",
+      "title": "ชุดรับโอนบ้านและคอนโด",
+      "titleEn": "Home and Condo Handover Pack",
+      "text": "ตรวจก่อนเซ็นรับโอน ครบจุดที่มักเจอปัญหา: ภาพรวมบ้าน กันซึม ไฟฟ้า ประปา ประตูหน้าต่าง",
+      "textEn": "Check before you sign: the whole home, waterproofing, electrical, plumbing, doors and windows.",
+      "aud": "home",
+      "who": "กำลังจะรับโอนบ้านหรือคอนโด",
+      "whoEn": "You are about to take over a house or condo",
+      "items": [
+        "F-18",
+        "F-08",
+        "F-10",
+        "F-11",
+        "F-15"
+      ],
+      "price": 449,
+      "sale": true,
+      "priceU": 679
+    },
+    {
+      "id": "B-HN",
+      "title": "ชุดสร้างบ้านใหม่ ครบทุกงวด",
+      "titleEn": "New House Pack, All Stages",
+      "text": "ตั้งแต่เสาเข็มจนส่งมอบ ใช้ตรวจก่อนจ่ายเงินแต่ละงวด: โครงสร้าง ผนัง หลังคา กันซึม ไฟฟ้า ประปา แอร์ ฝ้า สี ประตูหน้าต่าง และตรวจรับ",
+      "textEn": "From piles to handover. Use it before each payment: structure, walls, roof, waterproofing, electrical, plumbing, air conditioning, ceilings, paint, doors and final acceptance.",
+      "aud": "home",
+      "who": "กำลังสร้างบ้าน ไม่ว่าจะจ้างเหมาหรือคุมเอง",
+      "whoEn": "You are building a house, by contract or on your own",
+      "items": [
+        "F-01A",
+        "F-01B",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05",
+        "F-06",
+        "F-07",
+        "F-08",
+        "F-09",
+        "F-10",
+        "F-11",
+        "F-12",
+        "F-13",
+        "F-14",
+        "F-15",
+        "F-18"
+      ],
+      "price": 1290,
+      "sale": true,
+      "priceU": 1990
+    },
+    {
+      "id": "B-RN",
+      "title": "ชุดต่อเติมและรีโนเวทบ้าน",
+      "titleEn": "Extension and Renovation Pack",
+      "text": "งานที่ทำบ่อยตอนต่อเติมบ้าน: ฐานราก เทคอนกรีต ก่อฉาบ หลังคา กันซึม กระเบื้อง ไฟฟ้า ประปา สี ประตูหน้าต่าง",
+      "textEn": "The jobs most extensions need: footings, concrete, masonry, roof, waterproofing, tiling, electrical, plumbing, paint, doors and windows.",
+      "aud": "home",
+      "who": "จะต่อเติม รีโนเวท หรือแก้บ้านเก่า",
+      "whoEn": "You plan to extend, renovate or repair an older home",
+      "items": [
+        "F-02",
+        "F-05",
+        "F-06",
+        "F-07",
+        "F-08",
+        "F-09",
+        "F-10",
+        "F-11",
+        "F-14",
+        "F-15"
+      ],
+      "price": 790,
+      "sale": true,
+      "priceU": 1190
+    },
+    {
+      "id": "B-CD",
+      "title": "ชุดตกแต่งคอนโดและห้องชุด",
+      "titleEn": "Condo Fit-out Pack",
+      "text": "งานตกแต่งภายในที่ต้องตรวจก่อนจ่ายเงินช่าง: กระเบื้อง กันซึมห้องน้ำ แอร์ ฝ้าและผนังเบา สี ประตูหน้าต่าง",
+      "textEn": "Interior work to check before you pay the contractor: tiling, bathroom waterproofing, air conditioning, ceilings and partitions, paint, doors and windows.",
+      "aud": "home",
+      "who": "จะตกแต่งหรือปรับปรุงห้องชุด",
+      "whoEn": "You are fitting out or updating a condo unit",
+      "items": [
+        "F-08",
+        "F-09",
+        "F-12",
+        "F-13",
+        "F-14",
+        "F-15"
+      ],
+      "price": 479,
+      "sale": true,
+      "priceU": 719
+    },
+    {
+      "id": "B-BL",
+      "title": "ชุดอาคาร ตึกแถว และอาคารพาณิชย์",
+      "titleEn": "Commercial Building Pack",
+      "text": "โครงสร้างครบ นั่งร้าน งานสถาปัตย์ ประปา ฝ้า สี ประตูหน้าต่าง พร้อมใบบันทึกทดสอบคอนกรีตและเหล็ก · งานไฟฟ้าอาคารใหญ่ให้ใช้ข้อกำหนดของโครงการ",
+      "textEn": "Full structure, scaffolding, architectural work, plumbing, ceilings, paint, doors and windows, with concrete and steel test records. For electrical work in large buildings, use the project specification.",
+      "aud": "building",
+      "who": "ผู้รับเหมา ผู้ควบคุมงาน และเจ้าของอาคาร",
+      "whoEn": "Contractors, supervisors and building owners",
+      "items": [
+        "F-01A",
+        "F-01B",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05",
+        "F-22",
+        "F-06",
+        "F-07",
+        "F-08",
+        "F-09",
+        "F-11",
+        "F-13",
+        "F-14",
+        "F-15",
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
+      "price": 1390,
+      "sale": true,
+      "priceU": 2090
+    },
+    {
+      "id": "B-FT",
+      "title": "ชุดโรงงานและโกดัง",
+      "titleEn": "Factory and Warehouse Pack",
+      "text": "เสาเข็ม ฐานราก คอนกรีต โครงเหล็ก งานเชื่อมและสลักเกลียว ฐานเครื่องจักร นั่งร้าน หลังคา ตรวจแบบ พร้อมใบบันทึกทดสอบ · ไม่รวมข้อกำหนดเฉพาะของโรงงานแต่ละประเภท เช่น อาหาร หรือสารเคมี",
+      "textEn": "Piles, footings, concrete, structural steel, welding and bolting, machine foundations, scaffolding, roofing and drawing review, with test records. Rules specific to a factory type, such as food or chemicals, are not included.",
+      "aud": "factory",
+      "who": "เจ้าของโรงงาน ฝ่ายอาคาร และผู้รับเหมา",
+      "whoEn": "Factory owners, facilities teams and contractors",
+      "items": [
+        "F-01A",
+        "F-01B",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05",
+        "F-19",
+        "F-20",
+        "F-21",
+        "F-22",
+        "F-23",
+        "F-07",
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
+      "price": 1190,
+      "sale": true,
+      "priceU": 1790
+    },
+    {
+      "id": "B-ST",
+      "title": "ชุดงานโครงสร้าง",
+      "text": "เสาเข็มตอก เสาเข็มเจาะ ฐานราก เหล็กเสริม ไม้แบบ เทคอนกรีต",
+      "items": [
+        "F-01A",
+        "F-01B",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05"
+      ],
+      "price": 499,
+      "sale": true,
+      "priceU": 749,
+      "aud": "job",
+      "titleEn": "Structure Pack",
+      "textEn": "Driven piles, bored piles, footings, rebar, formwork, concrete"
+    },
+    {
+      "id": "B-PL",
+      "title": "ชุดเสาเข็ม",
+      "text": "เสาเข็มตอก และเสาเข็มเจาะ ใช้ได้ทั้ง 2 แบบในโครงการเดียว",
+      "items": [
+        "F-01A",
+        "F-01B"
+      ],
+      "price": 169,
+      "sale": true,
+      "priceU": 259,
+      "aud": "job",
+      "titleEn": "Piling Pack",
+      "textEn": "Driven and bored piling"
+    },
+    {
+      "id": "B-AR",
+      "title": "ชุดงานสถาปัตย์",
+      "text": "ก่อฉาบ หลังคา กันซึม ปูกระเบื้อง",
+      "items": [
+        "F-06",
+        "F-07",
+        "F-08",
+        "F-09"
+      ],
+      "price": 339,
+      "sale": true,
+      "priceU": 509,
+      "aud": "job",
+      "titleEn": "Architectural Pack",
+      "textEn": "Masonry, plaster, roofing, waterproofing, tiling"
+    },
+    {
+      "id": "B-ME",
+      "title": "ชุดงานระบบและติดตั้ง",
+      "text": "ไฟฟ้า ประปา เครื่องปรับอากาศ",
+      "items": [
+        "F-10",
+        "F-11",
+        "F-12"
+      ],
+      "price": 249,
+      "sale": true,
+      "priceU": 379,
+      "aud": "job",
+      "titleEn": "Services and Installation Pack",
+      "textEn": "Electrical, plumbing, air conditioning"
+    },
+    {
+      "id": "B-FN",
+      "title": "ชุดงานตกแต่งและช่องเปิด",
+      "text": "ฝ้าและผนังเบา ทาสี ประตู หน้าต่าง และกระจก",
+      "items": [
+        "F-13",
+        "F-14",
+        "F-15"
+      ],
+      "price": 249,
+      "sale": true,
+      "priceU": 379,
+      "aud": "job",
+      "titleEn": "Finishes and Openings Pack",
+      "textEn": "Ceilings, partitions, paint, doors and windows"
+    },
+    {
+      "id": "B-EN",
+      "title": "ชุดพลังงานในบ้าน",
+      "text": "โซลาร์รูฟท็อป และเครื่องชาร์จรถยนต์ไฟฟ้า",
+      "items": [
+        "F-16",
+        "F-17"
+      ],
+      "price": 169,
+      "sale": true,
+      "priceU": 259,
+      "aud": "job",
+      "titleEn": "Home Energy Pack",
+      "textEn": "Solar rooftop and home EV charger"
+    },
+    {
+      "id": "B-SM",
+      "title": "ชุดงานเหล็กและเครื่องจักร",
+      "text": "โครงสร้างเหล็กรูปพรรณ เชื่อมและสลักเกลียว ฐานเครื่องจักร นั่งร้านและค้ำยัน ตรวจรับแบบและรายการคำนวณ ป้าย",
+      "items": [
+        "F-19",
+        "F-20",
+        "F-21",
+        "F-22",
+        "F-23",
+        "F-24"
+      ],
+      "price": 669,
+      "sale": true,
+      "priceU": 1090,
+      "aud": "job",
+      "titleEn": "Steel and Machinery Pack",
+      "textEn": "Structural steel, welding and bolting, machine foundations, scaffolding, drawing review, signs"
+    },
+    {
+      "id": "B-QT",
+      "title": "ชุดทดสอบและเก็บตัวอย่าง",
+      "text": "ใบรับคอนกรีตและเก็บก้อนตัวอย่าง · ผลกำลังอัด · ตัวอย่างเหล็กเสริม · ทะเบียนตัวอย่าง",
+      "items": [
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
+      "price": 199,
+      "sale": true,
+      "priceU": 299,
+      "aud": "job",
+      "titleEn": "Testing and Sampling Pack",
+      "textEn": "Concrete and rebar test records"
+    },
+    {
+      "id": "B-ALL",
+      "title": "ครบชุด ฉบับปี 2569",
+      "text": "ทุกใบตรวจงานและใบบันทึกทดสอบฉบับมืออาชีพของฉบับปี 2569 ครบ 29 ใบ (ใบตรวจงาน 25 ใบ + ใบบันทึกทดสอบ 4 ใบ) รวมใบที่ออกเพิ่มและฉบับปรับปรุงภายในปีนี้",
+      "items": [
+        "F-01A",
+        "F-01B",
+        "F-02",
+        "F-03",
+        "F-04",
+        "F-05",
+        "F-06",
+        "F-07",
+        "F-08",
+        "F-09",
+        "F-10",
+        "F-11",
+        "F-12",
+        "F-13",
+        "F-14",
+        "F-15",
+        "F-16",
+        "F-17",
+        "F-18",
+        "F-19",
+        "F-20",
+        "F-21",
+        "F-22",
+        "F-23",
+        "F-24",
+        "T-01",
+        "T-02",
+        "T-03",
+        "T-04"
+      ],
+      "price": 2390,
+      "sale": true,
+      "priceU": 3590,
+      "aud": "job",
+      "titleEn": "Complete Set, 2026 Edition",
+      "textEn": "All 29 sheets"
+    }
+  ],
+  "services": [
+    {
+      "title": "ตรวจรับคอนโดก่อนโอน",
+      "text": "ตรวจห้องชุดทีละหมวดตามใบตรวจงาน F-18 พร้อมรายงานรูปถ่ายและรายการแก้ไข รวมการตรวจซ้ำ 1 ครั้งหลังแก้ไข",
+      "status": "ยังไม่เปิดรับ",
+      "url": "",
+      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ",
+      "price": "100 บาทต่อตารางเมตร ขั้นต่ำ 2,900 บาท"
+    },
+    {
+      "title": "ตรวจรับบ้านและทาวน์โฮมก่อนโอน",
+      "text": "ตรวจโครงสร้างที่มองเห็น หลังคา ผนัง พื้น ประตูหน้าต่าง ไฟฟ้า และประปา พร้อมรายงานรูปถ่าย รวมการตรวจซ้ำ 1 ครั้ง · ราคาตามพื้นที่ใช้สอย แจ้งเมื่อเปิดรับ",
+      "status": "ยังไม่เปิดรับ",
+      "url": "",
+      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+    },
+    {
+      "title": "ตรวจงานก่อสร้างรายงวด",
+      "text": "เข้าตรวจหน้างานก่อนจ่ายเงินแต่ละงวด ใช้ใบตรวจงานของช่องตามชนิดงาน ได้รายงานข้อที่ผ่านและข้อที่ต้องแก้",
+      "status": "ยังไม่เปิดรับ",
+      "url": "",
+      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+    },
+    {
+      "title": "ปรึกษาจากรูปถ่าย: รอยร้าวและน้ำท่วมบ้าน",
+      "text": "ส่งรูปและข้อมูลไม่เกิน 10 รูป ได้คำตอบเป็นข้อเขียน: เฝ้าดู แก้เอง หรือควรให้วิศวกรเข้าตรวจ",
+      "status": "ยังไม่เปิดรับ",
+      "url": "",
+      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+    },
+    {
+      "title": "อ่านใบเสนอราคาและ BOQ",
+      "text": "เทียบใบเสนอราคา 2 เจ้า บอกว่าแต่ละเจ้ารวมอะไร ขาดอะไร และคำถามที่ควรถามผู้รับเหมาก่อนเซ็นสัญญา",
+      "status": "ยังไม่เปิดรับ",
+      "url": "",
+      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+    }
+  ],
+  "notices": [],
+  "botfaq": [
+    {
+      "id": "buy",
+      "top": true,
+      "q": "ซื้อใบตรวจงานอย่างไร",
+      "qEn": "How do I buy a check sheet",
+      "k": "ซื้อยังไง ซื้ออย่างไร ซื้อที่ไหน สั่งซื้อ ตะกร้า วิธีซื้อ ซื้อใบตรวจ",
+      "a": "เลือกใบตรวจหรือชุดที่ตรงงาน กดใส่ตะกร้า สมัครสมาชิก ชำระเงิน แล้วดาวน์โหลดได้ที่หน้าเอกสารของฉัน",
+      "aEn": "Choose a sheet or a pack, add it to the cart, sign up, pay, then download it from My documents.",
+      "href": "sheets.html#packs"
+    },
+    {
+      "id": "price",
+      "top": true,
+      "q": "ราคาเท่าไร",
+      "qEn": "How much does it cost",
+      "k": "ราคาเท่าไร ราคาใบตรวจ กี่บาท ราคาชุด ค่าใช้จ่าย แพงไหม",
+      "a": "ใบตรวจงานฉบับฟรีไม่มีค่าใช้จ่าย ฉบับมืออาชีพและชุดแพ็กเกจแสดงราคาไว้ที่หน้าร้าน ราคาที่แสดงคือราคาที่จ่ายจริง ซื้อเป็นชุดประหยัดกว่าซื้อทีละใบ",
+      "aEn": "Free sheets cost nothing. The shop page shows the price of each pro sheet and pack. A pack costs less than buying each sheet.",
+      "href": "sheets.html#packs"
+    },
+    {
+      "id": "pack",
+      "top": true,
+      "q": "เลือกชุดไหนดี",
+      "qEn": "Which pack should I choose",
+      "k": "ชุดไหน แพ็กเกจ ตรวจรับบ้าน รับโอน ตรวจบ้านเอง เลือกชุด",
+      "a": "เลือกตามงาน: รับโอนบ้านหรือคอนโด สร้างบ้านใหม่ ต่อเติมบ้าน ตกแต่งคอนโด อาคารพาณิชย์ หรือโรงงาน ทุกชุดบอกว่ามีใบอะไรบ้าง และประหยัดเท่าไร",
+      "aEn": "Choose by job: home handover, new house, extension, condo fit-out, commercial building or factory. Each pack lists its sheets and the saving.",
+      "href": "sheets.html#packs"
+    },
+    {
+      "id": "free",
+      "top": true,
+      "q": "มีของฟรีไหม",
+      "qEn": "Is there anything free",
+      "k": "ของฟรี ฟรีไหม โหลดฟรี ดาวน์โหลดฟรี ไม่เสียเงิน ไม่ต้องสมัคร แจกฟรี",
+      "a": "มี ใบตรวจงานฉบับฟรีดาวน์โหลดได้ทุกใบโดยไม่ต้องสมัคร ไฟล์รวมทุกใบในไฟล์เดียวเป็นสิทธิ์ของสมาชิก สมัครฟรี",
+      "aEn": "Yes. Every free sheet downloads without sign-up. The single file with all free sheets is for members, and sign-up is free.",
+      "href": "sheets.html#compare"
+    },
+    {
+      "id": "diff",
+      "q": "ฉบับฟรีกับฉบับมืออาชีพต่างกันอย่างไร",
+      "qEn": "What is the difference between free and pro",
+      "k": "ฟรี มืออาชีพ โปร pro ต่างกัน ความต่าง",
+      "a": "ฉบับฟรีมีจุดสำคัญที่เจ้าของบ้านควรดูเอง ฉบับมืออาชีพมีรายการตรวจครบทุกขั้น จุดหยุดรอตรวจ ตารางบันทึกค่า ใบรายการข้อบกพร่อง และช่องลงชื่อ 3 ฝ่าย ดูตารางเทียบได้ที่หน้าใบตรวจงาน",
+      "aEn": "The free sheet has the key points an owner should check. The pro sheet has all check items, hold points, measurement tables, a defect list and 3 signature fields. See the comparison table.",
+      "href": "sheets.html#compare"
+    },
+    {
+      "id": "pay",
+      "top": true,
+      "q": "จ่ายเงินช่องทางไหนได้บ้าง",
+      "qEn": "How can I pay",
+      "k": "จ่ายเงิน ชำระเงิน โอนเงิน พร้อมเพย์ บัตรเครดิต เครดิต เดบิต ทรูมันนี่ truemoney promptpay สลิป จ่ายได้",
+      "a": "หน้าชำระเงินแสดงทุกช่องทางที่เปิดอยู่ ตอนนี้โอนผ่านพร้อมเพย์แล้วแนบสลิปได้ ช่องทางบัตรและกระเป๋าเงินออนไลน์จะแสดงเมื่อร้านเปิดใช้งานจริง",
+      "aEn": "The payment page shows every open method. You can pay by PromptPay and upload the slip. Card and e-wallet options show when the shop turns them on.",
+      "href": "cart.html"
+    },
+    {
+      "id": "get",
+      "q": "จ่ายแล้วได้ไฟล์เมื่อไรและที่ไหน",
+      "qEn": "When and where do I get my file",
+      "k": "ได้ไฟล์ รับไฟล์ ส่งไฟล์ ดาวน์โหลด เมื่อไร เอกสารของฉัน อีเมล",
+      "a": "เมื่อร้านยืนยันยอดแล้ว ไฟล์เปิดให้ดาวน์โหลดที่หน้าเอกสารของฉัน และระบบส่งอีเมลแจ้งคุณ",
+      "aEn": "When the shop confirms the payment, the file opens in My documents and we send you an e-mail.",
+      "href": "member.html#docs"
+    },
+    {
+      "id": "track",
+      "q": "ติดตามคำสั่งซื้อได้ที่ไหน",
+      "qEn": "Where can I track my order",
+      "k": "ติดตาม สถานะ พัสดุ คำสั่งซื้อ เลขพัสดุ ส่งของ",
+      "a": "ดูได้ที่หน้าสมาชิก เมนูคำสั่งซื้อ หรือกดลิงก์ติดตามในอีเมลที่ระบบส่งให้ สินค้าที่ต้องจัดส่งจะมีเลขพัสดุแสดงที่นั่น",
+      "aEn": "Open Orders in your member page, or use the tracking link in our e-mail. Shipped items show the parcel number there.",
+      "href": "member.html#orders"
+    },
+    {
+      "id": "receipt",
+      "top": true,
+      "q": "ขอใบเสร็จได้ไหม",
+      "qEn": "Can I get a receipt",
+      "k": "ใบเสร็จ ใบกำกับภาษี ภาษี บริษัท นิติบุคคล receipt",
+      "a": "ระบบออกใบเสร็จรับเงินหลังร้านยืนยันยอด เปิดได้ที่เมนูคำสั่งซื้อ ถ้าต้องการชื่อบริษัท ให้กรอกข้อมูลผู้เสียภาษีในโปรไฟล์ก่อนสั่งซื้อ",
+      "aEn": "The system issues a receipt after the shop confirms the payment. Open it from Orders. For a company name, fill in the tax details in your profile before you order.",
+      "href": "member.html#orders"
+    },
+    {
+      "id": "refund",
+      "q": "ขอคืนเงินได้ไหม",
+      "qEn": "Can I get a refund",
+      "k": "คืนเงิน ยกเลิก เปลี่ยน refund ไฟล์เสีย",
+      "a": "ถ้ายังไม่ได้ดาวน์โหลดไฟล์ แจ้งได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด ถ้าดาวน์โหลดแล้วไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง",
+      "aEn": "If you did not download the file, tell us within 7 days after the shop confirms the payment. After a download there is no refund, unless the file is damaged, does not open or is not the item you ordered.",
+      "href": "terms.html"
+    },
+    {
+      "id": "update",
+      "q": "เอกสารมีฉบับใหม่ต้องซื้อใหม่ไหม",
+      "qEn": "Do I pay again for a new version",
+      "k": "อัปเดต ฉบับใหม่ แก้ไข ปรับปรุง เวอร์ชัน รุ่นใหม่",
+      "a": "เมื่อเอกสารที่คุณซื้อมีฉบับใหม่ ระบบแจ้งที่หน้าเอกสารของฉัน เงื่อนไขของแต่ละแบบแสดงอยู่ที่หน้าสินค้าก่อนสั่งซื้อ",
+      "aEn": "When a document you bought has a new version, My documents shows it. The product page states the terms of each plan before you order.",
+      "href": "member.html#docs"
+    },
+    {
+      "id": "lang",
+      "q": "มีภาษาอื่นไหม",
+      "qEn": "Do you have other languages",
+      "k": "ภาษาอื่น ภาษาอังกฤษ ภาษาจีน ภาษาญี่ปุ่น english ญี่ปุ่น เยอรมัน แปลเป็น มาตรฐานต่างประเทศ",
+      "a": "ใบตรวจฉบับมืออาชีพเป็นอังกฤษคู่ไทย ถ้าต้องการภาษาอื่น หรือเกณฑ์ตามมาตรฐานของประเทศอื่น ส่งคำขอสั่งทำได้ ร้านจะตอบใบเสนอราคาภายใน 3 วันทำการ",
+      "aEn": "Pro sheets are English with Thai. For other languages or another country's standards, send a custom request. The shop quotes within 3 working days.",
+      "href": "request.html"
+    },
+    {
+      "id": "custom",
+      "q": "สั่งทำเอกสารเฉพาะงานได้ไหม",
+      "qEn": "Can you make a document for my job",
+      "k": "สั่งทำ เฉพาะงาน method statement เอกสาร ออกแบบ แบบฟอร์ม ใบเสนอราคา",
+      "a": "ได้ ส่งรายละเอียดที่หน้าสั่งทำเอกสาร ร้านไม่รับงานที่ต้องลงนามรับรองโดยผู้มีใบอนุญาต",
+      "aEn": "Yes. Send the details on the custom request page. The shop does not accept work that needs a licensed person to sign.",
+      "href": "request.html"
+    },
+    {
+      "id": "sell",
+      "q": "ฝากขายสินค้าได้ไหม",
+      "qEn": "Can I sell my product here",
+      "k": "ฝากขาย ขายของ ลงขาย ผู้ขาย สินค้า",
+      "a": "ได้ ส่งใบสมัครที่หน้าร้านฝากขาย ร้านตรวจก่อนลงขาย และต้องยืนยันว่าคุณมีลิขสิทธิ์ในสินค้า",
+      "aEn": "Yes. Apply on the consignment page. The shop checks your item first, and you must confirm that you hold the copyright.",
+      "href": "market.html"
+    },
+    {
+      "id": "inspect",
+      "q": "มีบริการตรวจบ้านหรือคอนโดไหม",
+      "qEn": "Do you inspect houses or condos",
+      "k": "ตรวจบ้าน ตรวจคอนโด บริการ จ้างตรวจ ราคาตรวจ ตารางเมตร",
+      "a": "บริการนี้ยังไม่เปิด จะแจ้งทาง LINE เมื่อเปิด ตอนนี้ใช้ใบตรวจงานตรวจเองได้ทันที",
+      "aEn": "This service is not open yet. We will announce it on LINE. You can use our check sheets now.",
+      "href": "sheets.html#packs"
+    },
+    {
+      "id": "contract",
+      "q": "มีแบบสัญญาจ้างไหม",
+      "qEn": "Do you have contract templates",
+      "k": "สัญญา สัญญาจ้าง สัญญาเช่า ผู้รับเหมา contract ฟ้อง",
+      "a": "แบบสัญญาอยู่ระหว่างจัดทำและจะเปิดเมื่อทนายตรวจแล้ว ก่อนเซ็นสัญญาจริงควรให้ทนายความอ่านก่อน",
+      "aEn": "Contract templates are in progress. They open after a lawyer checks them. Ask a lawyer to read any contract before you sign.",
+      "href": "index.html#services"
+    },
+    {
+      "id": "licensed",
+      "q": "ใบตรวจงานใช้แทนวิศวกรได้ไหม",
+      "qEn": "Can a check sheet replace an engineer",
+      "k": "แทนวิศวกร วิศวกร รับรอง เซ็น ลงนาม ใบอนุญาต ถูกกฎหมาย",
+      "a": "ไม่ได้ ใบตรวจงานช่วยให้คุณตรวจและถามได้ตรงจุด แต่ไม่แทนการรับรองของผู้มีใบอนุญาต งานโครงสร้างควรให้ผู้มีใบอนุญาตตรวจ",
+      "aEn": "No. A check sheet helps you check and ask the right questions. It does not replace a licensed person's sign-off.",
+      "href": "k-who-signs.html"
+    },
+    {
+      "id": "clip",
+      "q": "ดูคลิปได้ที่ไหน",
+      "qEn": "Where can I watch the clips",
+      "k": "ดูคลิป youtube ยูทูบ tiktok ติ๊กต็อก ตอนใหม่ ฟังเพลง",
+      "a": "ดูได้ที่หน้าหลักและช่อง YouTube ของเรา ทุกตอนมีแหล่งอ้างอิงในคำอธิบาย",
+      "aEn": "Watch on the home page and on our YouTube channel. Each episode lists its sources.",
+      "href": "index.html#episodes"
+    },
+    {
+      "id": "member",
+      "q": "สมัครสมาชิกต้องเสียเงินไหม",
+      "qEn": "Does sign-up cost money",
+      "k": "สมัคร สมาชิก ค่าสมาชิก เสียเงิน บัญชี ลืมรหัส รหัสผ่าน เข้าสู่ระบบ",
+      "a": "สมัครฟรี ถ้าลืมรหัสผ่าน กดลืมรหัสผ่านที่หน้าเข้าสู่ระบบ แล้วใช้รหัสจากอีเมล",
+      "aEn": "Sign-up is free. If you forget your password, use Forgot password on the sign-in page and enter the code from your e-mail.",
+      "href": "member.html"
+    },
+    {
+      "id": "privacy",
+      "q": "ข้อมูลของฉันปลอดภัยไหม",
+      "qEn": "Is my data safe",
+      "k": "ข้อมูลส่วนตัว ความเป็นส่วนตัว pdpa ลบบัญชี ลบข้อมูล",
+      "a": "ร้านใช้ข้อมูลเท่าที่จำเป็นต่อการขายและส่งมอบ คุณดาวน์โหลดหรือลบข้อมูลของตัวเองได้ที่หน้าสมาชิก อ่านรายละเอียดได้ที่นโยบายความเป็นส่วนตัว",
+      "aEn": "The shop uses only the data it needs to sell and deliver. You can export or delete your data on the member page. Read the privacy policy for details.",
+      "href": "privacy.html"
+    },
+    {
+      "id": "contact",
+      "top": true,
+      "q": "ติดต่อร้านอย่างไร",
+      "qEn": "How do I contact the shop",
+      "k": "ติดต่อ ไลน์ร้าน แอดมิน คุยกับคน เบอร์โทร อีเมลร้าน line id",
+      "a": "ติดต่อทาง LINE หรืออีเมล srang.build@gmail.com สมาชิกส่งคำถามได้ที่เมนูถามร้าน ร้านตอบภายใน 2 วันทำการ",
+      "aEn": "Use LINE or e-mail srang.build@gmail.com. Members can also use Ask the shop. The shop replies within 2 working days.",
+      "href": "member.html#ask"
+    }
+  ],
+  "termsDate": "30 ต.ค. 2026",
+  "privacyDate": "30 ต.ค. 2026"
 };

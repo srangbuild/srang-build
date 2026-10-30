@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://connect.facebook.net https://cdn.omise.co https://cdnjs.cloudflare.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://cdn.omise.co; font-src 'self' https://fonts.gstatic.com https://cdn.omise.co; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://graph.facebook.com https://www.facebook.com https://connect.facebook.net https://vault.omise.co https://api.omise.co https://cdn.omise.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com https://cdn.omise.co https://*.omise.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://connect.facebook.net https://cdn.omise.co https://www.paypal.com https://*.paypalobjects.com https://cdnjs.cloudflare.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://cdn.omise.co; font-src 'self' https://fonts.gstatic.com https://cdn.omise.co; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://graph.facebook.com https://www.facebook.com https://connect.facebook.net https://vault.omise.co https://api.omise.co https://cdn.omise.co https://www.paypal.com https://*.paypal.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com https://cdn.omise.co https://*.omise.co https://www.paypal.com https://*.paypal.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สมาชิก — สร้าง | BUILD TH</title>
@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="site.css">
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="pay.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -52,7 +53,7 @@
   // อวาตาร์สัตว์ 12 ตัวของแก๊งสัตว์ (รหัสตรงกับหลังบ้าน Code.gs ตัวแปร AVATARS)
   var AV = [["otter", "นากช่าง"], ["koon", "คูน"], ["sloth", "ลอธ"], ["somo", "ส้มโอ"], ["nim", "นิ่ม"], ["jib", "จิ๊บ"], ["kaew", "แก้ว"], ["langan", "หลังอาน"], ["plai", "พลายพ่น"], ["jok", "จอก"], ["sinsae", "ซินแส"], ["hoi", "ห้อย"]];
   var PROVINCES = ["กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", "นครราชสีมา", "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", "ปราจีนบุรี", "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", "แพร่", "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร", "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", "ราชบุรี", "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ", "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี", "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", "หนองบัวลำภู", "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"];
-  var PAYM = { card: ["บัตรเครดิต / เดบิต", "Visa Mastercard JCB ของไทยและต่างประเทศ"], promptpay: ["พร้อมเพย์", "สแกนคิวอาร์ด้วยแอปธนาคาร"], truemoney_jumpapp: ["ทรูมันนี่", "จ่ายผ่านแอป TrueMoney"] };
+  var PAYM = B.pay.LABEL;
   var TABS = [["home", "ภาพรวม"], ["docs", "เอกสารของฉัน"], ["orders", "คำสั่งซื้อ"], ["shop", "ซื้อฉบับมืออาชีพ"], ["ask", "ถามร้าน"], ["profile", "โปรไฟล์"], ["security", "ความปลอดภัย"]];
 
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
@@ -282,8 +283,10 @@
   }
   function saveBytes(name, bytes) { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
   function libOf() { return me.lib || (me.owned || []).map(function (id) { var s = B.find(id) || {}; return { id: id, title: s.title || id, rev: s.revDate || "", lastAt: "", lastRev: "", newer: false }; }); }
-  function payOnline() { var p = me && me.pay; return !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || ""))) && !(p.test && !p.guard && !B.demo)); } // โหมดทดสอบ + หลังบ้านรุ่นเก่า = ไม่แสดงการชำระออนไลน์ (กันบัตรทดสอบ)
-  function payMethods() { var on = (me && me.pay && me.pay.methods) || []; var want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(PAYM); return want.filter(function (k) { return PAYM[k] && on.indexOf(k) >= 0; }); }
+  function payOnline() { return B.pay.online(me); } // ฝั่งหลังบ้านเปิดแล้ว + คีย์ถูก (pay.js)
+  var capNames = null; B.pay.capability().then(function (c) { if (c) { capNames = c.names; if (me && tab === "orders") paint(); } });
+  function payMethods(amount) { return B.pay.methods(me, capNames, amount); }
+  B.pay.onCur = function () { if (me && tab === "orders") paint(); };
   function counts() {
     var o = me.orders || [], lib = libOf();
     return { todo: o.filter(function (x) { return x.status === ST.wait || x.status === ST.reject; }).length, check: o.filter(function (x) { return x.status === ST.check; }).length,
@@ -301,10 +304,11 @@
       '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
   }
   function payChooser(o) { // ชำระออนไลน์: ระบบตรวจยอดและเปิดสิทธิ์ดาวน์โหลดเองทันที
-    var ms = payMethods(); if (!ms.length) return "";
-    return '<div class="payopts" role="group" aria-label="เลือกวิธีชำระ"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p><div class="po">' + ms.map(function (k) {
-      return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id) + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small></button>";
-    }).join("") + '</div><p class="note" style="margin:8px 0 0">ชำระผ่าน Opn Payments ผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต · เลขบัตรไม่ผ่านเว็บร้าน' + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>";
+    var ms = payMethods(o.amount); if (!ms.length) return "";
+    return '<div class="payopts" role="group" aria-label="เลือกวิธีชำระ"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>' + B.pay.curBar(me, o.amount) + B.pay.GROUPS.map(function (g) {
+      var list = ms.filter(function (k) { return PAYM[k][2] === g[0]; });
+      return list.length ? '<p class="note pmh2">' + esc(g[1]) + '</p><div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id) + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small></button>"; }).join("") + "</div>" : "";
+    }).join("") + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล' + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>";
   }
   // ตัวติดตาม 5 ขั้น: สั่งซื้อ → ชำระ → ร้านตรวจยอด → พร้อมดาวน์โหลด → ได้รับไฟล์แล้ว
   function tracker(o) {
@@ -347,7 +351,7 @@
     var owned = me.owned || [], hiddenWant = B.allSheets.filter(function (x) { return x.hidden === true && wantList.indexOf(x.id) >= 0; });
     var list = B.bundles.concat(B.sheets, hiddenWant).filter(function (x) { return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) { return owned.indexOf(id) >= 0; }) : owned.indexOf(x.id) < 0); });
     if (!list.length) return '<div class="card pad"><p style="margin:0">' + (B.sheets.some(function (x) { return owned.indexOf(x.id) < 0; }) ? "ฉบับมืออาชีพยังไม่เปิดขาย เมื่อเปิดจะแจ้งทางอีเมลที่สมัครไว้" : "คุณมีครบทุกใบแล้ว") + '</p><p class="note"><a href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div>';
-    var how = payOnline() && payMethods().length ? "ชำระด้วย" + payMethods().map(function (k) { return PAYM[k][0]; }).join(" ") + " เปิดไฟล์ได้ทันที หรือโอนเงินแล้วแนบสลิป" : "ชำระด้วยการโอนเงินหรือพร้อมเพย์แล้วแนบสลิป · ไฟล์เปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว";
+    var how = payOnline() && payMethods().length ? "ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ เปิดไฟล์ได้ทันที หรือโอนเงินแล้วแนบสลิป" : "ชำระด้วยการโอนเงินหรือพร้อมเพย์แล้วแนบสลิป · ไฟล์เปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว";
     var anyU = list.some(function (x) { return +x.priceU > 0; }), wantU = wantList.some(function (k) { return B.isUpd(k); });
     var plans = anyU ? '<fieldset class="plan" role="radiogroup" aria-label="แบบสิทธิ์"><legend>เลือกแบบสิทธิ์ <small>ใช้กับทุกรายการในคำสั่งซื้อนี้</small></legend>' +
       '<label><input type="radio" name="plan" value="ed"' + (wantU ? "" : " checked") + '><span><b>ซื้อฉบับนี้ เก็บได้ตลอด</b><small>ได้ไฟล์ฉบับวันที่ซื้อ เปิด ดาวน์โหลด และพิมพ์ได้ตลอด · ถ้าภายหลังมีฉบับใหม่ อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง</small></span></label>' +
@@ -372,12 +376,16 @@
     if (!m.email) todo.push(["profile", "ใส่อีเมลในเมนู โปรไฟล์ ก่อนสั่งซื้อ เพื่อรับไฟล์และการแจ้งเตือน", "bad"]);
     (me.orders || []).filter(function (o) { return o.status === ST.wait || o.status === ST.reject; }).forEach(function (o) { todo.push(["orders", (o.status === ST.reject ? "แนบสลิปใหม่ของ " : "ชำระคำสั่งซื้อ ") + o.id + " ยอด " + B.baht(o.amount), o.status === ST.reject ? "bad" : ""]); });
     if (c.newer) todo.push(["docs", "มีฉบับใหม่ของเอกสารที่คุณซื้อ " + c.newer + " ใบ ดาวน์โหลดได้ฟรี", ""]);
+    // การแจ้งเตือน (30 ต.ค. 2026): คำตอบจากร้านที่ยังไม่ได้เปิดอ่าน · สินค้าที่ส่งแล้ว
+    var seenAsk = ""; try { seenAsk = localStorage.getItem("build_ask_seen") || ""; } catch (e) {}
+    (me.asks || []).filter(function (a) { return a.answer && String(a.answeredAt || "") > seenAsk; }).forEach(function (a) { todo.push(["ask", "ร้านตอบคำถาม " + a.id + " แล้ว กดเพื่ออ่าน", ""]); });
+    (me.orders || []).filter(function (o) { var at = o.ship && Date.parse(String(o.ship.at || "").replace(" ", "T")); return o.ship && o.ship.no && (!at || Date.now() - at < 1209600000); }).slice(0, 3).forEach(function (o) { todo.push(["orders", "คำสั่งซื้อ " + o.id + " จัดส่งแล้ว เลขพัสดุ " + o.ship.no, ""]); });
     if (full() && (!m.phone || !m.avatar)) todo.push(["profile", "เพิ่มรูปโปรไฟล์และเบอร์โทร (ไม่บังคับ) ให้บัญชีดูครบ", "soft"]);
     if (!PLIST.some(function (p) { return m.linked && m.linked[p]; }) && anySoc()) todo.push(["security", "เชื่อมบัญชี Google LINE Facebook หรือ TikTok เพื่อเข้าสู่ระบบได้ในคลิกเดียว", "soft"]);
     var tile = function (t, n, label, sub) { return '<a class="tile" href="#' + t + '"><b>' + n + "</b><span>" + label + "</span>" + (sub ? "<small>" + sub + "</small>" : "") + "</a>"; };
     return '<div class="tiles">' + tile("orders", c.todo, "คำสั่งซื้อรอชำระ", c.check ? "รอร้านตรวจ " + c.check : "") + tile("docs", c.docs, "เอกสารของฉัน", c.newer ? "ฉบับใหม่ " + c.newer : "") + tile("ask", c.asksOpen, "คำถามรอตอบ", "") + "</div>" +
       (todo.length ? '<section class="sec"><h2>สิ่งที่ควรทำต่อ</h2><div class="card todo">' + todo.map(function (x) { return '<a href="#' + x[0] + '" class="' + x[2] + '">' + esc(x[1]) + "<i>›</i></a>"; }).join("") + "</div></section>" : '<section class="sec"><div class="card pad"><p style="margin:0">ทุกอย่างเรียบร้อย ไม่มีงานค้าง</p></div></section>') +
-      '<section class="sec"><h2>สิทธิ์สมาชิก</h2><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="free.html' + q + '">เช็กลิสต์ฟรีพิมพ์ได้</a><a class="b line sm" href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div></section>';
+      '<section class="sec"><h2>สิทธิ์สมาชิก</h2><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a><a class="b line sm" href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div></section>';
   }
   function paneDocs() {
     var lib = libOf();
@@ -391,14 +399,16 @@
       return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + '<small>' + (planTx ? planTx + (ed && !d.lastAt ? "" : " · ") : "") + (ed ? "" : "ฉบับวันที่ " + esc(dmy(d.rev) || "-")) + (d.lastAt ? (ed ? "" : " · ") + "ดาวน์โหลดล่าสุด " + esc(B.when(d.lastAt)) + (d.lastRev ? " (ฉบับ " + esc(dmy(d.lastRev)) + ")" : "") : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">' + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b ' + ((d.newer && !ed) || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + "</span></div>";
     }).join("");
     return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + (lib.length ? '<div class="docs">' + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>') + "</section>" +
-      '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) และเช็กลิสต์ เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="free.html' + q + '">เช็กลิสต์ฟรีพิมพ์ได้</a></p></div></section>';
+      '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
   }
   function paneOrders() {
     var list = me.orders || [];
     return '<section class="sec"><h2>คำสั่งซื้อของฉัน</h2><div style="display:grid;gap:12px">' + (list.map(orderCard).join("") || '<div class="card pad"><p style="margin:0">ยังไม่มีคำสั่งซื้อ</p><p class="note"><a href="#shop">ซื้อฉบับมืออาชีพ</a></p></div>') + "</div></section>";
   }
   function paneShop() { var n = B.cart ? B.cart.get().length : 0; return '<section class="sec"><h2>ซื้อฉบับมืออาชีพ</h2><div class="card pad" style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span style="flex:1;min-width:200px">เลือกดูรายละเอียดทีละใบ เลือกแบบสิทธิ์ แล้วชำระในหน้าชำระเงิน</span><a class="b line sm" href="sheets.html' + q + '">ดูร้านใบตรวจงาน</a>' + (n ? '<a class="b pri sm" href="checkout.html' + q + '">ชำระเงิน (' + n + " รายการในตะกร้า)</a>" : "") + "</div>" + shopBox() + "</section>"; }
-  function paneAsk() { return '<section class="sec" id="askbox"><h2>ถามร้าน</h2>' + askBox() + "</section>"; }
+  function paneAsk() { try { var la = (me.asks || []).map(function (a) { return String(a.answeredAt || ""); }).sort().pop(); if (la) localStorage.setItem("build_ask_seen", la); } catch (e) {} return '<section class="sec" id="askbox"><h2>ถามร้าน</h2>' + askBox() + "</section>"; }
+  // ลิงก์ Google Maps จากพิกัดหรือลิงก์ที่บันทึกไว้ · ไม่มีหมุด = เปิดแผนที่เปล่าให้ค้นหาแล้วคัดลอกลิงก์
+  function mapLink(v) { var s = String(v || "").trim(); if (/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(s)) return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s); if (/^https:\/\//.test(s)) return s; return "https://www.google.com/maps"; }
   function provOptions(sel) { return '<option value="">เลือกจังหวัด</option>' + PROVINCES.map(function (p) { return "<option" + (p === sel ? " selected" : "") + ">" + esc(p) + "</option>"; }).join(""); }
   function paneProfile() {
     var m = me.member, a = m.addr || {}, t = m.tax || {}, pr = m.prefs || { newEdition: true, news: false }, cur = String(m.avatar || "");
@@ -408,16 +418,17 @@
     return '<section class="sec"><h2>รูปโปรไฟล์</h2><form class="f card pad" id="f-avatar" novalidate><div class="avnow">' + avatarHtml(avDraft ? { avatar: "photo", avatarSrc: avDraft, name: m.name } : m, "xl") + '<div><p style="margin:0">เลือกตัวละครจากแก๊งสัตว์ หรืออัปโหลดรูปของคุณ (ระบบตัดเป็นสี่เหลี่ยมจัตุรัสให้เอง)</p><label class="b line sm upl">อัปโหลดรูป<input type="file" name="photo" accept="image/jpeg,image/png" hidden></label>' + (cur ? ' <button type="button" class="linkbtn" data-avdel="1">ลบรูปโปรไฟล์</button>' : "") + '</div></div><div class="avgrid">' + avGrid + '</div><button class="b pri" type="submit">บันทึกรูปโปรไฟล์</button></form></section>' +
       '<section class="sec"><h2>ข้อมูลพื้นฐาน</h2><form class="f card pad" id="f-basic" novalidate><div class="g2"><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" value="' + esc(m.name) + '" required></label>' +
       (m.email ? '<label>อีเมล<input type="email" value="' + esc(m.email) + '" readonly aria-readonly="true"></label>' : '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือน (ต้องใส่ก่อนสั่งซื้อ)<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>') +
-      '<label>เบอร์โทรศัพท์ (ไม่บังคับ)<input type="tel" name="phone" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="08x-xxx-xxxx" data-phone="1" value="' + esc(fmtPhone(m.phone)) + '"></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off" value="' + esc(m.line) + '"></label></div>' + (m.email ? '<p class="note" style="margin:0">เปลี่ยนอีเมลของบัญชี: ถามร้านในเมนู ถามร้าน (เพื่อความปลอดภัย ร้านยืนยันตัวตนก่อนเปลี่ยน)</p>' : "") + '<button class="b pri" type="submit">บันทึกข้อมูลพื้นฐาน</button></form></section>' +
-      '<section class="sec"><h2>ที่อยู่จัดส่ง <small class="opt">ไม่บังคับ · ใช้กับสินค้าที่ต้องส่งของในอนาคต</small></h2><form class="f card pad" id="f-addr" novalidate><div class="g2"><label>ประเทศ<select name="country" data-country="1"><option' + (thai ? " selected" : "") + '>ไทย</option><option value="ต่างประเทศ"' + (!thai ? " selected" : "") + '>ต่างประเทศ</option></select></label><span></span>' +
+      '<label>เบอร์โทรศัพท์ (ไม่บังคับ)<input type="tel" name="phone" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="08x-xxx-xxxx" data-phone="1" value="' + esc(fmtPhone(m.phone)) + '"></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off" value="' + esc(m.line) + '"></label><label>อาชีพ (ไม่บังคับ)<input type="text" name="occ" maxlength="60" list="occs" autocomplete="organization-title" value="' + esc(m.occ || "") + '"><datalist id="occs"><option value="เจ้าของบ้าน"><option value="ผู้รับเหมา"><option value="ช่างและหัวหน้าช่าง"><option value="ผู้ควบคุมงาน"><option value="วิศวกร"><option value="สถาปนิก"><option value="ผู้จัดการโครงการ"><option value="เจ้าของโรงงานหรือฝ่ายอาคาร"><option value="นิสิตนักศึกษา"></datalist></label><label>บริษัทหรือหน่วยงาน (ไม่บังคับ)<input type="text" name="org" maxlength="100" autocomplete="organization" value="' + esc(m.org || "") + '"></label></div><p class="note" style="margin:0">อาชีพและหน่วยงานช่วยให้ร้านทำเอกสารที่ตรงกับงานของคุณมากขึ้น ไม่กรอกก็ใช้งานได้ครบ</p>' + (m.email ? '<p class="note" style="margin:0">เปลี่ยนอีเมลของบัญชี: ถามร้านในเมนู ถามร้าน (เพื่อความปลอดภัย ร้านยืนยันตัวตนก่อนเปลี่ยน)</p>' : "") + '<button class="b pri" type="submit">บันทึกข้อมูลพื้นฐาน</button></form></section>' +
+      '<section class="sec"><h2>ที่อยู่จัดส่ง <small class="opt">ไม่บังคับ · ใช้กับสินค้าที่ต้องส่งของในอนาคต</small></h2><form class="f card pad" id="f-addr" novalidate><div class="g2"><label>ประเทศ<select name="country" data-country="1"><option' + (thai ? " selected" : "") + '>ไทย</option><option value="ต่างประเทศ"' + (!thai ? " selected" : "") + '>ต่างประเทศ</option></select></label>' + (thai ? "<span></span>" : '<label>ชื่อประเทศ (Country)<input type="text" name="ctry" maxlength="40" autocomplete="shipping country-name" list="ctrys" value="' + esc(a.country && a.country !== "ต่างประเทศ" ? a.country : "") + '"><datalist id="ctrys"><option value="Singapore"><option value="Malaysia"><option value="Vietnam"><option value="Laos"><option value="Cambodia"><option value="Myanmar"><option value="Indonesia"><option value="Philippines"><option value="China"><option value="Japan"><option value="South Korea"><option value="Hong Kong"><option value="Taiwan"><option value="India"><option value="United Arab Emirates"><option value="United Kingdom"><option value="United States"><option value="Australia"><option value="Germany"></datalist></label>') +
       '<label>ชื่อผู้รับ<input type="text" name="name" maxlength="80" autocomplete="shipping name" value="' + esc(a.name || "") + '"></label><label>เบอร์โทรผู้รับ<input type="tel" name="phone" maxlength="16" inputmode="tel" autocomplete="shipping tel" data-phone="1" value="' + esc(fmtPhone(a.phone)) + '"></label></div>' +
-      '<label>บ้านเลขที่ อาคาร หมู่บ้าน ซอย ถนน<input type="text" name="line1" maxlength="200" autocomplete="shipping address-line1" value="' + esc(a.line1 || "") + '"></label><div class="g2">' +
-      '<label>ตำบล / แขวง<input type="text" name="sub" maxlength="60" autocomplete="shipping address-level3" value="' + esc(a.sub || "") + '"></label><label>อำเภอ / เขต<input type="text" name="dist" maxlength="60" autocomplete="shipping address-level2" value="' + esc(a.dist || "") + '"></label>' +
-      '<label>จังหวัด' + (thai ? '<select name="prov" autocomplete="shipping address-level1">' + provOptions(a.prov) + "</select>" : '<input type="text" name="prov" maxlength="60" autocomplete="shipping address-level1" value="' + esc(a.prov || "") + '">') + '</label><label>รหัสไปรษณีย์<input type="text" name="zip" maxlength="10" inputmode="numeric" autocomplete="shipping postal-code" value="' + esc(a.zip || "") + '"></label></div>' +
+      '<label>' + (thai ? "บ้านเลขที่ อาคาร หมู่บ้าน ซอย ถนน" : "ที่อยู่ (Street address)") + '<input type="text" name="line1" maxlength="200" autocomplete="shipping address-line1" value="' + esc(a.line1 || "") + '"></label><div class="g2">' +
+      '<label>' + (thai ? "ตำบล / แขวง" : "ย่าน (District, ไม่บังคับ)") + '<input type="text" name="sub" maxlength="60" autocomplete="shipping address-level3" value="' + esc(a.sub || "") + '"></label><label>' + (thai ? "อำเภอ / เขต" : "เมือง (City)") + '<input type="text" name="dist" maxlength="60" autocomplete="shipping address-level2" value="' + esc(a.dist || "") + '"></label>' +
+      '<label>' + (thai ? "จังหวัด" : "รัฐหรือจังหวัด (State / Province)") + (thai ? '<select name="prov" autocomplete="shipping address-level1">' + provOptions(a.prov) + "</select>" : '<input type="text" name="prov" maxlength="60" autocomplete="shipping address-level1" value="' + esc(a.prov || "") + '">') + '</label><label>รหัสไปรษณีย์<input type="text" name="zip" maxlength="10" inputmode="' + (thai ? "numeric" : "text") + '" autocomplete="shipping postal-code" value="' + esc(a.zip || "") + '"></label></div>' +
+      '<label>หมุดบน Google Maps (ไม่บังคับ · ช่วยให้ขนส่งหาง่าย)<input type="text" name="map" maxlength="300" inputmode="url" placeholder="วางลิงก์จาก Google Maps หรือกดปุ่มใช้ตำแหน่งปัจจุบัน" value="' + esc(a.map || "") + '"></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-geo="1">ใช้ตำแหน่งปัจจุบันของเครื่องนี้</button> · <a href="' + esc(mapLink(a.map)) + '" target="_blank" rel="noopener" id="maplink">เปิด Google Maps</a></p>' +
       '<label>หมายเหตุถึงผู้ส่ง (ไม่บังคับ)<input type="text" name="note" maxlength="150" value="' + esc(a.note || "") + '"></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fill="addr">ใช้ชื่อและเบอร์จากข้อมูลพื้นฐาน</button></p><div class="sum" style="margin:0"><button class="b pri" type="submit">บันทึกที่อยู่</button>' + (m.addr ? '<button class="b line sm" type="button" data-clear="addr">ลบที่อยู่</button>' : "") + "</div></form></section>" +
       '<section class="sec"><h2>ข้อมูลออกใบเสร็จ <small class="opt">ไม่บังคับ · แสดงในใบเสร็จรับเงินของคำสั่งซื้อที่ชำระหลังจากบันทึก</small></h2><form class="f card pad" id="f-tax" novalidate><div class="chips" role="radiogroup"><label class="ck"><input type="radio" name="type" value="person"' + (t.type !== "company" ? " checked" : "") + '><span>บุคคลธรรมดา</span></label><label class="ck"><input type="radio" name="type" value="company"' + (t.type === "company" ? " checked" : "") + '><span>นิติบุคคล (บริษัท ห้าง หน่วยงาน)</span></label></div><div class="g2">' +
       '<label>ชื่อ' + (t.type === "company" ? "บริษัทหรือหน่วยงาน" : "ผู้ซื้อ") + '<input type="text" name="name" maxlength="120" autocomplete="organization" value="' + esc(t.name || "") + '"></label><label>เลขประจำตัวผู้เสียภาษี 13 หลัก' + (t.type === "company" ? "" : " (ไม่บังคับ)") + '<input type="text" name="taxid" maxlength="17" inputmode="numeric" data-taxid="1" value="' + esc(fmtTax(t.id)) + '"><small class="hint" id="taxhint"></small></label>' +
-      (t.type === "company" ? '<label>สาขา<input type="text" name="branch" maxlength="40" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" value="' + esc(t.branch || "") + '"></label><span></span>' : "") + '</div><label>ที่อยู่สำหรับออกเอกสาร<textarea name="addr" rows="3" maxlength="300">' + esc(t.addr || "") + '</textarea></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fill="tax">ใช้ที่อยู่จัดส่ง</button> · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารที่ออกจึงเป็นหลักฐานการชำระเงิน ไม่ใช่ใบกำกับภาษี</p><div class="sum" style="margin:0"><button class="b pri" type="submit">บันทึกข้อมูลออกใบเสร็จ</button>' + (m.tax ? '<button class="b line sm" type="button" data-clear="tax">ลบข้อมูลนี้</button>' : "") + "</div></form></section>" +
+      (t.type === "company" ? '<label>สาขา<input type="text" name="branch" maxlength="40" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" value="' + esc(t.branch || "") + '"></label><span></span>' : "") + '</div><label>ที่อยู่สำหรับออกเอกสาร<textarea name="addr" rows="3" maxlength="300">' + esc(t.addr || "") + '</textarea></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fill="tax">ใช้ที่อยู่จัดส่ง</button> · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารที่ออกจึงเป็นใบเสร็จรับเงิน ไม่ใช่ใบกำกับภาษี</p><div class="sum" style="margin:0"><button class="b pri" type="submit">บันทึกข้อมูลออกใบเสร็จ</button>' + (m.tax ? '<button class="b line sm" type="button" data-clear="tax">ลบข้อมูลนี้</button>' : "") + "</div></form></section>" +
       '<section class="sec"><h2>การแจ้งเตือนทางอีเมล</h2><form class="f card pad" id="f-prefs" novalidate><label class="ck"><input type="checkbox" name="newEdition"' + (pr.newEdition !== false ? " checked" : "") + '><span>แจ้งเมื่อเอกสารที่ฉันซื้อมีฉบับใหม่ (แนะนำ)</span></label><label class="ck"><input type="checkbox" name="news"' + (pr.news ? " checked" : "") + '><span>ข่าวคลิปใหม่ เอกสารใหม่ และโปรโมชัน (ไม่เกินเดือนละ 2 ฉบับ)</span></label><p class="note" style="margin:0">อีเมลเรื่องคำสั่งซื้อและความปลอดภัยของบัญชีส่งเสมอ</p><button class="b line" type="submit">บันทึกการแจ้งเตือน</button></form></section>';
   }
   function paneSecurity() {
@@ -477,58 +488,10 @@
     });
   }
 
-  // ---------- ชำระออนไลน์ (Opn Payments) ----------
-  var omiseReady = null;
-  function omiseLoad() {
-    if (omiseReady) return omiseReady;
-    omiseReady = new Promise(function (res, rej) {
-      if (window.OmiseCard) return res(window.OmiseCard);
-      var s = document.createElement("script"); s.src = "https://cdn.omise.co/omise.js"; s.async = true;
-      s.onload = function () { if (window.OmiseCard) res(window.OmiseCard); else { omiseReady = null; rej(new Error("โหลดระบบชำระเงินไม่สำเร็จ ลองใหม่อีกครั้ง")); } };
-      s.onerror = function () { omiseReady = null; rej(new Error("โหลดระบบชำระเงินไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่")); };
-      document.head.appendChild(s);
-    });
-    return omiseReady;
-  }
-  function payOpen(oid, method) {
+  // ---------- ชำระออนไลน์ (pay.js) ----------
+  function payOpen(oid, method) { // ทุกช่องทางใช้ pay.js ชุดเดียวกับหน้าชำระเงิน (30 ต.ค. 2026)
     var o = (me.orders || []).filter(function (x) { return x.id === oid; })[0]; if (!o || busy) return;
-    if (B.demo) { // โหมดทดลอง: ตัวจำลองของ Opn ตอบแทน (บัตร = ผ่านทันที · พร้อมเพย์ = คิวอาร์ทดลอง · ทรูมันนี่ = ไปหน้ายืนยันแล้วกลับมา)
-      var n = method === "card" ? "tokn_test_emuok" : method === "promptpay" ? "src_test_emupromptpay" : "src_test_emutruemoney";
-      return payStartFlow(oid, n + B.rand(4));
-    }
-    lock(true);
-    omiseLoad().then(function (OC) {
-      lock(false);
-      OC.configure({ publicKey: P.opnKey, currency: "THB", frameLabel: "สร้าง | BUILD TH", frameDescription: "คำสั่งซื้อ " + oid, submitLabel: "ชำระเงิน", buttonLabel: "ชำระเงิน", locale: "th", image: new URL("img/logo.png", location.href).href });
-      OC.open({ amount: Math.round(o.amount * 100), currency: "THB", defaultPaymentMethod: method === "card" ? "credit_card" : method, otherPaymentMethods: "",
-        onCreateTokenSuccess: function (nonce) { payStartFlow(oid, nonce); }, onFormClosed: function () {} });
-    }).catch(function (e) { lock(false); say(e.message, true); });
-  }
-  function payStartFlow(oid, nonce) {
-    return run(B.call("payStart", { order: oid, nonce: nonce }).then(function (r) {
-      if (r.status === "successful") return refresh(true).then(function () { go("docs"); say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว ระบบส่งหลักฐานไปที่อีเมล"); });
-      if (r.authorizeUri) { try { sessionStorage.setItem("build_pay_wait", oid); } catch (e) {} location.href = r.authorizeUri; return; }
-      if (r.qr || r.method === "promptpay") return qrModal(oid, r);
-      say(r.message || "ชำระไม่สำเร็จ ลองใหม่อีกครั้ง", true);
-    }));
-  }
-  function stopWatch() { if (payWatch) { clearInterval(payWatch.t); payWatch = null; } var m = $("paymodal"); if (m) m.remove(); document.body.style.overflow = ""; }
-  function qrModal(oid, r) {
-    stopWatch();
-    var o = (me.orders || []).filter(function (x) { return x.id === oid; })[0] || { amount: 0 };
-    var d = document.createElement("div"); d.id = "paymodal"; d.className = "modal"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "สแกนคิวอาร์พร้อมเพย์");
-    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">สแกนจ่ายด้วยพร้อมเพย์</h2><p class="note" style="margin:0">คำสั่งซื้อ ' + esc(oid) + ' · ยอด <b>' + B.baht(o.amount) + "</b></p>" + (r.qr ? '<img class="qrbig" src="' + esc(r.qr) + '" alt="คิวอาร์พร้อมเพย์ของคำสั่งซื้อนี้">' : '<p class="msg bad">โหลดรูปคิวอาร์ไม่ได้ กดปิดแล้วลองใหม่</p>') +
-      '<ol class="steps"><li>เปิดแอปธนาคารของคุณ เลือกสแกนจ่าย</li><li>สแกนคิวอาร์ ยอดขึ้นให้เอง ไม่ต้องพิมพ์</li><li>จ่ายแล้วรอหน้านี้สักครู่ ระบบตรวจและเปิดไฟล์ให้เอง</li></ol><p class="note" id="qrleft" style="margin:0"></p>' +
-      (r.qr ? '<p style="margin:6px 0 0"><a href="' + esc(r.qr) + '" download="PromptPay_' + esc(oid) + '.svg">บันทึกรูปคิวอาร์</a> (ใช้สแกนจากรูปในเครื่องได้)</p>' : "") +
-      '<div class="sum" style="margin:12px 0 0"><button class="b pri" type="button" data-paycheck="' + esc(oid) + '">ฉันจ่ายแล้ว ตรวจผล</button><button class="b line sm" type="button" data-payclose="1">ปิด</button></div>' + (B.demo ? '<p style="margin:10px 0 0"><button type="button" class="linkbtn" data-emupaid="' + esc(oid) + '">โหมดทดลอง: จำลองว่าสแกนจ่ายแล้ว</button></p>' : "") + "</div>";
-    document.body.appendChild(d); document.body.style.overflow = "hidden";
-    var exp = r.expiresAt ? new Date(r.expiresAt).getTime() : Date.now() + 864e5, until = Math.min(exp, Date.now() + 20 * 60000), left = $("qrleft");
-    payWatch = { oid: oid, t: setInterval(function () {
-      var now = Date.now(); if (left) left.textContent = "คิวอาร์ใช้ได้ถึง " + B.when(new Date(exp).toISOString()) + " · ระบบตรวจผลทุก 5 วินาที";
-      if (now > until) { stopWatch(); say("ยังไม่พบการชำระ ถ้าจ่ายแล้ว ระบบจะตรวจและแจ้งทางอีเมลภายใน 10 นาที", true); return; }
-      B.call("payCheck", { order: oid }).then(function (c) { if (c.status === "successful") { stopWatch(); refresh(true).then(function () { go("docs"); say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว"); }); } else if (c.message) { stopWatch(); say(c.message, true); } }).catch(function () {});
-    }, 5000) };
-    var btn = d.querySelector("[data-paycheck]"); if (btn) btn.focus();
+    B.pay.start(o, method, { back: "", lock: lock, msg: function (t, bad) { say(t, bad); }, paid: function () { return refresh(true).then(function () { go("docs"); say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว ระบบส่งหลักฐานไปที่อีเมล"); }); } });
   }
   function payReturn() { // กลับจากหน้ายืนยันของธนาคาร ทรูมันนี่ หรือ 3-D Secure
     var sp; try { sp = new URLSearchParams(location.search); } catch (e) { return null; }
@@ -546,15 +509,8 @@
   }
 
   // ---------- เหตุการณ์ ----------
-  document.addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-paycheck],[data-payclose],[data-emupaid]"); if (!t) return;
-    if (t.dataset.payclose) { stopWatch(); say("ปิดหน้าคิวอาร์แล้ว · ถ้าจ่ายแล้ว ระบบตรวจและแจ้งทางอีเมลภายใน 10 นาที"); return; }
-    if (t.dataset.emupaid) { var ch = Object.keys(window.EMU.state.charges).filter(function (k) { var c = window.EMU.state.charges[k]; return c.metadata && c.metadata.order === t.dataset.emupaid && c.status === "pending"; }).pop(); if (ch) window.EMU.payDone(ch); return; }
-    if (t.dataset.paycheck) { B.call("payCheck", { order: t.dataset.paycheck }).then(function (c) { if (c.status === "successful") { stopWatch(); refresh(true).then(function () { go("docs"); say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว"); }); } else { var l = $("qrleft"); if (l) l.textContent = c.message || "ยังไม่พบการชำระ ลองอีกครั้งใน 10–20 วินาที"; } }).catch(function (e) { say(e.message, true); }); }
-  });
-  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && $("paymodal")) { stopWatch(); } });
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear]"); if (!t) return;
+    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear]"); if (!t) return;
     if (t.dataset.eye) { ev.preventDefault(); var pi = t.parentNode.querySelector("input"); var show = pi.type === "password"; pi.type = show ? "text" : "password"; t.textContent = show ? "ซ่อน" : "แสดง"; t.setAttribute("aria-label", show ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"); return; }
     if (t.dataset.vr === "again") { run(B.call("registerResend", { email: regWait.email }).then(function () { verifyView(); }), "ส่งรหัสใหม่แล้ว"); return; }
     if (t.dataset.vr === "edit") { mode = "reg"; regWait = null; say(""); authView(); return; }
@@ -571,6 +527,12 @@
     if (t.dataset.outall) { if (!confirm("ออกจากระบบทุกเครื่อง? เครื่องนี้จะยังเข้าสู่ระบบอยู่")) return; run(B.call("logoutAll").then(function (r) { B.token.set(r.token); }), "ออกจากระบบเครื่องอื่นทั้งหมดแล้ว"); return; }
     if (t.dataset.export) { run(B.call("exportMe").then(function (r) { var s = JSON.stringify(r.file, null, 2), b64 = btoa(unescape(encodeURIComponent(s))); B.saveFile("BUILD_TH_ข้อมูลของฉัน_" + new Date().toISOString().slice(0, 10) + ".json", b64, "application/json"); }), "เริ่มดาวน์โหลดข้อมูลของคุณแล้ว"); return; }
     if (t.dataset.avdel) { if (!confirm("ลบรูปโปรไฟล์?")) return; avDraft = null; run(B.call("profile", { avatar: "" }).then(function (r) { me.member = r.member; paint(); }), "ลบรูปโปรไฟล์แล้ว"); return; }
+    if (t.dataset.geo) {
+      if (!navigator.geolocation) { say("เครื่องนี้ไม่รองรับการหาตำแหน่ง วางลิงก์จาก Google Maps แทนได้", true); return; }
+      say("กำลังหาตำแหน่ง… ถ้าเบราว์เซอร์ถาม ให้กดอนุญาต");
+      navigator.geolocation.getCurrentPosition(function (p) { var fm = $("f-addr"); if (!fm) return; fm.elements.map.value = p.coords.latitude.toFixed(6) + "," + p.coords.longitude.toFixed(6); var ml = $("maplink"); if (ml) ml.href = mapLink(fm.elements.map.value); say("ใส่พิกัดแล้ว ตรวจในแผนที่ แล้วกด บันทึกที่อยู่"); }, function () { say("หาตำแหน่งไม่สำเร็จ วางลิงก์จาก Google Maps แทนได้", true); }, { enableHighAccuracy: true, timeout: 12000 });
+      return;
+    }
     if (t.dataset.fill === "addr") { var fa = $("f-addr"); if (fa) { fa.elements.name.value = me.member.name || ""; fa.elements.phone.value = fmtPhone(me.member.phone || ""); } return; }
     if (t.dataset.fill === "tax") { var ft = $("f-tax"), ad = me.member.addr; if (ft && ad) ft.elements.addr.value = [ad.line1, ad.sub, ad.dist, ad.prov, ad.zip].filter(String).join(" "); else say("ยังไม่มีที่อยู่จัดส่ง", true); return; }
     if (t.dataset.clear) { if (!confirm(t.dataset.clear === "addr" ? "ลบที่อยู่จัดส่ง?" : "ลบข้อมูลออกใบเสร็จ?")) return; var body = {}; body[t.dataset.clear] = null; run(B.call("profile", body).then(function (r) { me.member = mergeMember(r.member); paint(); }), "ลบข้อมูลแล้ว"); return; }
@@ -589,7 +551,7 @@
     if (e.name === "it" || e.name === "plan") total();
     if (e.form && e.form.id === "f-avatar" && e.name === "photo" && e.files && e.files[0]) { cropAvatar(e.files[0]).then(function (d) { avDraft = d; [].forEach.call(e.form.querySelectorAll("input[name=av]"), function (r) { r.checked = false; }); var holder = e.form.querySelector(".avnow"); if (holder) holder.firstElementChild.outerHTML = avatarHtml({ avatar: "photo", avatarSrc: d, name: me.member.name }, "xl"); say("ตรวจรูปตัวอย่าง แล้วกด บันทึกรูปโปรไฟล์"); }).catch(function (er) { say(er.message, true); }); }
     if (e.form && e.form.id === "f-avatar" && e.name === "av") { avDraft = null; var holder2 = e.form.querySelector(".avnow"); if (holder2) holder2.firstElementChild.outerHTML = avatarHtml({ avatar: e.value, name: me.member.name }, "xl"); }
-    if (e.dataset && e.dataset.country) { var f = e.form, data = {}; ["name", "phone", "line1", "sub", "dist", "prov", "zip", "note"].forEach(function (k) { data[k] = f.elements[k] ? f.elements[k].value : ""; }); data.country = e.value; var keep = me.member.addr; me.member.addr = data; paint(); me.member.addr = keep; }
+    if (e.dataset && e.dataset.country) { var f = e.form, data = {}; ["name", "phone", "line1", "sub", "dist", "prov", "zip", "note", "map"].forEach(function (k) { data[k] = f.elements[k] ? f.elements[k].value : ""; }); data.country = e.value; var keep = me.member.addr; me.member.addr = data; paint(); me.member.addr = keep; }
     if (e.form && e.form.id === "f-tax" && e.name === "type") { var ft = e.form, keepT = me.member.tax; me.member.tax = { type: e.value, name: ft.elements.name.value, id: ft.elements.taxid.value, branch: ft.elements.branch ? ft.elements.branch.value : "", addr: ft.elements.addr.value }; paint(); me.member.tax = keepT; }
   });
   $("view").addEventListener("input", function (ev) {
@@ -633,9 +595,9 @@
       if (pick) { run(B.call("profile", { avatar: pick.value }).then(saved("บันทึกรูปโปรไฟล์แล้ว"))); return; }
       say("เลือกตัวละครหรืออัปโหลดรูปก่อน", true); return;
     }
-    if (f.id === "f-basic") { if (!v("name").trim()) { say("กรอกชื่อที่ใช้เรียก", true); return; } var bb = { name: v("name"), line: v("line"), email: v("email") }; if (f.elements.phone) bb.phone = v("phone"); run(B.call("profile", bb).then(saved("บันทึกข้อมูลพื้นฐานแล้ว"))); return; }
+    if (f.id === "f-basic") { if (!v("name").trim()) { say("กรอกชื่อที่ใช้เรียก", true); return; } var bb = { name: v("name"), line: v("line"), email: v("email") }; if (f.elements.phone) bb.phone = v("phone"); if (f.elements.occ) { bb.occ = v("occ"); bb.org = v("org"); } run(B.call("profile", bb).then(saved("บันทึกข้อมูลพื้นฐานแล้ว"))); return; }
     if (f.id === "f-addr") {
-      var ad = { country: v("country"), name: v("name"), phone: v("phone"), line1: v("line1"), sub: v("sub"), dist: v("dist"), prov: v("prov"), zip: v("zip"), note: v("note") };
+      var ad = { country: v("country") === "ไทย" ? "ไทย" : (v("ctry").trim() || "ต่างประเทศ"), name: v("name"), phone: v("phone"), line1: v("line1"), sub: v("sub"), dist: v("dist"), prov: v("prov"), zip: v("zip"), note: v("note"), map: v("map").trim() };
       if (!ad.name.trim() || !ad.line1.trim()) { say("กรอกชื่อผู้รับและบ้านเลขที่ ถนน", true); return; }
       if (ad.country === "ไทย" && (!ad.sub.trim() || !ad.dist.trim() || !ad.prov || !/^\d{5}$/.test(ad.zip))) { say("กรอกตำบลหรือแขวง อำเภอหรือเขต จังหวัด และรหัสไปรษณีย์ 5 หลัก", true); return; }
       run(B.call("profile", { addr: ad }).then(saved("บันทึกที่อยู่จัดส่งแล้ว"))); return;

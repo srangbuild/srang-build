@@ -6,11 +6,11 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สร้าง | BUILD TH — เข้าใจโลกที่มนุษย์กำลังสร้าง</title>
-<meta name="description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม ในคลิป 70 วินาที พร้อมเช็กลิสต์ฟรีที่หยิบไปใช้ได้จริง">
+<meta name="description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม พร้อมใบตรวจงานฟรีและความรู้ก่อสร้างภาษาคน">
 <meta name="theme-color" content="#0F2A44">
 <meta property="og:type" content="website">
 <meta property="og:title" content="สร้าง | BUILD TH — เรื่องที่คนไม่เล่า">
-<meta property="og:description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม ในคลิป 70 วินาที พร้อมเช็กลิสต์ฟรี">
+<meta property="og:description" content="เล่าเรื่องบ้าน เมือง และสิ่งที่อยู่ใต้ถนน ด้วยหลักวิศวกรรม พร้อมใบตรวจงานฟรีและความรู้ก่อสร้างภาษาคน">
 <meta property="og:image" content="https://srangbuild.github.io/srang-build/img/og.jpg">
 <link rel="icon" href="img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,6 +101,9 @@
   .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .kw { font-size:14px; color:var(--mute); }
   .kw b { color:var(--navy); background:#EEF2F6; padding:1px 8px; border-radius:7px; }
+  .freegrid { display:grid; gap:12px; } @media (min-width:760px) { .freegrid { grid-template-columns:repeat(3,1fr); } }
+  .freeitem { display:flex; flex-direction:column; gap:6px; padding:18px; color:inherit; text-decoration:none; } .freeitem:hover { border-color:var(--orange); }
+  .freeitem b { color:var(--navy); font-size:18.5px; } .freeitem span { color:#3B4654; font-size:15.5px; } .freeitem i { margin-top:auto; font-style:normal; font-weight:700; color:var(--orange-d); }
   .leadbox { margin-top:14px; padding:18px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; background:var(--navy); color:#fff; border:0; }
   .leadbox p { margin:0; max-width:32em; }
   .leadbox small { color:#B9CADB; display:block; font-size:14px; }
@@ -177,9 +180,13 @@
   </section>
 
   <section id="free">
-    <div class="head"><h2>ของแจกฟรี</h2><p class="lead">เช็กลิสต์จากในคลิป อ่านตรงนี้ได้เลย ไม่ต้องสมัครอะไร</p></div>
-    <div class="free" id="freebies"></div>
-    <div class="card leadbox" id="leadbox"></div>
+    <div class="head"><h2>ใช้ฟรี ไม่ต้องสมัคร</h2><p class="lead">เริ่มจากเรื่องที่ตรงกับงานของคุณ</p></div>
+    <div class="freegrid">
+      <a class="card freeitem" href="sheets.html#compare"><b>ใบตรวจงานฉบับฟรี</b><span>พิมพ์ไปตรวจงานเองได้ ทุกงานตั้งแต่เสาเข็มถึงรับมอบบ้าน</span><i>ดูใบตรวจงาน ›</i></a>
+      <a class="card freeitem" href="knowledge.html"><b>ความรู้ภาษาคน</b><span>ต่อเติมต้องขออนุญาตไหม เปิดร้านหรือโรงงานต้องทำอะไร พร้อมแหล่งอ้างอิง</span><i>เลือกเรื่องที่อยากรู้ ›</i></a>
+      <a class="card freeitem" href="member.html#ask" data-bot-open="1"><b>ถามผู้ช่วย</b><span>พิมพ์คำถามแล้วได้คำตอบทันที ถ้าตอบไม่ได้ ส่งต่อให้ร้านตอบ</span><i>ถามได้เลย ›</i></a>
+    </div>
+    <div hidden><div id="freebies"></div><div id="leadbox"></div></div>
   </section>
 
   <section id="sheets" hidden>
@@ -261,7 +268,7 @@
   // ปุ่มหลัก
   var firstCh = PLAT.filter(function (p) { return ok(L[p[0]]); })[0];
   var cta = "";
-  if (ok(L.line)) cta += '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">รับเช็กลิสต์ฟรีทาง LINE</a>"; else cta += '<a class="b pri" href="#free">อ่านเช็กลิสต์ฟรี</a>';
+  cta += '<a class="b pri" href="sheets.html' + pv + '#compare">โหลดใบตรวจงานฟรี</a>'; /* มติสภา 30 ต.ค. 2026: ชูใบตรวจงาน เลิกแจกเช็กลิสต์จากคลิปบนหน้าเว็บ */
   if (firstCh) cta += '<a class="b sec" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ดูคลิปบน " + firstCh[1] + "</a>"; else cta += '<a class="b sec" href="#episodes">ดูตอนทั้งหมด</a>';
   var anySale = (S.pay || {}).on === true && (S.sheets || []).some(function (x) { return x.hidden !== true && x.ok === true && x.sale === true; });
   if (anySale) cta += '<a class="b sec" href="sheets.html' + (/[?&]preview=1/.test(location.search) ? "?preview=1" : "") + '">ร้านใบตรวจงาน</a>'; // เปิดขายแล้ว: ปุ่มเข้าร้านบนหน้าแรก
@@ -272,7 +279,7 @@
   var outEps = eps.filter(function (e) { return hasLink(e) || (e.date && !future(e.date)); });
   var nextEps = eps.filter(function (e) { return outEps.indexOf(e) < 0 && e.date; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }).slice(0, 2);
   var shown = outEps.concat(nextEps);
-  $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>อังคาร 18:00</b>ตอนใหม่ทุกสัปดาห์</li><li><b>" + frees.length + "</b>เช็กลิสต์ฟรี</li>";
+  $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>อังคาร 18:00</b>ตอนใหม่ทุกสัปดาห์</li><li><b>" + ((S.sheets || []).filter(function (x) { return x.free && x.hidden !== true; }).length || 29) + "</b>ใบตรวจงานฟรี</li>";
   var st = shown.concat(eps).filter(function (e) { return e.cover; }); var pick = [st[3] || st[0], st[0], st[7] || st[1]].filter(Boolean);
   $("stack").innerHTML = pick.map(function (e) { return '<img src="' + esc(e.cover) + '" alt="" loading="lazy">'; }).join("");
 
@@ -326,7 +333,8 @@
 
   // บริการ ร้าน เพลง คำถาม
   // รายการที่มีหน้าในเว็บนี้เอง (ช่อง page เช่น sheets.html) ได้ปุ่มไปหน้านั้น · รายการที่ยังไม่เปิดได้ปุ่มแจ้งเตือนทาง LINE
-  function item(x) { var open = ok(x.url), pg = /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "") ? x.page : ""; return '<div class="card it"><h3>' + esc(x.title) + ' <span class="pill' + (open ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : (x.status || "เร็ว ๆ นี้")) + "</span></h3><p>" + esc(x.text) + "</p>" + (open ? '<a class="b line sm" href="' + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (pg ? '<a class="b line sm" href="' + esc(pg) + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="' + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>"; }
+  // บริการหรือของที่ยังไม่เปิด: ผู้ใช้เห็นชื่อ + เร็ว ๆ นี้ + ปุ่มรับแจ้งเตือน · รายละเอียดและราคาอยู่ในหลังบ้าน (คำสั่งผู้ใช้ 30 ต.ค. 2026)
+  function item(x) { var open = ok(x.url), pg = /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "") ? x.page : "", live = open || !!pg; return '<div class="card it' + (live ? "" : " soon") + '"><h3>' + esc(x.title) + ' <span class="pill' + (live ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : pg ? (x.price || "เปิดขายแล้ว") : "เร็ว ๆ นี้") + "</span></h3>" + (live ? "<p>" + esc(x.text) + "</p>" : "") + (open ? '<a class="b line sm" href="' + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (pg ? '<a class="b line sm" href="' + esc(pg) + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="' + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>"; }
   $("services").innerHTML = (S.services || []).map(item).join("");
   $("shopitems").innerHTML = (S.shop || []).map(item).join("");
   $("musiclinks").innerHTML = (S.music || []).map(function (m) { var on = ok(m.url); return '<a class="card ch' + (on ? "" : " off") + '" href="' + (on ? esc(m.url) : "#") + '"' + (on ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>♪</i><span><strong>" + esc(m.title) + "</strong><small>" + esc(m.text) + '</small></span><span class="arr">' + (on ? "→" : "") + "</span></a>"; }).join("");
@@ -335,7 +343,7 @@
 
   // แถบปุ่มล่างจอ (มือถือ)
   var dock = $("dock");
-  dock.innerHTML = ok(L.line) ? '<a class="b pri" href="' + esc(L.line) + '"' + ext + ">รับเช็กลิสต์ฟรีทาง LINE</a>" : (firstCh ? '<a class="b pri" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ติดตามบน " + firstCh[1] + "</a>" : "");
+  dock.innerHTML = true ? '<a class="b pri" href="sheets.html' + pv + '#compare">โหลดใบตรวจงานฟรี</a>' : (firstCh ?'<a class="b pri" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ติดตามบน " + firstCh[1] + "</a>" : "");
   if (dock.innerHTML) window.addEventListener("scroll", function () { dock.classList.toggle("show", window.scrollY > 520); }, { passive: true });
 
   // ข้อมูลให้เครื่องมือค้นหา + สถิติ (ทำงานเมื่อใส่รหัส GA4 ใน data.js เท่านั้น)

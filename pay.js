@@ -7,12 +7,14 @@
   "use strict";
   var B = window.BUILD; if (!B) return;
   var esc = B.esc, P = B.P;
-  // ช่องทางของ Opn ที่ฟอร์มสำเร็จรูปรองรับในไทย (docs.omise.co/omise-js อ่าน 25 ต.ค. 2026) · [ชื่อ, คำอธิบาย, กลุ่ม]
+  // ช่องทางชำระเงิน (ตรวจกับบัญชี Opn จริงผ่าน Capability API และสร้าง source ทดสอบทุกชนิด 30 ต.ค. 2026) · [ชื่อ, คำอธิบาย, กลุ่ม]
+  // จ่ายที่เคาน์เตอร์ Lotus's: Opn ปิดแล้ว ("type is no longer available") จึงไม่มีในรายการ
   var LABEL = {
     promptpay: ["พร้อมเพย์", "สแกนคิวอาร์ด้วยแอปธนาคารใดก็ได้ ยอดขึ้นเอง ระบบตรวจยอดอัตโนมัติ", "th"],
-    card: ["บัตรเครดิต / เดบิต", "Visa Mastercard JCB ออกในไทยหรือต่างประเทศ · ตัดเป็นบาท ธนาคารผู้ออกบัตรแปลงสกุลเงินให้", "intl"],
+    card: ["บัตรเครดิต / เดบิต", "Visa Mastercard JCB UnionPay American Express ออกในไทยหรือต่างประเทศ · ตัดเป็นบาท ธนาคารผู้ออกบัตรแปลงสกุลเงินให้", "intl"],
     googlepay: ["Google Pay", "จ่ายด้วยบัตรที่บันทึกไว้ใน Google (Android และ Chrome)", "intl"],
-    alipay: ["Alipay", "สำหรับลูกค้าที่ใช้ Alipay (จีน)", "intl"],
+    paypal: ["PayPal", "บัญชี PayPal หรือบัตรผ่าน PayPal จากทั่วโลก · ตัดเป็นบาท PayPal แปลงสกุลเงินให้", "intl"],
+    installment: ["ผ่อนชำระผ่านบัตรเครดิต", "ยอดตั้งแต่ 2,000 บาท · เลือกธนาคารและจำนวนเดือนในหน้าถัดไป", "intl"],
     mobile_banking_kbank: ["K PLUS", "กสิกรไทย · เปิดแอปจ่ายทันที", "bank"],
     mobile_banking_scb: ["SCB EASY", "ไทยพาณิชย์ · เปิดแอปจ่ายทันที", "bank"],
     mobile_banking_bbl: ["Bualuang mBanking", "กรุงเทพ · เปิดแอปจ่ายทันที", "bank"],
@@ -21,9 +23,49 @@
     truemoney_jumpapp: ["ทรูมันนี่", "จ่ายผ่านแอป TrueMoney", "wallet"],
     rabbit_linepay: ["Rabbit LINE Pay", "จ่ายผ่าน LINE", "wallet"],
     shopeepay: ["ShopeePay", "จ่ายผ่านแอป Shopee", "wallet"],
-    grabpay: ["GrabPay", "จ่ายผ่านแอป Grab", "wallet"]
+    grabpay: ["GrabPay", "จ่ายผ่านแอป Grab", "wallet"],
+    alipay: ["Alipay", "สำหรับลูกค้าที่ใช้ Alipay (จีน)", "foreign"],
+    wechat_pay: ["WeChat Pay", "สำหรับลูกค้าที่ใช้ WeChat (จีน)", "foreign"],
+    alipay_hk: ["AlipayHK", "สำหรับลูกค้าในฮ่องกง", "foreign"],
+    kakaopay: ["KakaoPay", "สำหรับลูกค้าในเกาหลีใต้", "foreign"],
+    touch_n_go: ["Touch 'n Go eWallet", "สำหรับลูกค้าในมาเลเซีย", "foreign"]
   };
-  var GROUPS = [["th", "แนะนำ · ตรวจยอดอัตโนมัติ"], ["intl", "บัตรและช่องทางสากล (ลูกค้าต่างประเทศใช้ได้)"], ["bank", "แอปธนาคารในไทย"], ["wallet", "กระเป๋าเงินออนไลน์"]];
+  var GROUPS = [["th", "แนะนำ · ตรวจยอดอัตโนมัติ"], ["intl", "บัตรและช่องทางสากล (ลูกค้าต่างประเทศใช้ได้)"], ["bank", "แอปธนาคารในไทย"], ["wallet", "กระเป๋าเงินออนไลน์"], ["foreign", "กระเป๋าเงินของลูกค้าต่างประเทศ"]];
+  // ฟอร์มสำเร็จรูปของ Opn ไม่รองรับช่องทางนี้ในไทย จึงสร้าง source ด้วย Omise.createSource (docs.omise.co/omise-js)
+  var DIRECT = { wechat_pay: 1, alipay_hk: 1, kakaopay: 1, touch_n_go: 1 };
+  // ช่องทางที่ต้องเปิดแอปในเครื่องเดียวกัน: บนคอมพิวเตอร์บอกให้เปิดหน้านี้บนมือถือ
+  var APP_ONLY = ["mobile_banking_kbank", "mobile_banking_scb", "mobile_banking_bbl", "mobile_banking_bay", "mobile_banking_ktb", "truemoney_jumpapp", "wechat_pay", "alipay_hk", "kakaopay", "touch_n_go"];
+  var isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "") || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform || ""));
+  if (!isPhone) APP_ONLY.forEach(function (k) { if (LABEL[k]) LABEL[k][1] += " · ต้องจ่ายจากมือถือ"; });
+  var MIN_FOR = { installment: 2000 }, ppId = "", ppReady = null, ppCur = "", capCur = null;
+  // หลายสกุลเงิน: บัตร (Opn Multi-currency) และ PayPal จ่ายเป็นสกุลเงินของลูกค้าได้ · ช่องทางอื่นจ่ายเป็นบาท · ร้านได้รับเป็นบาทเสมอ · ราคาจริงมาจากหลังบ้านเท่านั้น
+  var CUR = { THB: ["฿", "บาท"], USD: ["US$", "ดอลลาร์สหรัฐ"], EUR: ["€", "ยูโร"], GBP: ["£", "ปอนด์สเตอร์ลิง"], JPY: ["¥", "เยน"], SGD: ["S$", "ดอลลาร์สิงคโปร์"], AUD: ["A$", "ดอลลาร์ออสเตรเลีย"], HKD: ["HK$", "ดอลลาร์ฮ่องกง"], CNY: ["CN¥", "หยวน"], CHF: ["CHF ", "ฟรังก์สวิส"], DKK: ["DKK ", "โครนเดนมาร์ก"], NOK: ["NOK ", "โครนนอร์เวย์"], SEK: ["SEK ", "โครนาสวีเดน"] };
+  var curNow = (function () { try { var c = sessionStorage.getItem("build_pay_cur"); if (CUR[c]) return c; } catch (e) {} return localStorageLang() === "en" ? "USD" : "THB"; })();
+  function localStorageLang() { try { return localStorage.getItem("build_lang") || ""; } catch (e) { return ""; } }
+  function curs(me) { // สกุลเงินที่ใช้ได้จริงตอนนี้: บาท + สกุลบัตรของบัญชี Opn + สกุลของ PayPal
+    var p = me && me.pay, want = Array.isArray(P.currencies) && P.currencies.length ? P.currencies : Object.keys(CUR);
+    return want.filter(function (c) { return CUR[c] && (c === "THB" || (p && p.opn && (B.demo || (capCur && capCur.indexOf(c) >= 0))) || (p && p.paypal && c !== "CNY")); });
+  }
+  function cur(me) { var l = me ? curs(me) : null; return !l || l.indexOf(curNow) >= 0 ? curNow : "THB"; }
+  function money(c, v) { return CUR[c][0] + v; }
+  // กล่องเลือกสกุลเงิน: หน้าเว็บวางไว้เหนือรายการช่องทาง · ตั้ง B.pay.onCur เพื่อวาดรายการใหม่เมื่อเปลี่ยนสกุล
+  function curBar(me, thb) {
+    var l = curs(me); if (l.length < 2) return "";
+    setTimeout(curPreview, 0);
+    return '<div class="curbar" style="margin:0 0 10px"><label style="display:block;font-weight:600">จ่ายเป็นสกุลเงิน <select data-paycur="1" data-thb="' + (+thb || 0) + '" style="font:inherit;min-height:44px;margin-left:6px;padding:0 8px;border-radius:10px">' + l.map(function (c) { return '<option value="' + c + '"' + (c === cur(me) ? " selected" : "") + ">" + c + " · " + esc(CUR[c][1]) + "</option>"; }).join("") + '</select></label><p class="note" id="curq" aria-live="polite" style="margin:6px 0 0"></p></div>';
+  }
+  function curPreview() {
+    var s = document.querySelector("[data-paycur]"), n = document.getElementById("curq"); if (!s || !n) return;
+    var c = s.value, thb = +s.getAttribute("data-thb"); curNow = c;
+    if (c === "THB") { n.textContent = ""; return; }
+    n.textContent = "กำลังคิดราคา…";
+    B.call("payQuote", { cur: c, thb: thb }).then(function (r) { if (s.value !== c) return; n.textContent = "ยอดโดยประมาณ " + money(c, r.quote.value) + " จาก " + B.baht(thb) + " · ระบบแสดงยอดสุดท้ายก่อนยืนยัน · ธนาคารของคุณอาจมีค่าธรรมเนียมเพิ่ม · ร้านคำนวณจากอัตราแลกเปลี่ยนของผู้ให้บริการ"; }).catch(function (e) { n.textContent = e.message; });
+  }
+  document.addEventListener("change", function (ev) {
+    var s = ev.target && ev.target.closest && ev.target.closest("[data-paycur]"); if (!s) return;
+    curNow = s.value; try { sessionStorage.setItem("build_pay_cur", curNow); } catch (e) {}
+    if (B.pay.onCur) B.pay.onCur(); curPreview();
+  });
   var watch = null, omiseReady = null, cap = null;
 
   // ช่องทางที่บัญชี Opn ของร้านเปิดอยู่จริง (Capability API ใช้คีย์สาธารณะ · docs.omise.co/capability-api) · อ่านครั้งเดียวต่อการเปิดหน้า
@@ -34,15 +76,17 @@
         if (!c || !Array.isArray(c.payment_methods)) return null;
         var names = c.payment_methods.map(function (m) { return m.name; });
         if (names.indexOf("truemoney") >= 0) names.push("truemoney_jumpapp");
+        if (names.some(function (n) { return /^installment_/.test(n); })) names.push("installment");
         if ((c.tokenization_methods || []).indexOf("googlepay") >= 0) names.push("googlepay");
+        var cardM = c.payment_methods.filter(function (m) { return m.name === "card"; })[0]; capCur = cardM && Array.isArray(cardM.currencies) ? cardM.currencies : null;
         return { names: names, min: c.limits && c.limits.charge_amount ? +c.limits.charge_amount.min / 100 : 0 };
       });
     return cap;
   }
   // วิธีชำระออนไลน์ที่ใช้ได้: หลังบ้านรองรับ (me.pay.methods) + ร้านเลือกไว้ใน data.js (pay.methods) + บัญชี Opn เปิดแล้ว (ถ้าอ่านได้)
-  function methods(me, capNames) { var on = (me && me.pay && me.pay.methods) || [], want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(LABEL); return want.filter(function (k) { return LABEL[k] && on.indexOf(k) >= 0 && (!capNames || capNames.indexOf(k) >= 0); }); }
+  function methods(me, capNames, amount) { var on = (me && me.pay && me.pay.methods) || [], want = Array.isArray(P.methods) && P.methods.length ? P.methods : Object.keys(LABEL); if (me && me.pay && me.pay.paypal) ppId = me.pay.paypal; return want.filter(function (k) { return LABEL[k] && on.indexOf(k) >= 0 && (k === "paypal" || !capNames || capNames.indexOf(k) >= 0) && (amount === undefined || amount >= (MIN_FOR[k] || 0)) && (curNow === "THB" || (k === "card" && (B.demo || (capCur && capCur.indexOf(curNow) >= 0))) || (k === "paypal" && curNow !== "CNY")); }); }
   // โหมดทดสอบของ Opn กับหลังบ้านรุ่นเก่า (ไม่มี guard): ซ่อนการชำระออนไลน์ เพราะบัตรทดสอบที่เผยแพร่ "ชำระผ่าน" ได้โดยไม่มีเงินจริง
-  function online(me) { var p = me && me.pay; return !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || ""))) && !(p.test && !p.guard && !B.demo) && methods(me).length); }
+  function online(me) { var p = me && me.pay, opnOk = !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || ""))) && !(p.test && !p.guard && !B.demo)); return !!(p && (opnOk || p.paypal) && methods(me).length); }
   function minOnline(me) { return +(me && me.minOnline) || 20; }
 
   function omiseLoad() {
@@ -61,25 +105,71 @@
   function start(order, method, ui) {
     ui = ui || {};
     var done = function (r) { return finish(order, r, ui); };
-    if (B.demo) { // โหมดทดลอง: ตัวจำลองของ Opn ตอบแทน (บัตร = ผ่านทันที · พร้อมเพย์ = คิวอาร์ทดลอง · ทรูมันนี่ = ไปหน้ายืนยันแล้วกลับมา)
-      var n = method === "card" || method === "googlepay" ? "tokn_test_emuok" : method === "promptpay" ? "src_test_emupromptpay" : "src_test_emutruemoney";
-      return charge(order, n + B.rand(4), ui).then(done);
+    var pc = method === "card" || method === "paypal" ? curNow : "THB";
+    if (method === "paypal") return paypal(order, ui, pc);
+    if (B.demo) { // โหมดทดลอง: ตัวจำลองของ Opn ตอบแทน (บัตร = ผ่านทันที · พร้อมเพย์ = คิวอาร์ทดลอง · ช่องทางอื่น = ไปหน้ายืนยันแล้วกลับมา)
+      var n = method === "card" || method === "googlepay" ? "tokn_test_emuok" : "src_test_emu" + String(method).replace(/_/g, "");
+      return (pc === "THB" ? Promise.resolve() : B.call("payQuote", { order: order.id, cur: pc })).then(function () { return charge(order, n + B.rand(4), ui, pc); }).then(done);
     }
     if (ui.lock) ui.lock(true);
-    return omiseLoad().then(function (OC) {
+    var quote = null;
+    return (pc === "THB" ? Promise.resolve() : B.call("payQuote", { order: order.id, cur: pc }).then(function (r) { quote = r.quote; })).then(omiseLoad).then(function (OC) {
       if (ui.lock) ui.lock(false);
+      if (DIRECT[method]) return new Promise(function (res) {
+        window.Omise.setPublicKey(P.opnKey);
+        window.Omise.createSource(method, { amount: Math.round(order.amount * 100), currency: "THB" }, function (st, r) {
+          if (st === 200 && r && r.id) res(charge(order, r.id, ui).then(done));
+          else { if (ui.msg) ui.msg((r && r.message) || "ชำระไม่สำเร็จ ลองใหม่อีกครั้ง หรือเลือกวิธีอื่น", true); res(null); }
+        });
+      });
       return new Promise(function (res) {
-        var cfg = { publicKey: P.opnKey, currency: "THB", frameLabel: "สร้าง | BUILD TH", frameDescription: "คำสั่งซื้อ " + order.id, submitLabel: "ชำระเงิน", buttonLabel: "ชำระเงิน", locale: /^en/i.test(navigator.language || "") && !/^th/i.test(document.documentElement.lang) ? "en" : "th", image: new URL("img/logo.png", location.href).href };
+        var cfg = { publicKey: P.opnKey, currency: pc, location: pc === "THB" ? "no" : "yes", frameLabel: "สร้าง | BUILD TH", frameDescription: "คำสั่งซื้อ " + order.id, submitLabel: "ชำระเงิน", buttonLabel: "ชำระเงิน", locale: /^en/i.test(document.documentElement.lang) ? "en" : "th", image: new URL("img/logo.png", location.href).href };
         if (P.googlePayId) cfg.googlepayMerchantId = P.googlePayId; // คีย์จริงต้องมีรหัสร้านค้า Google Pay (โหมดทดสอบไม่ต้องมี)
         OC.configure(cfg);
-        OC.open({ amount: Math.round(order.amount * 100), currency: "THB", defaultPaymentMethod: method === "card" ? "credit_card" : method, otherPaymentMethods: "",
-          onCreateTokenSuccess: function (nonce) { res(charge(order, nonce, ui).then(done)); }, onFormClosed: function () { res(null); } });
+        OC.open({ amount: quote ? quote.amt : Math.round(order.amount * 100), currency: pc, defaultPaymentMethod: method === "card" ? "credit_card" : method, otherPaymentMethods: "",
+          onCreateTokenSuccess: function (nonce) { res(charge(order, nonce, ui, pc).then(done)); }, onFormClosed: function () { res(null); } });
       });
     }).catch(function (e) { if (ui.lock) ui.lock(false); if (ui.msg) ui.msg(e.message, true); });
   }
-  function charge(order, nonce, ui) {
+  // PayPal (Orders v2 · developer.paypal.com/docs/checkout/standard/integrate): ปุ่มของ PayPal สร้างและยืนยันรายการผ่านหลังบ้านร้านเท่านั้น
+  function ppLoad(pc) {
+    if (ppReady && ppCur === pc) return ppReady;
+    if (ppCur && ppCur !== pc) { var old = document.getElementById("pp-sdk"); if (old) old.remove(); try { delete window.paypal; } catch (e) { window.paypal = undefined; } ppReady = null; }
+    ppCur = pc;
+    ppReady = new Promise(function (res, rej) {
+      if (window.paypal) return res(window.paypal);
+      var s = document.createElement("script"); s.id = "pp-sdk"; s.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(ppId) + "&currency=" + encodeURIComponent(pc) + "&intent=capture&components=buttons"; s.async = true;
+      s.onload = function () { if (window.paypal) res(window.paypal); else { ppReady = null; rej(new Error("โหลดระบบชำระเงินไม่สำเร็จ ลองใหม่อีกครั้ง")); } };
+      s.onerror = function () { ppReady = null; rej(new Error("โหลดระบบชำระเงินไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่")); };
+      document.head.appendChild(s);
+    });
+    return ppReady;
+  }
+  function paypal(order, ui, pc) {
+    stop();
+    var d = document.createElement("div"); d.id = "paymodal"; d.className = "modal"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "PayPal");
+    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">จ่ายด้วย PayPal</h2><p class="note" style="margin:0 0 12px">คำสั่งซื้อ ' + esc(order.id) + " · ยอด <b>" + B.baht(order.amount) + '</b><span id="pp-cur"></span></p><div id="pp-box"></div>' + (B.demo ? '<p><button class="b pri" type="button" data-pq="ppemu">โหมดทดลอง: จำลองการจ่ายผ่าน PayPal</button></p>' : "") + '<p class="note" id="pp-msg" aria-live="polite" style="margin:8px 0 0"></p><div class="sum" style="margin:12px 0 0"><button class="b line sm" type="button" data-pq="close">ปิด</button></div></div>';
+    document.body.appendChild(d); document.body.style.overflow = "hidden";
+    var fail = function (e) { var m = document.getElementById("pp-msg"); if (m) m.textContent = (e && e.message) || "ชำระไม่สำเร็จ ลองใหม่อีกครั้ง หรือเลือกวิธีอื่น"; };
+    var capture = function (ppOrder) { return B.call("ppCapture", { order: order.id, pp: ppOrder }).then(function (r) { if (r.status === "successful") { stop(); if (ui.paid) ui.paid(r); } else fail({ message: r.message }); return r; }); };
+    d.addEventListener("click", function (ev) {
+      var t = ev.target.closest("[data-pq]"); if (!t) return;
+      if (t.getAttribute("data-pq") === "close") stop();
+      if (t.getAttribute("data-pq") === "ppemu") B.call("ppStart", { order: order.id, cur: pc }).then(function (r) { return capture(r.id); }).catch(fail);
+    });
+    if (pc !== "THB") B.call("payQuote", { cur: pc, thb: order.amount, via: "paypal" }).then(function (r) { var e = document.getElementById("pp-cur"); if (e) e.textContent = " · ประมาณ " + money(pc, r.quote.value); }).catch(function () {});
+    if (B.demo) return Promise.resolve(null);
+    return ppLoad(pc).then(function (PP) {
+      return PP.Buttons({
+        createOrder: function () { return B.call("ppStart", { order: order.id, cur: pc }).then(function (r) { return r.id; }); },
+        onApprove: function (data) { return capture(data.orderID).catch(fail); },
+        onError: fail
+      }).render("#pp-box");
+    }).catch(fail);
+  }
+  function charge(order, nonce, ui, pc) {
     if (ui.lock) ui.lock(true);
-    return B.call("payStart", { order: order.id, nonce: nonce, ret: ui.back || "" }).then(function (r) { if (ui.lock) ui.lock(false); return r; }, function (e) { if (ui.lock) ui.lock(false); throw e; });
+    return B.call("payStart", { order: order.id, nonce: nonce, ret: ui.back || "", cur: pc || "THB" }).then(function (r) { if (ui.lock) ui.lock(false); return r; }, function (e) { if (ui.lock) ui.lock(false); throw e; });
   }
   function finish(order, r, ui) {
     if (!r) return null;
@@ -127,5 +217,5 @@
     var p = (B.demo && emu ? B.ensureEmu().then(function () { window.EMU.payDone(emu); }) : Promise.resolve()).then(function () { return check(oid); });
     return { oid: oid, check: p };
   }
-  B.pay = { LABEL: LABEL, GROUPS: GROUPS, methods: methods, capability: capability, online: online, minOnline: minOnline, start: start, check: check, stop: stop, returned: returned };
+  B.pay = { CUR: CUR, curs: curs, cur: cur, curBar: curBar, curPreview: curPreview, onCur: null, LABEL: LABEL, GROUPS: GROUPS, methods: methods, capability: capability, online: online, minOnline: minOnline, start: start, check: check, stop: stop, returned: returned };
 })();

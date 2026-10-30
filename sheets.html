@@ -43,11 +43,17 @@
     <h1>ตรวจงานทีละขั้น <em>ก่อนถูกปิดทับ</em></h1>
     <p>งานที่เทคอนกรีตทับ ฉาบปิด หรือปูทับไปแล้ว ตรวจย้อนหลังไม่ได้ ใบตรวจงานบอกว่าต้องดูอะไร ดูตอนไหน และผ่านเมื่อไร พิมพ์ไปใช้หน้างานได้เลย</p>
     <ul class="hero-pts" id="hero-pts"></ul>
-    <p class="hero-cta"><a class="b pri" href="#list">เลือกใบตรวจงาน</a><a class="b line" href="#bundle">ชุดรวม ถูกกว่าซื้อแยก</a></p>
+    <p class="hero-cta"><a class="b pri" href="#packs">เลือกตามงานของคุณ</a><a class="b line" href="#list">ดูทีละใบ</a></p>
   </div>
 </header>
 
 <main class="wrap" id="main">
+
+  <section id="packs">
+    <div class="head"><h2>เลือกตามงานของคุณ</h2><p class="lead">ไม่ต้องรู้ชื่องานช่าง บอกแค่ว่ากำลังทำอะไร แล้วเลือกชุดที่ตรงงาน · ทุกชุดถูกกว่าซื้อแยก</p></div>
+    <div class="grid" id="packcards"></div>
+    <p class="note" style="margin:12px 0 0">งานของคุณไม่ตรงกับชุดไหน หรืออยากได้ภาษาอื่น: <a href="request.html">สั่งทำเอกสาร</a></p>
+  </section>
 
   <section id="list">
     <div class="head"><h2>ใบตรวจงานทั้งหมด</h2><p class="lead" id="list-lead"></p></div>
@@ -57,7 +63,7 @@
   </section>
 
   <section id="bundle">
-    <div class="head"><h2>ชุดรวม</h2><p class="lead">ซื้อเป็นชุดสำหรับงานสร้างบ้านทั้งหลัง</p></div>
+    <div class="head"><h2>ชุดตามหมวดงาน</h2><p class="lead">สำหรับคนที่รู้แล้วว่าต้องการงานหมวดไหน และครบชุดทุกใบ</p></div>
     <div class="grid" id="bundles"></div>
   </section>
 
@@ -160,7 +166,14 @@
   $("chips").innerHTML = ["ทั้งหมด"].concat(groups).map(function (g) { return '<button class="chip" type="button" aria-pressed="' + (g === cur) + '">' + esc(g) + "</button>"; }).join("");
   $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); });
   draw();
-  $("bundles").innerHTML = B.bundles.map(function (x) {
+  // แพ็กเกจตามกลุ่มผู้ใช้ (สภา 30 ต.ค. 2026): พูดภาษาคนซื้อ ไม่ใช่ภาษางานช่าง · ส่วนต่างคำนวณจริงจากราคารายใบ
+  var packs = B.bundles.filter(function (x) { return x.aud && x.aud !== "job"; }), AUD = { home: "บ้านและคอนโด", building: "อาคาร", factory: "โรงงาน" };
+  function saveOf(x) { var sum = x.items.reduce(function (t, id) { var s = B.find(id); return t + (s ? B.memberPrice(s.price) : 0); }, 0); return Math.max(0, sum - B.memberPrice(x.price)); }
+  $("packcards").innerHTML = packs.map(function (x) {
+    return '<div class="card pad" style="display:flex;flex-direction:column;gap:6px"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">' + esc(AUD[x.aud] || "") + " · " + x.items.length + ' ใบ</span><h3 style="margin:0;font-size:19px;color:#0F2A44;font-family:inherit"><a href="' + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0;font-weight:600;font-size:15px;color:#344054">' + esc(x.who || "") + '</p><p style="margin:0;font-size:15px">' + esc(x.text) + '</p><p class="note" style="margin:0">ถูกกว่าซื้อแยก ' + B.baht(saveOf(x)) + ' · <a href="' + esc(pLink(x.id)) + '">ดูว่ามีใบอะไรบ้าง ›</a></p><div class="sum" style="margin:auto 0 0">' + buy(x) + "</div></div>";
+  }).join("");
+  if (!packs.length) $("packs").hidden = true;
+  $("bundles").innerHTML = B.bundles.filter(function (x) { return !x.aud || x.aud === "job"; }).map(function (x) {
     var names = x.items.map(function (id) { var s = B.find(id); return s ? s.id : id; }).join(" · ");
     return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">' + esc(x.id) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit"><a href="' + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0 0 4px;font-size:15.5px">' + esc(x.text) + '</p><p class="note" style="margin:0 0 12px">' + esc(names) + ' · <a href="' + esc(pLink(x.id)) + '">ดูรายละเอียดชุด ›</a></p><div class="sum" style="margin:0">' + buy(x) + "</div></div>";
   }).join("");

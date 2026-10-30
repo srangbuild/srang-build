@@ -1,0 +1,90 @@
+/* Knowledge pages: large text, one idea per block, works on a phone and on paper */
+.k-body { font-size:17px; line-height:1.75; }
+.k-big .k-body, .k-big.k-body { font-size:20px; }
+.k-tools { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; }
+.k-tools button, .k-tools a { font:inherit; font-size:14.5px; font-weight:600; color:#fff; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.35); border-radius:11px; min-height:42px; padding:0 14px; cursor:pointer; display:inline-flex; align-items:center; text-decoration:none; }
+.k-tools button:hover, .k-tools a:hover { background:rgba(255,255,255,.22); }
+.k-sec { margin:26px 0; }
+.k-sec > h2 { margin-bottom:12px; }
+.k-short { background:#FFF6EF; border:1.5px solid #FFD2B3; border-radius:16px; padding:16px 18px; }
+.k-short ul { margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+.k-short li { padding-left:30px; position:relative; }
+.k-short li::before { content:"✓"; position:absolute; left:0; top:1px; width:22px; height:22px; border-radius:50%; background:var(--orange); color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center; }
+.k-check { background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:16px 18px; }
+.k-check .hint { margin:0 0 10px; color:var(--mute); font-size:15px; }
+.k-check ol { margin:0; padding-left:22px; display:grid; gap:12px; }
+.k-check .ans { display:block; font-size:15.5px; color:#3B4654; margin-top:2px; }
+.k-q { font-weight:600; color:var(--navy); font-size:1.08em; margin:0 0 12px; }
+.k-count { color:var(--mute); font-size:14px; margin:0 0 4px; }
+.k-btns { display:flex; gap:10px; flex-wrap:wrap; }
+.k-btns button { font:inherit; font-weight:700; min-height:50px; min-width:104px; padding:0 18px; border-radius:13px; border:1.5px solid var(--line); background:#fff; color:var(--navy); cursor:pointer; }
+.k-btns button:hover { border-color:var(--orange); background:#FFF6EF; }
+.k-res { border-radius:13px; padding:14px 16px; font-weight:600; }
+.k-res.go { background:#FFF1E8; border:1.5px solid var(--orange); color:#7A2E03; }
+.k-res.ok { background:#EDF7F0; border:1.5px solid #2F8F5B; color:#14512F; }
+.k-res small { display:block; font-weight:400; margin-top:6px; color:#3B4654; font-size:14.5px; }
+.k-ex { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
+.k-ex li { background:#fff; border:1px solid var(--line); border-radius:13px; padding:11px 14px; display:grid; grid-template-columns:1fr auto; gap:2px 12px; align-items:start; }
+.k-ex b { color:var(--navy); font-weight:600; }
+.k-ex span.why { grid-column:1 / -1; font-size:15px; color:#3B4654; }
+.k-pill { font-size:13px; font-weight:700; border-radius:999px; padding:3px 11px; white-space:nowrap; }
+.k-pill.yes { background:#FFE3D2; color:#8A3306; } .k-pill.no { background:#DDF2E5; color:#14512F; } .k-pill.ask { background:#E4EAF1; color:#0F2A44; }
+.k-steps { counter-reset:s; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.k-steps li { background:#fff; border:1px solid var(--line); border-radius:13px; padding:12px 14px 12px 58px; position:relative; }
+.k-steps li::before { counter-increment:s; content:counter(s); position:absolute; left:14px; top:12px; width:32px; height:32px; border-radius:50%; background:var(--navy); color:#fff; font:700 16px/32px "Kanit",sans-serif; text-align:center; }
+.k-steps b { display:block; color:var(--navy); }
+.k-docs { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.k-docs label { display:flex; gap:10px; align-items:flex-start; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; cursor:pointer; }
+.k-docs input { width:22px; height:22px; margin:3px 0 0; flex:none; accent-color:var(--orange); }
+.k-note { font-size:14.5px; color:var(--mute); margin:8px 0 0; }
+.k-tb { width:100%; border-collapse:collapse; background:#fff; border-radius:13px; overflow:hidden; border:1px solid var(--line); }
+.k-tb th, .k-tb td { padding:10px 12px; border-top:1px solid var(--line); text-align:left; vertical-align:top; font-size:16px; }
+.k-tb thead th { background:var(--navy); color:#fff; border-top:0; font-weight:600; }
+.k-tb tbody th { color:var(--navy); font-weight:600; width:38%; background:#FBFAF7; }
+.k-wrap { overflow-x:auto; }
+.k-bad { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+.k-bad li { padding-left:30px; position:relative; }
+.k-bad li::before { content:"!"; position:absolute; left:0; top:1px; width:22px; height:22px; border-radius:50%; background:#B3261E; color:#fff; font-size:14px; font-weight:700; display:grid; place-items:center; }
+.k-terms { margin:0; display:grid; gap:8px; }
+.k-terms div { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; }
+.k-terms dt { font-weight:700; color:var(--navy); } .k-terms dd { margin:0; }
+.k-faq details { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; margin-bottom:8px; }
+.k-faq summary { font-weight:600; color:var(--navy); cursor:pointer; min-height:30px; }
+.k-faq p { margin:8px 0 2px; }
+.k-rel { background:var(--navy); color:#fff; border-radius:16px; padding:16px 18px; display:grid; gap:6px; }
+.k-rel b { font-size:1.08em; } .k-rel p { margin:0; color:#DDE6EF; font-size:15.5px; }
+.k-rel .b { justify-self:start; margin-top:6px; }
+.k-tpl { counter-reset:t; list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+@media (min-width:760px) { .k-tpl { grid-template-columns:1fr 1fr; } }
+.k-tpl li { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; }
+.k-tpl li b::before { counter-increment:t; content:counter(t) ". "; color:var(--orange); }
+.k-tpl li b { display:block; color:var(--navy); }
+.k-sample { background:#FBFCFD; border:1.5px dashed #B9C3CF; border-radius:14px; padding:14px 16px; }
+.k-sample p { margin:0 0 8px; }
+.k-refs { margin:0; padding-left:20px; font-size:14.5px; display:grid; gap:6px; }
+.k-refs a { overflow-wrap:anywhere; }
+.k-tag { font-size:12.5px; border-radius:6px; padding:1px 7px; margin-left:6px; background:#E4EAF1; color:#0F2A44; white-space:nowrap; }
+.k-tag.primary { background:#DDF2E5; color:#14512F; } .k-tag.secondary { background:#F3EEDD; color:#6A5410; }
+.k-notice { background:#F3F1EA; border-radius:12px; padding:12px 14px; font-size:14.5px; color:#3B4654; }
+.k-crumb { font-size:14px; color:#CFDAE5; margin:0 0 10px; } .k-crumb a { color:#fff; }
+.k-find { width:100%; font:inherit; font-size:17px; min-height:54px; border:1.5px solid var(--line); border-radius:14px; padding:0 16px; background:#fff; color:var(--ink); }
+.k-find:focus { outline:3px solid var(--orange); outline-offset:1px; }
+.k-tiles { display:grid; gap:12px; grid-template-columns:1fr; list-style:none; margin:14px 0 0; padding:0; }
+@media (min-width:620px) { .k-tiles { grid-template-columns:1fr 1fr; } } @media (min-width:980px) { .k-tiles { grid-template-columns:repeat(3,1fr); } }
+.k-tile { display:flex; gap:14px; align-items:flex-start; height:100%; background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:16px; color:inherit; text-decoration:none; box-sizing:border-box; }
+.k-tile:hover { border-color:var(--orange); box-shadow:0 6px 18px rgba(15,42,68,.08); }
+.k-tile .ic { font-size:32px; line-height:1.1; flex:none; }
+.k-tile b { display:block; color:var(--navy); font-size:17.5px; line-height:1.4; }
+.k-tile span.s { display:block; font-size:15px; color:#3B4654; margin-top:2px; }
+.k-tile span.m { display:block; font-size:13px; color:var(--mute); margin-top:6px; }
+.k-where { display:grid; gap:10px; } @media (min-width:760px) { .k-where { grid-template-columns:repeat(3,1fr); } }
+.k-where div { background:#fff; border:1px solid var(--line); border-radius:13px; padding:12px 14px; font-size:15.5px; }
+.k-where b { display:block; color:var(--navy); margin-bottom:2px; }
+.k-free { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between; background:#FFF6EF; border:1.5px solid #FFD2B3; border-radius:16px; padding:14px 18px; }
+.k-free b { color:var(--navy); display:block; }
+@media print {
+  #hdr, .k-tools, .k-rel, .skip, footer, #bot-root { display:none !important; }
+  .hero { background:#fff !important; color:#000 !important; padding:0 !important; }
+  .hero h1, .hero p, .k-crumb, .k-crumb a { color:#000 !important; }
+  .k-tile, .k-steps li, .k-docs label { break-inside:avoid; }
+}

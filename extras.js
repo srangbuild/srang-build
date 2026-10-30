@@ -12,7 +12,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function ok(u) { return /^https?:\/\//i.test(u || ""); }
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
-  var css = ".bx-ck{position:fixed;left:12px;right:12px;bottom:12px;z-index:90;max-width:760px;margin:0 auto;background:#0F2A44;color:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 16px 40px rgba(15,42,68,.45);font:15px/1.55 \"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif}" +
+  var css = "@media (max-width:520px){.bx-fa{bottom:74px!important}}.bx-ck{position:fixed;left:12px;right:12px;bottom:12px;z-index:90;max-width:760px;margin:0 auto;background:#0F2A44;color:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 16px 40px rgba(15,42,68,.45);font:15px/1.55 \"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif}" +
     ".bx-ck p{margin:0 0 10px}.bx-ck a{color:#FFB98F}.bx-ck .r{display:flex;flex-wrap:wrap;gap:8px}.bx-ck button{border:0;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",\"Leelawadee UI\",sans-serif;cursor:pointer}" +
     ".bx-ck .a{background:#FF6B1A;color:#fff}.bx-ck .n{background:#fff;color:#0F2A44}" +
     ".bx-ad{border:1px dashed #C9D2DC;border-radius:16px;padding:14px 16px;background:#fff;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0}.bx-ad .tg{font:700 12px/1 \"Kanit\",sans-serif;background:#E8ECF1;color:#475466;border-radius:999px;padding:5px 10px;flex:none}" +
@@ -128,6 +128,6 @@
     w.appendChild(p);
   }
 
-  function start() { foot(); ads(); tribute(); consent(false); floatAd(); }
+  function start() { foot(); ads(); tribute(); consent(false); floatAd(); var bs = document.createElement("script"); bs.src = "bot.js"; document.body.appendChild(bs); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
