@@ -386,7 +386,17 @@
     var tile = function (t, n, label, sub) { return '<a class="tile" href="#' + t + '"><b>' + n + "</b><span>" + label + "</span>" + (sub ? "<small>" + sub + "</small>" : "") + "</a>"; };
     return '<div class="tiles">' + tile("orders", c.todo, "คำสั่งซื้อรอชำระ", c.check ? "รอร้านตรวจ " + c.check : "") + tile("docs", c.docs, "เอกสารของฉัน", c.newer ? "ฉบับใหม่ " + c.newer : "") + tile("ask", c.asksOpen, "คำถามรอตอบ", "") + "</div>" +
       (todo.length ? '<section class="sec"><h2>สิ่งที่ควรทำต่อ</h2><div class="card todo">' + todo.map(function (x) { return '<a href="#' + x[0] + '" class="' + x[2] + '">' + esc(x[1]) + "<i>›</i></a>"; }).join("") + "</div></section>" : '<section class="sec"><div class="card pad"><p style="margin:0">ทุกอย่างเรียบร้อย ไม่มีงานค้าง</p></div></section>') +
-      '<section class="sec"><h2>สิทธิ์สมาชิก</h2><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a><a class="b line sm" href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div></section>';
+      nextStage() + '<section class="sec"><h2>สิทธิ์สมาชิก</h2><div class="card pad"><ul class="tick">' + perks + '</ul><p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL">ดาวน์โหลดไฟล์รวมฉบับฟรีทุกงาน</button><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a><a class="b line sm" href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div></section>';
+  }
+  // งานถัดไปตามลำดับงานทั่วไป: ซื้อใบไหนแล้ว แนะนำใบของงวดถัดไป 2 ใบ · ไม่มีส่วนลดหลอก ไม่เร่ง (ซื้อซ้ำ ข้อ 9 · 31 ต.ค. 2026)
+  var STAGE = ["F-01A", "F-01B", "F-02", "F-04", "F-03", "F-05", "F-07", "F-06", "F-10", "F-11", "F-08", "F-09", "F-13", "F-15", "F-14", "F-12", "F-18"];
+  function nextStage() {
+    var own = libOf().map(function (d) { return d.id; }), last = -1;
+    STAGE.forEach(function (id, i) { if (own.indexOf(id) >= 0) last = i; });
+    if (last < 0) return "";
+    var list = STAGE.slice(last + 1).filter(function (id) { var x = B.find(id); return x && x.ok === true && +x.price > 0 && own.indexOf(id) < 0 && !(id === "F-01B" && own.indexOf("F-01A") >= 0); }).slice(0, 2);
+    if (!list.length) return "";
+    return '<section class="sec"><h2>งานถัดไปที่ควรตรวจ</h2><div class="card pad"><p class="note" style="margin:0 0 10px">เรียงตามลำดับงานทั่วไป ลำดับจริงขึ้นกับแบบและผู้รับเหมา</p>' + list.map(function (id) { var x = B.find(id); return '<p style="margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center"><span>' + esc(x.id + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="product.html?id=' + encodeURIComponent(id) + (q ? "&" + q.replace(/^\?/, "") : "") + '">ดูใบนี้</a></p>'; }).join("") + "</div></section>";
   }
   function paneDocs() {
     var lib = libOf();
