@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="shop.css">
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="qr.js"></script>
 <script src="pay.js"></script>
 </head>
 <body>
@@ -103,7 +104,7 @@
       return;
     }
     var online = PAY.online(me), minOn = PAY.minOnline(me), ms = PAY.methods(me, capNames, total), canOnline = online && ms.length && total >= minOn;
-    var drawPm = function () { ms = PAY.methods(me, capNames, total); var thb = PAY.cur(me) === "THB", can2 = online && ms.length && total >= minOn; return (can2 ? methodGroups(ms) : "") + (thb || !can2 ? transferRow(can2) : '<p class="note" style="margin:8px 0 0">ช่องทางอื่นและการโอนเงินจ่ายเป็นบาท เลือกสกุลเงิน THB เพื่อดูทั้งหมด</p>'); };
+    var drawPm = function () { ms = PAY.methods(me, capNames, total); var thb = PAY.cur(me) === "THB", can2 = online && ms.length && total >= minOn; return (can2 ? methodGroups(ms) + PAY.instTable(ms, total) : "") + (thb || !can2 ? transferRow(can2) : '<p class="note" style="margin:8px 0 0">ช่องทางอื่นและการโอนเงินจ่ายเป็นบาท เลือกสกุลเงิน THB เพื่อดูทั้งหมด</p>'); };
     var transferRow = function (can2) { return '<p class="kn pmh">โอนเงินเข้าบัญชีร้าน</p><label><input type="radio" name="pm" value="transfer"' + (can2 ? "" : " checked") + "><b>โอนเงินแล้วแนบสลิป</b><small>" + esc(P.bank ? "ธนาคาร " + P.bank + " หรือพร้อมเพย์ของร้าน · " : "") + (me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปกับธนาคารอัตโนมัติ เปิดไฟล์ได้ในไม่กี่วินาที" : "ร้านตรวจยอดภายใน " + esc(P.hours || 24) + " ชั่วโมง แล้วเปิดไฟล์ให้") + "</small></label>"; };
     PAY.onCur = function () { var b = $("pmbox"); if (b) b.innerHTML = drawPm(); };
     var why = online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
@@ -127,7 +128,7 @@
     var first = true;
     return PAY.GROUPS.map(function (g) {
       var list = ms.filter(function (k) { return PAY.LABEL[k][2] === g[0]; }); if (!list.length) return "";
-      return '<p class="kn pmh">' + esc(g[1]) + "</p>" + list.map(function (k) { var c = first; first = false; return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>" + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small></label>"; }).join("");
+      var had = first; return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", list.map(function (k) { var c = first; first = false; return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>" + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</label>"; }).join(""), had);
     }).join("");
   }
   function taxHint() { var f = $("f-co"); if (!f) return; var i = f.elements.taxid, h = $("taxhint"); if (!i || !h) return; var d = i.value.replace(/\D/g, ""); h.textContent = !d ? "" : d.length < 13 ? "ยังไม่ครบ 13 หลัก" : taxOk(d) ? "รูปแบบเลขถูกต้อง" : "ตรวจเลขอีกครั้ง (เลขหลักสุดท้ายไม่ตรงกับสูตรตรวจ)"; h.className = "hint" + (d.length === 13 ? (taxOk(d) ? " ok" : " bad") : ""); }
@@ -135,17 +136,18 @@
   // ---------- ขั้นชำระของคำสั่งซื้อที่สร้างแล้ว ----------
   function payBox(o) {
     var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.baht(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
-    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + (P.qr ? '<div><img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์พร้อมเพย์รับเงินของร้าน"><p class="note" style="margin:4px 0 0"><a href="' + esc(P.qr) + '" download="BUILD_TH_QR.jpg">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคาร · ใส่ยอดให้ตรง</p></div>' : "") + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
       '<form class="f" id="f-slip" data-oid="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><button class="b pri" type="submit">ส่งสลิป</button></form></div>';
   }
-  function payView(o, method) {
-    PAY.onCur = function () { payView(o, method); };
+  function payView(o, method, keep) {
+    PAY.onCur = function () { payView(o, method, true); };
     steps(1);
     var ms = PAY.methods(me, capNames, o.amount), online = PAY.online(me) && ms.length && o.amount >= PAY.minOnline(me);
-    var on = online ? '<div class="payopts" role="group" aria-label="ชำระออนไลน์"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>' + PAY.curBar(me, o.amount) + PAY.GROUPS.map(function (g) { var list = ms.filter(function (k) { return PAY.LABEL[k][2] === g[0]; }); return list.length ? '<p class="note pmh2">' + esc(g[1]) + '</p><div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small></button>"; }).join("") + "</div>" : ""; }).join("") + '<p class="note" style="margin:8px 0 0">ชำระผ่าน Opn Payments ผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต · เลขบัตรไม่ผ่านเว็บร้าน' + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
-    var tr = method === "transfer" || !online, slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours || 24) + " ชั่วโมง";
-    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id) + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.baht(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>" + tracker(o) + on +
-      (online ? '<details class="alt"' + (tr ? " open" : "") + "><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (" + slipTx + ")</summary>" + payBox(o) + "</details>" : payBox(o)) +
+    var on = online ? '<div class="payopts" role="group" aria-label="ชำระออนไลน์"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>' + PAY.curBar(me, o.amount) + PAY.GROUPS.map(function (g) { var list = ms.filter(function (k) { return PAY.LABEL[k][2] === g[0]; }); return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>", '<div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</button>"; }).join("") + "</div>") : ""; }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล' + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
+    var slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours || 24) + " ชั่วโมง";
+    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id) + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.baht(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>" + tracker(o) +
+      (method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "") + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
+        : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
       '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ · <button type="button" class="linkbtn" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></p></div>' +
       '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) { return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>"; }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.baht(o.amount) + "</b></div></div></aside></div>";
   }

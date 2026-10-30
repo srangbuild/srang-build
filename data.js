@@ -883,9 +883,11 @@ window.SITE = {
     "opnKey": "pkey_test_69fymwz5y4m08hm1zyl",
     "methods": [
       "promptpay",
+      "stripe",
       "card",
       "googlepay",
       "paypal",
+      "installment",
       "mobile_banking_kbank",
       "mobile_banking_scb",
       "mobile_banking_bbl",
@@ -903,7 +905,9 @@ window.SITE = {
     ],
     "googlePayId": "",
     "usdRate": 0.0296,
-    "usdDate": "2026-10-28"
+    "usdDate": "2026-10-28",
+    "qrBase": "00020101021229370016A0000006770101110113006661746699153037645802TH6304A221",
+    "bankMin": 200
   },
   "sheetsNext": [
     "งานรั้วและประตูรั้ว",

@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="site.css">
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="qr.js"></script>
 <script src="pay.js"></script>
 </head>
 <body>
@@ -300,15 +301,15 @@
   function copyBtn(text, label) { return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก") + "</button>"; }
   function payBox(o) { // โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ไม่มีค่าธรรมเนียม ร้านตรวจยอดเอง)
     var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.baht(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
-    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + (P.qr ? '<div><img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์พร้อมเพย์รับเงินของร้าน"><p class="note" style="margin:4px 0 0"><a href="' + esc(P.qr) + '" download="BUILD_TH_QR.jpg">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคาร · ใส่ยอดให้ตรง</p></div>' : "") + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
       '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
   }
   function payChooser(o) { // ชำระออนไลน์: ระบบตรวจยอดและเปิดสิทธิ์ดาวน์โหลดเองทันที
     var ms = payMethods(o.amount); if (!ms.length) return "";
     return '<div class="payopts" role="group" aria-label="เลือกวิธีชำระ"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>' + B.pay.curBar(me, o.amount) + B.pay.GROUPS.map(function (g) {
       var list = ms.filter(function (k) { return PAYM[k][2] === g[0]; });
-      return list.length ? '<p class="note pmh2">' + esc(g[1]) + '</p><div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id) + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small></button>"; }).join("") + "</div>" : "";
-    }).join("") + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล' + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>";
+      return list.length ? B.pay.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>", '<div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id) + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small>" + B.pay.feeHtml(k) + "</button>"; }).join("") + "</div>") : "";
+    }).join("") + B.pay.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล' + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>";
   }
   // ตัวติดตาม 5 ขั้น: สั่งซื้อ → ชำระ → ร้านตรวจยอด → พร้อมดาวน์โหลด → ได้รับไฟล์แล้ว
   function tracker(o) {

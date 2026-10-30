@@ -140,7 +140,7 @@
 .who2 b { color:var(--navy); }
 .paym { display:grid; gap:8px; border:0; padding:0; margin:0; min-width:0; }
 .paym label { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; align-items:start; padding:12px 14px; border:1.5px solid var(--line); border-radius:14px; background:#fff; cursor:pointer; font-weight:400 !important; }
-.paym label input { width:20px; height:20px; margin:3px 0 0; accent-color:var(--orange); grid-row:span 2; }
+.paym label input { width:20px; height:20px; margin:3px 0 0; accent-color:var(--orange); grid-row:span 3; }
 .paym label b { color:var(--navy); font-size:15.5px; }
 .paym label small { color:var(--mute); font-size:13.5px; line-height:1.45; }
 .paym label:has(input:checked) { border-color:var(--orange); background:#FFFAF6; box-shadow:0 0 0 1px var(--orange) inset; }
@@ -163,3 +163,11 @@
 .done .row { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
 .done .paybox { text-align:left; width:100%; max-width:560px; }
 @media print { .mbar, .lightbox, .stepbar { display:none !important; } }
+.pfee { display:block; font-size:13px; line-height:1.45; color:#8A3306; margin-top:2px; font-weight:500; } .pfee.none { color:#14512F; }
+.insttb summary { cursor:pointer; font-weight:600; color:#0F2A44; min-height:32px; }
+.paym label small.pfee { grid-column:2; color:#8A3306; font-size:13px; font-weight:500; } .paym label small.pfee.none { color:#14512F; }
+.pmg { border:1.5px solid var(--line); border-radius:14px; background:#fff; padding:0 14px; margin-top:8px; }
+.pmg summary { cursor:pointer; font-weight:700; color:var(--navy); font-size:14.5px; padding:12px 0; }
+.pmg summary small { font-weight:500; color:var(--mute); font-size:13px; margin-left:4px; }
+.pmg[open] { padding-bottom:12px; }
+.pmg > label { margin-top:8px; }
