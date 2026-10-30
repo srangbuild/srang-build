@@ -110,6 +110,7 @@
   .pubbar { background:#DFF3E8; color:#14532D; border-bottom:1px solid #A7D7BC; padding:8px 16px; font-size:14px; text-align:center; }
   .pubbar.err { background:#FBE4E2; color:#7A1A12; border-color:#F0B8B2; }
   @media (max-width:640px) { .stick { position:static; } .kpis { grid-template-columns:repeat(2, minmax(0, 1fr)); } .kpi b { font-size:21px; } .links { grid-template-columns:1fr 1fr; } .links a { padding:8px 10px; } .links a small { display:none; } #b-imp, #b-reset { display:none; } }
+.soon-tb { width:100%; border-collapse:collapse; font-size:14px; } .soon-tb th, .soon-tb td { text-align:left; padding:8px 10px; border-bottom:1px solid #DDE3EA; vertical-align:top; } .soon-tb th { background:#EEF1F5; white-space:nowrap; }
 </style>
 <script src="data.js"></script>
 <script src="app.js"></script>
@@ -138,7 +139,7 @@
 <script>
 (function () {
   "use strict";
-  var NEED_API = "2026-10-31"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-10-31b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   var KEY = "build_site_draft";
   var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";
@@ -454,6 +455,15 @@
   }
   // คำถามจากกล่องผู้ช่วย (30 ต.ค. 2026 · Phase 1 ข้อ 35): ดูว่าคนถามอะไร ตอบคนที่ขอ และนำคำถามซ้ำไปเพิ่มเป็นคำตอบ
   var botSeg = "รอจัดการ";
+  // ของที่รอเปิดตัว: ข้อมูลมาจากหลังบ้านหลังเข้าสู่ระบบเท่านั้น ไม่อยู่ในไฟล์เว็บ
+  function soonTab() {
+    if (!SHOP) return needShop("ของที่รอเปิดตัว");
+    var P = SHOP.pipeline;
+    if (!P) return '<div class="card"><h2>ของที่รอเปิดตัว</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version) + " ยังไม่มีรายการนี้ · วาง Code.gs รุ่นล่าสุดก่อน</p></div>";
+    return '<div class="card"><h2>ของที่รอเปิดตัว <span class="tag no">ผู้ใช้ไม่เห็น</span></h2><p class="hint">' + esc(P.note) + "</p></div>" + (P.groups || []).map(function (g) {
+      return '<div class="card"><h2>' + esc(g.title) + '</h2><p class="hint"><b>เงื่อนไขเปิด:</b> ' + esc(g.gate) + "<br><b>ไฟล์:</b> " + esc(g.doc) + '</p><div style="overflow:auto"><table class="soon-tb"><thead><tr>' + g.head.map(function (h) { return '<th scope="col">' + esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" + g.rows.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div></div>";
+    }).join("");
+  }
   function botTab() {
     if (!SHOP) return needShop("คำถามจากผู้ช่วย");
     if (!SHOP.bot) return '<div class="card"><h2>คำถามจากผู้ช่วย</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version) + " ยังไม่เก็บคำถาม · วาง Code.gs รุ่นล่าสุดก่อน</p></div>";
@@ -607,6 +617,7 @@
     ["req", "สั่งทำ", requestTab],
     ["pay", "ช่องทางชำระเงิน", payTab],
     ["bot", "ผู้ช่วย", botTab],
+    ["soon", "รอเปิดตัว", soonTab],
     ["brand", "แบรนด์และลิงก์", function () { return objCard("links", "ลิงก์ช่องทาง", "เว้นว่าง = ปุ่มบนเว็บขึ้นว่า “เร็ว ๆ นี้”") + objCard("brand", "แบรนด์") + objCard("site", "เว็บและสถิติ") + objCard("announce", "แถบประกาศ", "ใช้ตอนเปิดขาย เปิดรับงาน หรือปล่อยอัลบั้ม") + upCard("ปกตอน รูปสินค้า หรือรูปประกอบหน้าเว็บ · แล้วนำที่อยู่ไปใส่ในช่องรูปของรายการนั้น"); }],
     ["ep", "ตอน", function () { return listCard("episodes", "ตอนทั้งหมด", "ปล่อยคลิปแล้วนำลิงก์มาใส่ที่นี่ ตอนที่ยังไม่มีลิงก์จะแสดงวันปล่อยแทน"); }],
     ["free", "ของแจก", function () { return listCard("freebies", "เช็กลิสต์แจกฟรี", "เนื้อหาต้องมาจากบทของตอนนั้น · 1 ชุด = 1 แผ่น A4 (หน้า free.html พิมพ์หรือบันทึกเป็น PDF ได้) · คำสั่ง LINE ต้องตรงกับที่ตั้งไว้ในข้อความตอบกลับอัตโนมัติ"); }],
@@ -620,7 +631,7 @@
   ];
   var tab = "ov";
   // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
-  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop", "cust", "cons", "req", "pay", "bot"];
+  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop", "cust", "cons", "req", "pay", "bot", "soon"];
   function badge(id) { if (!SHOP) return ""; var n = id === "shop" ? (SHOP.kpi.check || 0) + (SHOP.kpi.asksOpen || 0) : id === "cons" ? (SHOP.consigns || []).filter(function (c) { return c.status === "ใหม่"; }).length : id === "req" ? (SHOP.requests || []).filter(function (c) { return c.status === "ใหม่"; }).length : id === "bot" ? (SHOP.bot || []).filter(function (c) { return c.status === "ใหม่"; }).length : 0; return n ? "<i>" + n + "</i>" : ""; }
   function render() {
     var g = gated(), on1 = !!tokGet();

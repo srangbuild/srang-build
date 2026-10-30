@@ -49,6 +49,7 @@
   .foot b { font:12px Arial,sans-serif; color:#111; font-weight:400; }
   body.shot { background:#fff; } body.shot .bar { display:none; } body.shot .sheet { margin:0; box-shadow:none; max-width:none; width:210mm; min-height:297mm; }
   @page { size:A4; margin:0; }
+  @media screen and (max-width:720px) { body:not(.shot) .sheet { width:auto; min-height:0; padding:14px; } body:not(.shot) .hd { grid-template-columns:1fr; } body:not(.shot) .info, body:not(.shot) .sig { grid-template-columns:1fr; } }
   @media print { html { -webkit-print-color-adjust:exact; print-color-adjust:exact; } body { background:#fff; } .bar { display:none; } .sheet { box-shadow:none; margin:0; width:210mm; max-width:none; height:297mm; min-height:0; page-break-after:always; } .sheet:last-child { page-break-after:auto; } }
 </style>
 <script src="data.js"></script>

@@ -37,6 +37,7 @@
     ".bh-sub a:hover,.bh-sub a[aria-current]{background:#F3F5F8;color:#0F2A44}" +
     ".bh-btn{display:none;background:none;border:1.5px solid rgba(255,255,255,.45);color:#fff;border-radius:11px;min-width:46px;min-height:42px;font-size:20px;line-height:1;cursor:pointer;font-family:inherit}" +
     ".bh-tools{display:flex;gap:6px;align-items:center;flex:none;margin-left:6px}" +
+    ".bh-lwrap{position:relative}.bh-lmenu{position:absolute;right:0;top:calc(100% + 8px);width:230px;max-height:min(70vh,520px);overflow:auto;background:#fff;color:#0F2A44;border-radius:14px;box-shadow:0 14px 34px rgba(15,42,68,.3);padding:6px;z-index:120;font-size:15px}.bh-lmenu[hidden]{display:none}.bh-lmenu button,.bh-lmenu a{display:block;width:100%;min-height:44px;padding:10px 12px;border:0;background:none;color:#0F2A44;font:inherit;text-align:left;text-decoration:none;border-radius:10px;cursor:pointer}.bh-lmenu button:hover,.bh-lmenu a:hover{background:#EEF1F5}.bh-lmenu [aria-current]{font-weight:700;background:#E4EAF1}.bh-lmenu p{margin:6px 8px;font-size:12.5px;line-height:1.45;color:#475466}" +
     ".bh-lang{font:inherit;font-size:13.5px;font-weight:600;color:#fff;background:none;border:1.5px solid rgba(255,255,255,.35);border-radius:11px;min-height:42px;min-width:46px;padding:0 10px;cursor:pointer}.bh-lang:hover{background:rgba(255,255,255,.13)}" +
     ".bh-cart{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:11px;min-height:42px;padding:0 11px;font-size:14.5px;font-weight:600}.bh-cart:hover,.bh-cart[aria-current]{background:rgba(255,255,255,.13)}" +
     ".bh-cart svg{width:20px;height:20px}.bh-cart i{font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#FF6B1A;color:#fff;font:700 12px/20px \"Kanit\",sans-serif;text-align:center}" +
@@ -65,7 +66,10 @@
   var nCart = 0; try { if (window.BUILD && window.BUILD.cart) nCart = window.BUILD.cart.get().length; else { var raw = JSON.parse(localStorage.getItem("build_cart") || "[]"); nCart = Array.isArray(raw) ? raw.length : 0; } } catch (e) {}
   var cartBtn = hasSheets ? '<a class="bh-cart navcart" href="cart.html' + pv + '"' + (here === "cart.html" ? ' aria-current="page"' : "") + ' aria-label="' + lab("ตะกร้า", "Cart") + '" data-noi18n="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L22 7H6"/></svg><span>' + lab("ตะกร้า", "Cart") + "</span><i" + (nCart ? "" : " hidden") + ">" + nCart + "</i></a>" : "";
   var memBtn = hasSheets && memOn ? '<a class="bh-mem" href="member.html' + pv + '"' + (here === "member.html" ? ' aria-current="page"' : "") + ' data-noi18n="1">' + (logged ? lab("บัญชีของฉัน", "My account") : lab("สมาชิก", "Member")) + "</a>" : "";
-  var langBtn = '<button class="bh-lang" type="button" id="bh-lang" aria-label="' + (lang === "en" ? "เปลี่ยนเป็นภาษาไทย" : "Switch to English") + '" data-noi18n="1">' + (lang === "en" ? "ไทย" : "EN") + "</button>";
+  // เมนูภาษา: ไทยและอังกฤษแปลโดยร้าน · ภาษาอื่นใช้ปุ่มแปลของเบราว์เซอร์ (ลิงก์ Google Translate ใช้ไม่ได้ เพราะ CSP ของเว็บบล็อกตามตั้งใจ ทดสอบ 31 ต.ค. 2026)
+  var langMenu = '<div class="bh-lmenu" id="bh-lmenu" hidden data-noi18n="1"><button type="button" data-l="th"' + (lang === "th" ? ' aria-current="true"' : "") + '>ไทย</button><button type="button" data-l="en"' + (lang === "en" ? ' aria-current="true"' : "") + ">English</button><p>" +
+    lab("ภาษาอื่น: ใช้ปุ่มแปลในเบราว์เซอร์ของคุณ (ถ้าเครื่องรองรับ) · Chrome มือถือ: เมนู ⋮ แล้วกด แปล · iPhone Safari: ปุ่ม aA แล้วกด แปลเว็บไซต์ · Edge: เมนู ⋯ แล้วกด แปล", "Other languages: use the translate button in your browser, if your device has one. Chrome on a phone: menu ⋮, then Translate. iPhone Safari: aA button, then Translate Website. Edge: menu ⋯, then Translate.") + "</p></div>";
+  var langBtn = '<div class="bh-lwrap"><button class="bh-lang" type="button" id="bh-lang" aria-haspopup="true" aria-expanded="false" aria-controls="bh-lmenu" aria-label="' + lab("เลือกภาษา", "Choose language") + '" data-noi18n="1">' + (lang === "en" ? "EN" : "ไทย") + " ▾</button>" + langMenu + "</div>";
   box.innerHTML = '<div class="bh-in"><a class="bh-logo" href="' + (here === "index.html" ? "#top" : "index.html" + pv) + '" data-noi18n="1"><img src="img/logo.png" alt="" width="34" height="34"><span>สร้าง <b>|</b> BUILD TH</span></a><nav class="bh-nav" id="bh-nav" aria-label="' + lab("เมนูหลัก", "Main menu") + '">' + navHtml + '</nav><div class="bh-tools">' + langBtn + cartBtn + memBtn + '<button class="bh-btn" type="button" aria-expanded="false" aria-controls="bh-nav" aria-label="' + lab("เปิดเมนู", "Open menu") + '">☰</button></div></div>';
   var btn = box.querySelector(".bh-btn");
   function setOpen(o) { box.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); btn.textContent = o ? "✕" : "☰"; btn.setAttribute("aria-label", o ? lab("ปิดเมนู", "Close menu") : lab("เปิดเมนู", "Open menu")); }
@@ -74,9 +78,13 @@
   box.addEventListener("click", function (ev) {
     var top = ev.target.closest(".bh-top");
     if (top && window.matchMedia("(min-width:1081px)").matches) { var g = top.parentNode, o = !g.classList.contains("open"); closeGroups(g); g.classList.toggle("open", o); top.setAttribute("aria-expanded", String(o)); return; }
-    if (ev.target.closest("#bh-lang")) { try { localStorage.setItem("build_lang", lang === "en" ? "th" : "en"); } catch (e) {} location.reload(); return; }
+    var lb = ev.target.closest("#bh-lang"), lm = box.querySelector("#bh-lmenu");
+    if (lb) { var lo = lm.hidden; lm.hidden = !lo; lb.setAttribute("aria-expanded", String(lo)); return; }
+    var lc = ev.target.closest("#bh-lmenu [data-l]");
+    if (lc) { if (lc.getAttribute("data-l") !== lang) { try { localStorage.setItem("build_lang", lc.getAttribute("data-l")); } catch (e) {} location.reload(); } else { lm.hidden = true; } return; }
     if (ev.target.closest(".bh-nav a")) { setOpen(false); closeGroups(); }
   });
-  document.addEventListener("click", function (ev) { if (!ev.target.closest(".bh-grp")) closeGroups(); });
-  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { setOpen(false); closeGroups(); } });
+  function closeLang() { var m = box.querySelector("#bh-lmenu"); if (m && !m.hidden) { m.hidden = true; box.querySelector("#bh-lang").setAttribute("aria-expanded", "false"); } }
+  document.addEventListener("click", function (ev) { if (!ev.target.closest(".bh-grp")) closeGroups(); if (!ev.target.closest(".bh-lwrap")) closeLang(); });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { setOpen(false); closeGroups(); closeLang(); } });
 })();

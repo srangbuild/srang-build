@@ -4036,9 +4036,9 @@ window.SITE = {
       "q": "มีแบบสัญญาจ้างไหม",
       "qEn": "Do you have contract templates",
       "k": "สัญญา สัญญาจ้าง สัญญาเช่า ผู้รับเหมา contract ฟ้อง",
-      "a": "แบบสัญญาอยู่ระหว่างจัดทำและจะเปิดเมื่อทนายตรวจแล้ว ก่อนเซ็นสัญญาจริงควรให้ทนายความอ่านก่อน",
-      "aEn": "Contract templates are in progress. They open after a lawyer checks them. Ask a lawyer to read any contract before you sign.",
-      "href": "index.html#services"
+      "a": "ตอนนี้ร้านมีใบตรวจงาน ยังไม่มีแบบสัญญาจำหน่าย ก่อนเซ็นสัญญาจริงควรให้ทนายความอ่านก่อน และถามข้อสงสัยได้ที่ สคบ. สายด่วน 1166",
+      "aEn": "We sell check sheets. We do not sell contract templates now. Ask a lawyer to read any contract before you sign. In Thailand you can also call the consumer protection office at 1166.",
+      "href": "sheets.html"
     },
     {
       "id": "licensed",

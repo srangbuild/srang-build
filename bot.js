@@ -21,7 +21,7 @@
   function apiOn() { return typeof B.call === "function" && !!((S.member && S.member.api) || /\/_dev\//.test(location.pathname)); }
 
   var css = ".bn-note{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;font-size:15px;line-height:1.5;background:#FFF1E8;color:#6F2B05;border-bottom:1px solid #FFD2B3}.bn-note.warn{background:#FDECEA;color:#7A1C14;border-color:#F5C4BE}.bn-note .x{margin-left:auto;background:none;border:0;font-size:22px;line-height:1;color:inherit;cursor:pointer;min-width:36px;min-height:36px}.bn-note a{color:inherit;font-weight:700}" +
-    ".bt-fab{position:fixed;right:14px;bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:85;display:flex;align-items:center;gap:8px;min-height:50px;padding:0 18px;border:0;border-radius:999px;background:#0F2A44;color:#fff;font:600 15.5px/1 \"IBM Plex Sans Thai\",sans-serif;box-shadow:0 10px 26px rgba(15,42,68,.35);cursor:pointer}.bt-fab:hover{background:#16395C}.bt-fab svg{width:20px;height:20px}" +
+    ".bt-fab{position:fixed;right:14px;bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:85;display:flex;align-items:center;gap:8px;min-height:50px;padding:0 18px;border:0;border-radius:999px;background:#0F2A44;color:#fff;font:600 15.5px/1 \"IBM Plex Sans Thai\",sans-serif;box-shadow:0 10px 26px rgba(15,42,68,.35);cursor:pointer}.bt-fab:hover{background:#16395C}.bt-fab svg{width:20px;height:20px}.bt-fab.bt-typing{display:none}" +
     ".bt-pan{position:fixed;right:14px;bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:96;width:min(400px,calc(100vw - 28px));height:min(600px,calc(100vh - 90px));display:flex;flex-direction:column;background:#F6F4EF;border-radius:18px;box-shadow:0 20px 50px rgba(15,42,68,.4);overflow:hidden;font:16px/1.6 \"IBM Plex Sans Thai\",sans-serif;color:#16202B}" +
     ".bt-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#0F2A44;color:#fff}.bt-hd b{display:block;font-size:16.5px}.bt-hd small{display:block;font-size:12.5px;color:#CFDAE5}.bt-hd button{margin-left:auto;background:none;border:0;color:#fff;font-size:26px;line-height:1;min-width:42px;min-height:42px;cursor:pointer}" +
     ".bt-log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}.bt-m{max-width:90%;padding:9px 12px;border-radius:14px;background:#fff;border:1px solid #DDE3EA;white-space:pre-wrap;overflow-wrap:anywhere}.bt-m.me{align-self:flex-end;background:#FFE7D8;border-color:#FFD2B3}" +
@@ -140,6 +140,9 @@
   fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.7A8 8 0 1 1 21 12z"/></svg>' + esc(T.open);
   fab.addEventListener("click", build);
   document.addEventListener("click", function (ev) { var a = ev.target.closest && ev.target.closest("[data-bot-open]"); if (a) { ev.preventDefault(); build(); } });
+  // บนมือถือ ปุ่มผู้ช่วยหลบตอนพิมพ์ ไม่ให้ทับช่องกรอก
+  document.addEventListener("focusin", function (ev) { if (window.innerWidth <= 768 && /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) fab.classList.add("bt-typing"); });
+  document.addEventListener("focusout", function () { fab.classList.remove("bt-typing"); });
   function start() { document.body.appendChild(fab); drawNotices(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
