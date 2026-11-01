@@ -47,7 +47,7 @@
   var yr = $("yr"); if (yr) yr.textContent = new Date().getFullYear();
   var q = new URLSearchParams(location.search), oid = q.get("o") || "", key = q.get("k") || "";
   function say(t, bad) { var m = $("msg"); m.textContent = t; m.className = "msg" + (bad ? " bad" : ""); m.hidden = !t; }
-  function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
+  function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
   function paint(o) {
     var paid = o.status === ST.paid, rej = o.status === ST.reject, can = o.status === ST.cancel;
     // ขั้นตอนแบบระบบติดตามพัสดุ: แต่ละขั้นมีเวลาจริงจากหลังบ้าน

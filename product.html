@@ -65,10 +65,10 @@
   var items = bundle ? x.items.map(B.find).filter(Boolean) : [];
   var sumOf = function (k) { return items.reduce(function (t, s) { return t + (+s[k] || 0); }, 0); };
   var title = bundle ? x.title : x.title, code = bundle ? x.id : (x.code || x.id);
-  document.title = x.id + " " + title + " — สร้าง | BUILD TH";
+  document.title = B.code(x) + " " + title + " — สร้าง | BUILD TH";
   var md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute("content", (bundle ? x.text : src.sum) || md.getAttribute("content"));
 
-  $("crumbs").innerHTML = mk ? '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("market.html") + '">ร้านฝากขาย</a><span aria-hidden="true">›</span><span>' + esc(x.kind || "") + '</span><span aria-hidden="true">›</span><span aria-current="page">' + esc(x.id) + "</span>" : '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("sheets.html") + '">ใบตรวจงาน</a><span aria-hidden="true">›</span>' + (bundle ? '<a href="' + L("sheets.html") + '#bundle">ชุดรวม</a>' : '<span>' + esc(src.group || "") + "</span>") + '<span aria-hidden="true">›</span><span aria-current="page">' + esc(x.id) + "</span>";
+  $("crumbs").innerHTML = mk ? '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("market.html") + '">ร้านฝากขาย</a><span aria-hidden="true">›</span><span>' + esc(x.kind || "") + '</span><span aria-hidden="true">›</span><span aria-current="page">' + esc(B.code(x)) + "</span>" : '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="' + L("sheets.html") + '">ใบตรวจงาน</a><span aria-hidden="true">›</span>' + (bundle ? '<a href="' + L("sheets.html") + '#bundle">ชุดรวม</a>' : '<span>' + esc(src.group || "") + "</span>") + '<span aria-hidden="true">›</span><span aria-current="page">' + esc(B.code(x)) + "</span>";
 
   // ---------- ภาพ ----------
   function media() {
@@ -147,7 +147,7 @@
   }
   function secIncluded() {
     var sv = B.cart.saving(x.id) || 0, sum = items.reduce(function (t, s) { return t + B.memberPrice(s.price); }, 0);
-    return '<section class="pd-sec" id="inside"><h2>ใบในชุดนี้</h2><ul class="inc">' + items.map(function (s) { return '<li><a href="' + L("product.html", "id=" + encodeURIComponent(s.id)) + '"><span>' + esc(s.id + " " + s.title) + "</span><em>" + esc(s.nPro) + " ข้อ · " + B.baht(B.memberPrice(s.price)) + "</em></a></li>"; }).join("") + "</ul>" +
+    return '<section class="pd-sec" id="inside"><h2>ใบในชุดนี้</h2><ul class="inc">' + items.map(function (s) { return '<li><a href="' + L("product.html", "id=" + encodeURIComponent(s.id)) + '"><span>' + esc(B.code(s) + " " + s.title) + "</span><em>" + esc(s.nPro) + " ข้อ · " + B.baht(B.memberPrice(s.price)) + "</em></a></li>"; }).join("") + "</ul>" +
       '<p class="note">ซื้อแยกทุกใบ (แบบซื้อฉบับนี้) รวม ' + B.baht(sum) + " · ซื้อเป็นชุด " + B.baht(pE) + (sum > pE ? ' · <b style="color:var(--ok)">ถูกกว่า ' + B.baht(sum - pE) + "</b>" : "") + (x.id === "B-ALL" ? " · ชุดรวมฉบับปีให้สิทธิ์ทุกใบของฉบับปีนั้น รวมใบที่ออกเพิ่มและรุ่นปรับปรุงภายในปีของฉบับ" : "") + "</p></section>";
   }
   function secBundles() {
@@ -155,7 +155,7 @@
     var bs = B.bundlesOf(x.id); if (!bs.length) return "";
     return '<section class="pd-sec" id="sets"><h2>ซื้อเป็นชุดถูกกว่า</h2><div class="bcards">' + bs.map(function (b) {
       var s = b.items.reduce(function (t, k) { var y = B.find(k); return t + (y ? B.memberPrice(y.price) : 0); }, 0), p = B.memberPrice(b.price);
-      return '<a class="bcard" href="' + L("product.html", "id=" + encodeURIComponent(b.id)) + '"><b>' + esc(b.id + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(b.items.join(" · ")) + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p ? ' <span class="sv">ถูกกว่าซื้อแยก ' + B.baht(s - p) + "</span>" : "") + "</span></a>";
+      return '<a class="bcard" href="' + L("product.html", "id=" + encodeURIComponent(b.id)) + '"><b>' + esc(B.code(b) + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(b.items.map(function (i) { var y = B.find(i); return y ? B.code(y) : i; }).join(" · ")) + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p ? ' <span class="sv">ถูกกว่าซื้อแยก ' + B.baht(s - p) + "</span>" : "") + "</span></a>";
     }).join("") + "</div></section>";
   }
   // สินค้าฝากขาย: รายละเอียดจากผู้ขาย + ข้อมูลผู้ขาย
@@ -202,13 +202,13 @@
     var a = ev.target.closest("[data-act]"); if (!a) return;
     ev.stopPropagation();
     var up = plan() === "up", act = a.getAttribute("data-act");
-    if (act === "addv") { var ev0 = B.cart.add(x.id + "." + a.getAttribute("data-v"), false); toast(ev0 || "ใส่ " + x.id + " " + B.LANGS[a.getAttribute("data-v")] + " ลงตะกร้าแล้ว"); return; }
+    if (act === "addv") { var ev0 = B.cart.add(x.id + "." + a.getAttribute("data-v"), false); toast(ev0 || "ใส่ " + B.code(x) + " " + B.LANGS[a.getAttribute("data-v")] + " ลงตะกร้าแล้ว"); return; }
     if (act === "upg") { var e0 = B.cart.has(x.id) ? (B.cart.setPlan(x.id, true), "") : B.cart.add(x.id, true); if (e0) { toast(e0); return; } location.href = L("checkout.html"); return; }
     if (B.cart.has(x.id)) { if (act === "now") location.href = L("checkout.html"); else location.href = L("cart.html"); return; }
     var lv0 = lang(), err = B.cart.add(x.id + (lv0 ? "." + lv0 : ""), up);
     if (err) { toast(err); return; }
     if (act === "now") { location.href = L("checkout.html"); return; }
-    toast("ใส่ " + x.id + " ลงตะกร้าแล้ว · " + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้") + " · " + B.LANGS[lv0]);
+    toast("ใส่ " + B.code(x) + " ลงตะกร้าแล้ว · " + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้") + " · " + B.LANGS[lv0]);
     redrawBuy();
   }, true);
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { var l0 = document.querySelector(".lightbox"); if (l0) l0.remove(); } });
@@ -226,7 +226,7 @@
   }
   // ข้อมูลสินค้าสำหรับเครื่องมือค้นหา (เฉพาะรายการที่เปิดขาย)
   if (sell && !x.hidden) {
-    var ld = { "@context": "https://schema.org", "@type": "Product", name: x.id + " " + title, sku: code, description: bundle ? x.text : src.sum, brand: { "@type": "Brand", name: "สร้าง | BUILD TH" },
+    var ld = { "@context": "https://schema.org", "@type": "Product", name: B.code(x) + " " + title, sku: code, description: bundle ? x.text : src.sum, brand: { "@type": "Brand", name: "สร้าง | BUILD TH" },
       offers: { "@type": "Offer", priceCurrency: "THB", price: String(pE), availability: "https://schema.org/InStock", url: location.href.split("#")[0] } };
     if (!bundle && src.img) ld.image = new URL(src.img, location.href).href;
     var sc = document.createElement("script"); sc.type = "application/ld+json"; sc.textContent = JSON.stringify(ld); document.head.appendChild(sc);

@@ -60,7 +60,7 @@
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button"), function (b) { b.disabled = on; }); }
   function run(p, okText) { if (busy) return; lock(true); return p.then(function (r) { lock(false); if (okText) say(okText); return r; }).catch(function (e) { lock(false); say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true); }); }
-  function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
+  function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id) + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : ""); }
   // เข้าระบบสำเร็จ: ถ้ามาจากหน้าชำระเงิน (ร้านแบบอีคอมเมิร์ซ 24 ต.ค. 2026) พากลับไปหน้านั้น ตะกร้ายังอยู่ครบ
   function nextPage() { var n = ""; try { n = sessionStorage.getItem("build_next") || ""; sessionStorage.removeItem("build_next"); } catch (e) {} return /^checkout\.html(\?preview=1)?$/.test(n) ? n : ""; }
   function signedIn(r) { B.token.set(r.token); pending = null; regWait = null; var nx = nextPage(); if (nx) { location.replace(nx); return new Promise(function () {}); } return refresh(true); }
@@ -359,7 +359,7 @@
       '<label><input type="radio" name="plan" value="up"' + (wantU ? " checked" : "") + '><span><b>รับฉบับใหม่ตลอด</b><small>เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ฟรีทุกครั้ง และได้อีเมลแจ้ง</small></span></label></fieldset>' : "";
     return '<form class="card pad" id="f-order">' + plans + '<div class="pick">' + list.map(function (x) {
       var p = B.memberPrice(x.price), pu = +x.priceU > 0 ? B.memberPrice(x.priceU) : 0, want = wantList.indexOf(x.id) >= 0 || wantList.indexOf(x.id + "+U") >= 0;
-      return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + p + '" data-priceu="' + pu + '"' + (want ? " checked" : "") + "><span>" + esc(x.id + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(p) + (pu ? '<small class="pu">รับฉบับใหม่ ' + B.baht(pu) + "</small>" : "") + "</em></label>";
+      return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + p + '" data-priceu="' + pu + '"' + (want ? " checked" : "") + "><span>" + esc(B.code(x) + " " + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(p) + (pu ? '<small class="pu">รับฉบับใหม่ ' + B.baht(pu) + "</small>" : "") + "</em></label>";
     }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">' + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ</p></form>";
   }
   /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
@@ -396,7 +396,7 @@
     if (last < 0) return "";
     var list = STAGE.slice(last + 1).filter(function (id) { var x = B.find(id); return x && x.ok === true && +x.price > 0 && own.indexOf(id) < 0 && !(id === "F-01B" && own.indexOf("F-01A") >= 0); }).slice(0, 2);
     if (!list.length) return "";
-    return '<section class="sec"><h2>งานถัดไปที่ควรตรวจ</h2><div class="card pad"><p class="note" style="margin:0 0 10px">เรียงตามลำดับงานทั่วไป ลำดับจริงขึ้นกับแบบและผู้รับเหมา</p>' + list.map(function (id) { var x = B.find(id); return '<p style="margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center"><span>' + esc(x.id + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="product.html?id=' + encodeURIComponent(id) + (q ? "&" + q.replace(/^\?/, "") : "") + '">ดูใบนี้</a></p>'; }).join("") + "</div></section>";
+    return '<section class="sec"><h2>งานถัดไปที่ควรตรวจ</h2><div class="card pad"><p class="note" style="margin:0 0 10px">เรียงตามลำดับงานทั่วไป ลำดับจริงขึ้นกับแบบและผู้รับเหมา</p>' + list.map(function (id) { var x = B.find(id); return '<p style="margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center"><span>' + esc(B.code(x) + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="product.html?id=' + encodeURIComponent(id) + (q ? "&" + q.replace(/^\?/, "") : "") + '">ดูใบนี้</a></p>'; }).join("") + "</div></section>";
   }
   function paneDocs() {
     var lib = libOf();

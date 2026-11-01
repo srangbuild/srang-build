@@ -53,7 +53,7 @@
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button, #view input, #view select, #view textarea"), function (b) { if (on) { b.dataset.was = b.disabled ? "1" : ""; b.disabled = true; } else b.disabled = b.dataset.was === "1"; }); var s = document.querySelector("#view [data-go]"); if (s) { if (on) { s.dataset.txt = s.textContent; s.textContent = "กำลังดำเนินการ…"; } else if (s.dataset.txt) s.textContent = s.dataset.txt; } }
   function steps(n) { [].forEach.call($("steps").children, function (li, i) { li.className = i < n ? "done" : i === n ? "on" : ""; if (i === n) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current"); }); }
-  function title(id) { var x = B.find(id); return (x ? x.id + " " + x.title : id); }
+  function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id); }
   function planTx(id) { var x = B.find(id); return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด"; }
   function trackUrl(o) { return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k=" + encodeURIComponent(o.track) : ""; }
   function copyBtn(text, label) { return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก") + "</button>"; }

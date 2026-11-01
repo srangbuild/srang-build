@@ -140,3 +140,5 @@
 
   window.BUILD = { baseOf: baseOf, isUpd: isUpd, rootOf: rootOf, varOf: varOf, langsOf: langsOf, langLabel: langLabel, LANGS: LANGS, LANGS_EN: LANGS_EN, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, market: market, isMarket: isMarket, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();
+// 1 พ.ย. 2026 (Q29, C03): รหัสที่ลูกค้าเห็นต้องตรงกับรหัสบน PDF (เช่น BTH-F05-P) · id ภายในไม่เปลี่ยน · ชุดรวม = BTH-BHO
+window.BUILD.code = function (x) { if (!x) return ""; if (x.code) return String(x.code); var id = String(x.id || ""); if (/^[FT]-\d/.test(id)) return "BTH-" + id.replace("-", "") + "-P"; if (x.items) return "BTH-" + id.replace(/-/g, ""); return id; };
