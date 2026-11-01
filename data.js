@@ -875,7 +875,7 @@ window.SITE = {
   "pay": {
     "on": true,
     "qr": "pay/qr.jpg",
-    "bank": "BBL",
+    "bank":  "ธนาคารกรุงเทพ",
     "name": "Thanatat J",
     "acc": "1314132745",
     "hours": 24,

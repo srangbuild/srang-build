@@ -171,3 +171,8 @@
 .pmg summary small { font-weight:500; color:var(--mute); font-size:13px; margin-left:4px; }
 .pmg[open] { padding-bottom:12px; }
 .pmg > label { margin-top:8px; }
+
+/* 1 Nov 2026: small phones, long select text and grid items must not push the page wider than the screen */
+.ln .tt, .ln .ctl, .ln .ctl label, .cosec, .cosec > *, main form.f, main aside { min-width:0; }
+.ln .ctl select, .cosec select { max-width:100%; min-width:0; }
+@media (max-width:400px) { .ln .ctl label, .ln .ctl select { width:100%; } .cosec { padding:16px 14px; } }

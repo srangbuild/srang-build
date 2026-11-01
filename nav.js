@@ -49,7 +49,7 @@
     ".bh-sub{display:block;position:static;background:none;border:0;box-shadow:none;padding:0;min-width:0}.bh-sub a{color:#fff;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.07);font-size:16.5px}.bh-sub a small{display:none}.bh-sub a:hover,.bh-sub a[aria-current]{background:rgba(255,255,255,.13);color:#fff}" +
     ".bh-mm{display:block!important;margin-top:10px;text-align:center;background:#FF6B1A!important;color:#fff!important;font-weight:700}}" +
     "@media(min-width:1081px){.bh-mm{display:none!important}}" +
-    "@media(max-width:400px){.bh-logo span{font-size:15px}}" +
+    "@media(max-width:400px){.bh-logo span{font-size:15px}.bh-in{padding:0 10px;gap:6px}.bh-cart i{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;font-size:11px;line-height:18px}}@media(max-width:350px){.bh-logo span{display:none}}" +
     "@media print{.bh{display:none!important}}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   var box = document.getElementById("hdr"); if (!box) return;

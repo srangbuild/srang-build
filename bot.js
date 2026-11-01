@@ -143,6 +143,16 @@
   // บนมือถือ ปุ่มผู้ช่วยหลบตอนพิมพ์ ไม่ให้ทับช่องกรอก
   document.addEventListener("focusin", function (ev) { if (window.innerWidth <= 768 && /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) fab.classList.add("bt-typing"); });
   document.addEventListener("focusout", function () { fab.classList.remove("bt-typing"); });
-  function start() { document.body.appendChild(fab); drawNotices(); }
+  // ปุ่มผู้ช่วยไม่ทับปุ่มตะกร้าและแถบซื้อด้านล่าง: ยกตัวเองขึ้นเหนือสิ่งที่อยู่ก้นจอ (1 พ.ย. 2026)
+  function dock() {
+    var top = window.innerHeight;
+    [".bc-fab", "#mbar"].forEach(function (s) { var e = document.querySelector(s), r = e && e.getBoundingClientRect(); if (r && r.width > 0 && r.height > 0) top = Math.min(top, r.top); });
+    fab.style.bottom = top < window.innerHeight ? Math.round(window.innerHeight - top + 10) + "px" : "";
+  }
+  function start() {
+    document.body.appendChild(fab); drawNotices(); dock();
+    new MutationObserver(dock).observe(document.body, { attributes: true, subtree: true, attributeFilter: ["class"] });
+    window.addEventListener("resize", dock);
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
