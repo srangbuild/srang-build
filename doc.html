@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบฟอร์มเอกสารอัจฉริยะ เลือกภาษา มาตรฐาน กฎหมาย — สร้าง | BUILD TH</title>
+<meta name="description" content="สร้างใบตรวจงานก่อสร้างได้ทันที เลือก 26 ภาษา มาตรฐานอ้างอิง และกฎหมายท้องถิ่น แล้วพิมพ์เป็น PDF">
+<meta name="theme-color" content="#0F2A44">
+<meta property="og:title" content="สั่งทำเอกสาร — สร้าง | BUILD TH">
+<meta property="og:image" content="img/og.jpg">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="shop.css">
+<style>
+.hero-cta { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 0 !important; }
+.hero-cta .b.line { background:transparent; color:#fff; border-color:rgba(255,255,255,.45); }
+.kinds { display:grid; gap:12px; } @media (min-width:760px) { .kinds { grid-template-columns:repeat(3,1fr); } }
+.kinds .card { padding:16px; display:flex; flex-direction:column; gap:6px; }
+.kinds h3 { margin:0; font-size:17.5px; color:var(--navy); line-height:1.4; }
+.kinds p { margin:0; font-size:15px; color:#3B4654; }
+.kinds .ex { font-size:13.5px; color:var(--mute); }
+.kinds .b { margin-top:auto; align-self:flex-start; }
+.steps4 { counter-reset:s; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+@media (min-width:760px) { .steps4 { grid-template-columns:repeat(4,1fr); } }
+.steps4 li { background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px; font-size:15px; }
+.steps4 li::before { counter-increment:s; content:counter(s); display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:var(--orange); color:#fff; font:700 15px/1 "Kanit",sans-serif; margin-bottom:8px; }
+.steps4 li b { display:block; color:var(--navy); margin-bottom:2px; }
+.terms2 { display:grid; gap:12px; } @media (min-width:760px) { .terms2 { grid-template-columns:1fr 1fr; } }
+.terms2 ul { margin:0; padding-left:20px; font-size:15px; display:grid; gap:4px; }
+.langpick { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 2px; }
+.langpick label { display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); border-radius:12px; padding:9px 14px; cursor:pointer; font-weight:600; background:#fff; }
+.langpick label:has(input:checked) { border-color:var(--orange); background:#FFF6EF; }
+.preview { border:1px dashed #B9C3CF; border-radius:12px; padding:10px 14px; background:#FBFCFD; font-size:14.5px; }
+.preview b { color:var(--navy); } .preview .l2 { color:#3F4A58; font-size:13.5px; display:block; }
+</style>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<style>
+.docform .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+#result[hidden]{display:none}
+.sheetpaper{background:#fff;color:#16202B;border:1px solid var(--line);border-radius:14px;padding:18px;overflow:hidden}
+.dh{display:flex;justify-content:space-between;gap:14px;border-bottom:3px solid #0F2A44;padding-bottom:10px}.dt{font:700 22px/1.3 "Kanit",sans-serif;color:#0F2A44}.dt .l2{font-size:16px;font-weight:500}.ds{margin:6px 0 0;font-size:14px}.dc{text-align:right;font-size:13px;white-space:nowrap}
+.warn{background:#FFF4D6;color:#3A2B05;padding:8px 12px;border-radius:8px;font-size:14px;margin:10px 0}
+.flds{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;margin:12px 0}.fld{border:1px solid #C9D2DC;border-radius:6px;padding:5px 8px;font-size:13px;min-height:48px}.fld .k{color:#4B5B6B;font-size:12px}.fld .v{font-weight:600}
+.key{font-size:12.5px;margin:6px 0}.l2{color:#4B5B6B;font-size:.92em}
+.tw{overflow-x:auto}.dtb{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}.dtb th,.dtb td{border:1px solid #9AA7B4;padding:5px 6px;vertical-align:top;text-align:start}.dtb th{background:#0F2A44;color:#fff;font-weight:600;font-size:12px}.dtb th .l2{color:#D5E1EE}.dtb .st td{background:#E4EAF1;font-weight:700}.dtb .c{text-align:center}.dtb .b{width:34px}.dtb .fl{background:#FFF9E8}.ref{margin-top:4px;padding-top:4px;border-top:1px dashed #9AA7B4;font-size:12px;color:#4B5B6B}
+.recs h3{margin:14px 0 6px;font-size:15px}.rec{border:1px solid #9AA7B4;padding:6px 8px;margin-bottom:4px;font-size:13px;min-height:58px}
+.sign{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px;font-size:13px}.sign .ln{display:block;border-bottom:1px solid #16202B;height:34px}
+.rm{margin-left:4px;width:26px;height:26px;border:1px solid #C0392B;background:#fff;color:#C0392B;border-radius:6px;cursor:pointer}[contenteditable=true]{outline:1px dashed #FF6B1A}.l3{color:#6B7785;font-size:.82em}#l2wrap[hidden]{display:none}.mv{min-width:60px}.printdraft{display:none}.rect{min-width:0}.lawb{border:1px solid #C9D2DC;border-radius:8px;padding:8px 10px;margin:10px 0;font-size:12.5px}.lawb h3{margin:0 0 4px;font-size:14px}.lawb div{margin:2px 0;overflow-wrap:anywhere}.fine{font-size:11.5px;color:#4B5B6B;margin:8px 0 0}
+@media print{@page{size:A4 landscape;margin:10mm}.printdraft{display:block;position:fixed;bottom:0;right:0;font-size:9px;background:#fff}[contenteditable=true]{outline:0}body{background:#fff}body>*:not(main),.noprint,#main>section:not(#result){display:none!important}#main,#result{display:block!important;margin:0;padding:0;max-width:none}.sheetpaper{border:0;padding:0}.tw{overflow:visible}.dtb{min-width:0}.dtb tr{break-inside:avoid}.dtb th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<div id="hdr"></div><script src="nav.js"></script>
+<div class="demo" id="demo" hidden>โหมดทดลอง: ระบบสมาชิกยังไม่ได้ต่อกับหลังบ้าน ข้อมูลที่กรอกอยู่ในเบราว์เซอร์เครื่องนี้เท่านั้น</div>
+
+<header class="hero noprint"><div class="wrap"><span class="eyebrow">ระบบฟอร์มเอกสารอัจฉริยะ</span><h1>เลือกแล้ว <em>พิมพ์ได้ทันที</em></h1><p>เลือกใบตรวจงาน 1 หรือ 2 ภาษา เลือกมาตรฐานอ้างอิงและประเทศ แล้วกรอกค่าตามข้อกำหนดของโครงการคุณ</p></div></header>
+
+<main class="wrap" id="main">
+  <section class="narrow noprint">
+    <div class="head"><h2 class="kn">สร้างเอกสาร</h2><p class="lead">เลือกใบตรวจงาน ภาษา มาตรฐาน และกฎหมายท้องถิ่น แล้วได้เอกสารพร้อมพิมพ์ทันที ไม่ต้องรอใบเสนอราคา</p></div>
+    <p class="msg" id="msg" role="status" aria-live="polite" hidden></p>
+    <p id="loginLink" hidden><a class="b line sm" href="member.html?next=doc.html">เข้าสู่ระบบหรือสมัครสมาชิก</a></p>
+    <form class="f card pad docform" id="f-doc" novalidate>
+      <label>ใบตรวจงาน<select name="sheet" id="sheet"></select></label>
+      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">จำนวนภาษาบนเอกสาร</legend><div class="langpick"><label><input type="radio" name="nlang" value="1"> 1 ภาษา</label> <label><input type="radio" name="nlang" value="2" checked> 2 ภาษา (เลือกจับคู่ได้ทุกคู่)</label></div></fieldset>
+      <div class="g3"><label><span id="l1txt">ภาษาที่ 1 (ข้อความหลัก)</span><select name="lang1" id="lang1"></select></label><label id="l2wrap">ภาษาที่ 2<select name="lang2" id="lang2"></select></label></div>
+      <div class="g3"><label>มาตรฐานอ้างอิง<select name="std"><option value="th">ไทย: ใช้ค่าตามฉบับไทย</option><option value="int">สากล: กรอกตามข้อกำหนดโครงการ</option><option value="hk">ฮ่องกง: กรอกตามข้อกำหนดโครงการ</option><option value="sg">สิงคโปร์: กรอกตามข้อกำหนดโครงการ</option><option value="other">มาตรฐานอื่น: กรอกตามข้อกำหนดโครงการ</option></select></label><label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI"><option value="ASTM"><option value="Eurocode"><option value="BS"><option value="JIS"><option value="GB"><option value="AS/NZS"><option value="IS"><option value="SNI"><option value="TCVN"><option value="MS"><option value="มยผ."><option value="มอก."><option value="วสท."></datalist></label></div>
+      <label>กฎหมายท้องถิ่น: ประเทศที่โครงการตั้งอยู่<select name="law" id="law"></select></label><div class="note" id="lawInfo" style="margin:0"></div>
+      <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
+      <button class="b pri" type="submit">สร้างเอกสาร</button>
+      <p class="note" style="margin:0">ซื้อใบนี้แล้วสร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับที่ซื้อ (ฉบับอังกฤษ-ไทย = ไทยและอังกฤษ มาตรฐานไทย) · ภาษาและมาตรฐานอื่นเป็นฉบับแยก กำลังเปิดขาย · ยังไม่ซื้อ ดูตัวอย่างข้อฟรีได้ · ค่าเกณฑ์นอกฉบับไทยให้กรอกตามข้อกำหนดของโครงการ ระบบไม่เดาตัวเลขแทนคุณ</p>
+      <p class="note" style="margin:0">ภาษาอื่นนอกจากไทยและอังกฤษแปลด้วยเครื่อง ระบบตรวจตัวเลข ช่องกรอก และแปลกลับทุกช่อง แต่ไม่แทนการตรวจโดยผู้แปล ถ้าเอกสารไม่มีไทยหรืออังกฤษ ระบบเติมบรรทัดควบคุมอังกฤษตัวเล็กให้</p>
+    </form>
+  </section>
+  <section id="result" hidden>
+    <p class="noprint"><button class="b pri" type="button" id="printBtn">พิมพ์หรือบันทึกเป็น PDF</button> <button class="b line" type="button" id="editBtn">แก้ไขเอกสาร</button> <button class="b line" type="button" id="addRow" hidden>เพิ่มรายการ</button></p>
+    <div class="sheetpaper" id="sheetOut"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>เอกสารสั่งทำเป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด หรือการตรวจโดยผู้มีใบอนุญาต</p>
+    <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
+  </div>
+</footer>
+
+<script src="doc-law.js"></script><script src="doc.js"></script>
+</body>
+</html>

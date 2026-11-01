@@ -320,8 +320,8 @@
       return '<article class="card ep"><div class="im">' + (e.cover ? '<img src="' + esc(e.cover) + '" alt="ปกตอน #' + esc(e.no) + '" loading="lazy" width="360" height="480">' : "") + badge + '</div><div class="tx"><h3>#' + esc(e.no) + " " + esc(e.title) + '</h3><div class="meta">' + esc(e.topic || "") + (e.date ? " · " + fmt(e.date) : "") + "</div>" + (w ? '<div class="acts">' + w + "</div>" : "") + (e.songTitle ? '<div class="song">เพลง “' + esc(e.songTitle) + "”" + (s ? ' <span class="acts" style="display:inline-flex;margin-left:4px">' + s + "</span>" : (e.songDate ? " · " + fmt(e.songDate, true) : "")) + "</div>" : "") + "</div></article>";
     }).join("");
   }
-  $("chips").innerHTML = ["ทั้งหมด"].concat(topics).map(function (t) { return '<button class="chip" type="button" aria-pressed="' + (t === cur) + '">' + esc(t) + "</button>"; }).join("");
-  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); drawEps(); });
+  $("chips").innerHTML = ["ทั้งหมด"].concat(topics).map(function (t) { return '<button class="chip" type="button" data-v="' + esc(t) + '" aria-pressed="' + (t === cur) + '">' + esc(t) + "</button>"; }).join("");
+  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.getAttribute("data-v") || b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); drawEps(); });
   drawEps();
 
   // ของที่ใช้ในคลิป (แสดงเฉพาะรายการที่ใส่ลิงก์แล้ว)

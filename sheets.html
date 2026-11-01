@@ -26,7 +26,7 @@
 .tools2 input:focus, .tools2 select:focus { border-color:var(--orange); outline:none; }
 .tools2 .srt { display:flex; align-items:center; gap:8px; font-size:14.5px; color:var(--mute); }
 .tools2 .srt select { width:auto; }
-.sr { position:absolute; left:-9999px; }
+.sr { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
 @media (max-width:640px) { .hero { padding:22px 0 24px; } .hero p { font-size:16px; } .hero-pts { font-size:14px; gap:4px; } .hero-cta .b { flex:1 1 140px; min-height:44px; padding:8px 12px; font-size:15px; } }
 </style>
 <script src="data.js"></script>
@@ -163,8 +163,8 @@
     }).join("") || '<p class="note">' + (term ? "ไม่พบใบตรวจงานที่ตรงกับ “" + esc(term) + "” ลองคำอื่น หรือเลือกกลุ่ม ทั้งหมด" : "ยังไม่มีใบตรวจงานในกลุ่มนี้") + "</p>";
     relabel();
   }
-  $("chips").innerHTML = ["ทั้งหมด"].concat(groups).map(function (g) { return '<button class="chip" type="button" aria-pressed="' + (g === cur) + '">' + esc(g) + "</button>"; }).join("");
-  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); });
+  $("chips").innerHTML = ["ทั้งหมด"].concat(groups).map(function (g) { return '<button class="chip" type="button" data-v="' + esc(g) + '" aria-pressed="' + (g === cur) + '">' + esc(g) + "</button>"; }).join("");
+  $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.getAttribute("data-v") || b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); });
   draw();
   // แพ็กเกจตามกลุ่มผู้ใช้ (สภา 30 ต.ค. 2026): พูดภาษาคนซื้อ ไม่ใช่ภาษางานช่าง · ส่วนต่างคำนวณจริงจากราคารายใบ
   var packs = B.bundles.filter(function (x) { return x.aud && x.aud !== "job"; }), AUD = { home: "บ้านและคอนโด", building: "อาคาร", factory: "โรงงาน" };

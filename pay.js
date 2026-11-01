@@ -57,7 +57,7 @@
   }
   // หลายสกุลเงิน: บัตร (Opn Multi-currency) และ PayPal จ่ายเป็นสกุลเงินของลูกค้าได้ · ช่องทางอื่นจ่ายเป็นบาท · ร้านได้รับเป็นบาทเสมอ · ราคาจริงมาจากหลังบ้านเท่านั้น
   var CUR = { THB: ["฿", "บาท"], USD: ["US$", "ดอลลาร์สหรัฐ"], EUR: ["€", "ยูโร"], GBP: ["£", "ปอนด์สเตอร์ลิง"], JPY: ["¥", "เยน"], SGD: ["S$", "ดอลลาร์สิงคโปร์"], AUD: ["A$", "ดอลลาร์ออสเตรเลีย"], HKD: ["HK$", "ดอลลาร์ฮ่องกง"], CNY: ["CN¥", "หยวน"], CHF: ["CHF ", "ฟรังก์สวิส"], DKK: ["DKK ", "โครนเดนมาร์ก"], NOK: ["NOK ", "โครนนอร์เวย์"], SEK: ["SEK ", "โครนาสวีเดน"] };
-  var curNow = (function () { try { var c = sessionStorage.getItem("build_pay_cur"); if (CUR[c]) return c; } catch (e) {} return localStorageLang() === "en" ? "USD" : "THB"; })();
+  var curNow = (function () { try { var c = sessionStorage.getItem("build_pay_cur"); if (CUR[c]) return c; } catch (e) {} var pl = localStorageLang(); return pl && pl !== "th" ? "USD" : "THB"; })();
   function localStorageLang() { try { return localStorage.getItem("build_lang") || ""; } catch (e) { return ""; } }
   function curs(me) { // สกุลเงินที่ใช้ได้จริงตอนนี้: บาท + สกุลบัตรของบัญชี Opn + สกุลของ PayPal
     var p = me && me.pay, want = Array.isArray(P.currencies) && P.currencies.length ? P.currencies : Object.keys(CUR);

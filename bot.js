@@ -6,7 +6,7 @@
   var B = window.BUILD || {}, S = window.SITE || B.S || {};
   var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
   if (/^(admin|receipt|go)\.html$/.test(here) || /[?&]shot=1/.test(location.search)) return;
-  var EN = false; try { EN = localStorage.getItem("build_lang") === "en"; } catch (e) {}
+  var EN = false; try { var bl = localStorage.getItem("build_lang"); EN = !!bl && bl !== "th"; } catch (e) {}
   var T = EN ? {
     open: "Ask us", title: "BUILD helper", sub: "Automatic answers. This helper is not a person.", hello: "Hello. Choose a topic or type your question.", ph: "Type your question", send: "Send", close: "Close",
     more: "Read more", good: "This helps", bad: "Not what I asked", none: "We have no answer for this yet. Send it to the shop, or contact us on LINE.", thanks: "Thank you.",

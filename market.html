@@ -136,7 +136,7 @@
     }).join("") || '<p class="note">ไม่มีสินค้าในประเภทนี้</p>';
     try { window.dispatchEvent(new Event("build-cart")); } catch (e) {}
   }
-  if (kinds.length > 1) { $("chips").innerHTML = ["ทั้งหมด"].concat(kinds).map(function (k) { return '<button class="chip" type="button" aria-pressed="' + (k === cur) + '">' + esc(k) + "</button>"; }).join(""); $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); }); } else $("chips").hidden = true;
+  if (kinds.length > 1) { $("chips").innerHTML = ["ทั้งหมด"].concat(kinds).map(function (k) { return '<button class="chip" type="button" data-v="' + esc(k) + '" aria-pressed="' + (k === cur) + '">' + esc(k) + "</button>"; }).join(""); $("chips").addEventListener("click", function (ev) { var b = ev.target.closest(".chip"); if (!b) return; cur = b.getAttribute("data-v") || b.textContent; [].forEach.call($("chips").children, function (c) { c.setAttribute("aria-pressed", String(c === b)); }); draw(); }); } else $("chips").hidden = true;
   draw();
 
   // ใบสมัครฝากขาย → หลังบ้าน (action consign) · กันส่งซ้ำระหว่างรอ
