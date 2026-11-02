@@ -16,6 +16,7 @@
     if (n && n !== cc) return n;
     return REC[cc] ? (lang === "th" ? REC[cc].countryTh : REC[cc].country) : cc;
   }
+  function labelIn(cc, lg) { try { var n = new Intl.DisplayNames([lg], { type: "region", style: "short" }).of(cc); if (n && n !== cc) return n; } catch (e) {} return REC[cc] ? REC[cc].country : cc; }
   function defaultCc() { return LANG_CC[lang] || "TH"; }
   function data(cc, sheet) { var c = REFS.cc && REFS.cc[cc]; return (c && c.sheets && c.sheets[sheet]) || null; }
   function countries() { var first = defaultCc(); return Object.keys(REC).sort(function (a, b) { return a === first ? -1 : b === first ? 1 : a === "TH" ? -1 : b === "TH" ? 1 : label(a).localeCompare(label(b), lang); }); }
@@ -24,9 +25,10 @@
     var o = function (c) { return '<option value="' + esc(c) + '"' + (c === sel ? " selected" : "") + ">" + esc(label(c)) + "</option>"; };
     return '<optgroup label="มีข้อมูลของใบนี้แล้ว">' + yes.map(o).join("") + "</optgroup>" + (no.length ? '<optgroup label="ประเทศอื่น กรอกค่าตามข้อกำหนดโครงการ">' + no.map(o).join("") + "</optgroup>" : "");
   }
+  var langSite = lang;
   // English notes: translated once per language, kept in this browser
-  function trEn(root) {
-    if (lang === "en") return;
+  function trEn(root, target) {
+    var lang = target || langSite; if (lang === "en") return;
     var els = [].slice.call(root.querySelectorAll("[data-en]")); if (!els.length) return;
     var key = "build_sx_" + lang, cache = {}; try { cache = JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (e) {}
     var need = [], put = function () { els.forEach(function (e) { var t = cache[e.getAttribute("data-en")]; if (t) e.textContent = t; }); };
@@ -65,26 +67,26 @@
       if (!d) return '<div class="sx-empty"><b>ยังไม่มีค่าที่ตรวจแล้วของประเทศนี้สำหรับใบนี้</b><p>ฟอร์มใช้ได้ทันที ช่องเกณฑ์เว้นให้กรอกตามข้อกำหนดโครงการ และพิมพ์เกณฑ์ไทยเป็นข้อมูลอ้างอิง</p>' + (r && r.codeName ? '<p><b>มาตรฐานหลักของประเทศนี้</b><br>' + off(r.codeName) + "</p>" : "") + "</div>";
       var rows = d.s.map(function (n, i) {
         var t = d.t ? trow(d, i) : null, c = countOf(d, i);
-        var box = many && c > 0; return (box ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"' + (S.off[n] ? "" : " checked") + ">" : '<div class="sx-i">') + '<span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b>" + (t && t.name ? "<small>" + esc(t.name) + (t.by ? " · " + esc(t.by) : "") + "</small>" : "") + "</span>" + (c ? "<em>" + c + " ข้อ</em>" : "") + (box ? "</label>" : "</div>");
+        var box = many && c > 0; return (box ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"' + (S.off[n] ? "" : " checked") + ">" : '<div class="sx-i">') + '<span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b>" + (t && t.name ? "<small>" + esc(t.name) + (t.by ? " · " + esc(t.by) : "") + "</small>" : "") + "</span>" + (c ? "<em>" + c + " <span>ข้อ</span></em>" : "") + (box ? "</label>" : "</div>");
       }).join("");
       var cv = cover(d, S.off), n = d.n || 0, pct = n ? Math.round(cv.have / n * 100) : 0, names = (o.stages || []);
-      var stage = names.map(function (nm, i) { var p = cv.per[i]; if (!p) return ""; return '<li><span>' + esc(nm) + "</span><b>" + p.n + " ข้อ</b>" + (many ? '<small data-noi18n="1">' + Object.keys(p.by).map(function (k) { var tk = d.t ? trow(d, +k).code : d.s[+k]; return esc(tk) + " " + p.by[k]; }).join(" · ") + "</small>" : "") + "</li>"; }).join("");
+      var stage = names.map(function (nm, i) { var p = cv.per[i]; if (!p) return ""; return '<li><span>' + esc(nm) + "</span><b>" + p.n + " <span>ข้อ</span></b>" + (many ? '<small data-noi18n="1">' + Object.keys(p.by).map(function (k) { var tk = d.t ? trow(d, +k).code : d.s[+k]; return esc(tk) + " " + p.by[k]; }).join(" · ") + "</small>" : "") + "</li>"; }).join("");
       return '<p class="sx-lead">' + (many ? "เรื่องนี้มีมาตรฐานหลายตัว เลือกตัวที่ต้องการ ระบบแสดงผลและใช้ในฟอร์มตามที่เลือก" : "มาตรฐานที่ใช้กับใบนี้") + '</p><div class="sx-list">' + rows + "</div>" +
         (many ? '<p class="sx-tools"><button type="button" class="sx-l" data-sxall="1">เลือกทั้งหมด</button></p>' : "") +
         '<div class="sx-sum"><div class="sx-m"><b>' + (d.t ? "ใช้เกณฑ์ตามมาตรฐานที่เลือก " : "มีค่าที่ตรวจแล้ว ") + cv.have + " ข้อ จาก " + n + ' ข้อ</b><span class="sx-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span></div>' + (stage ? '<ul class="sx-st">' + stage + "</ul>" : "") + (cv.have < n ? '<p class="note" style="margin:6px 0 0">ข้อที่เหลือเว้นช่องให้กรอกตามข้อกำหนดโครงการ</p>' : "") + "</div>";
     }
     function panelLaw() {
       var r = REC[S.cc]; if (!r) return '<div class="sx-empty"><b>ยังไม่มีข้อมูลกฎหมายของประเทศนี้</b></div>';
-      var row = function (k, v) { return v ? "<dt>" + k + "</dt><dd>" + v + "</dd>" : ""; };
-      var c = REFS.cc && REFS.cc[S.cc], l = (c && c.law) || {}, src = [r.sourceUrl, r.sourceUrl2].concat(l.sources || []).filter(function (u, i, a) { return /^https:\/\//.test(String(u)) && a.indexOf(u) === i; }).slice(0, 4);
-      return '<dl class="sx-dl">' + row("กฎหมายหลัก", off(l.mainLaw || r.lawName) + (r.lawNameLocal ? "<br>" + off(r.lawNameLocal) : "")) + row("หน่วยงาน", en(l.authority || r.authority)) + row("ขออนุญาตที่", en(l.permitBody)) + row("การตรวจตามกฎหมาย", en(l.mandatoryInspections)) + row("ผู้มีใบอนุญาต", en(l.licensedPersons || r.licensed)) + row("มาตรฐานหลัก", off(r.codeName)) + row("หน่วยงานมาตรฐาน", off(r.standardsBody)) + row("ตรวจข้อมูลเมื่อ", off(c && c.date ? c.date : r.checked) + (r.confidence === "official" ? "" : " · ยังไม่ยืนยันจากแหล่งทางการ")) + row("แหล่งข้อมูล", src.map(function (u, i) { return '<a href="' + esc(u) + '" target="_blank" rel="noopener nofollow">' + (i + 1) + " " + esc(String(u).replace(/^https:\/\/(www\.)?/, "").split("/")[0]) + "</a>"; }).join(" · ")) + "</dl>";
+      var row = function (k, v) { return v ? "<dt>" + k + "</dt><dd>" + v + "</dd>" : ""; }, c = REFS.cc && REFS.cc[S.cc], src = [r.sourceUrl, r.sourceUrl2].filter(function (u) { return /^https:\/\//.test(String(u)); });
+      return '<dl class="sx-dl">' + row("กฎหมายหลัก", off(r.lawName) + (r.lawNameLocal && r.lawNameLocal !== r.lawName ? "<br>" + off(r.lawNameLocal) : "")) + row("หน่วยงาน", en(r.authority)) + row("ผู้มีใบอนุญาต", en(r.licensed)) + row("มาตรฐานหลัก", off(r.codeName)) + row("หน่วยงานมาตรฐาน", off(r.standardsBody)) + row("ตรวจข้อมูลเมื่อ", off(c && c.date ? c.date : r.checked) + (r.confidence === "official" ? "" : ' · <span class="sx-warn">ยังไม่ยืนยันจากแหล่งทางการ</span>')) + row("แหล่งข้อมูล", src.map(function (u, i) { return '<a href="' + esc(u) + '" target="_blank" rel="noopener nofollow">' + (i + 1) + " " + esc(String(u).replace(/^https:\/\/(www\.)?/, "").split("/")[0]) + "</a>"; }).join(" · ")) + '</dl><p class="note" style="margin:8px 0 0">รายละเอียดการตรวจตามกฎหมาย พิมพ์ในภาคผนวก ข ท้ายเอกสารฉบับประเทศ</p>';
     }
-    function panelSys() {
-      var c = REFS.cc && REFS.cc[S.cc], sys = (c && c.sys) || null, r = REC[S.cc];
-      var TOP = [["building", "งานอาคาร"], ["concrete", "คอนกรีต"], ["steel", "เหล็ก"], ["electrical", "ไฟฟ้า"], ["plumbing", "ประปาและสุขาภิบาล"], ["fire", "อัคคีภัย"], ["safety", "ความปลอดภัย"]];
-      if (S.cc === "TH") return '<dl class="sx-dl"><dt>กฎหมายและมาตรฐาน</dt><dd>' + esc(lang === "th" ? "กฎกระทรวงตามพระราชบัญญัติควบคุมอาคาร และมาตรฐาน มยผ. มอก. วสท." : r ? r.codeName : "") + "</dd></dl>";
-      if (!sys) return '<div class="sx-empty"><b>ยังไม่ได้ค้นรายละเอียดตามหมวดงานของประเทศนี้</b>' + (r && r.codeName ? "<p>" + off(r.codeName) + "</p>" : "") + "</div>";
-      return '<dl class="sx-dl">' + TOP.map(function (t) { return sys[t[0]] ? "<dt>" + t[1] + "</dt><dd>" + en(sys[t[0]]) + "</dd>" : ""; }).join("") + "</dl>";
+    function panelSys() { // ทุกมาตรฐานที่ระบบใช้กับประเทศนี้ และใช้กับใบไหนบ้าง
+      var c = REFS.cc && REFS.cc[S.cc], r = REC[S.cc], sh = (c && c.sheets) || {}, map = {}, order = [];
+      Object.keys(sh).sort().forEach(function (id) { var d = sh[id]; d.s.forEach(function (n, i) { var t = d.t ? trow(d, i).code : n; if (!map[t]) { map[t] = []; order.push(t); } map[t].push(id); }); });
+      if (!order.length) return '<div class="sx-empty"><b>ยังไม่ได้ค้นรายชื่อมาตรฐานตามใบงานของประเทศนี้</b>' + (r && r.codeName ? "<p>" + off(r.codeName) + "</p>" : "") + "</div>";
+      order.sort(function (a, b) { var ha = map[a].indexOf(o.sheet) >= 0 ? 0 : 1, hb = map[b].indexOf(o.sheet) >= 0 ? 0 : 1; return ha - hb || map[b].length - map[a].length || a.localeCompare(b); }); // ใบนี้ขึ้นก่อน
+      var nHere = order.filter(function (t) { return map[t].indexOf(o.sheet) >= 0; }).length, show = S.sysAll ? order : order.slice(0, Math.max(6, nHere));
+      return '<p class="sx-lead">มาตรฐานทั้งหมดที่ระบบใช้กับประเทศนี้ และใบตรวจงานที่ใช้</p><div class="sx-list sx-two">' + show.map(function (t) { return '<div class="sx-i' + (map[t].indexOf(o.sheet) >= 0 ? " sx-here" : "") + '"><span class="sx-t"><b data-noi18n="1">' + esc(t) + '</b><small data-noi18n="1">' + map[t].map(esc).join(" · ") + "</small></span></div>"; }).join("") + "</div>" + (show.length < order.length ? '<p class="sx-tools"><button type="button" class="sx-l" data-sxmore="1">ดูทั้งหมด (<span data-noi18n="1">' + order.length + "</span>)</button></p>" : "");
     }
     function draw() {
       var tabs = [["std", "มาตรฐานของใบนี้"], ["law", "กฎหมาย"], ["sys", "ระบบมาตรฐาน"]];
@@ -93,19 +95,20 @@
     }
     el.addEventListener("change", function (ev) {
       var t = ev.target;
-      if (t.id === "sxCc") { S.cc = t.value; S.off = {}; draw(); if (o.onCc) o.onCc(S.cc); return; }
+      if (t.id === "sxCc") { S.cc = t.value; S.off = {}; S.sysAll = false; draw(); if (o.onCc) o.onCc(S.cc); return; }
       if (t.getAttribute && t.getAttribute("data-sx") !== null) { S.off[t.getAttribute("data-sx")] = !t.checked; if (!picked().length) { S.off[t.getAttribute("data-sx")] = false; t.checked = true; return; } draw(); var f = el.querySelector('[data-sx="' + t.getAttribute("data-sx").replace(/"/g, '\\"') + '"]'); if (f) f.focus(); }
     });
     el.addEventListener("click", function (ev) {
       var b = ev.target.closest("[data-sxt]"); if (b) { S.tab = b.getAttribute("data-sxt"); draw(); var f = el.querySelector('[data-sxt="' + S.tab + '"]'); if (f) f.focus(); return; }
-      if (ev.target.closest("[data-sxall]")) { S.off = {}; draw(); }
+      if (ev.target.closest("[data-sxall]")) { S.off = {}; draw(); return; }
+      if (ev.target.closest("[data-sxmore]")) { S.sysAll = true; draw(); }
     });
     el.addEventListener("keydown", function (ev) {
       var b = ev.target.closest && ev.target.closest("[data-sxt]"); if (!b || (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft")) return;
       var all = [].slice.call(el.querySelectorAll("[data-sxt]")), i = all.indexOf(b) + (ev.key === "ArrowRight" ? 1 : -1), n = all[(i + all.length) % all.length]; S.tab = n.getAttribute("data-sxt"); draw(); var f = el.querySelector('[data-sxt="' + S.tab + '"]'); if (f) f.focus(); ev.preventDefault();
     });
     draw();
-    return { setCc: function (cc) { if (cc && cc !== S.cc && REC[cc]) { S.cc = cc; S.off = {}; draw(); } } };
+    return { setCc: function (cc) { if (cc && cc !== S.cc && REC[cc]) { S.cc = cc; S.off = {}; S.sysAll = false; draw(); } } };
   }
 
   // ---------- form page: tick boxes. Nothing is shown when the country has no names for this sheet.
@@ -115,7 +118,7 @@
     var want = o.picked && o.picked.length ? o.picked : null, many = usable(d).length > 1;
     el.innerHTML = '<fieldset class="sx-mini"><legend>' + (many ? "มาตรฐานที่ใช้ในเอกสารนี้ (เลือกได้)" : "มาตรฐานของใบนี้") + "</legend>" + d.s.map(function (n, i) {
       var t = d.t ? trow(d, i) : null, c = countOf(d, i);
-      return many && c > 0 ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"' + (!want || want.indexOf(n) >= 0 ? " checked" : "") + '><span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b></span>" + (c ? "<em>" + c + " ข้อ</em>" : "") + "</label>" : '<div class="sx-i"><span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b></span>" + (c ? "<em>" + c + " ข้อ</em>" : "") + "</div>";
+      return many && c > 0 ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"' + (!want || want.indexOf(n) >= 0 ? " checked" : "") + '><span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b></span>" + (c ? "<em>" + c + " <span>ข้อ</span></em>" : "") + "</label>" : '<div class="sx-i"><span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n) + "</b></span>" + (c ? "<em>" + c + " <span>ข้อ</span></em>" : "") + "</div>";
     }).join("") + (many ? '<p class="note" style="margin:4px 0 0">ข้อที่ไม่มีค่าจากมาตรฐานที่เลือก เว้นช่องให้กรอกตามข้อกำหนดโครงการ</p>' : "") + "</fieldset>";
   }
   // names that are on, or an empty list when all are on (the back end then uses everything)
@@ -123,5 +126,5 @@
     var all = [].slice.call(el.querySelectorAll("[data-sx]")), on = all.filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute("data-sx"); });
     return on.length === all.length ? [] : on;
   }
-  window.StdPick = { mount: mount, list: list, selected: selected, label: label, defaultCc: defaultCc, data: data, ccOptions: ccOptions, trEn: trEn };
+  window.StdPick = { labelIn: labelIn, mount: mount, list: list, selected: selected, label: label, defaultCc: defaultCc, data: data, ccOptions: ccOptions, trEn: trEn };
 })();

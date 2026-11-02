@@ -124,3 +124,10 @@
   .fm.editing [data-e] { outline: 0; }
 }
 @media (max-width: 760px) { .pagewrap { padding: 6px; border-radius: 10px; } .dn { font-size: 14.5px; } }
+/* 2 Nov 2026: spans inside a tick option keep the size of the form. An option from a standard has its name on one line, the text below. */
+.fm label.pick span { font-size: inherit; line-height: inherit; font-weight: inherit; color: inherit; }
+.fm label.pick .ctag { font: 700 6.4pt/1.5 Arial, sans-serif; }
+.fm label.pick .l2 { font-size: 7.2pt; }
+.fm label.pick .rf2 { font-size: 6.8pt; color: #3F4A58; }
+.fm .pick.ptag { flex-wrap: wrap; }
+.fm .pick.ptag .ptx { flex: 1 1 100%; }

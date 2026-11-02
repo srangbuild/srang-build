@@ -156,7 +156,7 @@
   }
   function crCell(r, n) {
     var L = D.lab;
-    if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) { return '<label class="pick" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk' + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">' + esc(o.tag || o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">' + esc(o.ref) + "</span>" : "") + "</span></label>"; }).join("") + "</div>";
+    if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) { return '<label class="pick' + (o.tag ? " ptag" : "") + '" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk' + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">' + esc(o.tag || o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">' + esc(o.ref) + "</span>" : "") + "</span></label>"; }).join("") + "</div>";
     return Bi(r.cr, true) + (r.jref ? '<div class="rf">' + One(L.also) + " " + esc(r.jref) + "</div>" : "") + (r.ref ? '<div class="rf">' + One(L.ref) + " " + One(r.ref) + "</div>" : "");
   }
   function thw(c) { var s = (c || []).join(" "); return /\bdate\b|วันที่/i.test(s) ? ' style="min-width:15mm"' : /\btime\b|เวลา/i.test(s) ? ' style="min-width:13mm"' : /\bno\.|เลข/i.test(s) ? ' style="min-width:11mm"' : ""; }
@@ -236,12 +236,12 @@
   }
   function lawBlock(cc, c) {
     var r = REC[cc] || null, x = (c && c.law) || {}; if (!r && !c) return "";
-    var row = function (k, v) { return v ? "<div><b>" + k + ":</b> " + esc(v) + "</div>" : ""; }, name = r ? r.country : (c ? c.en : cc);
-    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (r ? row("Law", r.lawName + (r.lawNameLocal ? " (" + r.lawNameLocal + ")" : "")) + row("Authority", r.authority) + row("Code", r.codeName) + row("Standards body", r.standardsBody) + row("Licensed persons", r.licensed) + row("Note", r.note) : "") + row("Permit body", x.permitBody) + row("Mandatory inspections", x.mandatoryInspections) + row("Licensed persons (detail)", x.licensedPersons) + row("Statutory language", x.statutoryLanguage) + row("Notes", x.notes) + (r ? row("Source", r.sourceUrl) + row("Source 2", r.sourceUrl2) + row("Checked", r.checked + " · " + r.confidence) : "") + (x.sources && x.sources.length ? row("More sources", x.sources.join(" · ")) : "") + "</div>";
+    var tx = function (t) { return '<span data-en="' + esc(t) + '">' + esc(t) + "</span>"; }, row = function (k, v, keep) { return v ? "<div><b>" + tx(k) + ":</b> " + (keep ? esc(v) : tx(v)) + "</div>" : ""; }, name = window.StdPick ? window.StdPick.labelIn(cc, langs()[0]) : r ? r.country : (c ? c.en : cc); // คำบนภาคผนวกตามภาษาของเอกสาร ชื่อทางการและลิงก์คงเดิม
+    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (r ? row("Law", r.lawName + (r.lawNameLocal ? " (" + r.lawNameLocal + ")" : ""), true) + row("Authority", r.authority) + row("Code", r.codeName, true) + row("Standards body", r.standardsBody, true) + row("Licensed persons", r.licensed) : "") + row("Permit body", x.permitBody) + row("Mandatory inspections", x.mandatoryInspections) + row("Licensed persons (detail)", x.licensedPersons) + row("Statutory language", x.statutoryLanguage) + row("Notes", x.notes) + (r ? row("Source", r.sourceUrl, true) + row("Source 2", r.sourceUrl2, true) + row("Checked", r.checked + " · " + r.confidence, true) : "") + (x.sources && x.sources.length ? row("More sources", x.sources.join(" · "), true) : "") + "</div>";
   }
   function annexes() { // ภาคผนวก ก มาตรฐานอ้างอิงและลำดับการใช้เกณฑ์ · ภาคผนวก ข กรอบกฎหมายของประเทศที่เลือก (อยู่ท้ายเอกสาร ตามคำสั่งผู้ใช้ 2 พ.ย. 2026)
     var d = D, L = d.lab, cs = langs();
-    var codeRow = function (c) { var m = c.code || {}, keys = Object.keys(m).filter(function (k) { return m[k]; }); return keys.length ? '<div class="stdc"><h4>' + esc(c.en) + "</h4>" + keys.map(function (k) { return "<div><b>" + esc(k) + ":</b> " + esc(m[k]) + "</div>"; }).join("") + "</div>" : ""; };
+    var codeRow = function (c) { var m = c.code || {}, keys = Object.keys(m).filter(function (k) { return m[k]; }); return keys.length ? '<div class="stdc"><h4>' + esc(c.en) + "</h4>" + keys.map(function (k) { var lb = { building: "Building work", concrete: "Concrete", steel: "Steel", electrical: "Electrical", plumbing: "Plumbing and sanitation", fire: "Fire", safety: "Safety" }[k] || k; return '<div><b><span data-en="' + esc(lb) + '">' + esc(lb) + "</span>:</b> " + '<span data-en="' + esc(m[k]) + '">' + esc(m[k]) + "</span></div>"; }).join("") + "</div>" : ""; };
     var thRefs = (d.ccs || []).indexOf("TH") >= 0 && (d.refs || []).length ? '<div class="refs" style="margin:0;border:0"><b>' + M(L.refsT) + "</b><ul>" + d.refs.map(refRow).join("") + "</ul><p>" + One(L.refsN) + "</p></div>" : "";
     var ord = '<p class="ordb"><b>' + esc(L.ordT[0]) + '</b> <b class="tick"></b>1 ' + esc(L.ordA[0]) + ' <b class="tick"></b>2 ' + esc(L.ordB[0]) + ' <b class="tick"></b>3 ' + esc(L.ordC[0]) + ' <span class="bl"' + CEA + "></span> · " + esc(L.ordN[0]) + cs.slice(1).map(function (c, i) { return '<span class="l2"' + at(c) + ">" + esc(L.ordT[i + 1]) + ": 1 " + esc(L.ordA[i + 1]) + " · 2 " + esc(L.ordB[i + 1]) + " · 3 " + esc(L.ordC[i + 1]) + " · " + esc(L.ordN[i + 1]) + "</span>"; }).join("") + "</p>";
     var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (d.picked && d.picked.length ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(esc).join(" · ") + "</div>" : "") + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName) + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
@@ -275,7 +275,7 @@
     box.className = "fm" + (cs[0] === "th" ? " thf" : "") + (cs.length > 2 ? " t3" : "");
     box.setAttribute("dir", [d.lang1, d.lang2].filter(Boolean).every(function (c) { return RTL[c]; }) ? "rtl" : "ltr"); box.setAttribute("lang", cs[0]);
     box.innerHTML = (d.owned ? proForm(META) : freeForm(META)) + (d.owned ? '<p class="lic">' + esc(docCode(d)) + " · สร้าง | BUILD TH · Licensed to " + esc(d.licensee) + (d.licNo ? " · " + esc(d.licNo) : "") + "</p>" : "") + '<p class="fine editedNote" hidden>' + One(d.lab.edited) + "</p>";
-    noteBar(d); pageCss(d);
+    noteBar(d); pageCss(d); if (window.StdPick) window.StdPick.trEn(box, cs[0]); // ภาคผนวกตามภาษาของเอกสาร
     $("swapBtn").hidden = !d.lang2; editing = false; $("editBtn").textContent = "แก้ไขเอกสาร"; $("addRow").hidden = true; $("result").hidden = false; drawPicks(); fit();
   }
   function render(d, meta) { D = d; META = meta; draw(); $("result").scrollIntoView({ block: "start" }); }
