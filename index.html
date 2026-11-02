@@ -46,7 +46,7 @@
   .hero { background-color:var(--navy); background-image:linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px), radial-gradient(900px 500px at 85% 0%, #1E4B77 0%, rgba(30,75,119,0) 70%); background-size:34px 34px, 34px 34px, auto; color:#fff; padding:46px 0 54px; overflow:hidden; }
   .hero .wrap { display:grid; grid-template-columns:1fr; gap:30px; align-items:center; }
   .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#FFD9C4; background:rgba(255,107,26,.16); border:1px solid rgba(255,107,26,.45); padding:4px 12px; border-radius:999px; }
-  .hero h1 { font-size:clamp(34px, 7.2vw, 56px); font-weight:800; margin:16px 0 10px; letter-spacing:.2px; }
+  .hero h1 { font-size:clamp(30px, 6.4vw, 52px); font-weight:800; margin:16px 0 10px; letter-spacing:.2px; }
   .hero h1 em { font-style:normal; color:var(--orange); white-space:nowrap; }
   .hero p.sub { font-size:18px; color:#D5E1EE; margin:0 0 22px; max-width:34em; }
   .cta { display:flex; flex-wrap:wrap; gap:10px; }
@@ -68,7 +68,7 @@
 
   section { padding:44px 0 8px; }
   .head { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 16px; }
-  h2 { font-size:clamp(24px, 4.6vw, 31px); margin:0; color:var(--navy); font-weight:700; }
+  h2 { font-size:clamp(22px, 4.4vw, 29px); margin:0; color:var(--navy); font-weight:700; }
   h2::before { content:""; display:inline-block; width:10px; height:22px; background:var(--orange); border-radius:3px; margin-right:10px; vertical-align:-2px; }
   .lead { color:var(--mute); margin:4px 0 0; font-size:15.5px; flex-basis:100%; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); }
@@ -117,7 +117,7 @@
   .ep .im img { width:100%; height:100%; object-fit:cover; object-position:50% 34%; }
   .ep .im .pill { position:absolute; left:8px; bottom:8px; }
   .ep .tx { padding:11px 13px 13px; display:flex; flex-direction:column; gap:7px; flex:1; }
-  .ep h3 { margin:0; font-size:16px; font-weight:600; color:var(--navy); font-family:inherit; line-height:1.45; }
+  .ep h3 { margin:0; font-size:17px; font-weight:600; color:var(--navy); font-family:inherit; line-height:1.45; }
   .ep .meta { font-size:13px; color:var(--mute); }
   .ep .acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; }
   .ep .acts a { font-size:13.5px; font-weight:600; text-decoration:none; padding:5px 10px; border-radius:9px; background:#EEF2F6; color:var(--navy); }
@@ -151,7 +151,7 @@
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .dock { transition:none; } }
   @media print { .topbar, .dock, .cta, .nav { display:none !important; } body { background:#fff; } }
 </style>
-<script src="data.js"></script>
+<script src="data.js"></script><script src="app.js"></script>
 <link rel="canonical" href="https://srangbuild.github.io/srang-build/index.html"><meta property="og:url" content="https://srangbuild.github.io/srang-build/index.html"><meta name="twitter:card" content="summary_large_image"></head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -182,7 +182,7 @@
   <section id="free">
     <div class="head"><h2>ใช้ฟรี ไม่ต้องสมัคร</h2><p class="lead">เริ่มจากเรื่องที่ตรงกับงานของคุณ</p></div>
     <div class="freegrid">
-      <a class="card freeitem" href="sheets.html#compare"><b>ใบตรวจงานฉบับฟรี</b><span>พิมพ์ไปตรวจงานเองได้ ทุกงานตั้งแต่เสาเข็มถึงรับมอบบ้าน</span><i>ดูใบตรวจงาน ›</i></a>
+      <a class="card freeitem" href="sheets.html#compare"><b>ใบตรวจงานฉบับฟรี</b><span>พิมพ์ไปตรวจงานเองได้ ทุกงานตั้งแต่เสาเข็มถึงรับมอบบ้าน 1 ภาษา เลือกได้ทุกภาษา</span><i>ดูใบตรวจงาน ›</i></a>
       <a class="card freeitem" href="knowledge.html"><b>ความรู้ภาษาคน</b><span>ต่อเติมต้องขออนุญาตไหม เปิดร้านหรือโรงงานต้องทำอะไร พร้อมแหล่งอ้างอิง</span><i>เลือกเรื่องที่อยากรู้ ›</i></a>
       <a class="card freeitem" href="member.html#ask" data-bot-open="1"><b>ถามผู้ช่วย</b><span>พิมพ์คำถามแล้วได้คำตอบทันที ถ้าตอบไม่ได้ ส่งต่อให้ร้านตอบ</span><i>ถามได้เลย ›</i></a>
     </div>
@@ -249,6 +249,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
   var ok = function (u) { return /^https?:\/\//i.test(u || ""); };
+  var pv = /[?&]preview=1/.test(location.search) ? "?preview=1" : ""; /* 2 Nov 2026: defined early · the free-sheet button used it before it was set (link ended in "undefined") */
   var MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
   var fmt = function (iso, short) { var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(iso || ""); if (!m) return ""; return (+m[3]) + " " + MON[+m[2] - 1] + (short ? "" : " " + m[1]); };
   var future = function (iso) { return iso && new Date(iso + "T00:00:00") > new Date(); };
@@ -297,7 +298,7 @@
     : "<p><strong>ไฟล์พิมพ์ครบทุกชุด</strong><small>กด “เปิดฉบับพิมพ์” ของชุดที่ต้องการ แล้วสั่งพิมพ์หรือบันทึกเป็น PDF ได้เลย</small></p>" + '<a class="b pri" href="free.html">เปิดทุกชุด</a>';
 
   // ใบตรวจงานและสมาชิก (แสดงเมื่อมีใบตรวจงานใน data.js)
-  var shs = (Array.isArray(S.sheets) ? S.sheets : []).filter(function (x) { return x.hidden !== true; }), pv = /[?&]preview=1/.test(location.search) ? "?preview=1" : "";
+  var shs = (Array.isArray(S.sheets) ? S.sheets : []).filter(function (x) { return x.hidden !== true; });
   if (shs.length) {
     var rdy = shs.filter(function (x) { return x.ok === true; }).length, memOn = !S.member || S.member.on !== false;
     $("sheets").hidden = false;
@@ -306,7 +307,7 @@
     // เปิดขายแล้ว (24 ต.ค. 2026): บอกราคาเริ่มต้นและปุ่มเข้าร้าน
     var onSale = (S.pay || {}).on === true ? shs.filter(function (x) { return x.ok === true && x.sale === true && +x.price > 0; }) : [];
     var minP = onSale.map(function (x) { return +x.price; }).sort(function (a, b) { return a - b; })[0];
-    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " ใบ อังกฤษ-ไทย: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า) และฉบับมืออาชีพที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง" + (onSale.length ? " · เปิดขายแล้ว " + onSale.length + " ใบ ราคาเริ่มต้น ฿" + Number(minP).toLocaleString("th-TH") + " · ชุดรวมถูกกว่าซื้อแยก · ชำระแล้วดาวน์โหลดได้ทันที" : rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">' + (onSale.length ? "เลือกซื้อใบตรวจงาน" : "ดูใบตรวจงาน") + "</a>" + (memOn ? '<a class="b sec" href="member.html' + pv + '">' + (onSale.length ? "บัญชีสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" : "") + "</span>";
+    $("sheetbox").innerHTML = "<p><strong>" + shs.length + " ใบ: " + esc(shs.slice(0, 4).map(function (x) { return x.title.replace(/\s*\(.*$/, ""); }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า, 1 ภาษา เลือกได้ทุกภาษา) และฉบับมืออาชีพอังกฤษ-ไทยที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง" + (onSale.length ? " · เปิดขายแล้ว " + onSale.length + " ใบ ราคาเริ่มต้น " + (window.BUILD && window.BUILD.baht ? window.BUILD.baht(minP) : "฿" + Number(minP).toLocaleString("th-TH")) + " · ชุดรวมถูกกว่าซื้อแยก · ชำระแล้วดาวน์โหลดได้ทันที" : rdy < shs.length ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html' + pv + '">' + (onSale.length ? "เลือกซื้อใบตรวจงาน" : "ดูใบตรวจงาน") + "</a>" + (memOn ? '<a class="b sec" href="member.html' + pv + '">' + (onSale.length ? "บัญชีสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" : "") + "</span>";
   }
 
   // ตอน

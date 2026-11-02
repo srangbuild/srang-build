@@ -4,6 +4,7 @@
 html { scroll-behavior:smooth; scroll-padding-top:72px; }
 body { margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI","Sarabun",system-ui,sans-serif; font-size:17px; line-height:1.7; -webkit-text-size-adjust:100%; }
 h1,h2,h3,.kn { font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif; line-height:1.25; }
+/* heading scale */ h1 { font-size:clamp(26px, 5vw, 36px); } h3 { font-size:18px; }
 a { color:inherit; }
 img { max-width:100%; display:block; }
 .wrap { max-width:1040px; margin:0 auto; padding:0 18px; }
@@ -68,6 +69,7 @@ h2::before { content:""; display:inline-block; width:10px; height:22px; backgrou
 .ver b { color:var(--navy); font-size:15px; }
 .ver small { color:var(--mute); font-size:13px; line-height:1.45; }
 .ver.pro { border-color:#F5C7A9; background:#FFFAF6; }
+.fl3 { display:flex; flex-wrap:wrap; gap:6px; } .fl3 .b { flex:1 1 auto; padding-left:10px; padding-right:10px; }
 .price { font-family:"Kanit",sans-serif; font-weight:700; font-size:20px; color:var(--navy); }
 .price s { font-weight:400; font-size:14px; color:var(--mute); margin-left:6px; }
 table.cmp { width:100%; border-collapse:collapse; font-size:15.5px; }
@@ -152,7 +154,7 @@ form.f input[readonly] { background:#F2F4F7; color:var(--mute); }
 .soc .sb.tt { background:#111; border-color:#111; color:#fff; }
 .acct-head { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 .acct-head .who { flex:1; min-width:180px; }
-.acct-head h1 { font-size:24px; color:var(--navy); margin:0; }
+.acct-head h1 { font-size:26px; color:var(--navy); margin:0; }
 .av { width:44px; height:44px; border-radius:50%; object-fit:cover; flex:none; background:#EEF1F5; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--line); }
 .av.lg { width:64px; height:64px; } .av.xl { width:96px; height:96px; }
 .av.ini { display:inline-flex; align-items:center; justify-content:center; background:var(--navy); color:#fff; font-family:"Kanit",sans-serif; font-weight:700; font-size:22px; }
@@ -224,3 +226,9 @@ details.alt > summary { cursor:pointer; font-weight:600; color:var(--navy); font
 .plan input { margin-top: 4px; accent-color: #FF6B1A; width: 18px; height: 18px; }
 .pick em small.pu { display: block; font-size: 12.5px; font-style: normal; color: #5A6573; font-weight: 400; }
 .pick label.off { opacity: .45; }
+/* tap targets 2 Nov 2026 */
+footer a { display:inline-block; padding:4px 2px; min-height:24px; }
+.langpick input[type=radio] { width:20px; height:20px; flex:none; margin:0; }
+form.f input[type=radio], form.f input[type=checkbox] { width:20px; height:20px; flex:none; }
+/* 2 Nov 2026: the English second line is for Thai pages only */
+html:not([lang="th"]) .pd-info .en, html:not([lang="th"]) .sh p[lang="en"] { display:none; }

@@ -20,17 +20,58 @@
   var ASK = ["คำสั่งซื้อและการชำระเงิน", "ไฟล์และการดาวน์โหลด", "เนื้อหาของใบตรวจงาน", "บัญชีสมาชิก", "เรื่องอื่น"];
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function baht(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
+  // ราคา (คำสั่งผู้ใช้ 2 พ.ย. 2026): แสดงตามภาษาที่เลือก แล้ววงเล็บดอลลาร์สหรัฐ · ภาษาอังกฤษแสดงดอลลาร์อย่างเดียว · thb() คือยอดเงินบาทจริงสำหรับหน้าชำระเงิน คำสั่งซื้อ และใบเสร็จ
+  // ค่าอื่นนอกจากบาทเป็นค่าประมาณจากอัตราแลกเปลี่ยนล่าสุด · อักขระ U+2068 U+2069 กันทิศทางข้อความในภาษาขวาไปซ้าย และบอก i18n.js ว่านี่คือราคา ไม่ต้องแปล
+  function thb(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
+  var LANG_CUR = { th: "THB", en: "USD", zh: "CNY", hi: "INR", es: "EUR", fr: "EUR", ar: "SAR", bn: "BDT", pt: "BRL", ru: "RUB", ur: "PKR", id: "IDR", de: "EUR", ja: "JPY", tr: "TRY", sw: "TZS", ta: "INR", vi: "VND", tl: "PHP", ko: "KRW", it: "EUR", nl: "EUR", my: "MMK", ms: "MYR", km: "KHR", lo: "LAK" };
+  var FX0 = { USD:0.029625,CNY:0.197842,INR:2.812735,EUR:0.026545,SAR:0.111091,BDT:3.673813,BRL:0.161063,RUB:2.388268,PKR:8.197044,IDR:536.552651,JPY:4.666575,TRY:1.479806,TZS:78.086048,VND:763.850492,PHP:1.886672,KRW:39.56349,MMK:62.300689,MYR:0.120188,KHR:121.68,LAK:663.212163 }, siteLang = "th", FX = FX0; // FX0 = อัตราสำรองวันที่สร้างไฟล์ · ใช้เมื่ออ่านอัตราล่าสุดไม่ได้
+  try { siteLang = localStorage.getItem("build_lang") || "th"; var fxs = JSON.parse(localStorage.getItem("build_fx") || "null"); if (fxs && fxs.rates && fxs.rates.USD > 0) FX = fxs.rates; } catch (e) {}
+  function fxFmt(v, cur, loc) {
+    var nd = /^(USD|EUR|BRL|MYR|SAR|CNY|TRY)$/.test(cur) ? 2 : 0;
+    if (!nd) { if (v >= 1000) { var p = Math.pow(10, Math.floor(Math.log(v) / Math.LN10) - 2); v = Math.round(v / p) * p; } else v = Math.round(v); }
+    try { return new Intl.NumberFormat(loc + "-u-nu-latn", { style: "currency", currency: cur, currencyDisplay: "narrowSymbol", minimumFractionDigits: nd, maximumFractionDigits: nd }).format(v); }
+    catch (e) { return cur + " " + v.toLocaleString("en-US", { minimumFractionDigits: nd, maximumFractionDigits: nd }); }
+  }
+  function fxOf(n, cur) { var r = +FX[cur] || +FX0[cur]; return r > 0 ? fxFmt(n * r, cur, cur === "USD" ? "en-US" : siteLang) : ""; }
+  function baht(n) { // ราคาที่แสดงในร้าน
+    n = Number(n || 0); if (!n) return thb(0);
+    var cur = LANG_CUR[siteLang] || "THB", us = fxOf(n, "USD"), main = cur === "THB" ? thb(n) : fxOf(n, cur) || thb(n);
+    return "\u2068" + (cur === "USD" && us ? us : main + (us ? " (" + us + ")" : "")) + "\u2069";
+  }
+  function thbFx(n) { // ยอดเรียกเก็บจริงเป็นบาท พร้อมค่าประมาณตามภาษา (ใช้ในสรุปยอดหน้าชำระเงิน)
+    n = Number(n || 0); if (!n) return thb(0);
+    var cur = LANG_CUR[siteLang] || "THB", us = fxOf(n, "USD"), loc = cur === "THB" || cur === "USD" ? "" : fxOf(n, cur);
+    return "\u2068" + thb(n) + (loc ? " ≈ " + loc : "") + (us ? " (" + us + ")" : "") + "\u2069";
+  }
+  (function fxLoad() { // อ่านอัตราล่าสุดจากหลังบ้าน วันละ 2 ครั้ง · ใช้กับหน้าถัดไป ไม่ทำให้หน้าปัจจุบันกระตุก
+    var api = window.SITE && window.SITE.member && window.SITE.member.api; if (!/^https:/.test(String(api || "")) || !window.fetch) return;
+    var at = 0; try { at = +((JSON.parse(localStorage.getItem("build_fx") || "{}") || {}).at || 0); } catch (e) {} if (Date.now() - at < 432e5) return;
+    fetch(api + "?action=fx", { redirect: "follow" }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.ok && j.rates && j.rates.USD > 0) { FX = j.rates; try { localStorage.setItem("build_fx", JSON.stringify({ at: Date.now(), rates: j.rates })); } catch (e) {} } }).catch(function () {});
+  })();
+  // หมายเหตุราคา: แสดงในหน้าที่มีราคา
+  document.addEventListener("DOMContentLoaded", function () {
+    var pg = location.pathname.split("/").pop() || "index.html", m = document.getElementById("main"); if (!m || !/^(sheets|product|cart|checkout|market|member)\.html$/.test(pg)) return;
+    var p = document.createElement("p"); p.className = "note noprint"; p.style.cssText = "margin:18px 0 0;font-size:13.5px";
+    p.appendChild(document.createTextNode("ราคาในวงเล็บและราคาสกุลเงินอื่นเป็นราคาโดยประมาณจากอัตราแลกเปลี่ยนล่าสุด ยอดที่เรียกเก็บจริงแสดงในหน้าชำระเงิน"));
+    var a = document.createElement("a"); a.href = "https://www.exchangerate-api.com"; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Rates By Exchange Rate API"; a.setAttribute("data-noi18n", "1");
+    p.appendChild(document.createTextNode(" · ")); p.appendChild(a); m.appendChild(p);
+  });
   // +U = แบบรับฉบับใหม่ตลอด (คำสั่งผู้ใช้ 23 ต.ค. 2026) · รหัสปกติ = ซื้อฉบับนี้ เก็บได้ตลอด
   function baseOf(id) { return String(id || "").replace(/\+U$/, ""); }
   function isUpd(id) { return /\+U$/.test(String(id || "")); }
   // ฉบับภาษา (โปรเจกต์กำแพง 24 ต.ค. 2026): ไม่มีท้ายรหัส = อังกฤษ + ไทย · .EN = อังกฤษอย่างเดียว · .TH = ไทยอย่างเดียว · ราคาเท่ากัน (ตรงกับหลังบ้าน VARS)
   var LANGS = { "": "อังกฤษ + ไทย", EN: "อังกฤษอย่างเดียว", TH: "ไทยอย่างเดียว" }, LANGS_EN = { "": "English + Thai", EN: "English only", TH: "Thai only" };
+  // ฉบับประเทศ (2 พ.ย. 2026): F-05.JP = ภาษาของประเทศนั้น ไทย อังกฤษ + ค่ามาตรฐานและกฎหมายของประเทศนั้นเทียบกับค่าไทย · สร้างจากหน้าเอกสารอัจฉริยะ ไม่มีไฟล์ PDF · ตรงกับหลังบ้าน CTRY · [ชื่อไทย, ชื่ออังกฤษ, ภาษาบนเอกสาร]
+  var CTRY = { JP: ["ญี่ปุ่น", "Japan", "日本語"], CN: ["จีน", "China", "中文"], IN: ["อินเดีย", "India", "हिन्दी, தமிழ்"], ES: ["สเปน", "Spain", "Español"], FR: ["ฝรั่งเศส", "France", "Français"], SA: ["ซาอุดีอาระเบีย", "Saudi Arabia", "العربية"], BD: ["บังกลาเทศ", "Bangladesh", "বাংলা"], PT: ["โปรตุเกส", "Portugal", "Português"], BR: ["บราซิล", "Brazil", "Português"], RU: ["รัสเซีย", "Russia", "Русский"], PK: ["ปากีสถาน", "Pakistan", "اردو"], ID: ["อินโดนีเซีย", "Indonesia", "Indonesia"], DE: ["เยอรมนี", "Germany", "Deutsch"], TR: ["ตุรกี", "Turkey", "Türkçe"], TZ: ["แทนซาเนีย", "Tanzania", "Kiswahili"], KE: ["เคนยา", "Kenya", "Kiswahili"], VN: ["เวียดนาม", "Vietnam", "Tiếng Việt"], PH: ["ฟิลิปปินส์", "Philippines", "Tagalog"], KR: ["เกาหลีใต้", "South Korea", "한국어"], IT: ["อิตาลี", "Italy", "Italiano"], NL: ["เนเธอร์แลนด์", "Netherlands", "Nederlands"], MM: ["เมียนมา", "Myanmar", "မြန်မာ"], MY: ["มาเลเซีย", "Malaysia", "Melayu"], KH: ["กัมพูชา", "Cambodia", "ខ្មែរ"], LA: ["ลาว", "Laos", "ລາວ"], SG: ["สิงคโปร์", "Singapore", "English, 中文, Melayu, தமிழ்"], HK: ["ฮ่องกง", "Hong Kong", "中文"], US: ["สหรัฐอเมริกา", "United States", "English, Español"], GB: ["สหราชอาณาจักร", "United Kingdom", "English"] };
+  Object.keys(CTRY).forEach(function (k) { LANGS[k] = "ฉบับ" + CTRY[k][0]; LANGS_EN[k] = CTRY[k][1] + " edition"; });
+  function docOn() { return P.docOn === true; }
+  function isCtry(v) { return !!CTRY[v]; }
+  function docPrice(p) { return Math.ceil((+p || 0) * (+P.docFactor || 1.5) / 10) * 10 - 1; }
   function varOf(id) { var m = /\.([A-Z]{2})(\+U)?$/.exec(String(id || "")); return m && LANGS[m[1]] ? m[1] : ""; }
   function rootOf(id) { return baseOf(id).replace(/\.[A-Z]{2}$/, ""); }
   function find0(id) { return allSheets.filter(function (x) { return x.id === id; })[0] || bundles.filter(function (x) { return x.id === id; })[0] || market.filter(function (x) { return x.id === id; })[0] || null; }
   function langsOf(x) { if (!x || isMarket(x)) return [""]; var vs = isBundle(x) ? Object.keys(LANGS).filter(function (v) { return v && x.items.length && x.items.every(function (k) { var s = find0(k); return s && (s.vars || []).indexOf(v) >= 0; }); }) : (x.vars || []).filter(function (v) { return !!LANGS[v]; }); return [""].concat(vs); }
-  function find(id) { var b = baseOf(id), hit = find0(b); if (hit) return hit; var v = varOf(b), x = v ? find0(rootOf(b)) : null; return x && x.hidden !== true && langsOf(x).indexOf(v) > 0 ? x : null; }
+  function find(id) { var b = baseOf(id), hit = find0(b); if (hit) return hit; var v = varOf(b), x = v ? find0(rootOf(b)) : null; if (x && CTRY[v]) return docOn() && x.hidden !== true && !isMarket(x) && (isBundle(x) || /^[FT]-/.test(x.id)) ? x : null; return x && x.hidden !== true && langsOf(x).indexOf(v) > 0 ? x : null; }
   function langLabel(id) { var v = varOf(id); return v ? LANGS[v] : ""; }
   function isMarket(x) { return !!(x && /^M-\d{3}$/.test(String(x.id))); }
   function isBundle(x) { return !!(x && Array.isArray(x.items)); }
@@ -105,7 +146,7 @@
   // กติกา: ใส่ชุดรวมแล้ว ใบเดี่ยวและชุดย่อยที่อยู่ในชุดนั้นจะถูกเอาออก (ไม่จ่ายซ้ำ) · ใบที่อยู่ในชุดซึ่งอยู่ในตะกร้าแล้ว ใส่ซ้ำไม่ได้
   var CK = "build_cart";
   function planOk(id) { var x = find(id); return !!(x && canSell(x) && (!isUpd(id) || +x.priceU > 0)); }
-  function unitPrice(id) { var x = find(id); return x ? memberPrice(isUpd(id) ? x.priceU : x.price) : 0; }
+  function unitPrice(id) { var x = find(id); if (!x) return 0; var p = isUpd(id) ? x.priceU : x.price; return memberPrice(CTRY[varOf(id)] ? docPrice(p) : p); }
   var cart = {
     get: function () { try { var a = JSON.parse(localStorage.getItem(CK) || "[]"), seen = {}; return Array.isArray(a) ? a.filter(function (id) { if (typeof id !== "string" || seen[rootOf(id)] || !planOk(id)) return false; seen[rootOf(id)] = 1; return true; }) : []; } catch (e) { return []; } },
     put: function (a) { try { localStorage.setItem(CK, JSON.stringify(a)); } catch (e) {} try { window.dispatchEvent(new Event("build-cart")); } catch (e) {} },
@@ -127,18 +168,19 @@
     },
     setPlan: function (id, upd) { var r0 = rootOf(id), x = find(id); if (upd && !(x && +x.priceU > 0)) return; cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? baseOf(k) + (upd ? "+U" : "") : k; })); },
     // เปลี่ยนภาษาของบรรทัดในตะกร้า (คำสั่งผู้ใช้ 24 ต.ค. 2026: ในตะกร้าปรับตัวเลือกของสินค้าได้) · ราคาเท่าเดิม
-    setLang: function (id, v) { var r0 = rootOf(id), x = find(r0); if (!x || langsOf(x).indexOf(v || "") < 0) return; cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? r0 + (v ? "." + v : "") + (isUpd(k) ? "+U" : "") : k; })); },
+    setLang: function (id, v) { var r0 = rootOf(id), x = find(r0); if (!x || (langsOf(x).indexOf(v || "") < 0 && !CTRY[v])) return; cart.put(cart.get().map(function (k) { return rootOf(k) === r0 ? r0 + (v ? "." + v : "") + (isUpd(k) ? "+U" : "") : k; })); },
     remove: function (id) { var b = rootOf(id); cart.put(cart.get().filter(function (k) { return rootOf(k) !== b; })); },
     clear: function () { cart.put([]); },
     price: unitPrice,
     total: function () { return cart.get().reduce(function (t, id) { return t + unitPrice(id); }, 0); },
     // ส่วนต่างจริงของชุดรวมเทียบกับราคารายใบของใบในชุด แบบเดียวกัน (ใช้บอก ประหยัด ไม่ใช่ราคาขีดฆ่า)
-    saving: function (id) { var x = find(id), u = isUpd(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); return t + (y ? memberPrice(u && +y.priceU > 0 ? y.priceU : y.price) : 0); }, 0); return Math.max(0, s - unitPrice(id)); }
+    saving: function (id) { var x = find(id), u = isUpd(id); if (!isBundle(x)) return 0; var s = x.items.reduce(function (t, k) { var y = find(k); var q = y ? (u && +y.priceU > 0 ? y.priceU : y.price) : 0; return t + (y ? memberPrice(CTRY[varOf(id)] ? docPrice(q) : q) : 0); }, 0); return Math.max(0, s - unitPrice(id)); }
   };
   // ชุดรวมที่มีใบนี้ (หน้าสินค้าและตะกร้าใช้แนะนำ ซื้อเป็นชุดถูกกว่า)
   function bundlesOf(id) { var b = rootOf(id); return bundles.filter(function (x) { return x.items.indexOf(b) >= 0; }); }
 
-  window.BUILD = { baseOf: baseOf, isUpd: isUpd, rootOf: rootOf, varOf: varOf, langsOf: langsOf, langLabel: langLabel, LANGS: LANGS, LANGS_EN: LANGS_EN, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, market: market, isMarket: isMarket, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
+  function freeEN(x) { return String(x && x.free || "").replace(/_free\.pdf$/, "_free_EN.pdf"); } // ฉบับฟรี 1 ภาษา (คำสั่ง C13): x.free = ไทย · _free_EN = อังกฤษ · ภาษาอื่นสร้างที่ doc.html
+  window.BUILD = { thb: thb, thbFx: thbFx, freeEN: freeEN, CTRY: CTRY, isCtry: isCtry, docOn: docOn, docPrice: docPrice, baseOf: baseOf, isUpd: isUpd, rootOf: rootOf, varOf: varOf, langsOf: langsOf, langLabel: langLabel, LANGS: LANGS, LANGS_EN: LANGS_EN, allSheets: allSheets, S: S, M: M, P: P, ST: ST, ASK: ASK,demo: !API, api: API, esc: esc, baht: baht, sheets: sheets, bundles: bundles, find: find, isBundle: isBundle, memberPrice: memberPrice, reviewed: reviewed, canSell: canSell, expand: expand, bundlesOf: bundlesOf, planOk: planOk, market: market, isMarket: isMarket, token: token, call: call, callAdmin: callAdmin, ping: ping, demoMail: demoMail, ensureEmu: ensureEmu, shrink: shrink, saveFile: saveFile, when: when, rand: rand, cart: cart, preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : "" };
 })();
 // 1 พ.ย. 2026 (Q29, C03): รหัสที่ลูกค้าเห็นต้องตรงกับรหัสบน PDF (เช่น BTH-F05-P) · id ภายในไม่เปลี่ยน · ชุดรวม = BTH-BHO
 window.BUILD.code = function (x) { if (!x) return ""; if (x.code) return String(x.code); var id = String(x.id || ""); if (/^[FT]-\d/.test(id)) return "BTH-" + id.replace("-", "") + "-P"; if (x.items) return "BTH-" + id.replace(/-/g, ""); return id; };

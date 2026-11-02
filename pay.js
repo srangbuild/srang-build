@@ -52,7 +52,7 @@
   var INST = [["กสิกรไทย", 0.65, [3, 4, 6, 10], 0], ["UOB", 0.64, [3, 4, 6, 10], 500], ["KTC", 0.74, [3, 4, 5, 6, 7, 8, 9, 10], 0], ["กรุงเทพ", 0.74, [3, 4, 5, 6, 7, 8, 9, 10], 500], ["ไทยพาณิชย์", 0.74, [3, 4, 6, 9, 10], 500], ["กรุงศรี", 0.8, [3, 4, 6, 9, 10], 500], ["ทีทีบี", 0.8, [3, 4, 6, 10], 500], ["กรุงศรี เฟิร์สช้อยส์", 1.3, [3, 4, 6, 9, 10, 12, 18, 24, 36], 300]];
   function instTable(ms, thb) {
     if (!ms || ms.indexOf("installment") < 0) return "";
-    var rows = INST.map(function (r) { var ok = r[2].filter(function (n) { return thb / n >= r[3]; }); if (!ok.length) return ""; var n = ok[ok.length - 1], m = thb / n + thb * r[1] / 100; return "<tr><td>" + esc(r[0]) + "</td><td>" + r[1].toFixed(2) + "%</td><td>" + ok.join(", ") + "</td><td>" + B.baht(Math.ceil(m)) + "</td></tr>"; }).join("");
+    var rows = INST.map(function (r) { var ok = r[2].filter(function (n) { return thb / n >= r[3]; }); if (!ok.length) return ""; var n = ok[ok.length - 1], m = thb / n + thb * r[1] / 100; return "<tr><td>" + esc(r[0]) + "</td><td>" + r[1].toFixed(2) + "%</td><td>" + ok.join(", ") + "</td><td>" + B.thb(Math.ceil(m)) + "</td></tr>"; }).join("");
     return '<details class="insttb" style="margin:8px 0 0"><summary>ดูดอกเบี้ยและยอดผ่อนของคำสั่งซื้อนี้</summary><div style="overflow:auto"><table class="cmp" style="font-size:14px"><thead><tr><th>บัตรของธนาคาร</th><th>ดอกเบี้ยต่อเดือน</th><th>ผ่อนได้ (เดือน)</th><th>จ่ายต่ำสุดต่อเดือน</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="note" style="margin:6px 0 0">ยอดต่อเดือน = ยอดซื้อ ÷ จำนวนเดือน + ดอกเบี้ยต่อเดือนของยอดซื้อ · ธนาคารอาจปรับอัตราได้ ยอดจริงแสดงก่อนยืนยันที่หน้าถัดไป</p></details>';
   }
   // หลายสกุลเงิน: บัตร (Opn Multi-currency) และ PayPal จ่ายเป็นสกุลเงินของลูกค้าได้ · ช่องทางอื่นจ่ายเป็นบาท · ร้านได้รับเป็นบาทเสมอ · ราคาจริงมาจากหลังบ้านเท่านั้น
@@ -76,7 +76,7 @@
     var c = s.value, thb = +s.getAttribute("data-thb"); curNow = c;
     if (c === "THB") { n.textContent = ""; return; }
     n.textContent = "กำลังคิดราคา…";
-    B.call("payQuote", { cur: c, thb: thb }).then(function (r) { if (s.value !== c) return; n.textContent = "ยอดโดยประมาณ " + money(c, r.quote.value) + " จาก " + B.baht(thb) + " · ระบบแสดงยอดสุดท้ายก่อนยืนยัน · ธนาคารของคุณอาจมีค่าธรรมเนียมเพิ่ม · ร้านคำนวณจากอัตราแลกเปลี่ยนของผู้ให้บริการ"; }).catch(function (e) { n.textContent = e.message; });
+    B.call("payQuote", { cur: c, thb: thb }).then(function (r) { if (s.value !== c) return; n.textContent = "ยอดโดยประมาณ " + money(c, r.quote.value) + " จาก " + B.thb(thb) + " · ระบบแสดงยอดสุดท้ายก่อนยืนยัน · ธนาคารของคุณอาจมีค่าธรรมเนียมเพิ่ม · ร้านคำนวณจากอัตราแลกเปลี่ยนของผู้ให้บริการ"; }).catch(function (e) { n.textContent = e.message; });
   }
   document.addEventListener("change", function (ev) {
     var s = ev.target && ev.target.closest && ev.target.closest("[data-paycur]"); if (!s) return;
@@ -166,7 +166,7 @@
   function paypal(order, ui, pc) {
     stop();
     var d = document.createElement("div"); d.id = "paymodal"; d.className = "modal"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "PayPal");
-    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">จ่ายด้วย PayPal</h2><p class="note" style="margin:0 0 12px">คำสั่งซื้อ ' + esc(order.id) + " · ยอด <b>" + B.baht(order.amount) + '</b><span id="pp-cur"></span></p><div id="pp-box"></div>' + (B.demo ? '<p><button class="b pri" type="button" data-pq="ppemu">โหมดทดลอง: จำลองการจ่ายผ่าน PayPal</button></p>' : "") + '<p class="note" id="pp-msg" aria-live="polite" style="margin:8px 0 0"></p><div class="sum" style="margin:12px 0 0"><button class="b line sm" type="button" data-pq="close">ปิด</button></div></div>';
+    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">จ่ายด้วย PayPal</h2><p class="note" style="margin:0 0 12px">คำสั่งซื้อ ' + esc(order.id) + " · ยอด <b>" + B.thb(order.amount) + '</b><span id="pp-cur"></span></p><div id="pp-box"></div>' + (B.demo ? '<p><button class="b pri" type="button" data-pq="ppemu">โหมดทดลอง: จำลองการจ่ายผ่าน PayPal</button></p>' : "") + '<p class="note" id="pp-msg" aria-live="polite" style="margin:8px 0 0"></p><div class="sum" style="margin:12px 0 0"><button class="b line sm" type="button" data-pq="close">ปิด</button></div></div>';
     document.body.appendChild(d); document.body.style.overflow = "hidden";
     var fail = function (e) { var m = document.getElementById("pp-msg"); if (m) m.textContent = (e && e.message) || "ชำระไม่สำเร็จ ลองใหม่อีกครั้ง หรือเลือกวิธีอื่น"; };
     var capture = function (ppOrder) { return B.call("ppCapture", { order: order.id, pp: ppOrder }).then(function (r) { if (r.status === "successful") { stop(); if (ui.paid) ui.paid(r); } else fail({ message: r.message }); return r; }); };
@@ -211,7 +211,7 @@
   function qr(order, r, ui) {
     stop();
     var d = document.createElement("div"); d.id = "paymodal"; d.className = "modal"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "สแกนคิวอาร์พร้อมเพย์");
-    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">สแกนจ่ายด้วยพร้อมเพย์</h2><p class="note" style="margin:0">คำสั่งซื้อ ' + esc(order.id) + ' · ยอด <b>' + B.baht(order.amount) + "</b></p>" + (r.qr ? '<img class="qrbig" src="' + esc(r.qr) + '" alt="คิวอาร์พร้อมเพย์ของคำสั่งซื้อนี้">' : '<p class="msg bad">โหลดรูปคิวอาร์ไม่ได้ กดปิดแล้วลองใหม่</p>') +
+    d.innerHTML = '<div class="mbox"><h2 style="margin:0 0 4px">สแกนจ่ายด้วยพร้อมเพย์</h2><p class="note" style="margin:0">คำสั่งซื้อ ' + esc(order.id) + ' · ยอด <b>' + B.thb(order.amount) + "</b></p>" + (r.qr ? '<img class="qrbig" src="' + esc(r.qr) + '" alt="คิวอาร์พร้อมเพย์ของคำสั่งซื้อนี้">' : '<p class="msg bad">โหลดรูปคิวอาร์ไม่ได้ กดปิดแล้วลองใหม่</p>') +
       '<ol class="steps"><li>เปิดแอปธนาคารของคุณ เลือกสแกนจ่าย</li><li>สแกนคิวอาร์ ยอดขึ้นให้เอง ไม่ต้องพิมพ์</li><li>จ่ายแล้วรอหน้านี้สักครู่ ระบบตรวจและเปิดไฟล์ให้เอง</li></ol><p class="note" id="qrleft" style="margin:0" aria-live="polite"></p>' +
       (r.qr ? '<p style="margin:6px 0 0"><a href="' + esc(r.qr) + '" download="PromptPay_' + esc(order.id) + '.svg">บันทึกรูปคิวอาร์</a> (ใช้สแกนจากรูปในเครื่องได้)</p>' : "") +
       '<div class="sum" style="margin:12px 0 0"><button class="b pri" type="button" data-pq="check">ฉันจ่ายแล้ว ตรวจผล</button><button class="b line sm" type="button" data-pq="close">ปิด</button></div>' + (B.demo ? '<p style="margin:10px 0 0"><button type="button" class="linkbtn" data-pq="emu">โหมดทดลอง: จำลองว่าสแกนจ่ายแล้ว</button></p>' : "") + "</div>";

@@ -175,4 +175,8 @@
 /* 1 Nov 2026: small phones, long select text and grid items must not push the page wider than the screen */
 .ln .tt, .ln .ctl, .ln .ctl label, .cosec, .cosec > *, main form.f, main aside { min-width:0; }
 .ln .ctl select, .cosec select { max-width:100%; min-width:0; }
-@media (max-width:400px) { .ln .ctl label, .ln .ctl select { width:100%; } .cosec { padding:16px 14px; } }
+@media (max-width:400px) { .ln .ctl label, .ln .ctl select { width:100%; } .cosec { padding:16px 14px; } }/* 2 Nov 2026: prices follow the language and have a US dollar part, so a price can be long. It may wrap, and on a phone it has its own row. */
+.opt em, .ln .tt .nm em, .mini li b { white-space:normal; text-align:end; }
+.sumc dd { white-space:normal; }
+@media (max-width:520px) { .opt { grid-template-columns:auto 1fr; } .opt em { grid-column:2; text-align:start; font-size:19px; } }
+.inc li a em, .outl li em { white-space:normal; text-align:end; }

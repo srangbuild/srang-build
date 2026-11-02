@@ -53,7 +53,7 @@
   function say(t, bad) { var m = $("msg"); if (!t) { m.hidden = true; return; } m.hidden = false; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t; m.scrollIntoView({ block: "nearest" }); }
   function lock(on) { busy = on; [].forEach.call(document.querySelectorAll("#view button, #view input, #view select, #view textarea"), function (b) { if (on) { b.dataset.was = b.disabled ? "1" : ""; b.disabled = true; } else b.disabled = b.dataset.was === "1"; }); var s = document.querySelector("#view [data-go]"); if (s) { if (on) { s.dataset.txt = s.textContent; s.textContent = "กำลังดำเนินการ…"; } else if (s.dataset.txt) s.textContent = s.dataset.txt; } }
   function steps(n) { [].forEach.call($("steps").children, function (li, i) { li.className = i < n ? "done" : i === n ? "on" : ""; if (i === n) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current"); }); }
-  function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id); }
+  function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id) + (B.isCtry(B.varOf(id)) ? " · " + B.LANGS[B.varOf(id)] : ""); }
   function planTx(id) { var x = B.find(id); return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด"; }
   function trackUrl(o) { return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k=" + encodeURIComponent(o.track) : ""; }
   function copyBtn(text, label) { return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก") + "</button>"; }
@@ -89,8 +89,8 @@
       '<div class="buy" style="margin:0"><a class="b pri" href="' + L("member.html") + '" data-next="1">เข้าสู่ระบบ หรือสมัครสมาชิก</a></div><p class="note">เข้าด้วย Google LINE Facebook TikTok หรืออีเมลก็ได้ · เข้าระบบแล้วระบบพากลับมาหน้านี้ ตะกร้ายังอยู่ครบ</p></div>' + summary(ids, total, false) + "</div>";
   }
   function summary(ids, total, withOwn) {
-    return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) { var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) }; return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "") + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.baht(a.amt)) + "</b></li>"; }).join("") + "</ul>" +
-      '<dl><dt>ค่าส่ง</dt><dd>ไม่มี (ไฟล์ดิจิทัล)</dd></dl><div class="tot"><span>ยอดชำระ</span><b id="sumtot">' + B.baht(total) + '</b></div><p class="note"><a href="' + L("cart.html") + '">แก้ไขตะกร้า</a></p></div></aside>';
+    return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) { var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) }; return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "") + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt)) + "</b></li>"; }).join("") + "</ul>" +
+      '<dl><dt>ค่าส่ง</dt><dd>ไม่มี (ไฟล์ดิจิทัล)</dd></dl><div class="tot"><span>ยอดชำระ</span><b id="sumtot">' + B.thbFx(total) + '</b></div><p class="note"><a href="' + L("cart.html") + '">แก้ไขตะกร้า</a></p></div></aside>';
   }
 
   // ---------- หน้าชำระเงินหลัก ----------
@@ -100,7 +100,7 @@
     ids.forEach(function (id) { var a = lineAmt(id); if (a.block) blocked++; else total += a.amt; });
     var open = (me.orders || []).filter(function (o) { return o.status === ST.wait || o.status === ST.reject; });
     if (!ids.length) {
-      $("view").innerHTML = '<div class="card empty" style="margin-top:14px"><p style="font-size:18px;color:var(--navy);font-weight:600">ตะกร้าว่าง</p>' + (open.length ? '<p>คุณมีคำสั่งซื้อที่ยังไม่ได้ชำระ ' + open.length + " รายการ</p>" + open.map(function (o) { return '<p><button class="b pri" type="button" data-payorder="' + esc(o.id) + '">ชำระ ' + esc(o.id) + " · " + B.baht(o.amount) + "</button></p>"; }).join("") : "") + '<a class="b line" href="' + L("sheets.html") + '">เลือกใบตรวจงาน</a></div>';
+      $("view").innerHTML = '<div class="card empty" style="margin-top:14px"><p style="font-size:18px;color:var(--navy);font-weight:600">ตะกร้าว่าง</p>' + (open.length ? '<p>คุณมีคำสั่งซื้อที่ยังไม่ได้ชำระ ' + open.length + " รายการ</p>" + open.map(function (o) { return '<p><button class="b pri" type="button" data-payorder="' + esc(o.id) + '">ชำระ ' + esc(o.id) + " · " + B.thb(o.amount) + "</button></p>"; }).join("") : "") + '<a class="b line" href="' + L("sheets.html") + '">เลือกใบตรวจงาน</a></div>';
       return;
     }
     var online = PAY.online(me), minOn = PAY.minOnline(me), ms = PAY.methods(me, capNames, total), canOnline = online && ms.length && total >= minOn;
@@ -119,7 +119,7 @@
       '<div class="card cosec"><h2>3. วิธีชำระเงิน</h2><fieldset class="paym"><legend class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">เลือกวิธีชำระเงิน</legend>' + (canOnline ? PAY.curBar(me, total) : "") + '<div id="pmbox">' + drawPm() + "</div></fieldset>" + why + "</div>" +
       '<div class="card cosec"><p class="note refund" style="margin:10px 0 0"><b>การคืนเงิน:</b> ยังไม่ได้ดาวน์โหลดไฟล์ แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · ดาวน์โหลดแล้วไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านส่งไฟล์ที่ถูกต้องให้หรือคืนเงิน)</p><label class="ck" style="margin-top:10px"><input type="checkbox" name="agree" required><span>ฉันอ่านและยอมรับ <a href="' + L("terms.html") + '" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a> และเข้าใจว่าสินค้าเป็นไฟล์ดิจิทัล ใช้ในงานของตนเองและหน่วยงานของตน ห้ามขายหรือแจกจ่ายต่อ · ไฟล์ทุกหน้ามีชื่อและอีเมลของฉันพิมพ์ท้ายกระดาษ</span></label>' +
       (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html") + '">แก้ไขในตะกร้า</a> ก่อนสั่งซื้อ</p>' : "") +
-      '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ " + B.baht(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>' +
+      '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ " + B.thb(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>' +
       "</form>" + summary(ids, total, true) + "</div>";
     taxHint();
   }
@@ -135,7 +135,7 @@
 
   // ---------- ขั้นชำระของคำสั่งซื้อที่สร้างแล้ว ----------
   function payBox(o) {
-    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.baht(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
+    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
     return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
       '<form class="f" id="f-slip" data-oid="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><button class="b pri" type="submit">ส่งสลิป</button></form></div>';
   }
@@ -145,11 +145,11 @@
     var ms = PAY.methods(me, capNames, o.amount), online = PAY.online(me) && ms.length && o.amount >= PAY.minOnline(me);
     var on = online ? '<div class="payopts" role="group" aria-label="ชำระออนไลน์"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>' + PAY.curBar(me, o.amount) + PAY.GROUPS.map(function (g) { var list = ms.filter(function (k) { return PAY.LABEL[k][2] === g[0]; }); return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>", '<div class="po">' + list.map(function (k) { return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</button>"; }).join("") + "</div>") : ""; }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล' + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
     var slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours || 24) + " ชั่วโมง";
-    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id) + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.baht(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>" + tracker(o) +
+    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id) + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.thb(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>" + tracker(o) +
       (method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "") + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
         : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
       '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ · <button type="button" class="linkbtn" data-cancel="' + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></p></div>' +
-      '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) { return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>"; }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.baht(o.amount) + "</b></div></div></aside></div>";
+      '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) { return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>"; }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.thb(o.amount) + "</b></div></div></aside></div>";
   }
   function startOnline(o, method) {
     return PAY.start(o, method, { back: "checkout", lock: lock, msg: function (t, bad) { say(t, bad); }, paid: function () { return refresh().then(function () { doneView(o.id); }); } });
@@ -165,7 +165,7 @@
       : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>ร้านกำลังตรวจยอดเข้าบัญชี ภายใน ' + esc(P.hours || 24) + " ชั่วโมง · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
       : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
     $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">' + esc(o.id) + "</span>" + tracker(o) +
-      '<ul class="mini" style="width:100%;max-width:560px;text-align:left">' + o.items.map(function (id) { return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>"; }).join("") + '<li><span><b>ยอดชำระ</b></span><b>' + B.baht(o.amount) + "</b></li></ul>" +
+      '<ul class="mini" style="width:100%;max-width:560px;text-align:left">' + o.items.map(function (id) { return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>"; }).join("") + '<li><span><b>ยอดชำระ</b></span><b>' + B.thb(o.amount) + "</b></li></ul>" +
       '<div class="row">' + (paid ? '<a class="b pri" href="' + L("member.html") + '#docs">ดาวน์โหลดเอกสาร</a><a class="b line" href="' + L("member.html") + '#orders">ใบเสร็จรับเงิน</a>' : '<a class="b pri" href="' + L("member.html") + '#orders">ดูคำสั่งซื้อของฉัน</a>') + (tl ? '<a class="b line" href="' + esc(tl) + '" target="_blank" rel="noopener">หน้าติดตามสถานะ</a>' : "") + "</div>" +
       (tl ? '<p class="note">ลิงก์ติดตามเปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีได้ ' + copyBtn(tl, "คัดลอกลิงก์") + "</p>" : "") + '<p class="note"><a href="' + L("sheets.html") + '">เลือกซื้อใบตรวจงานต่อ</a></p></div>';
     try { history.replaceState(null, "", HERE + (q || "") + (q ? "&" : "?") + "done=" + encodeURIComponent(o.id)); } catch (e) {}

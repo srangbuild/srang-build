@@ -1,76 +1,339 @@
-/* doc.js: smart document page (1 Nov 2026). The customer chooses language, standard and local law, then prints the sheet. No quotation step. */
+/* doc.js: smart document page (1 Nov 2026 · country layers 2 Nov 2026 · same form as the PDF sheets 2 Nov 2026). The customer chooses language and country standard, then prints the sheet. No quotation step.
+   Rule from the owner: the standard follows the country of the language. Same value in both countries = one value, both documents cited. Different values = the customer ticks one in the document.
+   Rule C13 from the owner: the free edition keeps its form and its key items, in 1 language, any language. 2 languages are paid. */
 (function () {
   "use strict";
-  var B = window.BUILD, esc = B.esc, S = window.SITE || {}, $ = function (id) { return document.getElementById(id); };
+  var B = window.BUILD, esc = B.esc, $ = function (id) { return document.getElementById(id); };
   var LANGS = [["en", "English"], ["th", "ไทย"], ["zh", "中文"], ["hi", "हिन्दी"], ["es", "Español"], ["fr", "Français"], ["ar", "العربية"], ["bn", "বাংলা"], ["pt", "Português"], ["ru", "Русский"], ["ur", "اردو"], ["id", "Indonesia"], ["de", "Deutsch"], ["ja", "日本語"], ["tr", "Türkçe"], ["sw", "Kiswahili"], ["ta", "தமிழ்"], ["vi", "Tiếng Việt"], ["tl", "Tagalog"], ["ko", "한국어"], ["it", "Italiano"], ["nl", "Nederlands"], ["my", "မြန်မာ"], ["ms", "Melayu"], ["km", "ខ្មែរ"], ["lo", "ລາວ"]];
-  var RTL = { ar: 1, ur: 1 }, STD = { th: "Thailand", int: "Project specification", hk: "Hong Kong", sg: "Singapore", other: "Other" };
+  var RTL = { ar: 1, ur: 1 };
+  // ภาษา → ประเทศของมาตรฐาน · อังกฤษใช้หลายประเทศ จึงตามประเทศของภาษาคู่ หรือข้อกำหนดโครงการ
+  var LANG_CC = { th: "TH", zh: "CN", hi: "IN", es: "ES", fr: "FR", ar: "SA", bn: "BD", pt: "BR", ru: "RU", ur: "PK", id: "ID", de: "DE", ja: "JP", tr: "TR", sw: "TZ", ta: "IN", vi: "VN", tl: "PH", ko: "KR", it: "IT", nl: "NL", my: "MM", ms: "MY", km: "KH", lo: "LA", en: "" };
+  var CODE = { "Thailand": "TH", "United Kingdom (England)": "GB", "China": "CN", "India": "IN", "Spain": "ES", "France": "FR", "Saudi Arabia": "SA", "Bangladesh": "BD", "Portugal": "PT", "Brazil": "BR", "Russia": "RU", "Pakistan": "PK", "Indonesia": "ID", "Germany": "DE", "Japan": "JP", "Turkey": "TR", "Tanzania": "TZ", "Kenya": "KE", "Vietnam": "VN", "Philippines": "PH", "South Korea": "KR", "Italy": "IT", "Netherlands": "NL", "Myanmar": "MM", "Malaysia": "MY", "Cambodia": "KH", "Laos": "LA", "Singapore": "SG", "Hong Kong": "HK", "United States": "US" };
+  var LAW = window.LAWDB || [], REC = {}; LAW.forEach(function (x) { if (CODE[x.country]) REC[CODE[x.country]] = x; });
   function opts(list, sel) { return list.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === sel ? " selected" : "") + ">" + x[0].toUpperCase() + " · " + esc(x[1]) + "</option>"; }).join(""); }
-  var sheets = (S.sheets || []).filter(function (x) { return /^[FT]-\d\d[A-Z]?$/.test(x.id); });
+  var sheets = (window.SITE && window.SITE.sheets || []).filter(function (x) { return /^[FT]-\d\d[A-Z]?$/.test(x.id); });
   $("sheet").innerHTML = sheets.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.code || x.id) + " · " + esc(x.title) + "</option>"; }).join("");
-  $("lang1").innerHTML = opts(LANGS, "en");
-  $("lang2").innerHTML = opts(LANGS, "th");
-  function nLang() { var r = document.querySelector("input[name=nlang]:checked"); return r ? +r.value : 2; }
-  function drawLang() { var two = nLang() === 2; $("l2wrap").hidden = !two; $("l1txt").textContent = two ? "ภาษาที่ 1 (ข้อความหลัก)" : "ภาษาของเอกสาร"; }
-  document.addEventListener("change", function (ev) { if (ev.target.name === "nlang") drawLang(); });
-  drawLang();
-  var LAW = window.LAWDB || [];
-  $("law").innerHTML = '<option value="">ไม่ระบุประเทศ</option>' + LAW.map(function (x) { return '<option value="' + esc(x.country) + '">' + esc(x.countryTh) + " · " + esc(x.country) + "</option>"; }).join("");
-  function lawOf(n) { return LAW.filter(function (x) { return x.country === n; })[0] || null; }
-  function drawLaw() { var r = lawOf($("law").value); $("lawInfo").textContent = r ? [r.lawName, r.codeName].filter(Boolean).join(" · ") + " · ตรวจเมื่อ " + r.checked + (r.confidence === "official" ? "" : " · ยังไม่ยืนยันจากแหล่งทางการ") : ""; }
-  document.addEventListener("change", function (ev) { if (ev.target.id === "law") drawLaw(); });
-  function lawBlock(r) {
-    if (!r) return "";
-    var row = function (k, v) { return v ? "<div><b>" + k + ":</b> " + esc(v) + "</div>" : ""; };
-    return '<section class="lawb"><h3>Legal framework: ' + esc(r.country) + "</h3>" + row("Law", r.lawName + (r.lawNameLocal ? " (" + r.lawNameLocal + ")" : "")) + row("Authority", r.authority) + row("Code", r.codeName) + row("Standards body", r.standardsBody) + row("Licensed persons", r.licensed) + row("Note", r.note) + row("Source", r.sourceUrl) + row("Source 2", r.sourceUrl2) + row("Checked", r.checked + " · " + r.confidence) + "<div>Summary for reference, not legal advice. A blank field could not be confirmed. Confirm the current text and local rules before use. No values on this sheet come from this law unless the sheet says so.</div></section>";
+  var siteLang = "th"; try { siteLang = localStorage.getItem("build_lang") || "th"; } catch (e) {}
+  $("lang1").innerHTML = opts(LANGS, LANGS.some(function (x) { return x[0] === siteLang; }) ? siteLang : "th");
+  $("lang2").innerHTML = opts(LANGS, siteLang === "th" ? "en" : "th");
+  function ccOpts(none) {
+    var list = LAW.map(function (x) { return [CODE[x.country], x.countryTh + " · " + x.country]; }).filter(function (x) { return x[0]; }).sort(function (a, b) { return a[0] === "TH" ? -1 : b[0] === "TH" ? 1 : a[1].localeCompare(b[1], "th"); });
+    return (none ? '<option value="">' + esc(none) + "</option>" : "") + '<option value="INT">ตามข้อกำหนดโครงการ (กรอกค่าเอง)</option>' + list.map(function (x) { return '<option value="' + x[0] + '">' + esc(x[1]) + "</option>"; }).join("");
   }
-  var q = new URLSearchParams(location.search); if (q.get("item") && sheets.some(function (x) { return x.id === q.get("item"); })) $("sheet").value = q.get("item");
+  $("c1").innerHTML = ccOpts(""); $("c2").innerHTML = ccOpts("ไม่เทียบประเทศที่ 2");
+  function nLang() { var r = document.querySelector("input[name=nlang]:checked"); return r ? +r.value : 1; }
+  function drawLang() { var two = nLang() === 2; $("l2wrap").hidden = !two; $("swapWrap").hidden = !two; $("l1txt").textContent = two ? "ภาษาที่ 1 (ข้อความหลัก)" : "ภาษาของเอกสาร"; }
+  var touched = { c1: false, c2: false };
+  function follow() { // ภาษาไหนยึดประเทศนั้น จนกว่าลูกค้าจะเปลี่ยนเอง
+    var a = LANG_CC[$("lang1").value] || "", b = nLang() === 2 ? (LANG_CC[$("lang2").value] || "") : "";
+    if (!touched.c1) $("c1").value = a || b || "INT";
+    if (!touched.c2) $("c2").value = a && b && a !== b ? b : "";
+    drawCc();
+  }
+  function ccName(cc) { return cc === "TH" ? "ไทย" : cc === "INT" ? "ข้อกำหนดโครงการ" : REC[cc] ? REC[cc].countryTh : cc; }
+  function covLine(cc) {
+    if (!cc) return ""; if (cc === "INT") return "ข้อกำหนดโครงการ: ช่องเกณฑ์เว้นให้กรอกเอง ค่าไทยพิมพ์เป็นข้อมูลอ้างอิง"; if (cc === "TH") return "ไทย: ค่าเต็มตามฉบับไทย";
+    var D0 = window.DOCCOV || {}, id = $("sheet").value, t = (D0.numeric || {})[id] || 0, n = ((D0.cc || {})[cc] || {})[id] || 0;
+    return ccName(cc) + ": มีค่าที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อของใบนี้" + (n < t ? " · ข้อที่เหลือกรอกตามข้อกำหนดโครงการ" : "");
+  }
+  function drawCc() {
+    var a = $("c1").value, b = $("c2").value, r = REC[a];
+    $("ccInfo").textContent = [covLine(a), b && b !== a ? covLine(b) : ""].filter(Boolean).join(" · ");
+    $("lawInfo").textContent = r ? [r.lawName, r.codeName].filter(Boolean).join(" · ") + " · ตรวจเมื่อ " + r.checked + (r.confidence === "official" ? "" : " · ยังไม่ยืนยันจากแหล่งทางการ") : "";
+    $("c2wrapNote").hidden = !b || b === a;
+  }
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.name === "nlang") { drawLang(); follow(); }
+    else if (t.id === "lang1" || t.id === "lang2") follow();
+    else if (t.id === "c1" || t.id === "c2") { touched[t.id] = true; drawCc(); }
+    else if (t.id === "sheet") drawCc();
+  });
+  $("swapPick").addEventListener("click", function () { var a = $("lang1").value; $("lang1").value = $("lang2").value; $("lang2").value = a; if (touched.c1 || touched.c2) { var x = $("c1").value, y = $("c2").value; if (y) { $("c1").value = y; $("c2").value = x; } } follow(); }); // สลับลำดับภาษาก่อนสร้างเอกสาร · บรรทัดหลักและกล่องกรอกย้ายตาม
+  var q = new URLSearchParams(location.search);
+  if (q.get("item") && sheets.some(function (x) { return x.id === q.get("item"); })) $("sheet").value = q.get("item");
+  if (q.get("lang") && LANGS.some(function (x) { return x[0] === q.get("lang"); })) $("lang1").value = q.get("lang");
+  function setN(n) { var r = document.querySelector('input[name=nlang][value="' + n + '"]'); if (r) r.checked = true; }
+  // ลิงก์จากหน้าเอกสารของฉัน: ไม่มีรหัส = ฉบับอังกฤษ-ไทย · EN หรือ TH = ภาษาเดียว · รหัสประเทศ = ภาษาของประเทศนั้นคู่กับไทย
+  (function () {
+    if (!q.has("cc")) return; var cc = String(q.get("cc") || "").toUpperCase();
+    if (!cc) { $("lang1").value = "en"; $("lang2").value = "th"; setN(2); return; }
+    if (cc === "EN" || cc === "TH") { $("lang1").value = cc.toLowerCase(); setN(1); return; }
+    if (!REC[cc]) return;
+    var l = Object.keys(LANG_CC).filter(function (k) { return LANG_CC[k] === cc; })[0]; if (l) $("lang1").value = l; $("lang2").value = l === "th" ? "en" : "th"; setN(2); $("c1").value = cc; $("c2").value = cc === "TH" ? "" : "TH"; touched.c1 = true; touched.c2 = true;
+  })();
+  drawLang(); follow();
+  // ยังไม่เข้าสู่ระบบ: บอกตั้งแต่ต้นว่าอะไรดาวน์โหลดได้เลย · เข้าสู่ระบบแล้วกลับมาหน้านี้พร้อมตัวเลือกเดิม
+  function keepNext() { try { sessionStorage.setItem("build_next", "doc.html?item=" + encodeURIComponent($("sheet").value) + "&lang=" + encodeURIComponent($("lang1").value)); } catch (e) {} }
+  $("loginBar").hidden = !!B.token.get();
+  $("loginLink").addEventListener("click", keepNext);
+  // เข้าสู่ระบบแล้ว: ทำเครื่องหมายใบที่มีสิทธิ์ และบอกว่าได้ฉบับไหน
+  var OWN = {};
+  function drawRight() { var vs = OWN[$("sheet").value], el = $("rightInfo"); el.hidden = !vs; el.textContent = vs ? "คุณมีสิทธิ์ใบนี้: " + vs.map(function (v) { return B.LANGS[v] || v; }).join(" · ") + " · สร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับนี้" : ""; }
+  $("sheet").addEventListener("change", drawRight);
+  if (B.token.get()) B.call("me", { token: B.token.get() }).then(function (r) {
+    (r.owned || []).forEach(function (id) { var k = B.rootOf(id), v = B.varOf(id); if (!OWN[k]) OWN[k] = []; if (OWN[k].indexOf(v) < 0) OWN[k].push(v); });
+    [].forEach.call($("sheet").options, function (o) { if (OWN[o.value]) o.textContent = "✓ " + o.textContent; }); drawRight();
+  }).catch(function () {});
   function say(t, bad) { var m = $("msg"); m.hidden = !t; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t || ""; }
-  function cell(arr, d) { var cs = [d.lang1, d.lang2, d.lang3].filter(Boolean); return (arr || []).map(function (t, i) { var c = cs[i] || "en"; return '<div class="' + (i ? (cs[i] === d.lang3 && d.lang3 ? "l3" : "l2") : "l1") + '" lang="' + c + '" dir="' + (RTL[c] ? "rtl" : "ltr") + '">' + esc(t) + "</div>"; }).join(""); }
-  function field(lab, val, d) { return '<div class="fld"><div class="k">' + cell(lab, d) + '</div><div class="v">' + esc(val || "") + "</div></div>"; }
-  function render(d, meta) {
-    var L = d.lab, stdText = STD[d.std] + (d.stdName ? " · " + d.stdName : "");
-    var h = '<header class="dh"><div><div class="dt">' + cell(d.title, d) + '</div><div class="ds">' + cell(d.sum, d) + '</div></div><div class="dc"><b>' + esc(d.code || d.id) + "</b>" + (d.revDate ? "<br>" + esc(d.revDate) : "") + "</div></header>";
-    if (d.outside) h += '<div class="warn">' + esc("ภาษาหรือมาตรฐานนี้ไม่อยู่ในฉบับที่คุณซื้อ จึงแสดงเฉพาะข้อฟรี · ฉบับภาษาและมาตรฐานอื่นเป็นสินค้าแยก ร้านกำลังเปิดขาย") + "</div>";
-    if (!d.owned) h += '<div class="warn">' + cell(L.sample, d) + "</div>";
-    if (d.machine) h += '<div class="warn">' + cell(L.mt, d) + cell(L.draft, d) + "</div>";
-    if (d.std !== "th") h += '<div class="warn">' + cell(L.intl, d) + "</div>";
-    h += '<div class="flds">' + field(L.project, meta.project, d) + field(L.contractor, meta.contractor, d) + field(L.location, meta.location, d) + field(L.drawing, "", d) + field(L.date, "", d) + field(L.std, stdText, d) + field(L.law, d.law, d) + (d.stdName || d.law ? '<div class="fld"><div class="k">' + cell(L.user, d) + "</div></div>" : "") + field(L.permit, "", d) + field(L.licensed, "", d) + "</div>";
-    h += lawBlock(lawOf(d.law));
-    h += '<div class="key">' + cell(L.key, d) + "</div>";
-    h += '<div class="tw"><table class="dtb"><thead><tr><th>#</th><th>' + cell(L.point, d) + "</th><th>" + cell(L.item, d) + "</th><th>" + cell(L.crit, d) + "</th><th>" + cell(L.method, d) + "</th><th>" + cell(L.measured, d) + "</th><th>" + cell(L.pass, d) + "</th><th>" + cell(L.fail, d) + "</th><th>" + cell(L.na, d) + "</th><th>" + cell(L.remark, d) + "</th></tr></thead><tbody>";
-    var n = 0;
-    d.stages.forEach(function (st) {
-      h += '<tr class="st"><td colspan="10">' + cell(st.name, d) + "</td></tr>";
-      st.items.forEach(function (r) { n++; h += "<tr" + (r.warn ? ' class="fl"' : "") + "><td>" + n + (r.warn ? " ⚑" : "") + '</td><td class="c"><b>' + esc(r.p) + "</b></td><td>" + cell(r.it, d) + "</td><td>" + cell(r.cr, d) + (r.ref ? '<div class="ref">' + cell(L.ref, d) + cell(r.ref, d) + "</div>" : "") + "</td><td>" + cell(r.m, d) + '</td><td class="mv"></td><td class="b"></td><td class="b"></td><td class="b"></td><td></td></tr>'; });
-    });
-    h += "</tbody></table></div>";
-    if (d.recs.length) h += '<div class="recs"><h3>' + cell(L.rec, d) + "</h3>" + d.recs.map(function (x) { var cols = Math.max(x.cols.length, 1), blank = ""; for (var i = 0; i < 5; i++) { blank += "<tr>"; for (var j = 0; j < cols; j++) blank += "<td>&nbsp;</td>"; blank += "</tr>"; } return '<div class="rec"><b>' + cell(x.title, d) + '</b><div class="tw"><table class="dtb rect"><thead><tr>' + x.cols.map(function (k) { return "<th>" + cell(k, d) + "</th>"; }).join("") + "</tr></thead><tbody>" + blank + "</tbody></table></div></div>"; }).join("") + "</div>";
-    h += '<div class="sign">' + [L.inspector, L.supervisor, L.owner].map(function (x) { return "<div>" + cell(x, d) + '<span class="ln"></span><small>' + cell(L.date, d) + "</small></div>"; }).join("") + "</div>";
-    h += '<div class="fine">' + cell(L.note, d) + "</div><p class=\"fine lic\">" + esc(d.code || d.id) + " · สร้าง | BUILD TH · Licensed to " + esc(d.licensee) + (d.licNo ? " · " + esc(d.licNo) : "") + "</p>" + (d.machine ? '<div class="fine">' + cell(L.flag, d) + '</div><div class="printdraft">' + cell(L.draft, d) + "</div>" : "") + '<div class="fine editedNote" hidden>' + cell(L.edited, d) + "</div>";
-    $("sheetOut").innerHTML = h;
-    editing = false; $("editBtn").textContent = "แก้ไขเอกสาร"; $("addRow").hidden = true; $("result").hidden = false; $("result").scrollIntoView({ block: "start" });
+
+  // ---------- ตัวสร้างฟอร์ม: โครงเดียวกับใบ PDF (gen_sheets.ps1) แต่ข้อความมาจากหลังบ้านตามภาษาที่เลือก ----------
+  var D = null, META = {}, fitOn = true;
+  var CE = (function () { var e = document.createElement("div"); try { e.contentEditable = "plaintext-only"; if (e.contentEditable === "plaintext-only") return "plaintext-only"; } catch (x) {} return "true"; })();
+  var CEA = ' contenteditable="' + CE + '" spellcheck="false"';
+  var SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  var ICO = {
+    sun: SVG + '<circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>',
+    cloud: SVG + '<path d="M7 18h10.5a4.5 4.5 0 0 0 .4-9A6 6 0 0 0 6.3 10.2 4 4 0 0 0 7 18z"/></svg>',
+    rain: SVG + '<path d="M7 14h10.5a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 6.6 7.2 3.5 3.5 0 0 0 7 14z"/><path d="M8 17l-1 4M12.5 17l-1 4M17 17l-1 4"/></svg>',
+    wind: SVG + '<path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h7"/></svg>',
+    lock: '<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="11" rx="1.5" fill="#000"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>',
+    cam: SVG + '<path d="M3 8h4l1.6-2.5h6.8L17 8h4v11H3z"/><circle cx="12" cy="13.3" r="3.3"/></svg>'
+  };
+  function langs() { return [D.lang1, D.lang2, D.lang3].filter(Boolean); }
+  function at(c) { return ' lang="' + c + '" dir="' + (RTL[c] ? "auto" : "ltr") + '"'; }
+  // ข้อความหลักกับบรรทัดภาษาถัดไป
+  function M(arr) { var cs = langs(); return (arr || []).map(function (t, i) { var c = cs[i] || "en"; return "<span" + (i ? ' class="l2' + (i === 2 ? " l3" : "") + '"' : "") + at(c) + ">" + esc(t) + "</span>"; }).join(""); }
+  // ป้ายกำกับ: ภาษาหลัก + ภาษาถัดไปตัวเล็ก
+  function Lab(arr) { var cs = langs(); return '<span class="lb">' + (arr || []).map(function (t, i) { var c = cs[i] || "en"; return i ? "<i" + at(c) + ">" + esc(t) + "</i>" : "<span" + at(c) + ">" + esc(t) + "</span>"; }).join(" ") + "</span>"; }
+  // ทุกภาษาในบรรทัดเดียว
+  function One(arr) { var cs = langs(); return (arr || []).map(function (t, i) { return "<span" + at(cs[i] || "en") + ">" + esc(t) + "</span>"; }).join(" "); }
+  function Sla(arr) { return (arr || []).map(esc).join(" / "); }
+  var UNIT = "mm|cm|m²|m³|m|t|kg|kN|MPa|°C|%|s|min|h|days?|hours?|A|V|Ω|MΩ|bar|kPa|มม\\.|ซม\\.|ตร\\.ม\\.|ลบ\\.ม\\.|ม\\.|กก\\.|ตัน|นาที|ชม\\.|วัน|องศา|ซม";
+  var BLANK = new RegExp("_{2,}( (?:" + UNIT + ")(?=[\\s,.;·)]|$))?", "g"), SPLIT = /\s+·\s+|;\s+|；\s*|؛\s*/;
+  function nBlank(s) { return (String(s || "").match(/_{2,}/g) || []).length; }
+  // กล่องกรอกอยู่บรรทัดหลัก บรรทัดถัดไปมีเลขชี้กล่องเดียวกัน (กรอกครั้งเดียว) · หน่วยไม่แยกจากกล่อง
+  function boxed(s, num, k) {
+    var out = "", last = 0, m, re = new RegExp(BLANK.source, "g"), str = String(s || "");
+    while ((m = re.exec(str))) { k.n++; out += esc(str.slice(last, m.index)) + '<span class="fb">' + (num ? '<span class="bn">' + k.n + "</span>" : "") + '<span class="bl"' + CEA + "></span>" + esc(m[1] || "") + "</span>"; last = m.index + m[0].length; }
+    return out + esc(str.slice(last));
   }
+  function numbered(s, k) { var out = "", last = 0, m, re = /_{2,}/g, str = String(s || ""); while ((m = re.exec(str))) { k.n++; out += esc(str.slice(last, m.index)) + '<span class="bn">' + k.n + "</span>"; last = m.index + m[0].length; } return out + esc(str.slice(last)); }
+  function Bi(arr, bul) {
+    arr = arr || []; var cs = langs(), n = nBlank(arr[0]), same = arr.length > 1 && n > 0 && arr.slice(1).every(function (s) { return nBlank(s) === n; });
+    return arr.map(function (t, i) {
+      var k = { n: 0 }, c = cs[i] || "en", parts = bul ? String(t || "").split(SPLIT).filter(Boolean) : [String(t || "")];
+      var cell = function (p) { return i === 0 || !same ? boxed(p, same, k) : numbered(p, k); }, body = parts.length > 1 ? '<span class="mb">' + parts.map(function (p) { return "<span>" + cell(p) + "</span>"; }).join("") + "</span>" : cell(parts[0] || "");
+      return "<span" + (i ? ' class="l2' + (i === 2 ? " l3" : "") + '"' : "") + at(c) + ">" + body + "</span>";
+    }).join("");
+  }
+  function docCode(d) { // รหัสเอกสาร: -P ฉบับเต็ม · -F ฉบับฟรี · ต่อท้ายด้วยรหัสภาษา ยกเว้นฉบับอังกฤษ-ไทย
+    var base = String(d.code || ("BTH-" + d.id.replace("-", "") + "-P")).replace(/-[PF]$/, "") + "-" + (d.owned ? "P" : "F"), cs = [d.lang1, d.lang2].filter(Boolean);
+    return base + (cs.length === 2 && cs.indexOf("en") >= 0 && cs.indexOf("th") >= 0 ? "" : "-" + cs.join("-").toUpperCase());
+  }
+  function ctryName(c) { var cs = langs(); return cs.every(function (x) { return x === "th"; }) ? c.th : cs.indexOf("th") >= 0 ? c.en + " (" + c.th + ")" : c.en; }
+  function stdText() { var d = D; return (d.ctry || []).map(ctryName).join(" + ") + (d.stdName ? " · " + d.stdName : ""); }
+  function keyPlan() {
+    var L = D.lab, s = '<svg viewBox="0 0 22 15.5" fill="none" stroke="#000" stroke-width=".2" font-family="Arial" font-size="1.7" text-anchor="middle" aria-hidden="true">', x, y;
+    for (x = 0; x <= 8; x++) for (y = 0; y <= 7; y++) s += '<circle cx="' + (3.6 + 1.5 * x) + '" cy="' + (3.6 + 1.6 * y) + '" r=".13" fill="#8A939E" stroke="none"/>';
+    s += '<rect x="3.0" y="2.95" width="13.2" height="12.3" stroke-width=".22"/>';
+    for (x = 0; x <= 4; x++) s += '<rect x="' + (3.25 + 2.6 * x) + '" y=".35" width="2.15" height="1.9" stroke-width=".16"/>';
+    for (y = 0; y <= 3; y++) s += '<rect x=".3" y="' + (3.35 + 3.0 * y) + '" width="2.2" height="2.3" stroke-width=".16"/>';
+    s += '<circle cx="19.15" cy="7.2" r="2.45" stroke-width=".22"/><path d="M19.15 4.4v.6M19.15 9.4v.6M16.35 7.2h.6M21.35 7.2h.6" stroke-width=".2"/><circle cx="19.15" cy="7.2" r=".18" fill="#000" stroke="none"/>';
+    s += '<text x="19.15" y="12.3" fill="#000" stroke="none" font-size="1.45">' + esc(L.north[0]) + "</text>" + (L.north[1] ? '<text x="19.15" y="14.1" fill="#3F4A58" stroke="none" font-size="1.45">' + esc(L.north[1]) + "</text>" : "") + "</svg>";
+    return '<div class="kpc"><b>' + esc(L.kp[0]) + (L.kp[1] ? " <span>" + esc(L.kp[1]) + "</span>" : "") + "</b>" + s + "</div>";
+  }
+  function head(kind, plan) {
+    var d = D, L = d.lab, cs = langs(), tt = d.title || [], brand = /^T-/.test(d.id) ? L.brandT : L.brandF;
+    return '<header class="hd' + (plan ? " kp" : "") + '"><div class="lg"><img src="img/logo.png" alt=""><div><b>สร้าง | BUILD TH</b>' + brand.map(function (x, i) { return "<span" + at(cs[i] || "en") + ">" + esc(x) + "</span>"; }).join("") + '</div></div><div class="ti"><small>' + kind + "</small><h1" + at(cs[0]) + ">" + esc(tt[0]) + "</h1>" + tt.slice(1).map(function (x, i) { return "<h2" + at(cs[i + 1] || "en") + ">" + esc(x) + "</h2>"; }).join("") + '</div><div class="cd"><div><b>' + Sla(L.sheetNo) + '</b><span class="w"' + CEA + '></span></div><div><b>' + Sla(L.dateChk) + '</b><span class="w"' + CEA + "></span></div></div>" + (plan ? keyPlan() : "") + "</header>";
+  }
+  function info(rows) {
+    return '<section class="info">' + rows.map(function (r, i) { return "<div" + (i === rows.length - 1 && rows.length % 2 ? ' class="wide"' : "") + ">" + Lab(r[0]) + '<span class="iv w"' + CEA + ">" + esc(r[1] || "") + "</span></div>"; }).join("") + "</section>";
+  }
+  function strip() {
+    var d = D, L = d.lab, wx = "<div>" + '<span class="lb">' + esc(L.weather[0]) + (L.weather[1] ? "<i>" + esc(L.weather[1]) + "</i>" : "") + "</span>" + [[ICO.sun, L.sun], [ICO.cloud, L.cloud], [ICO.rain, L.rain], [ICO.wind, L.wind]].map(function (p) { return '<span class="wx"><b class="tick"></b>' + p[0] + esc(p[1][0]) + (p[1][1] ? "<small>" + esc(p[1][1]) + "</small>" : "") + "</span>"; }).join("") + "</div>", g = "";
+    if (d.gauge) g = '<div class="gauge"><span class="lb">' + esc(L.gauge[0]) + (L.gauge[1] ? "<i>" + esc(L.gauge[1]) + "</i>" : "") + "</span>" + [0.1, 0.2, 0.3, 0.5, 1, 2, 3].map(function (w) { return '<span class="gb"><i style="width:' + w + 'mm"></i>' + w.toFixed(1) + "</span>"; }).join("") + '<span class="cal"><i></i>' + esc(L.cal[0]) + (L.cal[1] ? "<br>" + esc(L.cal[1]) : "") + "</span></div>";
+    return '<div class="strip">' + wx + g + "</div>";
+  }
+  function notices() { // คำเตือนเฉพาะงาน · ค่าของประเทศ · เอกสารแปลด้วยเครื่อง
+    var d = D, L = d.lab, h = d.warnTxt ? '<p class="warn">' + M(d.warnTxt) + "</p>" : "";
+    if ((d.ccs || []).some(function (c) { return c !== "TH"; })) h += '<p class="warn">' + M(L.cnote) + "</p>";
+    if (d.machine) h += '<p class="warn">' + M(L.mt) + "</p>";
+    return h;
+  }
+  function crCell(r, n) {
+    var L = D.lab;
+    if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) { return '<label class="pick" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk' + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">' + esc(o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">' + esc(o.ref) + "</span>" : "") + "</span></label>"; }).join("") + "</div>";
+    return Bi(r.cr, true) + (r.jref ? '<div class="rf">' + One(L.also) + " " + esc(r.jref) + "</div>" : "") + (r.ref ? '<div class="rf">' + One(L.ref) + " " + One(r.ref) + "</div>" : "");
+  }
+  function thw(c) { var s = (c || []).join(" "); return /\bdate\b|วันที่/i.test(s) ? ' style="min-width:15mm"' : /\btime\b|เวลา/i.test(s) ? ' style="min-width:13mm"' : /\bno\.|เลข/i.test(s) ? ' style="min-width:11mm"' : ""; }
+  function blankRows(cols, rows) { var o = "", i, j; for (i = 0; i < rows; i++) { o += "<tr>"; for (j = 0; j < cols; j++) o += '<td class="w"' + CEA + "></td>"; o += "</tr>"; } return o; }
+  function recTable(x) {
+    var L = D.lab;
+    return '<div class="keep"><h3>' + M(x.title) + (x.plain && D.owned ? "<small>" + One(L.measS) + "</small>" : "") + '</h3><table class="rec"><thead><tr><th style="width:9mm">' + M(L.seq) + "</th>" + x.cols.map(function (c) { return "<th" + thw(c) + ">" + M(c) + "</th>"; }).join("") + "</tr></thead><tbody>" + blankRows(x.cols.length + 1, x.n) + "</tbody></table></div>";
+  }
+  function sign(roles) {
+    var L = D.lab;
+    return '<div class="sig c' + roles.length + '">' + roles.map(function (ro) { return "<div><h4>" + M(ro) + "</h4>" + [L.company, L.signature, L.name, L.position, L.date].map(function (f) { return "<p>" + Lab(f) + '<span class="w"' + CEA + "></span></p>"; }).join("") + "</div>"; }).join("") + "</div>";
+  }
+  function notesBox(lab, n) { var s = ""; for (var i = 0; i < n; i++) s += '<span class="w"' + CEA + "></span>"; return '<div class="nt"><b>' + One(lab) + "</b>" + s + "</div>"; }
+  function rpBar(extra) {
+    var d = D, L = d.lab;
+    return '<div class="rp"><b>' + M(L.rp) + "</b><span>" + esc(docCode(d)) + " " + esc((d.title || [])[0]) + '</span><span class="f">' + One(L.rpSheet) + ' <span class="w"' + CEA + '></span></span><span class="f">' + One(L.date) + ' <span class="w"' + CEA + "></span></span>" + (extra ? '<span class="f">' + One(L.rpNo) + ' <span class="w"' + CEA + "></span></span>" : "") + "</div>";
+  }
+  function freeRefs() {
+    var d = D, L = d.lab, th = langs()[0] === "th", list = d.frefs || [];
+    if (!list.length) return "";
+    return " · " + One(L.refsShort) + ": " + list.map(function (x) { return esc(th ? x[0] : (x[5] || x[0])) + " " + esc(th ? x[1] : (x[2] || x[1])); }).join(" · ") + " (" + One(L.refsFull) + ")";
+  }
+  function upBox() { // ฉบับฟรีบอกว่าฉบับเต็มมีอะไรเพิ่ม เหมือนใบ PDF
+    var d = D, L = d.lab, code = String(d.code || ("BTH-" + d.id.replace("-", "") + "-P")).replace(/-[PF]$/, "") + "-P", base = window.SITE && window.SITE.site && window.SITE.site.url ? String(window.SITE.site.url).replace(/\/+$/, "") + "/" : "";
+    return '<div class="up"><b>' + One(L.upT) + " · " + esc(code) + "</b><ul><li>" + One(L.upItems) + ": " + d.nPro + "</li><li>" + One(L.upStages) + ": " + d.nStages + "</li><li>" + One(L.upH) + ": " + d.nHold + "</li><li>" + One(L.up2L) + "</li><li>" + One(L.upRec) + "</li><li>" + One(L.upDef) + "</li><li>" + One(L.upPh) + "</li><li>" + One(L.upSign) + '</li></ul><div style="margin-top:1mm">' + One(L.upMore) + ": " + esc(base + "sheets.html") + "</div></div>";
+  }
+  function freeForm(m) {
+    var d = D, L = d.lab, kind = (/^T-/.test(d.id) ? L.kindFT : L.kindF).map(function (t, i) { return esc(t) + " · " + d.nFree + " " + esc((L.keyN || [])[i] || ""); }).join(" · ");
+    var rows = [[L.project, m.project], [L.area, m.location], [L.contractor, m.contractor], [L.drawing, ""]];
+    if ((d.ccs || []).some(function (c) { return c !== "TH"; })) rows.push([L.std, stdText()]);
+    var h = head(kind, false) + info(rows) + notices();
+    h += '<table class="chk"><colgroup><col style="width:8mm"><col style="width:70mm"><col style="width:68mm"><col style="width:8mm"><col style="width:8mm"><col></colgroup><thead><tr><th>' + M(L.no) + "</th><th>" + M(L.hItems) + "</th><th>" + M(L.hCrit) + "</th><th>C</th><th>NC</th><th>" + M(L.hRem) + "</th></tr></thead><tbody>";
+    var n = 0;
+    d.stages.forEach(function (st) { st.items.forEach(function (r) { n++; h += "<tr" + (r.warn ? ' class="fl"' : "") + '><td class="n">' + n + (r.warn ? " ⚑" : "") + '</td><td class="it">' + Bi(r.it, false) + '</td><td class="cr">' + crCell(r, n) + '</td><td class="bx"></td><td class="bx"></td><td class="w"' + CEA + "></td></tr>"; }); });
+    h += '</tbody></table><p class="lgd">C = ' + One(L.cC) + " · NC = " + One(L.cNC) + " · " + One(L.lgFree) + freeRefs() + "</p>";
+    var hasRec = (d.recs || []).length > 0;
+    var tail = '<p class="sh2 top">' + M(L.sh2) + "</p>" + sign([L.sIns, L.sAck]) + notesBox(L.notesF, hasRec ? 2 : 4) + upBox() + '<p class="fine">' + One(L.fine) + " · " + One(L.freeShare) + "</p>" + flagNote();
+    if (hasRec) h += '<div class="pb">' + rpBar(false) + d.recs.map(recTable).join("") + tail + "</div>"; else h += tail;
+    return h;
+  }
+  function flagNote() { var d = D, L = d.lab; return d.machine ? '<p class="fine">' + One(L.flag) + "</p>" : ""; }
+  function proForm(m) {
+    var d = D, L = d.lab, isT = /^T-/.test(d.id), intl = (d.ccs || []).some(function (c) { return c !== "TH"; }), lawText = (d.ctry || []).filter(function (c) { return c.cc !== "INT"; }).map(ctryName).join(" + "), two = langs().length > 1;
+    var rows = [[L.project, m.project], [L.location, m.location], [L.contractor, m.contractor], [L.supervisor, ""], [L.drawRev, ""], [L.areaGrid, ""], [L.refer, stdText()], [L.time, ""]];
+    if (intl) rows.push([L.law, lawText ? lawText + " · Annex B" : ""], [L.licensed, ""], [L.permit, ""]);
+    var h = head((isT ? L.kindPT : L.kindP).map(esc).join(" · "), true) + info(rows) + strip() + notices() + '<p class="sh1">' + M(L.sh1) + "</p>";
+    var cm = d.cmp || {};
+    if (cm.same || cm.diff || cm.none || cm.own) h += '<div class="cmpb"><b>' + One(L.cmpT) + "</b>" + [[cm.same, L.cmpS], [cm.diff, L.cmpD], [cm.own, L.cmpO], [cm.none, L.cmpN]].filter(function (x) { return x[0]; }).map(function (x) { return '<span class="cm"><em>' + x[0] + "</em><span>" + M(x[1]) + "</span></span>"; }).join("") + "</div>";
+    h += '<table class="chk"><colgroup><col style="width:8mm"><col style="width:6.6mm"><col style="width:57mm"><col style="width:62mm"><col style="width:12mm"><col style="width:7mm"><col style="width:7mm"><col style="width:7mm"><col></colgroup><thead><tr><th>' + esc(L.no[0]) + "</th><th>" + M(L.point) + "</th><th>" + M(L.hItems) + "</th><th>" + M(L.hCrit) + "</th><th>" + M(L.method) + "</th><th>C</th><th>NC</th><th>N/A</th><th>" + M(L.hRem) + "</th></tr></thead>";
+    var n = 0;
+    d.stages.forEach(function (st, si) {
+      h += '<tbody class="sg"><tr class="st"><td colspan="9">' + (si + 1) + ". " + M(st.name) + "</td></tr>";
+      st.items.forEach(function (r, ii) {
+        n++; if (ii === 1) h += "</tbody><tbody>"; var isH = r.p === "H";
+        h += "<tr" + (isH || r.warn ? ' class="' + (isH ? "hp" : "") + (r.warn ? " fl" : "") + '"' : "") + '><td class="n">' + (si + 1) + "." + (ii + 1) + (r.warn ? " ⚑" : "") + '</td><td class="pt"><b class="' + esc(r.p) + '">' + esc(r.p) + "</b>" + (isH ? ICO.lock : "") + '</td><td class="it">' + Bi(r.it, false) + '</td><td class="cr">' + crCell(r, n) + '</td><td class="hw">' + M(r.m) + '</td><td class="bx"></td><td class="bx"></td><td class="bx"></td>' + (isH ? '<td style="vertical-align:bottom"><span class="ph">' + ICO.cam + One(L.photo) + '<i class="w"' + CEA + "></i></span></td>" : '<td class="w"' + CEA + "></td>") + "</tr>";
+      });
+      h += "</tbody>";
+    });
+    h += '</table><p class="lgd"><span class="lg1">C = ' + One(L.cC) + '</span> · <span class="lg1">NC = ' + One(L.cNC) + '</span> · <span class="lg1">N/A = ' + One(L.cNA) + '</span> | <span class="lg1"><span class="mk H">H</span>' + One(L.lgH) + '</span> · <span class="lg1"><span class="mk W">W</span>' + One(L.lgW) + '</span> · <span class="lg1"><span class="mk">R</span>' + One(L.lgR) + '</span> · <span class="lg1"><span class="mk S">S</span>' + One(L.lgS) + "</span><br>" + (two ? '<span><span class="bn">1</span>' + One(L.lgBox) + "</span> · " : "") + "<span>" + One(L.lgPlan) + "</span></p>";
+    // ผลการตรวจ ลายเซ็น 3 ฝ่าย วิธีใช้ หมายเหตุ
+    h += '<div class="keep"><h3>' + M(L.result) + '</h3><div class="res"><span><b class="tick"></b>' + One(L.r1) + '</span><span><b class="tick"></b>' + esc(L.r2[0]) + ' <span class="bl"' + CEA + "></span>" + L.r2.slice(1).map(function (x, i) { return '<span class="l2"' + at(langs()[i + 1]) + ">" + esc(x) + "</span>"; }).join("") + '</span><span><b class="tick"></b>' + One(L.r3) + '</span><span class="ipc">' + One(L.ipc) + ' <span class="bl"' + CEA + '></span></span></div><p class="sh2">' + M(L.sh2) + "</p>" + sign([L.sCon, L.sSup, L.sOwn]) + "</div>";
+    h += '<ol class="use">' + [L.use1, L.use2, L.use3, L.use4, L.use5].map(function (u) { return "<li>" + M(u) + "</li>"; }).join("") + "</ol>" + notesBox(L.notesP, 4);
+    h += '<p class="fine">' + One(L.fine) + " · " + One(L.proOnly) + "</p>" + flagNote();
+    // แผ่นบันทึก: หน้าใหม่ พิมพ์เพิ่มได้ตามจำนวนรายการ
+    h += '<div class="pb">' + rpBar(true) + '<p class="addn">' + One(L.rpAdd) + "</p>" + (d.recs || []).map(recTable).join("");
+    h += '<div class="keep"><h3>' + M(L.defT) + "<small>" + One(L.defS) + '</small></h3><table class="rec"><thead><tr><th style="width:9mm">' + M(L.seq) + '</th><th style="width:14mm">' + M(L.dItem) + '</th><th style="width:30mm">' + M(L.dLoc) + "</th><th>" + M(L.dFound) + '</th><th style="width:38mm">' + M(L.dFix) + '</th><th style="width:17mm">' + M(L.dDue) + '</th><th style="width:23mm">' + M(L.dRe) + "</th></tr></thead><tbody>" + blankRows(7, 8) + "</tbody></table></div>";
+    h += '<div class="keep"><h3>' + M(L.phT) + "<small>" + One(L.phS) + '</small></h3><table class="rec"><thead><tr><th style="width:14mm">' + M(L.phNo) + '</th><th style="width:14mm">' + M(L.dItem) + '</th><th style="width:38mm">' + M(L.dLoc) + "</th><th>" + M(L.phSub) + '</th><th style="width:27mm">' + M(L.phDt) + "</th></tr></thead><tbody>" + blankRows(5, 7) + "</tbody></table></div></div>";
+    return h + annexes();
+  }
+  function refRow(x) {
+    var cs = langs(), hasTh = cs.indexOf("th") >= 0, onlyTh = cs.every(function (c) { return c === "th"; }), code = onlyTh ? x[0] : (x[5] || x[0]), by = onlyTh ? x[3] : (x[6] || x[3]);
+    return "<li><b>" + esc(code) + "</b> " + esc(hasTh ? x[1] : (x[2] || x[1])) + (hasTh && !onlyTh && x[2] ? '<span class="l2">' + esc(x[2]) + "</span>" : "") + (by ? ' <span style="color:#3F4A58">(' + esc(by) + ")</span>" : "") + "</li>";
+  }
+  function lawBlock(cc, c) {
+    var r = REC[cc] || null, x = (c && c.law) || {}; if (!r && !c) return "";
+    var row = function (k, v) { return v ? "<div><b>" + k + ":</b> " + esc(v) + "</div>" : ""; }, name = r ? r.country : (c ? c.en : cc);
+    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (r ? row("Law", r.lawName + (r.lawNameLocal ? " (" + r.lawNameLocal + ")" : "")) + row("Authority", r.authority) + row("Code", r.codeName) + row("Standards body", r.standardsBody) + row("Licensed persons", r.licensed) + row("Note", r.note) : "") + row("Permit body", x.permitBody) + row("Mandatory inspections", x.mandatoryInspections) + row("Licensed persons (detail)", x.licensedPersons) + row("Statutory language", x.statutoryLanguage) + row("Notes", x.notes) + (r ? row("Source", r.sourceUrl) + row("Source 2", r.sourceUrl2) + row("Checked", r.checked + " · " + r.confidence) : "") + (x.sources && x.sources.length ? row("More sources", x.sources.join(" · ")) : "") + "</div>";
+  }
+  function annexes() { // ภาคผนวก ก มาตรฐานอ้างอิงและลำดับการใช้เกณฑ์ · ภาคผนวก ข กรอบกฎหมายของประเทศที่เลือก (อยู่ท้ายเอกสาร ตามคำสั่งผู้ใช้ 2 พ.ย. 2026)
+    var d = D, L = d.lab, cs = langs();
+    var codeRow = function (c) { var m = c.code || {}, keys = Object.keys(m).filter(function (k) { return m[k]; }); return keys.length ? '<div class="stdc"><h4>' + esc(c.en) + "</h4>" + keys.map(function (k) { return "<div><b>" + esc(k) + ":</b> " + esc(m[k]) + "</div>"; }).join("") + "</div>" : ""; };
+    var thRefs = (d.ccs || []).indexOf("TH") >= 0 && (d.refs || []).length ? '<div class="refs" style="margin:0;border:0"><b>' + M(L.refsT) + "</b><ul>" + d.refs.map(refRow).join("") + "</ul><p>" + One(L.refsN) + "</p></div>" : "";
+    var ord = '<p class="ordb"><b>' + esc(L.ordT[0]) + '</b> <b class="tick"></b>1 ' + esc(L.ordA[0]) + ' <b class="tick"></b>2 ' + esc(L.ordB[0]) + ' <b class="tick"></b>3 ' + esc(L.ordC[0]) + ' <span class="bl"' + CEA + "></span> · " + esc(L.ordN[0]) + cs.slice(1).map(function (c, i) { return '<span class="l2"' + at(c) + ">" + esc(L.ordT[i + 1]) + ": 1 " + esc(L.ordA[i + 1]) + " · 2 " + esc(L.ordB[i + 1]) + " · 3 " + esc(L.ordC[i + 1]) + " · " + esc(L.ordN[i + 1]) + "</span>"; }).join("") + "</p>";
+    var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName) + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
+    var lawHtml = (d.ctry || []).filter(function (c) { return c.cc !== "INT"; }).map(function (c) { return lawBlock(c.cc, c); }).join("");
+    if (lawHtml) h += '<section class="annex"><h3>' + M(L.annexB) + "</h3>" + lawHtml + '<div class="ord2">' + M(L.lnote) + "</div></section>";
+    return h;
+  }
+  function pageCss(d) { // ท้ายทุกหน้า: รหัส ฉบับวันที่ ชื่อผู้ซื้อ เลขหน้า
+    var st = $("pageCss"), L = d.lab, q2 = function (s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ") + '"'; };
+    if (!st) { st = document.createElement("style"); st.id = "pageCss"; document.head.appendChild(st); }
+    var f = 'font: 7.6pt "Segoe UI", "Leelawadee UI", Arial, sans-serif; color: #111;';
+    st.textContent = "@media print { @page { size: A4; margin: 12mm 11mm 15mm 11mm; @bottom-left { content: " + q2(docCode(d) + (d.revDate ? " · " + L.issue[0] + " " + d.revDate : "")) + "; " + f + " } @bottom-center { content: " + q2("สร้าง | BUILD TH" + (d.owned && d.licensee ? " · Licensed to " + d.licensee + (d.licNo ? " · " + d.licNo : "") : "")) + "; " + f + " } @bottom-right { content: " + q2(L.page[0] + " ") + ' counter(page) " / " counter(pages); ' + f + " }" + (d.machine ? " @top-right { content: " + q2(L.draft[0]) + '; font: 7pt "Segoe UI", Arial, sans-serif; color: #C24A08; }' : "") + " } }";
+  }
+  function noteBar(d) { // ข้อความบนจอเหนือเอกสาร ไม่พิมพ์ · แปลตามภาษาของเว็บ
+    var h = "", cm = d.cmp || {};
+    if (!d.owned) {
+      var want = (d.ccs || []).filter(function (c) { return c !== "TH" && c !== "INT"; })[0] || LANG_CC[d.lang1] || "", href = "product.html?id=" + encodeURIComponent(d.id) + (want && want !== "TH" ? "&cc=" + want : "") + "#editions";
+      h += '<div class="dn"><span><b>' + esc(d.outside ? "ภาษาหรือมาตรฐานนี้ไม่อยู่ในฉบับที่คุณซื้อ จึงแสดงฉบับฟรี" : "นี่คือฉบับฟรี: ข้อหลัก 1 ภาษา") + "</b>" + (d.freeOne ? " · ฉบับฟรีแสดงเฉพาะภาษาที่ 1" : "") + " · ซื้อใบนี้เพื่อใช้ครบทุกข้อ และ 2 ภาษา</span>" + '<a class="b pri sm" href="' + esc(href) + '">' + esc(want && want !== "TH" ? "ซื้อฉบับ" + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a></div>";
+    }
+    if (cm.diff || (cm.none && (d.ccs || []).length > 1)) h += '<div class="pbar"><b>ค่าที่ต่างกัน:</b> ' + d.ccs.map(function (c) { return '<button class="b line sm" type="button" data-all="' + esc(c) + '">ใช้ค่า' + esc(ccName(c)) + "ทั้งใบ</button>"; }).join(" ") + ' <button class="b line sm" type="button" data-all="">ล้าง ให้ติ๊กหน้างาน</button><span class="note" id="pickN"></span></div>';
+    $("docNote").innerHTML = h;
+  }
+  function fit() { // จอเล็ก: ย่อทั้งแผ่นให้พอดีจอ · กดขยายเพื่อกรอกได้
+    var w = $("pagewrap"), box = $("sheetOut"), btn = $("fitBtn"); if (!w || !box || $("result").hidden) return;
+    var cs = getComputedStyle(w), avail = w.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), z = Math.min(1, avail / 794), small = z < 0.995;
+    btn.hidden = !small; box.style.zoom = small && fitOn ? z.toFixed(3) : ""; btn.textContent = fitOn ? "ขยายเต็มขนาด" : "ย่อให้พอดีจอ";
+  }
+  window.addEventListener("resize", fit);
+  function draw() {
+    var d = D, cs = langs(), box = $("sheetOut");
+    box.className = "fm" + (cs[0] === "th" ? " thf" : "") + (cs.length > 2 ? " t3" : "");
+    box.setAttribute("dir", [d.lang1, d.lang2].filter(Boolean).every(function (c) { return RTL[c]; }) ? "rtl" : "ltr"); box.setAttribute("lang", cs[0]);
+    box.innerHTML = (d.owned ? proForm(META) : freeForm(META)) + (d.owned ? '<p class="lic">' + esc(docCode(d)) + " · สร้าง | BUILD TH · Licensed to " + esc(d.licensee) + (d.licNo ? " · " + esc(d.licNo) : "") + "</p>" : "") + '<p class="fine editedNote" hidden>' + One(d.lab.edited) + "</p>";
+    noteBar(d); pageCss(d);
+    $("swapBtn").hidden = !d.lang2; editing = false; $("editBtn").textContent = "แก้ไขเอกสาร"; $("addRow").hidden = true; $("result").hidden = false; drawPicks(); fit();
+  }
+  function render(d, meta) { D = d; META = meta; draw(); $("result").scrollIntoView({ block: "start" }); }
+  function drawPicks() { var el = $("pickN"); if (!el) return; var all = document.querySelectorAll(".opts2").length, on = document.querySelectorAll(".opts2.chosen").length; el.textContent = " เลือกแล้ว " + on + " จาก " + all + " ข้อ · ข้อที่ยังไม่เลือกพิมพ์เป็นช่องติ๊กทั้ง 2 ค่า"; }
+  function setPick(group, inp) { group.classList.toggle("chosen", !!inp); [].forEach.call(group.querySelectorAll(".pick"), function (p) { var i = p.querySelector("input"), on = !!inp && i === inp; i.checked = on; p.classList.toggle("on", on); }); }
   var busy = false;
   $("f-doc").addEventListener("submit", function (ev) {
     ev.preventDefault(); if (busy) return;
     var f = ev.target, v = function (n) { return String(f.elements[n].value || "").trim(); }, tok = B.token.get();
-    if (!tok) { say("เข้าสู่ระบบก่อนสร้างเอกสาร", true); $("loginLink").hidden = false; return; }
+    $("freeNow").hidden = true;
+    if (!tok) {
+      var sx = sheets.filter(function (x) { return x.id === v("sheet"); })[0], l0 = v("lang1");
+      if (nLang() === 1 && sx && sx.free && sx.ok === true && (l0 === "th" || l0 === "en")) { // ฉบับฟรีไทยและอังกฤษมีไฟล์พร้อม ไม่ต้องสมัคร
+        say(""); $("freeNow").innerHTML = "<span><b>ฉบับฟรีของใบนี้พร้อมดาวน์โหลด ไม่ต้องสมัคร</b></span>" + '<a class="b pri sm" href="' + esc(l0 === "en" ? B.freeEN(sx) : sx.free) + '" download>' + (l0 === "en" ? "ดาวน์โหลด PDF (English)" : "ดาวน์โหลด PDF (ไทย)") + "</a>"; $("freeNow").hidden = false; return;
+      }
+      say(nLang() === 2 ? "2 ภาษาต้องซื้อ เข้าสู่ระบบก่อนสร้างเอกสาร" : "ภาษานี้สร้างจากระบบเอกสาร เข้าสู่ระบบก่อน (สมัครฟรี)", true); $("loginBar").hidden = false; keepNext(); return;
+    }
     var pick2 = nLang() === 2 ? v("lang2") : ""; if (v("lang1") === pick2) { say("เลือกภาษาที่ 2 ให้ต่างจากภาษาที่ 1", true); return; }
     busy = true; var b = f.querySelector("button[type=submit]"), old = b.textContent; b.disabled = true; b.textContent = "กำลังสร้างเอกสาร…"; say("ครั้งแรกของภาษานั้นอาจใช้เวลาประมาณ 1 นาที เพราะระบบแปลและตรวจทุกช่อง");
-    B.call("docBuild", { token: tok, sheet: v("sheet"), lang1: v("lang1"), lang2: pick2, std: v("std"), stdName: v("stdName"), law: v("law") })
+    B.call("docBuild", { token: tok, sheet: v("sheet"), lang1: v("lang1"), lang2: pick2, std: v("c1"), std2: v("c2"), stdName: v("stdName") })
       .then(function (r) { say(""); render(r.doc, { project: v("project"), contractor: v("contractor"), location: v("location") }); })
       .catch(function (e) { say(e.message || "สร้างเอกสารไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
       .then(function () { busy = false; b.disabled = false; b.textContent = old; });
   });
-  $("printBtn").addEventListener("click", function () { window.print(); });
-  // แก้เอกสารก่อนพิมพ์ได้ทุกช่อง · ซ่อนหรือเพิ่มรายการได้ · บรรทัดผู้มีสิทธิ์ใช้ท้ายเอกสารแก้ไม่ได้
-  var editing = false;
+  $("printBtn").addEventListener("click", function () { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); window.print(); });
+  $("fitBtn").addEventListener("click", function () { fitOn = !fitOn; fit(); });
+  // สลับภาษา 1 ↔ 2 โดยไม่ต้องสร้างใหม่: กล่องกรอกย้ายไปบรรทัดหลักของภาษาใหม่ ค่าที่กรอกแล้วยังอยู่
+  function swapText(o) {
+    if (Array.isArray(o)) { if (o.length >= 2 && o.every(function (x) { return typeof x === "string"; })) { var t = o[0]; o[0] = o[1]; o[1] = t; return; } o.forEach(swapText); return; }
+    if (o && typeof o === "object") Object.keys(o).forEach(function (k) { swapText(o[k]); });
+  }
+  $("swapBtn").addEventListener("click", function () {
+    var box = $("sheetOut"), vals = [].map.call(box.querySelectorAll(".w,.bl"), function (e) { return e.textContent; }), ticks = [].map.call(box.querySelectorAll(".bx,.tick"), function (e) { return e.classList.contains("on"); }), picks = [].map.call(box.querySelectorAll(".pick input"), function (e) { return e.checked; });
+    ["lab", "title", "sum", "stages", "recs", "warnTxt"].forEach(function (k) { swapText(D[k]); });
+    var l = D.lang1; D.lang1 = D.lang2; D.lang2 = l; draw();
+    [].forEach.call(box.querySelectorAll(".w,.bl"), function (e, i) { if (vals[i]) e.textContent = vals[i]; });
+    [].forEach.call(box.querySelectorAll(".bx,.tick"), function (e, i) { e.classList.toggle("on", !!ticks[i]); });
+    [].forEach.call(box.querySelectorAll(".pick input"), function (e, i) { if (picks[i]) setPick(e.closest(".opts2"), e); });
+    drawPicks();
+  });
+  // แก้เอกสารก่อนพิมพ์ได้ทุกช่อง · ซ่อนหรือเพิ่มรายการได้ · บรรทัดรหัสและชื่อผู้มีสิทธิ์ท้ายเอกสารแก้ไม่ได้
+  var editing = false, EDITABLE = ".ti small,.ti h1,.ti h2,.warn,.sh1,.sh2,.chk th,.chk td:not(.bx):not(.w),.rec th,h3,.res > span,.sig h4,.use li,.nt > b,.rp > b,.addn,.stdc,.lawc,.ordb,.up,.lgd,.cmpb";
   function setEdit(on) {
-    editing = on; var box = $("sheetOut"); var en = box.querySelector(".editedNote"); if (on && en) en.hidden = false; $("editBtn").textContent = on ? "เสร็จสิ้นการแก้ไข" : "แก้ไขเอกสาร"; $("addRow").hidden = !on;
-    [].forEach.call(box.querySelectorAll(".dt,.ds,.fld .v,.key,.dtb td,.dtb th,.rec,.sign div"), function (e) { if (on) e.setAttribute("contenteditable", "true"); else e.removeAttribute("contenteditable"); });
-    [].forEach.call(box.querySelectorAll(".dtb tbody tr:not(.st)"), function (tr) { var x = tr.querySelector(".rm"); if (on && !x) { x = document.createElement("button"); x.type = "button"; x.className = "rm noprint"; x.textContent = "×"; x.title = "ซ่อนแถวนี้"; x.setAttribute("contenteditable", "false"); tr.cells[0].appendChild(x); } if (!on && x) x.remove(); });
+    editing = on; var box = $("sheetOut"), en = box.querySelector(".editedNote"); if (on && en) en.hidden = false;
+    box.classList.toggle("editing", on); $("editBtn").textContent = on ? "เสร็จสิ้นการแก้ไข" : "แก้ไขเอกสาร"; $("addRow").hidden = !on;
+    [].forEach.call(box.querySelectorAll(EDITABLE), function (e) { if (on) { e.setAttribute("contenteditable", CE); e.setAttribute("data-e", "1"); } else { e.removeAttribute("contenteditable"); e.removeAttribute("data-e"); } });
+    [].forEach.call(box.querySelectorAll(".chk tbody tr:not(.st)"), function (tr) { var x = tr.querySelector(".rm"); if (on && !x) { x = document.createElement("button"); x.type = "button"; x.className = "rm noprint"; x.textContent = "×"; x.title = "ซ่อนแถวนี้"; x.setAttribute("contenteditable", "false"); tr.cells[0].appendChild(x); } if (!on && x) x.remove(); });
   }
   $("editBtn").addEventListener("click", function () { setEdit(!editing); });
-  $("sheetOut").addEventListener("click", function (ev) { var x = ev.target.closest(".rm"); if (x) x.closest("tr").remove(); });
-  $("addRow").addEventListener("click", function () { var tb = document.querySelector(".dtb tbody"); if (!tb) return; var tr = document.createElement("tr"); tr.innerHTML = '<td></td><td class="c"></td><td>รายการใหม่</td><td></td><td></td><td class="mv"></td><td class="b"></td><td class="b"></td><td class="b"></td><td></td>'; tb.appendChild(tr); setEdit(true); });
+  $("sheetOut").addEventListener("click", function (ev) {
+    var t = ev.target, x = t.closest(".rm"); if (x) { x.closest("tr").remove(); drawPicks(); return; }
+    var bx = t.closest("td.bx"); if (bx) { var was = bx.classList.contains("on"); [].forEach.call(bx.parentNode.querySelectorAll("td.bx"), function (c) { c.classList.remove("on"); }); if (!was) bx.classList.add("on"); return; } // ติ๊กได้ช่องเดียวต่อแถว
+    var wx = t.closest(".wx"); if (wx) { wx.querySelector(".tick").classList.toggle("on"); return; }
+    var tk = t.closest(".tick"); if (tk) { var on = tk.classList.contains("on"), grp = tk.closest(".res,.ordb"); if (grp) [].forEach.call(grp.querySelectorAll(".tick"), function (c) { c.classList.remove("on"); }); tk.classList.toggle("on", !on); }
+  });
+  $("sheetOut").addEventListener("change", function (ev) { var t = ev.target; if (t.matches && t.matches(".pick input")) { setPick(t.closest(".opts2"), t); drawPicks(); } });
+  $("sheetOut").addEventListener("keydown", function (ev) { if (ev.key === "Enter" && ev.target.classList && (ev.target.classList.contains("bl") || ev.target.classList.contains("iv"))) { ev.preventDefault(); ev.target.blur(); } });
+  $("docNote").addEventListener("click", function (ev) {
+    var all = ev.target.closest("[data-all]"); if (!all) return; var cc = all.getAttribute("data-all");
+    [].forEach.call($("sheetOut").querySelectorAll(".opts2"), function (g) { var p = cc ? g.querySelector('.pick[data-cc="' + cc + '"] input') : null; setPick(g, p); });
+    drawPicks();
+  });
+  $("addRow").addEventListener("click", function () {
+    var list = $("sheetOut").querySelectorAll("table.chk tbody"), tb = list[list.length - 1]; if (!tb) return; var tr = document.createElement("tr");
+    tr.innerHTML = D.owned ? '<td class="n"></td><td class="pt"></td><td class="it"></td><td class="cr"></td><td class="hw"></td><td class="bx"></td><td class="bx"></td><td class="bx"></td><td class="w"' + CEA + "></td>" : '<td class="n"></td><td class="it"></td><td class="cr"></td><td class="bx"></td><td class="bx"></td><td class="w"' + CEA + "></td>";
+    tb.appendChild(tr); setEdit(true); var c = tr.querySelector(".it"); if (c) c.focus();
+  });
 })();

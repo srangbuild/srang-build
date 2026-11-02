@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shop.css">
 <script src="data.js"></script>
-<script src="app.js"></script>
+<script src="app.js"></script><script src="doc-cov.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -93,21 +93,32 @@
     if (mk) return ""; var lv = B.langsOf(x), c = lang();
     var tx = { "": ["2 ภาษา: อังกฤษ + ไทย", "บรรทัดบนอังกฤษมีช่องกรอก บรรทัดล่างไทย · ใช้ได้ทั้งทีมไทยและทีมต่างชาติ"], EN: ["1 ภาษา: อังกฤษ", "ทั้งใบเป็นภาษาอังกฤษ · สำหรับโครงการและผู้ตรวจต่างประเทศ"], TH: ["1 ภาษา: ไทย", "ทั้งใบเป็นภาษาไทย ตัวอักษรใหญ่ขึ้น อ่านง่าย"] };
     return '<fieldset class="opts"' + (dis ? " disabled" : "") + '><legend>ภาษาบนใบ</legend>' + lv.map(function (v) { return '<label class="opt"><input type="radio" name="lang" value="' + v + '"' + (v === c ? " checked" : "") + "><span><b>" + tx[v][0] + "</b><small>" + tx[v][1] + "</small></span><em>ราคาเท่ากัน</em></label>"; }).join("") +
-      '<p class="note" style="margin:8px 2px 0">ต้องการภาษาอื่น (เช่น เมียนมา เขมร ลาว จีน) หรือเกณฑ์ตามมาตรฐานของประเทศอื่น: <a href="' + L("request.html", "item=" + encodeURIComponent(x.id)) + '">สั่งทำ ขอใบเสนอราคา</a></p></fieldset>';
+      '<p class="note" style="margin:8px 2px 0">ต้องการภาษาหรือมาตรฐานของประเทศอื่น: เลือก <a href="#editions">ฉบับประเทศ</a> ด้านล่าง</p></fieldset>';
+  }
+  // ฉบับประเทศ (2 พ.ย. 2026): ภาษาของประเทศนั้น ไทย อังกฤษ + ค่ามาตรฐานและกฎหมายของประเทศนั้นเทียบกับค่าไทย · แจ้งจำนวนข้อที่มีค่าตรวจแหล่งแล้วก่อนซื้อ
+  function ctryInfo(cc) {
+    var D = window.DOCCOV || {}, ids = bundle ? x.items : [x.id], t = 0, n = 0, c = B.CTRY[cc] || ["", "", ""];
+    ids.forEach(function (k) { t += (D.numeric || {})[k] || 0; n += ((D.cc || {})[cc] || {})[k] || 0; });
+    return { price: B.memberPrice ? B.memberPrice(B.docPrice(x.price)) : B.docPrice(x.price), note: "ภาษาบนเอกสาร: " + c[2] + " คู่กับไทยหรืออังกฤษ" + (/English/.test(c[2]) ? "" : " แปลด้วยเครื่อง มีคำเตือนบนเอกสาร") + " · ใช้ค่าไทย หรือเทียบกับมาตรฐาน" + c[0] + " ค่าตรงกันอ้างอิงร่วม ค่าต่างกันเลือกได้ในเอกสาร · มีค่าของ" + c[0] + "ที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อ ข้อที่เหลือใช้ค่าไทยเป็นข้อมูล หรือกรอกตามข้อกำหนดโครงการ · กรอบกฎหมายอยู่ท้ายเอกสาร · สร้างจากหน้าเอกสารอัจฉริยะ ไม่มีไฟล์ PDF สำเร็จรูป · ยังไม่ผ่านการตรวจโดยผู้แปลหรือผู้มีใบอนุญาตของประเทศนั้น" };
+  }
+  function ctryBox() {
+    if (mk || !B.docOn() || !sell) return "";
+    var ks = Object.keys(B.CTRY).sort(function (a, b) { return B.CTRY[a][0].localeCompare(B.CTRY[b][0], "th"); }), want = String(new URLSearchParams(location.search).get("cc") || "").toUpperCase(), c0 = B.CTRY[want] ? want : ks[0], f = ctryInfo(c0);
+    return '<fieldset class="opts" id="editions"><legend>ฉบับประเทศ: ภาษาและมาตรฐานของประเทศอื่น</legend><label class="ctl" style="display:block;margin:0 2px"><span class="note" style="margin:0">เลือกประเทศ</span><select id="ctry" style="width:100%;min-height:44px">' + ks.map(function (k) { return '<option value="' + k + '"' + (k === c0 ? " selected" : "") + ">" + esc(B.CTRY[k][0] + " · " + B.CTRY[k][1]) + "</option>"; }).join("") + '</select></label><p class="note" id="ctryNote" style="margin:8px 2px">' + esc(f.note) + '</p><button class="b line sm" type="button" data-act="addc">ใส่ฉบับประเทศนี้ลงตะกร้า <span id="ctryPrice">' + B.baht(f.price) + "</span></button></fieldset>";
   }
   function opts() {
     if (mk) return '<p style="margin:0 0 14px"><span class="price" style="font-size:30px">' + B.baht(pE) + "</span></p>";
     var c = cur() || "ed";
     var rows = [["ed", "ซื้อฉบับนี้ เก็บได้ตลอด", "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง", pE]];
     if (hasU) rows.push(["up", "รับฉบับใหม่ตลอด", "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง", pU]);
-    return langSel(false) + '<fieldset class="opts"><legend>เลือกแบบสิทธิ์</legend>' + rows.map(function (r) { return '<label class="opt"><input type="radio" name="plan" value="' + r[0] + '"' + (r[0] === c ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + "</small></span><em>" + B.baht(r[3]) + "</em></label>"; }).join("") + "</fieldset>";
+    return langSel(false) + '<fieldset class="opts"><legend>เลือกแบบสิทธิ์</legend>' + rows.map(function (r) { return '<label class="opt"><input type="radio" name="plan" value="' + r[0] + '"' + (r[0] === c ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + "</small></span><em>" + B.baht(r[3]) + "</em></label>"; }).join("") + "</fieldset>" + ctryBox();
   }
   var own = ""; // สิทธิ์ที่บัญชีนี้มีอยู่แล้ว: "edition" | "updates" (โหลดหลังหน้าเปิด ถ้าเข้าระบบอยู่)
   function ownBox() {
     var diff = hasU ? Math.max(1, pU - pE) : 0, inC = B.cart.line(x.id);
     var lib = '<a class="b line sm" href="' + L("member.html") + '#docs">เปิดเอกสารของฉัน</a>';
     if (mk) return '<div class="own"><span><b>คุณซื้อสินค้านี้แล้ว</b> · ' + esc(DEL[x.delivery] || DEL.manual) + '</span><div class="buy">' + (x.delivery === "file" ? lib : '<a class="b line sm" href="' + L("member.html") + '#orders">ดูคำสั่งซื้อของฉัน</a>') + "</div></div>";
-    var lvx = B.langsOf(x).filter(String), more = lvx.length && sell ? '<p class="note" style="margin:8px 0 0">ต้องการฉบับภาษาเดียวด้วย: ' + lvx.map(function (v) { return '<button class="b line sm" type="button" data-act="addv" data-v="' + v + '">' + esc(B.LANGS[v]) + " " + B.baht(pE) + "</button>"; }).join(" ") + "</p>" : "";
+    var lvx = B.langsOf(x).filter(String), more = ctryBox() + (lvx.length && sell ? '<p class="note" style="margin:8px 0 0">ต้องการฉบับภาษาเดียวด้วย: ' + lvx.map(function (v) { return '<button class="b line sm" type="button" data-act="addv" data-v="' + v + '">' + esc(B.LANGS[v]) + " " + B.baht(pE) + "</button>"; }).join(" ") + "</p>" : "");
     if (own === "updates") return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> (อังกฤษ + ไทย) แบบรับฉบับใหม่ตลอด · ดาวน์โหลดฉบับล่าสุดได้ทุกเมื่อ</span><div class="buy">' + lib + "</div>" + more + "</div>";
     return '<div class="own"><span><b>คุณมีใบนี้แล้ว</b> (อังกฤษ + ไทย) แบบซื้อฉบับนี้ เก็บได้ตลอด' + (diff ? " · อัปเกรดเป็นรับฉบับใหม่ตลอด จ่ายเฉพาะส่วนต่าง " + B.baht(diff) : "") + '</span><div class="buy">' + lib + (diff && sell ? (inC === x.id + "+U" ? '<a class="b pri sm" href="' + L("checkout.html") + '">อัปเกรดอยู่ในตะกร้า · ชำระเงิน</a>' : '<button class="b pri sm" type="button" data-act="upg">อัปเกรด ' + B.baht(diff) + "</button>") : "") + "</div>" + more + "</div>";
   }
@@ -116,12 +127,12 @@
     if (!sell) {
       var why = B.P.on !== true ? "ร้านยังไม่เปิดรับชำระเงิน" : B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "ร้านกำลังตรวจรายการของ" + (bundle ? "ใบในชุดนี้" : "ใบนี้") + " เปิดขายเมื่อตรวจครบ";
       var inAcc = !!B.token.get();
-      return opts().replace(/<fieldset class="opts">/g, '<fieldset class="opts" disabled>') + '<div class="soon"><b>' + esc(why) + "</b><br>" + (inAcc ? "ร้านส่งอีเมลแจ้งสมาชิกเมื่อเปิดขาย (ตั้งค่าได้ที่หน้าสมาชิก เมนู โปรไฟล์)" : "สมัครสมาชิกฟรี แล้วระบบส่งอีเมลแจ้งเมื่อเปิดขาย") + '</div><div class="buy"><a class="b pri" href="' + L("member.html") + (inAcc ? "#profile" : "") + '">' + (inAcc ? "ไปหน้าสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" + (!bundle && src.ok === true && src.free ? '<a class="b line" href="' + esc(src.free) + '" download>ดาวน์โหลดฉบับฟรี</a>' : "") + "</div>";
+      return opts().replace(/<fieldset class="opts">/g, '<fieldset class="opts" disabled>') + '<div class="soon"><b>' + esc(why) + "</b><br>" + (inAcc ? "ร้านส่งอีเมลแจ้งสมาชิกเมื่อเปิดขาย (ตั้งค่าได้ที่หน้าสมาชิก เมนู โปรไฟล์)" : "สมัครสมาชิกฟรี แล้วระบบส่งอีเมลแจ้งเมื่อเปิดขาย") + '</div><div class="buy"><a class="b pri" href="' + L("member.html") + (inAcc ? "#profile" : "") + '">' + (inAcc ? "ไปหน้าสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" + (!bundle && src.ok === true && src.free ? '<a class="b line" data-noi18n="1" lang="th" href="' + esc(src.free) + '" download>ฉบับฟรี ไทย</a><a class="b line" data-noi18n="1" lang="en" href="' + esc(B.freeEN(src)) + '" download>Free: English</a><a class="b line" href="' + L("doc.html") + (L("doc.html").indexOf("?") < 0 ? "?" : "&") + "item=" + encodeURIComponent(src.id) + '">ฉบับฟรี ภาษาอื่น</a>' : "") + "</div>";
     }
     var inC = B.cart.has(x.id), cov = !inC && B.cart.covered(x.id);
     var btns = cov ? '<p class="soon" style="margin:0 0 12px">ใบนี้อยู่ในชุดรวมที่อยู่ในตะกร้าแล้ว ไม่ต้องซื้อแยก · <a href="' + L("cart.html") + '">ดูตะกร้า</a></p>'
       : '<div class="buy"><button class="b pri" type="button" data-act="add">' + (inC ? "อยู่ในตะกร้าแล้ว ✓" : "ใส่ตะกร้า") + '</button><button class="b dark" type="button" data-act="now">' + (inC ? "ไปชำระเงิน" : "ซื้อเลย") + "</button></div>" + (inC ? '<p class="note" style="margin:-4px 0 12px">เปลี่ยนแบบสิทธิ์ด้านบนได้ ตะกร้าเปลี่ยนตาม · <a href="' + L("cart.html") + '">ดูตะกร้า</a></p>' : "");
-    return (x.hidden ? '<p class="soon"><b>รายการทดสอบระบบของร้าน</b> · ไม่แสดงในหน้าร้าน · เฉพาะบัญชีทดสอบที่ร้านตั้งไว้ซื้อได้</p>' : "") + opts() + btns + (!bundle && src.ok === true && src.free ? '<p class="note" style="margin:0 0 12px">อยากลองก่อน: <a href="' + esc(src.free) + '" download>ดาวน์โหลดฉบับฟรี</a> (' + esc(src.nFree) + " จุดสำคัญ · " + esc(+src.freePages || 1) + " หน้า)</p>" : "");
+    return (x.hidden ? '<p class="soon"><b>รายการทดสอบระบบของร้าน</b> · ไม่แสดงในหน้าร้าน · เฉพาะบัญชีทดสอบที่ร้านตั้งไว้ซื้อได้</p>' : "") + opts() + btns + (!bundle && src.ok === true && src.free ? '<p class="note" style="margin:0 0 12px">อยากลองก่อน: ฉบับฟรี (' + esc(src.nFree) + " จุดสำคัญ · " + esc(+src.freePages || 1) + " หน้า · 1 ภาษา): " + '<a data-noi18n="1" lang="th" href="' + esc(src.free) + '" download>ไทย</a> · <a data-noi18n="1" lang="en" href="' + esc(B.freeEN(src)) + '" download>English</a> · <a href="' + L("doc.html") + (L("doc.html").indexOf("?") < 0 ? "?" : "&") + "item=" + encodeURIComponent(src.id) + '">ภาษาอื่น</a></p>' : "");
   }
   function trust() {
     var h = +P.hours || 24;
@@ -202,6 +213,7 @@
     var a = ev.target.closest("[data-act]"); if (!a) return;
     ev.stopPropagation();
     var up = plan() === "up", act = a.getAttribute("data-act");
+    if (act === "addc") { var cv = document.getElementById("ctry").value, ec = B.cart.add(x.id + "." + cv, false); toast(ec || "ใส่ " + B.code(x) + " " + B.LANGS[cv] + " ลงตะกร้าแล้ว"); return; }
     if (act === "addv") { var ev0 = B.cart.add(x.id + "." + a.getAttribute("data-v"), false); toast(ev0 || "ใส่ " + B.code(x) + " " + B.LANGS[a.getAttribute("data-v")] + " ลงตะกร้าแล้ว"); return; }
     if (act === "upg") { var e0 = B.cart.has(x.id) ? (B.cart.setPlan(x.id, true), "") : B.cart.add(x.id, true); if (e0) { toast(e0); return; } location.href = L("checkout.html"); return; }
     if (B.cart.has(x.id)) { if (act === "now") location.href = L("checkout.html"); else location.href = L("cart.html"); return; }
@@ -212,7 +224,7 @@
     redrawBuy();
   }, true);
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { var l0 = document.querySelector(".lightbox"); if (l0) l0.remove(); } });
-  document.addEventListener("change", function (ev) { if (ev.target.name === "lang") { if (B.cart.has(x.id)) { B.cart.setLang(x.id, ev.target.value); toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว"); } return; } if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
+  document.addEventListener("change", function (ev) { if (ev.target.id === "ctry") { var fi = ctryInfo(ev.target.value); document.getElementById("ctryNote").textContent = fi.note; document.getElementById("ctryPrice").textContent = B.baht(fi.price); return; } if (ev.target.name === "lang") { if (B.cart.has(x.id)) { B.cart.setLang(x.id, ev.target.value); toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว"); } return; } if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
   window.addEventListener("build-cart", function () { if ($("buybox") && !$("buybox").contains(document.activeElement)) redrawBuy(); });
   draw();
   if (B.token.get() && !bundle) B.call("me").then(function (r) { var d = (r.lib || []).filter(function (k) { return k.id === x.id; })[0]; if (d) { own = d.plan === "edition" ? "edition" : "updates"; redrawBuy(); } }).catch(function () {});

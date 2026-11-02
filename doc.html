@@ -8,7 +8,7 @@
 <title>ระบบฟอร์มเอกสารอัจฉริยะ เลือกภาษา มาตรฐาน กฎหมาย — สร้าง | BUILD TH</title>
 <meta name="description" content="สร้างใบตรวจงานก่อสร้างได้ทันที เลือก 26 ภาษา มาตรฐานอ้างอิง และกฎหมายท้องถิ่น แล้วพิมพ์เป็น PDF">
 <meta name="theme-color" content="#0F2A44">
-<meta property="og:title" content="สั่งทำเอกสาร — สร้าง | BUILD TH">
+<meta property="og:title" content="ระบบฟอร์มเอกสารอัจฉริยะ — สร้าง | BUILD TH">
 <meta property="og:image" content="img/og.jpg">
 <link rel="icon" href="img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,21 +39,9 @@
 .preview b { color:var(--navy); } .preview .l2 { color:#3F4A58; font-size:13.5px; display:block; }
 </style>
 <script src="data.js"></script>
-<script src="app.js"></script>
-<style>
-.docform .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-#result[hidden]{display:none}
-.sheetpaper{background:#fff;color:#16202B;border:1px solid var(--line);border-radius:14px;padding:18px;overflow:hidden}
-.dh{display:flex;justify-content:space-between;gap:14px;border-bottom:3px solid #0F2A44;padding-bottom:10px}.dt{font:700 22px/1.3 "Kanit",sans-serif;color:#0F2A44}.dt .l2{font-size:16px;font-weight:500}.ds{margin:6px 0 0;font-size:14px}.dc{text-align:right;font-size:13px;white-space:nowrap}
-.warn{background:#FFF4D6;color:#3A2B05;padding:8px 12px;border-radius:8px;font-size:14px;margin:10px 0}
-.flds{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;margin:12px 0}.fld{border:1px solid #C9D2DC;border-radius:6px;padding:5px 8px;font-size:13px;min-height:48px}.fld .k{color:#4B5B6B;font-size:12px}.fld .v{font-weight:600}
-.key{font-size:12.5px;margin:6px 0}.l2{color:#4B5B6B;font-size:.92em}
-.tw{overflow-x:auto}.dtb{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}.dtb th,.dtb td{border:1px solid #9AA7B4;padding:5px 6px;vertical-align:top;text-align:start}.dtb th{background:#0F2A44;color:#fff;font-weight:600;font-size:12px}.dtb th .l2{color:#D5E1EE}.dtb .st td{background:#E4EAF1;font-weight:700}.dtb .c{text-align:center}.dtb .b{width:34px}.dtb .fl{background:#FFF9E8}.ref{margin-top:4px;padding-top:4px;border-top:1px dashed #9AA7B4;font-size:12px;color:#4B5B6B}
-.recs h3{margin:14px 0 6px;font-size:15px}.rec{border:1px solid #9AA7B4;padding:6px 8px;margin-bottom:4px;font-size:13px;min-height:58px}
-.sign{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px;font-size:13px}.sign .ln{display:block;border-bottom:1px solid #16202B;height:34px}
-.rm{margin-left:4px;width:26px;height:26px;border:1px solid #C0392B;background:#fff;color:#C0392B;border-radius:6px;cursor:pointer}[contenteditable=true]{outline:1px dashed #FF6B1A}.l3{color:#6B7785;font-size:.82em}#l2wrap[hidden]{display:none}.mv{min-width:60px}.printdraft{display:none}.rect{min-width:0}.lawb{border:1px solid #C9D2DC;border-radius:8px;padding:8px 10px;margin:10px 0;font-size:12.5px}.lawb h3{margin:0 0 4px;font-size:14px}.lawb div{margin:2px 0;overflow-wrap:anywhere}.fine{font-size:11.5px;color:#4B5B6B;margin:8px 0 0}
-@media print{@page{size:A4 landscape;margin:10mm}.printdraft{display:block;position:fixed;bottom:0;right:0;font-size:9px;background:#fff}[contenteditable=true]{outline:0}body{background:#fff}body>*:not(main),.noprint,#main>section:not(#result){display:none!important}#main,#result{display:block!important;margin:0;padding:0;max-width:none}.sheetpaper{border:0;padding:0}.tw{overflow:visible}.dtb{min-width:0}.dtb tr{break-inside:avoid}.dtb th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style>
+<script src="app.js"></script><script src="doc-cov.js"></script>
+<style>.docform .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}</style>
+<link rel="stylesheet" href="doc-form.css">
 </head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -66,28 +54,32 @@
   <section class="narrow noprint">
     <div class="head"><h2 class="kn">สร้างเอกสาร</h2><p class="lead">เลือกใบตรวจงาน ภาษา มาตรฐาน และกฎหมายท้องถิ่น แล้วได้เอกสารพร้อมพิมพ์ทันที ไม่ต้องรอใบเสนอราคา</p></div>
     <p class="msg" id="msg" role="status" aria-live="polite" hidden></p>
-    <p id="loginLink" hidden><a class="b line sm" href="member.html?next=doc.html">เข้าสู่ระบบหรือสมัครสมาชิก</a></p>
+    <div class="dn" id="loginBar" hidden><span><b>ฉบับฟรีภาษาไทยและอังกฤษ ดาวน์โหลดได้เลย ไม่ต้องสมัคร</b> · ภาษาอื่นและฉบับที่ซื้อแล้ว เข้าสู่ระบบก่อน (สมัครฟรี)</span><a class="b pri sm" id="loginLink" href="member.html">เข้าสู่ระบบหรือสมัครสมาชิก</a></div>
     <form class="f card pad docform" id="f-doc" novalidate>
-      <label>ใบตรวจงาน<select name="sheet" id="sheet"></select></label>
-      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">จำนวนภาษาบนเอกสาร</legend><div class="langpick"><label><input type="radio" name="nlang" value="1"> 1 ภาษา</label> <label><input type="radio" name="nlang" value="2" checked> 2 ภาษา (เลือกจับคู่ได้ทุกคู่)</label></div></fieldset>
-      <div class="g3"><label><span id="l1txt">ภาษาที่ 1 (ข้อความหลัก)</span><select name="lang1" id="lang1"></select></label><label id="l2wrap">ภาษาที่ 2<select name="lang2" id="lang2"></select></label></div>
-      <div class="g3"><label>มาตรฐานอ้างอิง<select name="std"><option value="th">ไทย: ใช้ค่าตามฉบับไทย</option><option value="int">สากล: กรอกตามข้อกำหนดโครงการ</option><option value="hk">ฮ่องกง: กรอกตามข้อกำหนดโครงการ</option><option value="sg">สิงคโปร์: กรอกตามข้อกำหนดโครงการ</option><option value="other">มาตรฐานอื่น: กรอกตามข้อกำหนดโครงการ</option></select></label><label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI"><option value="ASTM"><option value="Eurocode"><option value="BS"><option value="JIS"><option value="GB"><option value="AS/NZS"><option value="IS"><option value="SNI"><option value="TCVN"><option value="MS"><option value="มยผ."><option value="มอก."><option value="วสท."></datalist></label></div>
-      <label>กฎหมายท้องถิ่น: ประเทศที่โครงการตั้งอยู่<select name="law" id="law"></select></label><div class="note" id="lawInfo" style="margin:0"></div>
+      <label>ใบตรวจงาน<select name="sheet" id="sheet"></select></label><p class="note" id="rightInfo" style="margin:0" hidden></p>
+      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">จำนวนภาษาบนเอกสาร</legend><div class="langpick"><label><input type="radio" name="nlang" value="1" checked> 1 ภาษา (ฟรีทุกภาษา เฉพาะข้อหลัก)</label> <label><input type="radio" name="nlang" value="2"> 2 ภาษา (จับคู่ได้ทุกคู่ ต้องซื้อ)</label></div></fieldset>
+      <div class="g3"><label><span id="l1txt">ภาษาที่ 1 (ข้อความหลัก)</span><select name="lang1" id="lang1"></select></label><label id="l2wrap">ภาษาที่ 2<select name="lang2" id="lang2"></select></label></div><p id="swapWrap" style="margin:0" hidden><button class="b line sm" type="button" id="swapPick">สลับภาษา 1 ↔ 2</button></p>
+      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">มาตรฐานและกฎหมายของประเทศ</legend><p class="note" style="margin:0 0 6px">ระบบตั้งตามประเทศของภาษาให้ เปลี่ยนได้ · ค่าตรงกันพิมพ์ค่าเดียวและอ้างอิงร่วม · ค่าต่างกันให้คุณเลือกในเอกสาร · การเทียบ 2 ประเทศต้องซื้อ</p>
+      <div class="g3"><label>ประเทศที่ 1<select name="c1" id="c1"></select></label><label>ประเทศที่ 2 (เทียบค่า)<select name="c2" id="c2"></select></label></div></fieldset>
+      <div class="note" id="ccInfo" style="margin:0"></div><div class="note" id="lawInfo" style="margin:0"></div><div class="note" id="c2wrapNote" style="margin:0" hidden>ทั้ง 2 ประเทศจะพิมพ์กรอบกฎหมายในภาคผนวก ข ท้ายเอกสาร</div>
+      <label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI 318"><option value="Eurocode 2"><option value="BS EN 206"><option value="JIS A 5308"><option value="ASTM C94"><option value="IEC 60364"></datalist></label>
       <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
-      <button class="b pri" type="submit">สร้างเอกสาร</button>
-      <p class="note" style="margin:0">ซื้อใบนี้แล้วสร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับที่ซื้อ (ฉบับอังกฤษ-ไทย = ไทยและอังกฤษ มาตรฐานไทย) · ภาษาและมาตรฐานอื่นเป็นฉบับแยก กำลังเปิดขาย · ยังไม่ซื้อ ดูตัวอย่างข้อฟรีได้ · ค่าเกณฑ์นอกฉบับไทยให้กรอกตามข้อกำหนดของโครงการ ระบบไม่เดาตัวเลขแทนคุณ</p>
+      <button class="b pri" type="submit">สร้างเอกสาร</button><div class="dn" id="freeNow" style="margin:0" hidden></div>
+      <p class="note" style="margin:0">ซื้อใบนี้แล้วสร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับที่ซื้อ (ฉบับอังกฤษ-ไทย = ไทยและอังกฤษ มาตรฐานไทย) · ภาษาและมาตรฐานอื่นซื้อเป็นฉบับประเทศ · ฉบับฟรีมีข้อหลัก 1 ภาษา เลือกได้ทุกภาษา · 2 ภาษาต้องซื้อ · ค่าเกณฑ์นอกฉบับไทยให้กรอกตามข้อกำหนดของโครงการ ระบบไม่เดาตัวเลขแทนคุณ</p>
       <p class="note" style="margin:0">ภาษาอื่นนอกจากไทยและอังกฤษแปลด้วยเครื่อง ระบบตรวจตัวเลข ช่องกรอก และแปลกลับทุกช่อง แต่ไม่แทนการตรวจโดยผู้แปล ถ้าเอกสารไม่มีไทยหรืออังกฤษ ระบบเติมบรรทัดควบคุมอังกฤษตัวเล็กให้</p>
     </form>
   </section>
   <section id="result" hidden>
-    <p class="noprint"><button class="b pri" type="button" id="printBtn">พิมพ์หรือบันทึกเป็น PDF</button> <button class="b line" type="button" id="editBtn">แก้ไขเอกสาร</button> <button class="b line" type="button" id="addRow" hidden>เพิ่มรายการ</button></p>
-    <div class="sheetpaper" id="sheetOut"></div>
+    <div class="rbar noprint"><button class="b pri" type="button" id="printBtn">พิมพ์หรือบันทึกเป็น PDF</button> <button class="b line" type="button" id="swapBtn" hidden>สลับภาษา 1 ↔ 2</button> <button class="b line" type="button" id="editBtn">แก้ไขเอกสาร</button> <button class="b line" type="button" id="addRow" hidden>เพิ่มรายการ</button> <button class="b line" type="button" id="fitBtn" hidden>ขยายเต็มขนาด</button></div>
+    <p class="note noprint" style="margin:0 0 10px">กรอกในกล่องและติ๊กช่องบนจอได้เลย แล้วกดพิมพ์ หรือพิมพ์เปล่าไปกรอกหน้างาน · เลือกขนาด A4 ตอนพิมพ์</p>
+    <div class="noprint" id="docNote"></div>
+    <div class="pagewrap" id="pagewrap"><div class="fm" id="sheetOut" data-noi18n="1"></div></div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>เอกสารสั่งทำเป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด หรือการตรวจโดยผู้มีใบอนุญาต</p>
+    <p>เอกสารนี้เป็นเครื่องมือช่วยตรวจและบันทึก ไม่แทนแบบ ข้อกำหนด หรือการตรวจโดยผู้มีใบอนุญาต</p>
     <p>© <span id="yr"></span> สร้าง | BUILD TH</p>
   </div>
 </footer>

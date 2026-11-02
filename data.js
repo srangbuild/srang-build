@@ -729,7 +729,8 @@ window.SITE = {
     },
     {
       "q": "ใบตรวจงานฟรีจริงไหม",
-      "a": "ฟรีจริง ดาวน์โหลดฉบับฟรีได้ทุกใบโดยไม่ต้องสมัคร ฉบับมืออาชีพมีรายการครบกว่าและมีค่าใช้จ่าย ดูความต่างได้ที่หน้าใบตรวจงาน"
+      "a": "ฟรีจริง ดาวน์โหลดฉบับฟรีได้ทุกใบโดยไม่ต้องสมัคร เป็นภาษาไทยหรืออังกฤษ ภาษาอื่นสร้างได้ที่ระบบเอกสารอัจฉริยะเมื่อเป็นสมาชิก (สมัครฟรี) ฉบับฟรีมี 1 ภาษา ฉบับมืออาชีพมีรายการครบกว่า มี 2 ภาษาได้ และมีค่าใช้จ่าย ดูความต่างได้ที่หน้าใบตรวจงาน",
+      "aEn": "Yes. You can download the free edition of every sheet without signing up, in Thai or English. Other languages are on the smart document page for members (membership is free). The free edition has 1 language. The professional edition has more items, can have 2 languages, and has a price. See the difference on the check sheet page."
     }
   ],
   "posts": {
@@ -859,7 +860,7 @@ window.SITE = {
     "api": "https://script.google.com/macros/s/AKfycbzOtwU6DY8V841WK19ODCmS99HZfp4PCcehp7FL_homPFYs-hFBOB647w-oX--X90D9XA/exec",
     "discount": 0,
     "perks": [
-      "ไฟล์รวมใบตรวจงานฉบับฟรีทุกงานในไฟล์เดียว",
+      "ไฟล์รวมใบตรวจงานฉบับฟรีทุกงานในไฟล์เดียว ภาษาไทยหรืออังกฤษ",
       "ดาวน์โหลดไฟล์ที่ซื้อแล้วซ้ำได้ทุกเมื่อจากหน้าสมาชิก พร้อมเลขสิทธิ์ของคุณ",
       "เลือกได้: เก็บฉบับที่ซื้อตลอดไป หรือรับฉบับใหม่ทุกครั้งที่ร้านปรับปรุง (อัปเกรดภายหลังจ่ายเฉพาะส่วนต่าง)",
       "แจ้งใบตรวจงานใหม่และฉบับใหม่ทางอีเมล"
@@ -875,7 +876,7 @@ window.SITE = {
   "pay": {
     "on": true,
     "qr": "pay/qr.jpg",
-    "bank":  "ธนาคารกรุงเทพ",
+    "bank": "ธนาคารกรุงเทพ",
     "name": "Thanatat J",
     "acc": "1314132745",
     "hours": 24,
@@ -907,7 +908,9 @@ window.SITE = {
     "usdRate": 0.0296,
     "usdDate": "2026-10-28",
     "qrBase": "00020101021229370016A0000006770101110113006661746699153037645802TH6304A221",
-    "bankMin": 200
+    "bankMin": 200,
+    "docOn": true,
+    "docFactor": 1.5
   },
   "sheetsNext": [
     "งานรั้วและประตูรั้ว",
@@ -3926,8 +3929,8 @@ window.SITE = {
       "q": "มีของฟรีไหม",
       "qEn": "Is there anything free",
       "k": "ของฟรี ฟรีไหม โหลดฟรี ดาวน์โหลดฟรี ไม่เสียเงิน ไม่ต้องสมัคร แจกฟรี",
-      "a": "มี ใบตรวจงานฉบับฟรีดาวน์โหลดได้ทุกใบโดยไม่ต้องสมัคร ไฟล์รวมทุกใบในไฟล์เดียวเป็นสิทธิ์ของสมาชิก สมัครฟรี",
-      "aEn": "Yes. Every free sheet downloads without sign-up. The single file with all free sheets is for members, and sign-up is free.",
+      "a": "มี ใบตรวจงานฉบับฟรีดาวน์โหลดเป็นไทยหรืออังกฤษได้ทุกใบโดยไม่ต้องสมัคร ภาษาอื่นเลือกได้ที่ระบบเอกสารอัจฉริยะเมื่อเป็นสมาชิก ฉบับฟรีมี 1 ภาษา ไฟล์รวมทุกใบในไฟล์เดียวเป็นสิทธิ์ของสมาชิก สมัครฟรี",
+      "aEn": "Yes. You can download the free edition of every sheet in Thai or English without signing up. Other languages are on the smart document page for members. The free edition has 1 language. One file with all sheets is a member benefit. Membership is free.",
       "href": "sheets.html#compare"
     },
     {
@@ -3935,8 +3938,8 @@ window.SITE = {
       "q": "ฉบับฟรีกับฉบับมืออาชีพต่างกันอย่างไร",
       "qEn": "What is the difference between free and pro",
       "k": "ฟรี มืออาชีพ โปร pro ต่างกัน ความต่าง",
-      "a": "ฉบับฟรีมีจุดสำคัญที่เจ้าของบ้านควรดูเอง ฉบับมืออาชีพมีรายการตรวจครบทุกขั้น จุดหยุดรอตรวจ ตารางบันทึกค่า ใบรายการข้อบกพร่อง และช่องลงชื่อ 3 ฝ่าย ดูตารางเทียบได้ที่หน้าใบตรวจงาน",
-      "aEn": "The free sheet has the key points an owner should check. The pro sheet has all check items, hold points, measurement tables, a defect list and 3 signature fields. See the comparison table.",
+      "a": "ฉบับฟรีมีจุดสำคัญที่เจ้าของบ้านควรดูเอง 1 ภาษา เลือกได้ทุกภาษา ฉบับมืออาชีพมีรายการตรวจครบทุกขั้น จุดหยุดรอตรวจ ตารางบันทึกค่า ใบรายการข้อบกพร่อง ช่องลงชื่อ 3 ฝ่าย และมี 2 ภาษาได้ ดูตารางเทียบได้ที่หน้าใบตรวจงาน",
+      "aEn": "The free edition has the key points an owner should check, in 1 language, any language. The professional edition has all items of every stage, hold points, tables for measured values, a defect list, sign-off by 3 parties, and can have 2 languages. See the comparison on the check sheet page.",
       "href": "sheets.html#compare"
     },
     {
@@ -4000,8 +4003,8 @@ window.SITE = {
       "q": "มีภาษาอื่นไหม",
       "qEn": "Do you have other languages",
       "k": "ภาษาอื่น ภาษาอังกฤษ ภาษาจีน ภาษาญี่ปุ่น english ญี่ปุ่น เยอรมัน แปลเป็น มาตรฐานต่างประเทศ",
-      "a": "ใบตรวจฉบับมืออาชีพเป็นอังกฤษคู่ไทย ถ้าต้องการภาษาอื่น หรือเกณฑ์ตามมาตรฐานของประเทศอื่น ส่งคำขอสั่งทำได้ ร้านจะตอบใบเสนอราคาภายใน 3 วันทำการ",
-      "aEn": "Pro sheets are English with Thai. For other languages or another country's standards, send a custom request. The shop quotes within 3 working days.",
+      "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษแปลด้วยเครื่อง และมีคำเตือนบนเอกสาร",
+      "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are machine translated, and the document carries a warning.",
       "href": "request.html"
     },
     {

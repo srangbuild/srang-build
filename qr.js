@@ -93,7 +93,7 @@
   B.qrBox = function (o) {
     var esc = B.esc, url = "";
     try { if (P.qrBase) url = png(promptPay(P.qrBase, o.amount)); } catch (e) { url = ""; }
-    if (url) return '<div><img class="qr" src="' + url + '" alt="คิวอาร์พร้อมเพย์ของคำสั่งซื้อนี้ ยอด ' + esc(B.baht(o.amount)) + '"><p class="note" style="margin:4px 0 0">สแกนแล้วยอด <b>' + esc(B.baht(o.amount)) + '</b> ขึ้นเอง ไม่ต้องพิมพ์ · <a href="' + url + '" download="BUILD_TH_' + esc(o.id) + '.png">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคารได้</p></div>';
+    if (url) return '<div><img class="qr" src="' + url + '" alt="คิวอาร์พร้อมเพย์ของคำสั่งซื้อนี้ ยอด ' + esc(B.thb(o.amount)) + '"><p class="note" style="margin:4px 0 0">สแกนแล้วยอด <b>' + esc(B.thb(o.amount)) + '</b> ขึ้นเอง ไม่ต้องพิมพ์ · <a href="' + url + '" download="BUILD_TH_' + esc(o.id) + '.png">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคารได้</p></div>';
     return P.qr ? '<div><img class="qr" src="' + esc(P.qr) + '" alt="คิวอาร์พร้อมเพย์รับเงินของร้าน"><p class="note" style="margin:4px 0 0"><a href="' + esc(P.qr) + '" download="BUILD_TH_QR.jpg">บันทึกรูปคิวอาร์</a> แล้วเปิดในแอปธนาคาร · ใส่ยอดให้ตรง</p></div>' : "";
   };
   B.qrTest = { encode: encode, crc16: crc16, promptPay: promptPay };
