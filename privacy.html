@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>นโยบายความเป็นส่วนตัว — สร้าง | BUILD TH</title>
@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 <script src="region.js"></script><script src="data.js"></script>
+<link rel="stylesheet" href="nav.css">
 <link rel="canonical" href="https://srangbuild.github.io/srang-build/privacy.html"><meta property="og:url" content="https://srangbuild.github.io/srang-build/privacy.html"><meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://srangbuild.github.io/srang-build/img/og.jpg"></head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -80,19 +81,7 @@
 </div>
 </main>
 <footer><div class="wrap"><p>© <span id="yr"></span> สร้าง | BUILD TH</p></div></footer>
-<script>
-(function () {
-  "use strict";
-  var S = window.SITE || {}, L = S.links || {};
-  var $ = function (id) { return document.getElementById(id); };
-  $("yr").textContent = new Date().getFullYear();
-  $("ver").textContent = S.privacyDate || S.version || "";
-  if (L.email) { var a = document.createElement("a"); a.href = "mailto:" + L.email; a.textContent = L.email; $("who").appendChild(document.createTextNode("ติดต่อเรื่องข้อมูลส่วนตัวได้ที่ ")); $("who").appendChild(a); }
-  else $("who").textContent = "ติดต่อเรื่องข้อมูลส่วนตัวได้ทางช่องทางในหน้าหลัก";
-  var ga = /^G-[A-Z0-9]{6,}$/.test((S.site || {}).ga4 || "");
-  $("ga").textContent = "ระบบสมาชิกเก็บรหัสการเข้าสู่ระบบ รายการในตะกร้า และคำตอบของคุณในแถบแจ้งการเก็บข้อมูล ไว้ในเบราว์เซอร์ของคุณ ลบได้ด้วยการกดออกจากระบบ ล้างตะกร้า หรือล้างข้อมูลเว็บไซต์ในเบราว์เซอร์ เปลี่ยนคำตอบได้ที่ลิงก์ ตั้งค่าคุกกี้ ท้ายหน้า" + (ga ? " เว็บนี้ใช้ Google Analytics เพื่อนับจำนวนผู้เข้าชมและการกดลิงก์แบบรวม ไม่ระบุตัวบุคคล และจะเริ่มเก็บก็ต่อเมื่อคุณกดยอมรับสถิติในแถบแจ้งเท่านั้น" : " เว็บนี้ไม่ใช้เครื่องมือติดตามเพื่อการโฆษณา");
-})();
-</script>
+<script src="page/privacy.js"></script>
 <script src="extras.js"></script>
 </body>
 </html>

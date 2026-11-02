@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สั่งทำเอกสาร ภาษาและมาตรฐานของแต่ละประเทศ — สร้าง | BUILD TH</title>
@@ -16,30 +16,10 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shop.css">
-<style>
-.hero-cta { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 0 !important; }
-.hero-cta .b.line { background:transparent; color:#fff; border-color:rgba(255,255,255,.45); }
-.kinds { display:grid; gap:12px; } @media (min-width:760px) { .kinds { grid-template-columns:repeat(3,1fr); } }
-.kinds .card { padding:16px; display:flex; flex-direction:column; gap:6px; }
-.kinds h3 { margin:0; font-size:18px; color:var(--navy); line-height:1.4; }
-.kinds p { margin:0; font-size:15px; color:#3B4654; }
-.kinds .ex { font-size:13.5px; color:var(--mute); }
-.kinds .b { margin-top:auto; align-self:flex-start; }
-.steps4 { counter-reset:s; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-@media (min-width:760px) { .steps4 { grid-template-columns:repeat(4,1fr); } }
-.steps4 li { background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px; font-size:15px; }
-.steps4 li::before { counter-increment:s; content:counter(s); display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:var(--orange); color:#fff; font:700 15px/1 "Kanit",sans-serif; margin-bottom:8px; }
-.steps4 li b { display:block; color:var(--navy); margin-bottom:2px; }
-.terms2 { display:grid; gap:12px; } @media (min-width:760px) { .terms2 { grid-template-columns:1fr 1fr; } }
-.terms2 ul { margin:0; padding-left:20px; font-size:15px; display:grid; gap:4px; }
-.langpick { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 2px; }
-.langpick label { display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); border-radius:12px; padding:9px 14px; cursor:pointer; font-weight:600; background:#fff; }
-.langpick label:has(input:checked) { border-color:var(--orange); background:#FFF6EF; }
-.preview { border:1px dashed #B9C3CF; border-radius:12px; padding:10px 14px; background:#FBFCFD; font-size:14.5px; }
-.preview b { color:var(--navy); } .preview .l2 { color:#3F4A58; font-size:13.5px; display:block; }
-</style>
+<link rel="stylesheet" href="page/request.css">
 <script src="region.js"></script><script src="data.js"></script>
 <script src="app.js"></script>
+<link rel="stylesheet" href="nav.css">
 <link rel="canonical" href="https://srangbuild.github.io/srang-build/request.html"><meta property="og:url" content="https://srangbuild.github.io/srang-build/request.html"><meta name="twitter:card" content="summary_large_image"></head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -107,7 +87,7 @@
       </fieldset>
       <div class="g2"><label><span id="l1t">ภาษาบรรทัดบน (มีช่องกรอก)</span><select name="lang1" id="lang1" required></select></label><label id="l2w">ภาษาบรรทัดล่าง<select name="lang2" id="lang2"></select></label></div>
       <div class="preview" id="pv" aria-live="polite"></div>
-      <div class="g2"><label>มาตรฐานอ้างอิง<select name="stdPick" id="stdPick"><option value="th">ไทย (มยผ. และ มอก. ที่ใบอ้าง)</option><option value="int">สากล: กรอกตามข้อกำหนดโครงการ พร้อมตารางค่าอ้างอิง</option><option value="hk">ฮ่องกง (ร้านมีข้อมูลบางส่วน)</option><option value="sg">สิงคโปร์ (ร้านมีข้อมูลบางส่วน)</option><option value="other">มาตรฐานของประเทศอื่น (ระบุในรายละเอียด)</option></select></label><label>กฎหมายท้องถิ่น: ประเทศที่โครงการตั้งอยู่<input type="text" name="law" maxlength="60" list="countries" placeholder="เช่น ไทย สิงคโปร์ เวียดนาม"></label></div><div class="g2"><label>จำนวน (ฉบับ ชุด หรือโครงการ)<input type="number" name="qty" min="1" max="10000" step="1" value="1" inputmode="numeric"></label><label>ต้องการภายใน (ไม่บังคับ)<input type="text" name="due" maxlength="40" placeholder="เช่น ภายใน 2 สัปดาห์ หรือ 30 พ.ย. 2026"></label></div>
+      <div class="g2"><label>มาตรฐานอ้างอิง<select name="stdPick" id="stdPick"><option value="th" data-lc="TH">ไทย (มยผ. และ มอก. ที่ใบอ้าง)</option><option value="int" data-lc="INT">สากล: กรอกตามข้อกำหนดโครงการ พร้อมตารางค่าอ้างอิง</option><option value="other" data-last="1">มาตรฐานของประเทศอื่น (ระบุในรายละเอียด)</option></select></label><label>กฎหมายท้องถิ่น: ประเทศที่โครงการตั้งอยู่<input type="text" name="law" maxlength="60" list="countries" placeholder="เช่น ไทย สิงคโปร์ เวียดนาม"></label></div><div class="g2"><label>จำนวน (ฉบับ ชุด หรือโครงการ)<input type="number" name="qty" min="1" max="10000" step="1" value="1" inputmode="numeric"></label><label>ต้องการภายใน (ไม่บังคับ)<input type="text" name="due" maxlength="40" placeholder="เช่น ภายใน 2 สัปดาห์ หรือ 30 พ.ย. 2026"></label></div>
       <datalist id="countries"><option value="ไทย"><option value="สิงคโปร์"><option value="มาเลเซีย"><option value="เวียดนาม"><option value="ลาว"><option value="กัมพูชา"><option value="เมียนมา"><option value="อินโดนีเซีย"><option value="ฟิลิปปินส์"><option value="ฮ่องกง"><option value="จีน"><option value="ญี่ปุ่น"><option value="สหราชอาณาจักร"><option value="สหรัฐอเมริกา"><option value="ออสเตรเลีย"><option value="ตามข้อกำหนดของโครงการ"><option value="อินเดีย"><option value="ปากีสถาน"><option value="บังกลาเทศ"><option value="เกาหลีใต้"><option value="ซาอุดีอาระเบีย"><option value="สหรัฐอาหรับเอมิเรตส์"><option value="สเปน"><option value="ฝรั่งเศส"><option value="เยอรมนี"><option value="อิตาลี"><option value="เนเธอร์แลนด์"><option value="โปรตุเกส"><option value="บราซิล"><option value="รัสเซีย"><option value="ตุรกี"><option value="แทนซาเนีย"><option value="เคนยา"></datalist>
       <label>รายละเอียดของงาน: ใช้กับงานอะไร ใครเป็นผู้ใช้ มีแบบหรือตัวอย่างที่ใช้อยู่หรือไม่ (10–3000 ตัวอักษร)<textarea name="desc" rows="5" maxlength="3000" required></textarea></label>
       <label class="ck"><input type="checkbox" name="consent" required><span>ยินยอมให้ร้านใช้ข้อมูลนี้เพื่อติดต่อเรื่องคำขอนี้ และรับทราบกติกาของงานสั่งทำด้านบน</span></label>
@@ -124,56 +104,7 @@
   </div>
 </footer>
 
-<script>
-(function () {
-  "use strict";
-  var B = window.BUILD, esc = B.esc, q = B.preview;
-  var $ = function (id) { return document.getElementById(id); };
-  $("yr").textContent = new Date().getFullYear();
-  if (B.demo) $("demo").hidden = false;
-  if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) { a.href = a.getAttribute("href") + q; });
-  // รายการเดียวกับหลังบ้าน (Code.gs ตัวแปร RQ_KINDS และ RQ_LANGS)
-  var KINDS = ["ใบตรวจงานภาษาอื่น", "เกณฑ์ตามมาตรฐานของประเทศอื่น", "ใบตรวจงานตามแบบของโครงการ", "Method statement", "เช็กลิสต์เอกสารขออนุญาต", "แบบฟอร์มอื่น"];
-  var LANGS = ["อังกฤษ (สหรัฐอเมริกา)", "อังกฤษ (สหราชอาณาจักร)", "จีนกลาง", "ฮินดี", "สเปน", "ฝรั่งเศส", "อาหรับ", "เบงกาลี", "โปรตุเกส", "รัสเซีย", "อูรดู", "อินโดนีเซีย", "เยอรมัน", "ญี่ปุ่น", "ตุรกี", "สวาฮีลี", "ทมิฬ", "เวียดนาม", "ตากาล็อก", "เกาหลี", "ไทย", "อิตาลี", "ดัตช์", "เมียนมา", "มลายู", "เขมร", "ลาว", "ฮีบรู", "อื่น ๆ"];
-  var SAMPLE = { "ฮีบรู": "כיסוי בטון", "ไทย": "ระยะหุ้มคอนกรีต", "อังกฤษ (สหรัฐอเมริกา)": "Concrete cover", "อังกฤษ (สหราชอาณาจักร)": "Concrete cover", "จีนกลาง": "混凝土保护层", "ฮินดี": "कंक्रीट कवर", "สเปน": "Recubrimiento de hormigón", "ฝรั่งเศส": "Enrobage du béton", "อาหรับ": "الغطاء الخرساني", "เบงกาลี": "কংক্রিট কভার", "โปรตุเกส": "Recobrimento do betão", "รัสเซีย": "Защитный слой бетона", "อูรดู": "کنکریٹ کور", "อินโดนีเซีย": "Selimut beton", "เยอรมัน": "Betondeckung", "ญี่ปุ่น": "かぶり厚さ", "ตุรกี": "Beton örtüsü", "สวาฮีลี": "Kifuniko cha zege", "ทมิฬ": "கான்கிரீட் மூடுதல்", "เวียดนาม": "Lớp bê tông bảo vệ", "ตากาล็อก": "Takip ng kongkreto", "เกาหลี": "피복 두께", "อิตาลี": "Copriferro", "ดัตช์": "Betondekking", "เมียนมา": "ကွန်ကရစ်အကာ", "มลายู": "Penutup konkrit", "เขมร": "ស្រទាប់ការពារបេតុង", "ลาว": "ຄອນກຣີດຫຸ້ມ", "อื่น ๆ": "(ภาษาที่ระบุในรายละเอียด)" };
-  $("kind").innerHTML = '<option value="">เลือกประเภทงาน</option>' + KINDS.map(function (k) { return "<option>" + esc(k) + "</option>"; }).join("");
-  /* 3 Nov 2026: the Thai word for a language can also mean the country. The name comes from the browser in the language of the page, and the value stays the Thai name that the back end checks. */
-  var LCODE = { "อังกฤษ (สหรัฐอเมริกา)": "en-US", "อังกฤษ (สหราชอาณาจักร)": "en-GB", "จีนกลาง": "zh", "ฮินดี": "hi", "สเปน": "es", "ฝรั่งเศส": "fr", "อาหรับ": "ar", "เบงกาลี": "bn", "โปรตุเกส": "pt", "รัสเซีย": "ru", "อูรดู": "ur", "อินโดนีเซีย": "id", "เยอรมัน": "de", "ญี่ปุ่น": "ja", "ตุรกี": "tr", "สวาฮีลี": "sw", "ทมิฬ": "ta", "เวียดนาม": "vi", "ตากาล็อก": "tl", "เกาหลี": "ko", "ไทย": "th", "อิตาลี": "it", "ดัตช์": "nl", "เมียนมา": "my", "มลายู": "ms", "เขมร": "km", "ลาว": "lo", "ฮีบรู": "he" };
-  var UI = "th"; try { UI = localStorage.getItem("build_lang") || "th"; } catch (e) {}
-  function lgName(l) { var c = LCODE[l]; if (!c || UI === "th") return l; try { return new Intl.DisplayNames([UI], { type: "language" }).of(c) || l; } catch (e) { return l; } }
-  function lgOpt(l, sel) { return '<option value="' + esc(l) + '"' + (l === sel ? " selected" : "") + (LCODE[l] && UI !== "th" ? ' data-noi18n="1"' : "") + ">" + esc(lgName(l)) + "</option>"; }
-  $("lang1").innerHTML = LANGS.map(function (l) { return lgOpt(l, "อังกฤษ (สหรัฐอเมริกา)"); }).join("");
-  $("lang2").innerHTML = LANGS.map(function (l) { return lgOpt(l, "ไทย"); }).join("");
-  var P = new URLSearchParams(location.search);
-  if (P.get("item")) { $("items").value = String(P.get("item")).replace(/[^\w .,+-]/g, "").slice(0, 300); $("kind").value = "ใบตรวจงานภาษาอื่น"; }
-  if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
-  function nLang() { var r = document.querySelector("input[name=n]:checked"); return r ? +r.value : 2; }
-  function draw() {
-    var two = nLang() === 2; $("l2w").hidden = !two; $("l1t").textContent = two ? "ภาษาบรรทัดบน (มีช่องกรอก)" : "ภาษาของเอกสาร";
-    var a = $("lang1").value, b = $("lang2").value;
-    $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + '<span data-noi18n="1">' + esc(SAMPLE[a] || a) + "</span> [ ช่องกรอก ] มม." + (two ? '<span class="l2"><span data-noi18n="1">' + esc(SAMPLE[b] || b) + "</span> ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + '<span class="l2">คำตัวอย่างเป็นฉบับร่าง เอกสารจริงมีผู้แปลตรวจก่อนส่งมอบ</span>' + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
-  }
-  document.addEventListener("change", function (ev) { if (ev.target.name === "n" || ev.target.id === "lang1" || ev.target.id === "lang2") draw(); });
-  document.addEventListener("click", function (ev) { var k = ev.target.closest("[data-kind]"); if (k) { $("kind").value = k.getAttribute("data-kind"); } });
-  draw();
-  function say(t, bad) { var m = $("msg"); m.hidden = !t; m.className = "msg " + (bad ? "bad" : "ok"); m.textContent = t || ""; if (t) m.scrollIntoView({ block: "nearest" }); }
-  var busy = false;
-  $("f-rq").addEventListener("submit", function (ev) {
-    ev.preventDefault(); if (busy) return;
-    var f = ev.target, v = function (n) { return String(f.elements[n].value || "").trim(); }, two = nLang() === 2;
-    if (!v("name") || !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v("email"))) { say("กรอกชื่อและอีเมลให้ถูกต้อง", true); return; }
-    if (!v("kind")) { say("เลือกประเภทงาน", true); return; }
-    if (two && v("lang1") === v("lang2")) { say("ภาษาบรรทัดล่างต้องต่างจากบรรทัดบน หรือเลือก 1 ภาษา", true); return; }
-    if (v("desc").length < 10) { say("เล่ารายละเอียดของงานอย่างน้อย 10 ตัวอักษร", true); return; }
-    if (!f.elements.consent.checked) { say("ติ๊กยินยอมก่อนส่งคำขอ", true); return; }
-    busy = true; var btn = f.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "กำลังส่ง…";
-    B.call("request", { name: v("name"), email: v("email").toLowerCase(), contact: v("contact"), org: v("org"), kind: v("kind"), items: v("items"), lang1: v("lang1"), lang2: two ? v("lang2") : "", std: (function (o) { return o.getAttribute("data-src") || o.text; })(f.elements.stdPick.options[f.elements.stdPick.selectedIndex]) + (v("law") ? " · กฎหมาย: " + v("law") : ""), qty: +v("qty") || 1, due: v("due"), desc: v("desc"), consent: true })
-      .then(function (r) { f.reset(); draw(); say("ส่งคำขอ " + r.request.id + " แล้ว · ร้านส่งอีเมลยืนยันให้แล้ว และตอบใบเสนอราคาภายใน 3 วันทำการ"); })
-      .catch(function (e) { say(e && e.message ? e.message : "ส่งไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
-      .then(function () { busy = false; btn.disabled = false; btn.textContent = "ส่งคำขอ"; });
-  });
-})();
-</script>
+<script src="page/request.js"></script>
 <script src="cart.js"></script>
 <script src="extras.js"></script>
 </body>
