@@ -56,6 +56,7 @@
   function title(id) { var x = B.find(id); return (x ? B.code(x) + " " + x.title : id) + (B.isCtry(B.varOf(id)) ? " · " + B.LANGS[B.varOf(id)] : ""); }
   function planTx(id) { var x = B.find(id); return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด"; }
   function trackUrl(o) { return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k=" + encodeURIComponent(o.track) : ""; }
+  function pv(x) { return '<span data-noi18n="1">' + esc(x) + "</span>"; } // ข้อมูลของลูกค้าไม่ส่งไปแปล
   function copyBtn(text, label) { return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก") + "</button>"; }
   function taxOk(id) { var d = String(id || "").replace(/\D/g, ""); if (!/^\d{13}$/.test(d)) return false; var s = 0; for (var i = 0; i < 12; i++) s += +d[i] * (13 - i); return (11 - s % 11) % 10 === +d[12]; }
   function fmtTax(id) { var d = String(id || "").replace(/\D/g, "").slice(0, 13); return [d.slice(0, 1), d.slice(1, 5), d.slice(5, 10), d.slice(10, 12), d.slice(12, 13)].filter(String).join("-"); }
@@ -110,7 +111,7 @@
     var why = online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
     var hasTax = !!(t.name || t.id); taxOpen = taxOpen || hasTax;
     $("view").innerHTML = '<div class="cog"><form class="f" id="f-co" novalidate style="gap:14px">' +
-      '<div class="card cosec"><h2>1. ผู้ซื้อ</h2><div class="who2"><div><b>' + esc(m.name) + "</b><br>" + (m.email ? esc(m.email) : '<span class="note">ยังไม่มีอีเมล</span>') + '</div><button class="b line sm" type="button" data-out="1">ไม่ใช่คุณ? ออกจากระบบ</button></div>' +
+      '<div class="card cosec"><h2>1. ผู้ซื้อ</h2><div class="who2"><div><b>' + pv(m.name) + "</b><br>" + (m.email ? pv(m.email) : '<span class="note">ยังไม่มีอีเมล</span>') + '</div><button class="b line sm" type="button" data-out="1">ไม่ใช่คุณ? ออกจากระบบ</button></div>' +
       (m.email ? '<p class="note">ระบบส่งอีเมลยืนยันคำสั่งซื้อ ผลการชำระ และลิงก์ติดตามไปที่อีเมลนี้</p>' : '<label>อีเมลสำหรับรับการแจ้งเตือนคำสั่งซื้อ<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>') + "</div>" +
       '<div class="card cosec"><h2>2. ข้อมูลออกใบเสร็จ <small>ไม่บังคับ</small></h2><label class="ck"><input type="checkbox" name="wantTax"' + (taxOpen ? " checked" : "") + '><span>ออกใบเสร็จในนามบริษัท หรือใส่ชื่อ ที่อยู่ และเลขประจำตัวผู้เสียภาษี (ใบเสร็จออกอัตโนมัติทุกคำสั่งซื้อ)</span></label>' +
       '<div id="taxbox"' + (taxOpen ? "" : " hidden") + ' style="display:grid;gap:12px"><div class="chips" role="radiogroup" aria-label="ประเภทผู้ซื้อ"><label class="ck"><input type="radio" name="ttype" value="person"' + (t.type !== "company" ? " checked" : "") + '><span>บุคคลธรรมดา</span></label><label class="ck"><input type="radio" name="ttype" value="company"' + (t.type === "company" ? " checked" : "") + '><span>นิติบุคคล</span></label></div>' +
@@ -135,7 +136,7 @@
 
   // ---------- ขั้นชำระของคำสั่งซื้อที่สร้างแล้ว ----------
   function payBox(o) {
-    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + esc(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
+    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">' + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>" + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + pv(P.name) + "</dd>" : "") + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, "")) + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
     return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน' + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
       '<form class="f" id="f-slip" data-oid="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><button class="b pri" type="submit">ส่งสลิป</button></form></div>';
   }
@@ -161,7 +162,7 @@
     if (o.status === ST.wait || o.status === ST.reject) { say(note || "", !!note); return payView(o); }
     steps(o.status === ST.paid ? 3 : 2);
     var paid = o.status === ST.paid, tl = trackUrl(o);
-    var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ ' + esc(me.member.email || "อีเมลของคุณ") + "</p>"
+    var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ ' + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
       : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>ร้านกำลังตรวจยอดเข้าบัญชี ภายใน ' + esc(P.hours || 24) + " ชั่วโมง · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
       : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
     $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">' + esc(o.id) + "</span>" + tracker(o) +

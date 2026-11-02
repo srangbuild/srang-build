@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="shop.css">
 <script src="data.js"></script>
-<script src="app.js"></script><script src="doc-cov.js"></script>
+<script src="app.js"></script><script src="doc-cov.js"></script><script src="doc-law.js"></script><script src="doc-refs.js"></script><script src="std-pick.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">ข้ามไปเนื้อหา</a>
@@ -103,7 +103,7 @@
   }
   function ctryBox() {
     if (mk || !B.docOn() || !sell) return "";
-    var ks = Object.keys(B.CTRY).sort(function (a, b) { return B.CTRY[a][0].localeCompare(B.CTRY[b][0], "th"); }), want = String(new URLSearchParams(location.search).get("cc") || "").toUpperCase(), c0 = B.CTRY[want] ? want : ks[0], f = ctryInfo(c0);
+    var ks = Object.keys(B.CTRY).sort(function (a, b) { return B.CTRY[a][0].localeCompare(B.CTRY[b][0], "th"); }), want = String(new URLSearchParams(location.search).get("cc") || "").toUpperCase(), cov = function (k) { var D = window.DOCCOV || {}, s = 0; (bundle ? x.items : [x.id]).forEach(function (i) { s += ((D.cc || {})[k] || {})[i] || 0; }); return s; }, lc = window.StdPick ? window.StdPick.defaultCc() : "", c0 = B.CTRY[want] ? want : B.CTRY[lc] ? lc : ks.slice().sort(function (a, b) { return cov(b) - cov(a); })[0], f = ctryInfo(c0);
     return '<fieldset class="opts" id="editions"><legend>ฉบับประเทศ: ภาษาและมาตรฐานของประเทศอื่น</legend><label class="ctl" style="display:block;margin:0 2px"><span class="note" style="margin:0">เลือกประเทศ</span><select id="ctry" style="width:100%;min-height:44px">' + ks.map(function (k) { return '<option value="' + k + '"' + (k === c0 ? " selected" : "") + ">" + esc(B.CTRY[k][0] + " · " + B.CTRY[k][1]) + "</option>"; }).join("") + '</select></label><p class="note" id="ctryNote" style="margin:8px 2px">' + esc(f.note) + '</p><button class="b line sm" type="button" data-act="addc">ใส่ฉบับประเทศนี้ลงตะกร้า <span id="ctryPrice">' + B.baht(f.price) + "</span></button></fieldset>";
   }
   function opts() {
@@ -139,10 +139,18 @@
     if (mk) return '<ul class="trust"><li><i>✓</i><span>ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · ร้านรับชำระและดูแลการส่งมอบ</span></li><li><i>✓</i><span>ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร กระเป๋าเงินออนไลน์ หรือโอนเงิน</span></li><li><i>✓</i><span>' + esc(DEL[x.delivery] || DEL.manual) + "</span></li>" + (x.delivery === "file" ? "<li><i>✓</i><span>ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li>" : "") + "</ul>";
     return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน ' + h + ' ชั่วโมง</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
   }
+  // 2 พ.ย. 2026: บรรทัดอังกฤษที่สองมีเฉพาะหน้าภาษาไทย · หน้าอังกฤษใช้ข้อความอังกฤษที่เขียนไว้ · ภาษาอื่นแปลจากข้อความหลัก
+  function uiLang() { try { return localStorage.getItem("build_lang") || "th"; } catch (e) { return "th"; } }
+  function mainTx(th, en) {
+    if (uiLang() !== "en" || !en) return th;
+    if (/[a-z]/.test(en.replace(/\([^)]*\)/g, ""))) return en;
+    var s = en.replace(/\b[A-Z]{2,}(?:-[A-Z]{2,})*\b/g, function (w) { return w.toLowerCase(); }); return s.charAt(0).toUpperCase() + s.slice(1); // หัวตารางตัวพิมพ์ใหญ่ทั้งบรรทัด
+  }
+  function subTx(en) { return uiLang() === "th" && en ? en : ""; }
   // ---------- ส่วนรายละเอียด ----------
   function secOutline() {
     var o = src.outline || []; if (!o.length) return "";
-    return '<section class="pd-sec" id="inside"><h2>ในใบนี้มีอะไร</h2><ol class="outl">' + o.map(function (s, i) { return "<li><b>" + (i + 1) + "</b><span>" + esc(s.th) + (s.en ? "<small>" + esc(s.en) + "</small>" : "") + "</span><em>" + esc(s.n) + " ข้อ" + (s.h ? " · H " + esc(s.h) + " จุด" : "") + "</em></li>"; }).join("") +
+    return '<section class="pd-sec" id="inside"><h2>ในใบนี้มีอะไร</h2><ol class="outl">' + o.map(function (s, i) { return "<li><b>" + (i + 1) + "</b><span>" + esc(mainTx(s.th, s.en)) + (subTx(s.en) ? "<small>" + esc(s.en) + "</small>" : "") + "</span><em>" + esc(s.n) + " ข้อ" + (s.h ? " · H " + esc(s.h) + " จุด" : "") + "</em></li>"; }).join("") +
       '</ol><p class="note">ทุกข้อมีเกณฑ์ยอมรับ วิธีตรวจ (ตา วัด ทดสอบ เอกสาร) ช่อง C / NC / N/A และช่องหมายเหตุ · ช่องค่าตัวเลขเว้นให้เติมจากแบบและข้อกำหนดของงานคุณ · H = จุดหยุดรอตรวจ ห้ามทำงานขั้นต่อไปจนกว่าจะผ่าน</p>' + guide() + "</section>";
   }
   // คู่มือวิธีกรอก 8 ขั้น + ตัวอย่างที่กรอกแล้ว (ขึ้นเว็บเมื่อใบ F-02 ที่ใช้ในตัวอย่างผ่านการตรวจ)
@@ -152,9 +160,17 @@
   }
   function secRecords() {
     var r = src.recs || [], refs = src.refs || [];
-    var a = '<div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">ตารางบันทึกและหน้าท้าย</h3><ul class="reclist">' + r.map(function (t) { return "<li>" + esc(t.th) + (t.en ? "<small>" + esc(t.en) + " · " + esc(t.cols) + " คอลัมน์</small>" : "") + "</li>"; }).join("") + "<li>ใบรายการข้อบกพร่องและการตรวจซ้ำ<small>Defect list and re-inspection</small></li><li>บันทึกรูปถ่ายอ้างอิงรายข้อ<small>Photo log</small></li><li>ช่องลงชื่อ 3 ฝ่าย<small>Contractor · Supervisor · Owner</small></li></ul></div>";
-    var b = refs.length ? '<div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">มาตรฐานและกฎหมายที่อ้างอิง</h3><ul class="reflist">' + refs.map(function (t) { return "<li><b>" + esc(t.code) + "</b> " + esc(t.th) + "<small>" + esc(t.en) + (t.by ? " · " + esc(t.by) : "") + "</small></li>"; }).join("") + '</ul><p class="note">ใบตรวจงานอ้างอิงเฉพาะเอกสารที่ร้านค้นพบว่ามีอยู่จริง และไม่แทนเอกสารฉบับเต็ม</p></div>' : "";
-    return '<section class="pd-sec" id="records"><h2>บันทึกค่าและเอกสารอ้างอิง</h2><div class="twocol">' + a + b + "</div></section>";
+    var a = '<div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">ตารางบันทึกและหน้าท้าย</h3><ul class="reclist">' + r.map(function (t) { return "<li>" + esc(mainTx(t.th, t.en)) + (t.en ? "<small>" + (subTx(t.en) ? esc(t.en) + " · " : "") + esc(t.cols) + " คอลัมน์</small>" : "") + "</li>"; }).join("") + "<li>ใบรายการข้อบกพร่องและการตรวจซ้ำ" + (subTx("Defect list and re-inspection") ? "<small>Defect list and re-inspection</small>" : "") + "</li><li>บันทึกรูปถ่ายอ้างอิงรายข้อ" + (subTx("Photo log") ? "<small>Photo log</small>" : "") + "</li><li>ช่องลงชื่อ 3 ฝ่าย<small>Contractor · Supervisor · Owner</small></li></ul></div>";
+    var b = refs.length ? '<div class="card pad"><h3 class="kn" style="margin:0 0 8px;color:var(--navy)">มาตรฐานและกฎหมายที่อ้างอิง</h3><ul class="reflist">' + refs.map(function (t) { return "<li><b>" + esc(t.code) + "</b> " + esc(mainTx(t.th, t.en)) + "<small>" + [subTx(t.en), t.by].filter(Boolean).map(esc).join(" · ") + "</small></li>"; }).join("") + '</ul><p class="note">ใบตรวจงานอ้างอิงเฉพาะเอกสารที่ร้านค้นพบว่ามีอยู่จริง และไม่แทนเอกสารฉบับเต็ม</p></div>' : "";
+    return '<section class="pd-sec" id="records"><h2>บันทึกค่าและเอกสารท้ายใบ</h2>' + (window.StdPick ? a : '<div class="twocol">' + a + b + "</div>") + "</section>";
+  }
+  // 2 พ.ย. 2026 (คำสั่งผู้ใช้): มาตรฐานและกฎหมายตามประเทศของภาษา เลือกประเทศได้ และเลือกมาตรฐานได้ถ้าเรื่องนั้นมีหลายตัว
+  function secStandards() { return window.StdPick ? '<section class="pd-sec" id="standards"><h2>มาตรฐานและกฎหมายที่อ้างอิง</h2><p class="note" style="margin:-4px 0 10px">ฟอร์มนี้ปรับตามประเทศได้ เลือกประเทศ เลือกมาตรฐาน แล้วเปิดฟอร์มตามตัวเลือกนั้น</p><div class="card pad sx" id="stdPick"></div></section>' : ""; }
+  var picker = null;
+  function mountPicker() {
+    var box = $("stdPick"); if (!box || !window.StdPick) return;
+    var cq = String(new URLSearchParams(location.search).get("cc") || "").toUpperCase();
+    picker = window.StdPick.mount(box, { sheet: src.id || x.id, cc: cq, stages: (src.outline || []).map(function (s) { return mainTx(s.th, s.en); }), onCc: function (cc) { var se = $("ctry"); if (se && B.CTRY[cc]) { se.value = cc; var fi = ctryInfo(cc); document.getElementById("ctryNote").textContent = fi.note; document.getElementById("ctryPrice").textContent = B.baht(fi.price); } } });
   }
   function secIncluded() {
     var sv = B.cart.saving(x.id) || 0, sum = items.reduce(function (t, s) { return t + B.memberPrice(s.price); }, 0);
@@ -195,8 +211,8 @@
 
   function draw() {
     $("pd").innerHTML = '<div class="pd">' + media() + '<div class="pd-info"><span class="code">' + esc(mk ? x.id : code) + (mk ? " · " + esc(x.kind || "สินค้าฝากขาย") : bundle ? " · ชุดรวม" : " · " + esc(src.group || "")) + "</span><h1>" + esc(title) + "</h1>" + (!bundle && src.titleEn ? '<p class="en" lang="en">' + esc(src.titleEn) + "</p>" : "") + '<p class="lede">' + esc(bundle ? x.text : src.sum) + "</p>" + facts() + '<div id="buybox">' + buyBox() + "</div>" + trust() + "</div></div>" +
-      (mk ? secMarket() : (bundle ? secIncluded() : secOutline() + secRecords()) + secBundles()) + secFaq();
-    mbar();
+      (mk ? secMarket() : (bundle ? secIncluded() : secOutline() + secStandards() + secRecords()) + secBundles()) + secFaq();
+    mountPicker(); mbar();
   }
   function redrawBuy() { var bb = $("buybox"); if (bb) bb.innerHTML = buyBox(); mbar(); }
   function mbar() {
@@ -224,7 +240,7 @@
     redrawBuy();
   }, true);
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { var l0 = document.querySelector(".lightbox"); if (l0) l0.remove(); } });
-  document.addEventListener("change", function (ev) { if (ev.target.id === "ctry") { var fi = ctryInfo(ev.target.value); document.getElementById("ctryNote").textContent = fi.note; document.getElementById("ctryPrice").textContent = B.baht(fi.price); return; } if (ev.target.name === "lang") { if (B.cart.has(x.id)) { B.cart.setLang(x.id, ev.target.value); toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว"); } return; } if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
+  document.addEventListener("change", function (ev) { if (ev.target.id === "ctry") { if (picker) picker.setCc(ev.target.value); var fi = ctryInfo(ev.target.value); document.getElementById("ctryNote").textContent = fi.note; document.getElementById("ctryPrice").textContent = B.baht(fi.price); return; } if (ev.target.name === "lang") { if (B.cart.has(x.id)) { B.cart.setLang(x.id, ev.target.value); toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว"); } return; } if (ev.target.name === "plan") { if (B.cart.has(x.id)) { B.cart.setPlan(x.id, ev.target.value === "up"); toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว"); } mbar(); } });
   window.addEventListener("build-cart", function () { if ($("buybox") && !$("buybox").contains(document.activeElement)) redrawBuy(); });
   draw();
   if (B.token.get() && !bundle) B.call("me").then(function (r) { var d = (r.lib || []).filter(function (k) { return k.id === x.id; })[0]; if (d) { own = d.plan === "edition" ? "edition" : "updates"; redrawBuy(); } }).catch(function () {});

@@ -7,8 +7,8 @@
   var LANGS = [["en", "English"], ["th", "ไทย"], ["zh", "中文"], ["hi", "हिन्दी"], ["es", "Español"], ["fr", "Français"], ["ar", "العربية"], ["bn", "বাংলা"], ["pt", "Português"], ["ru", "Русский"], ["ur", "اردو"], ["id", "Indonesia"], ["de", "Deutsch"], ["ja", "日本語"], ["tr", "Türkçe"], ["sw", "Kiswahili"], ["ta", "தமிழ்"], ["vi", "Tiếng Việt"], ["tl", "Tagalog"], ["ko", "한국어"], ["it", "Italiano"], ["nl", "Nederlands"], ["my", "မြန်မာ"], ["ms", "Melayu"], ["km", "ខ្មែរ"], ["lo", "ລາວ"]];
   var RTL = { ar: 1, ur: 1 };
   // ภาษา → ประเทศของมาตรฐาน · อังกฤษใช้หลายประเทศ จึงตามประเทศของภาษาคู่ หรือข้อกำหนดโครงการ
-  var LANG_CC = { th: "TH", zh: "CN", hi: "IN", es: "ES", fr: "FR", ar: "SA", bn: "BD", pt: "BR", ru: "RU", ur: "PK", id: "ID", de: "DE", ja: "JP", tr: "TR", sw: "TZ", ta: "IN", vi: "VN", tl: "PH", ko: "KR", it: "IT", nl: "NL", my: "MM", ms: "MY", km: "KH", lo: "LA", en: "" };
-  var CODE = { "Thailand": "TH", "United Kingdom (England)": "GB", "China": "CN", "India": "IN", "Spain": "ES", "France": "FR", "Saudi Arabia": "SA", "Bangladesh": "BD", "Portugal": "PT", "Brazil": "BR", "Russia": "RU", "Pakistan": "PK", "Indonesia": "ID", "Germany": "DE", "Japan": "JP", "Turkey": "TR", "Tanzania": "TZ", "Kenya": "KE", "Vietnam": "VN", "Philippines": "PH", "South Korea": "KR", "Italy": "IT", "Netherlands": "NL", "Myanmar": "MM", "Malaysia": "MY", "Cambodia": "KH", "Laos": "LA", "Singapore": "SG", "Hong Kong": "HK", "United States": "US" };
+  var LANG_CC = window.LANG_CC || {};
+  var CODE = window.CC_OF || {};
   var LAW = window.LAWDB || [], REC = {}; LAW.forEach(function (x) { if (CODE[x.country]) REC[CODE[x.country]] = x; });
   function opts(list, sel) { return list.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === sel ? " selected" : "") + ">" + x[0].toUpperCase() + " · " + esc(x[1]) + "</option>"; }).join(""); }
   var sheets = (window.SITE && window.SITE.sheets || []).filter(function (x) { return /^[FT]-\d\d[A-Z]?$/.test(x.id); });
@@ -17,7 +17,7 @@
   $("lang1").innerHTML = opts(LANGS, LANGS.some(function (x) { return x[0] === siteLang; }) ? siteLang : "th");
   $("lang2").innerHTML = opts(LANGS, siteLang === "th" ? "en" : "th");
   function ccOpts(none) {
-    var list = LAW.map(function (x) { return [CODE[x.country], x.countryTh + " · " + x.country]; }).filter(function (x) { return x[0]; }).sort(function (a, b) { return a[0] === "TH" ? -1 : b[0] === "TH" ? 1 : a[1].localeCompare(b[1], "th"); });
+    var SP = window.StdPick, list = LAW.map(function (x) { return [CODE[x.country], SP ? SP.label(CODE[x.country]) : x.countryTh + " · " + x.country]; }).filter(function (x) { return x[0]; }).sort(function (a, b) { return a[0] === "TH" ? -1 : b[0] === "TH" ? 1 : a[1].localeCompare(b[1], siteLang); });
     return (none ? '<option value="">' + esc(none) + "</option>" : "") + '<option value="INT">ตามข้อกำหนดโครงการ (กรอกค่าเอง)</option>' + list.map(function (x) { return '<option value="' + x[0] + '">' + esc(x[1]) + "</option>"; }).join("");
   }
   $("c1").innerHTML = ccOpts(""); $("c2").innerHTML = ccOpts("ไม่เทียบประเทศที่ 2");
@@ -30,17 +30,19 @@
     if (!touched.c2) $("c2").value = a && b && a !== b ? b : "";
     drawCc();
   }
-  function ccName(cc) { return cc === "TH" ? "ไทย" : cc === "INT" ? "ข้อกำหนดโครงการ" : REC[cc] ? REC[cc].countryTh : cc; }
+  function ccName(cc) { return window.StdPick ? window.StdPick.label(cc) : cc === "TH" ? "ไทย" : cc === "INT" ? "ข้อกำหนดโครงการ" : REC[cc] ? REC[cc].countryTh : cc; }
   function covLine(cc) {
     if (!cc) return ""; if (cc === "INT") return "ข้อกำหนดโครงการ: ช่องเกณฑ์เว้นให้กรอกเอง ค่าไทยพิมพ์เป็นข้อมูลอ้างอิง"; if (cc === "TH") return "ไทย: ค่าเต็มตามฉบับไทย";
     var D0 = window.DOCCOV || {}, id = $("sheet").value, t = (D0.numeric || {})[id] || 0, n = ((D0.cc || {})[cc] || {})[id] || 0;
     return ccName(cc) + ": มีค่าที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อของใบนี้" + (n < t ? " · ข้อที่เหลือกรอกตามข้อกำหนดโครงการ" : "");
   }
+  var pickFirst = null;
   function drawCc() {
     var a = $("c1").value, b = $("c2").value, r = REC[a];
     $("ccInfo").textContent = [covLine(a), b && b !== a ? covLine(b) : ""].filter(Boolean).join(" · ");
-    $("lawInfo").textContent = r ? [r.lawName, r.codeName].filter(Boolean).join(" · ") + " · ตรวจเมื่อ " + r.checked + (r.confidence === "official" ? "" : " · ยังไม่ยืนยันจากแหล่งทางการ") : "";
+    var li = $("lawInfo"); li.textContent = ""; if (r) { /* ชื่อกฎหมายเป็นชื่อทางการ ไม่แปล · คำกำกับแยกส่วนเพื่อแปลตามภาษาของหน้า */ var names = [r.lawName, r.codeName].filter(Boolean).join(" · "), sp = document.createElement("span"), part = function (t) { var e = document.createElement("span"); e.textContent = t; li.appendChild(document.createTextNode(" · ")); li.appendChild(e); }; if (!/[\u0e01-\u0e5b]/.test(names)) sp.setAttribute("data-noi18n", "1"); sp.textContent = names; li.appendChild(sp); part("ตรวจเมื่อ"); li.appendChild(document.createTextNode(" " + r.checked)); if (r.confidence !== "official") part("ยังไม่ยืนยันจากแหล่งทางการ"); }
     $("c2wrapNote").hidden = !b || b === a;
+    if (window.StdPick && $("stdBox")) { window.StdPick.list($("stdBox"), { sheet: $("sheet").value, cc: a, picked: pickFirst }); pickFirst = null; } // เลือกมาตรฐานที่ใช้ในเอกสาร ถ้าเรื่องนั้นมีหลายตัว
   }
   document.addEventListener("change", function (ev) {
     var t = ev.target;
@@ -62,6 +64,7 @@
     if (!REC[cc]) return;
     var l = Object.keys(LANG_CC).filter(function (k) { return LANG_CC[k] === cc; })[0]; if (l) $("lang1").value = l; $("lang2").value = l === "th" ? "en" : "th"; setN(2); $("c1").value = cc; $("c2").value = cc === "TH" ? "" : "TH"; touched.c1 = true; touched.c2 = true;
   })();
+  if (q.get("c1")) { var c1q = String(q.get("c1")).toUpperCase(); if (c1q === "TH" || c1q === "INT" || REC[c1q]) { $("c1").value = c1q; touched.c1 = true; if (q.get("st")) pickFirst = String(q.get("st")).split("|").filter(Boolean); } }
   drawLang(); follow();
   // ยังไม่เข้าสู่ระบบ: บอกตั้งแต่ต้นว่าอะไรดาวน์โหลดได้เลย · เข้าสู่ระบบแล้วกลับมาหน้านี้พร้อมตัวเลือกเดิม
   function keepNext() { try { sessionStorage.setItem("build_next", "doc.html?item=" + encodeURIComponent($("sheet").value) + "&lang=" + encodeURIComponent($("lang1").value)); } catch (e) {} }
@@ -153,7 +156,7 @@
   }
   function crCell(r, n) {
     var L = D.lab;
-    if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) { return '<label class="pick" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk' + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">' + esc(o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">' + esc(o.ref) + "</span>" : "") + "</span></label>"; }).join("") + "</div>";
+    if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) { return '<label class="pick" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk' + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">' + esc(o.tag || o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">' + esc(o.ref) + "</span>" : "") + "</span></label>"; }).join("") + "</div>";
     return Bi(r.cr, true) + (r.jref ? '<div class="rf">' + One(L.also) + " " + esc(r.jref) + "</div>" : "") + (r.ref ? '<div class="rf">' + One(L.ref) + " " + One(r.ref) + "</div>" : "");
   }
   function thw(c) { var s = (c || []).join(" "); return /\bdate\b|วันที่/i.test(s) ? ' style="min-width:15mm"' : /\btime\b|เวลา/i.test(s) ? ' style="min-width:13mm"' : /\bno\.|เลข/i.test(s) ? ' style="min-width:11mm"' : ""; }
@@ -172,7 +175,11 @@
     return '<div class="rp"><b>' + M(L.rp) + "</b><span>" + esc(docCode(d)) + " " + esc((d.title || [])[0]) + '</span><span class="f">' + One(L.rpSheet) + ' <span class="w"' + CEA + '></span></span><span class="f">' + One(L.date) + ' <span class="w"' + CEA + "></span></span>" + (extra ? '<span class="f">' + One(L.rpNo) + ' <span class="w"' + CEA + "></span></span>" : "") + "</div>";
   }
   function freeRefs() {
-    var d = D, L = d.lab, th = langs()[0] === "th", list = d.frefs || [];
+    var d = D, L = d.lab, th = langs()[0] === "th", list = d.frefs || [], cc0 = (d.ccs || [])[0];
+    if (cc0 && cc0 !== "TH" && cc0 !== "INT") { // ฉบับฟรีอ้างอิงมาตรฐานของประเทศที่เลือก
+      var sd0 = window.StdPick ? window.StdPick.data(cc0, d.id) : null, nm = d.picked && d.picked.length ? d.picked : sd0 ? sd0.s : (REC[cc0] && REC[cc0].codeName ? [REC[cc0].codeName] : []);
+      return nm.length ? " · " + One(L.refsShort) + ": " + nm.slice(0, 4).map(esc).join(" · ") + " (" + One(L.refsFull) + ")" : "";
+    }
     if (!list.length) return "";
     return " · " + One(L.refsShort) + ": " + list.map(function (x) { return esc(th ? x[0] : (x[5] || x[0])) + " " + esc(th ? x[1] : (x[2] || x[1])); }).join(" · ") + " (" + One(L.refsFull) + ")";
   }
@@ -237,7 +244,7 @@
     var codeRow = function (c) { var m = c.code || {}, keys = Object.keys(m).filter(function (k) { return m[k]; }); return keys.length ? '<div class="stdc"><h4>' + esc(c.en) + "</h4>" + keys.map(function (k) { return "<div><b>" + esc(k) + ":</b> " + esc(m[k]) + "</div>"; }).join("") + "</div>" : ""; };
     var thRefs = (d.ccs || []).indexOf("TH") >= 0 && (d.refs || []).length ? '<div class="refs" style="margin:0;border:0"><b>' + M(L.refsT) + "</b><ul>" + d.refs.map(refRow).join("") + "</ul><p>" + One(L.refsN) + "</p></div>" : "";
     var ord = '<p class="ordb"><b>' + esc(L.ordT[0]) + '</b> <b class="tick"></b>1 ' + esc(L.ordA[0]) + ' <b class="tick"></b>2 ' + esc(L.ordB[0]) + ' <b class="tick"></b>3 ' + esc(L.ordC[0]) + ' <span class="bl"' + CEA + "></span> · " + esc(L.ordN[0]) + cs.slice(1).map(function (c, i) { return '<span class="l2"' + at(c) + ">" + esc(L.ordT[i + 1]) + ": 1 " + esc(L.ordA[i + 1]) + " · 2 " + esc(L.ordB[i + 1]) + " · 3 " + esc(L.ordC[i + 1]) + " · " + esc(L.ordN[i + 1]) + "</span>"; }).join("") + "</p>";
-    var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName) + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
+    var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (d.picked && d.picked.length ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(esc).join(" · ") + "</div>" : "") + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName) + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
     var lawHtml = (d.ctry || []).filter(function (c) { return c.cc !== "INT"; }).map(function (c) { return lawBlock(c.cc, c); }).join("");
     if (lawHtml) h += '<section class="annex"><h3>' + M(L.annexB) + "</h3>" + lawHtml + '<div class="ord2">' + M(L.lnote) + "</div></section>";
     return h;
@@ -288,7 +295,7 @@
     }
     var pick2 = nLang() === 2 ? v("lang2") : ""; if (v("lang1") === pick2) { say("เลือกภาษาที่ 2 ให้ต่างจากภาษาที่ 1", true); return; }
     busy = true; var b = f.querySelector("button[type=submit]"), old = b.textContent; b.disabled = true; b.textContent = "กำลังสร้างเอกสาร…"; say("ครั้งแรกของภาษานั้นอาจใช้เวลาประมาณ 1 นาที เพราะระบบแปลและตรวจทุกช่อง");
-    B.call("docBuild", { token: tok, sheet: v("sheet"), lang1: v("lang1"), lang2: pick2, std: v("c1"), std2: v("c2"), stdName: v("stdName") })
+    B.call("docBuild", { token: tok, sheet: v("sheet"), lang1: v("lang1"), lang2: pick2, std: v("c1"), std2: v("c2"), stdName: v("stdName"), stds: window.StdPick && $("stdBox") ? window.StdPick.selected($("stdBox")) : [] })
       .then(function (r) { say(""); render(r.doc, { project: v("project"), contractor: v("contractor"), location: v("location") }); })
       .catch(function (e) { say(e.message || "สร้างเอกสารไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
       .then(function () { busy = false; b.disabled = false; b.textContent = old; });

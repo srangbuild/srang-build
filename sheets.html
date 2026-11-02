@@ -48,6 +48,7 @@
 </header>
 
 <main class="wrap" id="main">
+  <p class="note" id="ccBar" style="margin:14px 0 0;padding:10px 14px;border-radius:12px;background:#F6F4EF" hidden></p>
 
   <section id="packs">
     <div class="head"><h2>เลือกตามงานของคุณ</h2><p class="lead">ไม่ต้องรู้ชื่องานช่าง บอกแค่ว่ากำลังทำอะไร แล้วเลือกชุดที่ตรงงาน · ทุกชุดถูกกว่าซื้อแยก</p></div>
@@ -183,6 +184,17 @@
   var nx = S.sheetsNext || []; if (nx.length) { $("next").hidden = false; $("nextlist").innerHTML = nx.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join(""); }
   var f02 = B.find("F-02"); if (f02 && f02.ok === true) $("how-guide").hidden = false;
   if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
+  // 2 พ.ย. 2026: ลูกค้าภาษาอื่นเห็นว่ามาตรฐานตามประเทศของตน มีข้อมูลแล้วกี่ใบ
+  (function () {
+    var lg = "th"; try { lg = localStorage.getItem("build_lang") || "th"; } catch (e) {} if (lg === "th" || lg === "en") return;
+    var load = function (u, cb) { var s = document.createElement("script"); s.src = u; s.onload = cb; document.head.appendChild(s); };
+    load("doc-cov.js", function () { load("doc-law.js", function () {
+      var cc = (window.LANG_CC || {})[lg], bar = $("ccBar"); if (!cc || !bar) return;
+      var cov = ((window.DOCCOV || {}).cc || {})[cc] || {}, n = Object.keys(cov).filter(function (k) { return cov[k] > 0; }).length, all = B.sheets.filter(function (x) { return /^[FT]-/.test(x.id); }).length, name = cc;
+      try { name = new Intl.DisplayNames([lg], { type: "region", style: "short" }).of(cc); } catch (e) {}
+      bar.innerHTML = '<b data-noi18n="1">' + esc(name) + ": </b><span>มีค่าที่ตรวจแล้ว " + n + " ใบ จาก " + all + ' ใบ ใบอื่นเปิดฟอร์มได้ และกรอกค่าตามข้อกำหนดโครงการ</span> <a href="doc.html">เปิดฟอร์มตามมาตรฐานของประเทศคุณ</a>'; bar.hidden = false;
+    }); });
+  })();
 })();
 </script>
 <script src="cart.js"></script>

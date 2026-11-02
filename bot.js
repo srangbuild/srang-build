@@ -6,7 +6,7 @@
   var B = window.BUILD || {}, S = window.SITE || B.S || {};
   var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
   if (/^(admin|receipt|go)\.html$/.test(here) || /[?&]shot=1/.test(location.search)) return;
-  var EN = false; try { var bl = localStorage.getItem("build_lang"); EN = !!bl && bl !== "th"; } catch (e) {}
+  var EN = false; try { var bl = localStorage.getItem("build_lang"); EN = bl === "en"; /* other languages use the Thai text, and i18n.js translates it */ } catch (e) {}
   var T = EN ? {
     open: "Ask us", title: "BUILD helper", sub: "Automatic answers. This helper is not a person.", hello: "Hello. Choose a topic or type your question.", ph: "Type your question", send: "Send", close: "Close",
     more: "Read more", good: "This helps", bad: "Not what I asked", none: "We have no answer for this yet. Send it to the shop, or contact us on LINE.", thanks: "Thank you.",
@@ -74,7 +74,7 @@
     return s;
   }
   function rank(q) { q = norm(q); return FAQ.map(function (it) { return { it: it, s: score(q, it) }; }).filter(function (x) { return x.s >= 5; }).sort(function (a, b) { return b.s - a.s; }); }
-  function say(text, me) { var d = document.createElement("div"); d.className = "bt-m" + (me ? " me" : ""); d.textContent = text; logBox.appendChild(d); logBox.scrollTop = logBox.scrollHeight; return d; }
+  function say(text, me) { var d = document.createElement("div"); d.className = "bt-m" + (me ? " me" : ""); if (me) d.setAttribute("data-noi18n", "1"); d.textContent = text; logBox.appendChild(d); logBox.scrollTop = logBox.scrollHeight; return d; }
   function block(cls, html) { var d = document.createElement("div"); d.className = cls; d.innerHTML = html; logBox.appendChild(d); logBox.scrollTop = logBox.scrollHeight; return d; }
   function lineBtn() { var l = S.links && S.links.line; return /^https:\/\//.test(l || "") ? '<a href="' + esc(l) + '" target="_blank" rel="noopener">' + esc(T.line) + "</a>" : ""; }
   function send(data) {

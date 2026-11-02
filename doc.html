@@ -61,7 +61,7 @@
       <div class="g3"><label><span id="l1txt">ภาษาที่ 1 (ข้อความหลัก)</span><select name="lang1" id="lang1"></select></label><label id="l2wrap">ภาษาที่ 2<select name="lang2" id="lang2"></select></label></div><p id="swapWrap" style="margin:0" hidden><button class="b line sm" type="button" id="swapPick">สลับภาษา 1 ↔ 2</button></p>
       <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin:0 0 2px">มาตรฐานและกฎหมายของประเทศ</legend><p class="note" style="margin:0 0 6px">ระบบตั้งตามประเทศของภาษาให้ เปลี่ยนได้ · ค่าตรงกันพิมพ์ค่าเดียวและอ้างอิงร่วม · ค่าต่างกันให้คุณเลือกในเอกสาร · การเทียบ 2 ประเทศต้องซื้อ</p>
       <div class="g3"><label>ประเทศที่ 1<select name="c1" id="c1"></select></label><label>ประเทศที่ 2 (เทียบค่า)<select name="c2" id="c2"></select></label></div></fieldset>
-      <div class="note" id="ccInfo" style="margin:0"></div><div class="note" id="lawInfo" style="margin:0"></div><div class="note" id="c2wrapNote" style="margin:0" hidden>ทั้ง 2 ประเทศจะพิมพ์กรอบกฎหมายในภาคผนวก ข ท้ายเอกสาร</div>
+      <div class="note" id="ccInfo" style="margin:0"></div><div class="note" id="lawInfo" style="margin:0"></div><div id="stdBox" hidden></div><div class="note" id="c2wrapNote" style="margin:0" hidden>ทั้ง 2 ประเทศจะพิมพ์กรอบกฎหมายในภาคผนวก ข ท้ายเอกสาร</div>
       <label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI 318"><option value="Eurocode 2"><option value="BS EN 206"><option value="JIS A 5308"><option value="ASTM C94"><option value="IEC 60364"></datalist></label>
       <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
       <button class="b pri" type="submit">สร้างเอกสาร</button><div class="dn" id="freeNow" style="margin:0" hidden></div>
@@ -84,6 +84,6 @@
   </div>
 </footer>
 
-<script src="doc-law.js"></script><script src="doc.js"></script>
+<script src="doc-law.js"></script><script src="doc-refs.js"></script><script src="std-pick.js"></script><script src="doc.js"></script>
 </body>
 </html>

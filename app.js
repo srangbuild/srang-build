@@ -103,7 +103,7 @@
       .then(function (j) { if (!j || j.ok !== true) throw new Error((j && j.error) || "ทำรายการไม่สำเร็จ"); return j; });
   }
   function call(action, data) {
-    var body = { action: action, token: token.get() }; Object.keys(data || {}).forEach(function (k) { body[k] = data[k]; });
+    var body = { action: action, token: token.get(), ui: siteLang }; Object.keys(data || {}).forEach(function (k) { body[k] = data[k]; });
     if (API) return post(API, body);
     return ensureEmu().then(function () { return post(EMU_API, body); });
   }
@@ -138,7 +138,11 @@
   }
   function saveFile(name, b64, type) { var bin = atob(b64), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([u], { type: type || "application/pdf" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
   var MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-  function when(iso) { var d = new Date(iso); if (!iso || isNaN(d)) return ""; return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+  function when(iso) {
+    var d = new Date(iso); if (!iso || isNaN(d)) return "";
+    if (siteLang !== "th") { try { return "⁨" + new Intl.DateTimeFormat(siteLang, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, numberingSystem: "latn" }).format(d) + "⁩"; } catch (e) {} } // 2 พ.ย. 2026: รูปแบบวันที่ของภาษานั้น · อักขระ U+2068 U+2069 บอก i18n.js ว่าไม่ต้องแปล
+    return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
   function rand(n) { var a = new Uint8Array(n || 16); (window.crypto || window.msCrypto).getRandomValues(a); return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
 
   // ---------- ตะกร้า (เก็บในเบราว์เซอร์เครื่องนี้ จนกว่าจะสร้างคำสั่งซื้อ ไม่มีข้อมูลส่วนตัว) ----------

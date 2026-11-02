@@ -104,7 +104,7 @@
       (blocked ? '<p class="msg bad" style="margin:0">มีรายการที่ซื้อซ้ำไม่ได้ ' + blocked + " รายการ เอาออกหรือเปลี่ยนแบบสิทธิ์ก่อน</p>" : "") +
       '<a class="b pri" href="' + L("checkout.html") + '"' + (blocked || !total ? ' aria-disabled="true" data-block="1"' : "") + ">ดำเนินการชำระเงิน →</a>" +
       '<p class="note">ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์ · ดาวน์โหลดซ้ำได้ทุกเมื่อ</p>' +
-      (me ? '<p class="note">ราคาคิดตามสิทธิ์ที่บัญชี ' + esc(me.member.email || me.member.name) + " มีอยู่แล้ว</p>" : '<p class="note">มีบัญชีอยู่แล้ว: ระบบตรวจใบที่คุณมีแล้วตอนชำระเงิน</p>') + "</div></aside></div>";
+      (me ? '<p class="note">ราคาคิดตามสิทธิ์ที่บัญชี ' + '<span data-noi18n="1">' + esc(me.member.email || me.member.name) + "</span>" + " มีอยู่แล้ว</p>" : '<p class="note">มีบัญชีอยู่แล้ว: ระบบตรวจใบที่คุณมีแล้วตอนชำระเงิน</p>') + "</div></aside></div>";
   }
   $("view").addEventListener("change", function (ev) { var t = ev.target; if (t.dataset.plan) { B.cart.setPlan(t.dataset.plan, t.value === "up"); say(""); } else if (t.dataset.lang) { B.cart.setLang(t.dataset.lang, t.value); say("เปลี่ยนภาษาบนใบของ " + t.dataset.lang + " เป็น " + B.LANGS[t.value] + " แล้ว ราคาเท่าเดิม"); } });
   $("view").addEventListener("click", function (ev) {
