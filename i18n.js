@@ -14,21 +14,31 @@
   });
   (Array.isArray(S.sheets) ? S.sheets : []).forEach(function (x) { (x.outline || []).concat(x.refs || []).forEach(function (s) { if (s.th && s.en) map[norm(s.th)] = s.en; }); });
   (Array.isArray(S.botfaq) ? S.botfaq : []).forEach(function (x) { if (x.q && x.qEn) map[norm(x.q)] = x.qEn; if (x.a && x.aEn) map[norm(x.a)] = x.aEn; });
+  /* 3 Nov 2026: the second list holds whole sentences and single labels. They never become a piece of another sentence. */
   var phrases = Object.keys(map).filter(function (k) { return k.length >= 6; }).sort(function (a, b) { return b.length - a.length; });
+  (function () { var D2 = window.I18N_EN2 || {}; Object.keys(D2).forEach(function (k) { map[norm(k)] = D2[k]; }); })();
+  /* 3 Nov 2026: a sentence with a number or a name inside. Its key in the English list has ZV1Z where the value goes, so one translation serves all values. Longest first: the most exact sentence wins. */
+  var TPL = [], RX_ESC = /[.*+?^${}()|[\]\\]/g;
+  Object.keys(map).forEach(function (k) { if (!/ZV\dZ/.test(k)) return; TPL.push({ re: new RegExp("^" + k.replace(RX_ESC, "\\$&").replace(/ZV(\d)Z/g, "(.+?)") + "$"), en: norm(map[k]), n: k.length }); delete map[k]; });
+  TPL.sort(function (a, b) { return b.n - a.n; });
+  function tplHit(t) { for (var i = 0; i < TPL.length; i++) { var m = TPL[i].re.exec(t); if (m) return { m: m, en: TPL[i].en }; } return null; }
+  function tplFill(s, m) { return s.replace(/ZV(\d)Z/g, function (x, k) { var v = m[+k]; if (v == null) return x; var y = THAI.test(v) ? tr1(v) : null; return y === null ? v : y; }); }
+  function one(s) { return String(s).replace(/(^|[^\d.,])1 (sheets|items|pages|hours|times|methods|columns|key points|hold points|documents|more sheets|more tries|days)\b/g, function (x, a, w) { return a + "1 " + w.replace(/ies\b/, "y").replace(/s\b/, ""); }); } /* "1 sheets" reads wrong */
   /* Languages other than Thai and English (1 Nov 2026): Thai -> English -> core word list. */
   var LANG = "en", CORE = {}, NOTE = "";
   try { LANG = localStorage.getItem("build_lang") || "en"; } catch (e) {}
   (function () { var L = (window.I18N_CORE || {})[LANG], K = window.I18N_KEYS || []; if (!L) { LANG = "en"; return; } L.split("|").forEach(function (w, i) { if (K[i] === "NOTE") NOTE = w; else if (K[i]) CORE[K[i]] = w; }); })();
   /* Full dictionary English -> this language, built by the back end (i18nBuildAll) and fetched once a day. Kept in this browser only. */
+  var I18N_VER = "20261103"; /* change this when the dictionaries change, so a returning visitor gets them at once */
   var FULL = {}, FIX = (window.I18N_FIX || {})[LANG] || {}; /* 2 Nov 2026: corrections by reviewers per language (i18n-fix.js) win over the machine dictionary */
   (function () { if (LANG === "en") return; try { var raw = localStorage.getItem("build_i18n_" + LANG); if (raw) { var j = JSON.parse(raw); if (j && j.map) FULL = j.map; } } catch (e) {} })();
   function fetchFull() {
     var api = S.member && S.member.api; if (!api || LANG === "en") return;
-    var at = 0; try { var raw = localStorage.getItem("build_i18n_" + LANG); if (raw) at = +((JSON.parse(raw) || {}).at || 0); } catch (e) {}
-    if (at && Date.now() - at < 864e5) return;
+    var at = 0, ver = ""; try { var raw = localStorage.getItem("build_i18n_" + LANG); if (raw) { var o0 = JSON.parse(raw) || {}; at = +(o0.at || 0); ver = o0.v || ""; } } catch (e) {}
+    if (at && ver === I18N_VER && Date.now() - at < 864e5) return;
     fetch(api + "?action=i18n&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) { return r.json(); }).then(function (j) {
       if (!j || !j.ok || !j.map) return;
-      try { localStorage.setItem("build_i18n_" + LANG, JSON.stringify({ at: Date.now(), built: j.built, map: j.map })); } catch (e) {}
+      try { localStorage.setItem("build_i18n_" + LANG, JSON.stringify({ at: Date.now(), v: I18N_VER, built: j.built, map: j.map })); } catch (e) {}
       FULL = j.map; again(); doNav();
     }).catch(function () {});
   }
@@ -77,8 +87,10 @@
     }
     var cm = CODE_ONLY.exec(t); if (cm) return CODE_EN[cm[1]] + " " + cm[2];
     var dm = dateOnly(t); if (dm) return dm;
+    var hit = THAI.test(t) && !map[t] ? tplHit(t) : null;
     if (LANG === "en") {
-      var e0 = trEn(raw); if (e0 !== null) return e0;
+      if (hit) return one(tplFill(hit.en, hit.m));
+      var e0 = trEn(raw); if (e0 !== null) return one(e0);
       if (!THAI.test(t)) return null;
       var x0 = EXTRA[t]; if (x0 && x0 !== t) return x0;
       need(t); return null;
@@ -86,9 +98,14 @@
     if (!THAI.test(t)) return null;
     var en = map[t] ? norm(map[t]) : "", c = en ? (FIX[en] || FULL[en] || CORE[en]) : "";
     if (c && c !== t) return c;
+    if (hit) { /* the translated sentence must keep each ZV mark, or a value would be lost */
+      var tc = FIX[hit.en] || FULL[hit.en] || "", marks = hit.en.match(/ZV\dZ/g) || [];
+      if (tc && marks.every(function (z) { return tc.indexOf(z) >= 0; })) return tplFill(tc, hit.m);
+    }
     var ex = EXTRA[t]; if (ex && ex !== t) return ex;
     need(t);
-    return trEn(raw); /* English only until the translation arrives */
+    if (hit) return one(tplFill(hit.en, hit.m));
+    var e1 = trEn(raw); return e1 === null ? null : one(e1); /* English only until the translation arrives */
   }
   function trEn(raw) {
     var t = norm(raw);
@@ -103,7 +120,10 @@
   }
   var SKIP = /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|CODE)$/, SRC = new WeakMap(), ATTR = new WeakMap();
   function doText(n) {
-    var e = n.parentElement; if (!e || SKIP.test(e.tagName) || e.closest("[data-noi18n]")) return;
+    var e = n.parentElement; if (!e || SKIP.test(e.tagName)) return;
+    /* 3 Nov 2026: an option with no value attribute sends its text. Keep the original text as the value, or the back end receives the translation and refuses the form. */
+    if (e.tagName === "OPTION" && !e.hasAttribute("data-src")) { var ot = norm(e.textContent); e.setAttribute("data-src", ot); if (!e.hasAttribute("value")) e.setAttribute("value", ot); }
+    if (e.closest("[data-noi18n]")) return;
     /* a price is its own text part: the text before and after it are translated by themselves */
     var tk = /⁨[^⁩]*⁩/.exec(n.nodeValue);
     if (tk) { if (n.nodeValue.length === tk[0].length) return; var mid = tk.index ? n.splitText(tk.index) : n, aft = mid.splitText(tk[0].length); if (mid !== n) doText(n); if (aft.nodeValue) doText(aft); return; }
@@ -153,13 +173,13 @@
   var TRXP = false;
   function fetchTrx() {
     var api = S.member && S.member.api; if (!api) return;
-    var key = "build_trxp_" + LANG, at = 0; try { at = +localStorage.getItem(key) || 0; } catch (e) {}
-    if (at && Date.now() - at < 864e5) return;
+    var key = "build_trxp_" + LANG, at = 0, ver = ""; try { var kv = String(localStorage.getItem(key) || "").split("|"); at = +kv[0] || 0; ver = kv[1] || ""; } catch (e) {}
+    if (at && ver === I18N_VER && Date.now() - at < 864e5) return;
     TRXP = true;
     fetch(api + "?action=trx&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) { return r.json(); }).then(function (j) {
       TRXP = false; if (!j || !j.ok || !j.map) return;
-      var n = 0; Object.keys(j.map).forEach(function (k) { if (!EXTRA[k]) { EXTRA[k] = j.map[k]; n++; } if (NEED[k]) delete NEED[k]; });
-      try { localStorage.setItem(extraKey, JSON.stringify(EXTRA)); localStorage.setItem(key, String(Date.now())); } catch (e) {}
+      var n = 0; Object.keys(j.map).forEach(function (k) { if (EXTRA[k] !== j.map[k]) { EXTRA[k] = j.map[k]; n++; } if (NEED[k]) delete NEED[k]; }); /* the prepared list wins over an older copy in this browser, so a correction reaches returning visitors */
+      try { localStorage.setItem(extraKey, JSON.stringify(EXTRA)); localStorage.setItem(key, Date.now() + "|" + I18N_VER); } catch (e) {}
       if (n) again();
     }).catch(function () { TRXP = false; });
   }

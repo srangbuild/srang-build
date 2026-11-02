@@ -137,8 +137,13 @@
   var LANGS = ["อังกฤษ", "จีนกลาง", "ฮินดี", "สเปน", "ฝรั่งเศส", "อาหรับ", "เบงกาลี", "โปรตุเกส", "รัสเซีย", "อูรดู", "อินโดนีเซีย", "เยอรมัน", "ญี่ปุ่น", "ตุรกี", "สวาฮีลี", "ทมิฬ", "เวียดนาม", "ตากาล็อก", "เกาหลี", "ไทย", "อิตาลี", "ดัตช์", "เมียนมา", "มลายู", "เขมร", "ลาว", "อื่น ๆ"];
   var SAMPLE = { "ไทย": "ระยะหุ้มคอนกรีต", "อังกฤษ": "Concrete cover", "จีนกลาง": "混凝土保护层", "ฮินดี": "कंक्रीट कवर", "สเปน": "Recubrimiento de hormigón", "ฝรั่งเศส": "Enrobage du béton", "อาหรับ": "الغطاء الخرساني", "เบงกาลี": "কংক্রিট কভার", "โปรตุเกส": "Recobrimento do betão", "รัสเซีย": "Защитный слой бетона", "อูรดู": "کنکریٹ کور", "อินโดนีเซีย": "Selimut beton", "เยอรมัน": "Betondeckung", "ญี่ปุ่น": "かぶり厚さ", "ตุรกี": "Beton örtüsü", "สวาฮีลี": "Kifuniko cha zege", "ทมิฬ": "கான்கிரீட் மூடுதல்", "เวียดนาม": "Lớp bê tông bảo vệ", "ตากาล็อก": "Takip ng kongkreto", "เกาหลี": "피복 두께", "อิตาลี": "Copriferro", "ดัตช์": "Betondekking", "เมียนมา": "ကွန်ကရစ်အကာ", "มลายู": "Penutup konkrit", "เขมร": "ស្រទាប់ការពារបេតុង", "ลาว": "ຄອນກຣີດຫຸ້ມ", "อื่น ๆ": "(ภาษาที่ระบุในรายละเอียด)" };
   $("kind").innerHTML = '<option value="">เลือกประเภทงาน</option>' + KINDS.map(function (k) { return "<option>" + esc(k) + "</option>"; }).join("");
-  $("lang1").innerHTML = LANGS.map(function (l) { return "<option" + (l === "อังกฤษ" ? " selected" : "") + ">" + esc(l) + "</option>"; }).join("");
-  $("lang2").innerHTML = LANGS.map(function (l) { return "<option" + (l === "ไทย" ? " selected" : "") + ">" + esc(l) + "</option>"; }).join("");
+  /* 3 Nov 2026: the Thai word for a language can also mean the country. The name comes from the browser in the language of the page, and the value stays the Thai name that the back end checks. */
+  var LCODE = { "อังกฤษ": "en", "จีนกลาง": "zh", "ฮินดี": "hi", "สเปน": "es", "ฝรั่งเศส": "fr", "อาหรับ": "ar", "เบงกาลี": "bn", "โปรตุเกส": "pt", "รัสเซีย": "ru", "อูรดู": "ur", "อินโดนีเซีย": "id", "เยอรมัน": "de", "ญี่ปุ่น": "ja", "ตุรกี": "tr", "สวาฮีลี": "sw", "ทมิฬ": "ta", "เวียดนาม": "vi", "ตากาล็อก": "tl", "เกาหลี": "ko", "ไทย": "th", "อิตาลี": "it", "ดัตช์": "nl", "เมียนมา": "my", "มลายู": "ms", "เขมร": "km", "ลาว": "lo" };
+  var UI = "th"; try { UI = localStorage.getItem("build_lang") || "th"; } catch (e) {}
+  function lgName(l) { var c = LCODE[l]; if (!c || UI === "th") return l; try { return new Intl.DisplayNames([UI], { type: "language" }).of(c) || l; } catch (e) { return l; } }
+  function lgOpt(l, sel) { return '<option value="' + esc(l) + '"' + (l === sel ? " selected" : "") + (LCODE[l] && UI !== "th" ? ' data-noi18n="1"' : "") + ">" + esc(lgName(l)) + "</option>"; }
+  $("lang1").innerHTML = LANGS.map(function (l) { return lgOpt(l, "อังกฤษ"); }).join("");
+  $("lang2").innerHTML = LANGS.map(function (l) { return lgOpt(l, "ไทย"); }).join("");
   var P = new URLSearchParams(location.search);
   if (P.get("item")) { $("items").value = String(P.get("item")).replace(/[^\w .,+-]/g, "").slice(0, 300); $("kind").value = "ใบตรวจงานภาษาอื่น"; }
   if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
@@ -146,7 +151,7 @@
   function draw() {
     var two = nLang() === 2; $("l2w").hidden = !two; $("l1t").textContent = two ? "ภาษาบรรทัดบน (มีช่องกรอก)" : "ภาษาของเอกสาร";
     var a = $("lang1").value, b = $("lang2").value;
-    $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + esc(SAMPLE[a] || a) + " [ ช่องกรอก ] มม." + (two ? '<span class="l2">' + esc(SAMPLE[b] || b) + " ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + '<span class="l2">คำตัวอย่างเป็นฉบับร่าง เอกสารจริงมีผู้แปลตรวจก่อนส่งมอบ</span>' + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
+    $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + '<span data-noi18n="1">' + esc(SAMPLE[a] || a) + "</span> [ ช่องกรอก ] มม." + (two ? '<span class="l2"><span data-noi18n="1">' + esc(SAMPLE[b] || b) + "</span> ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + '<span class="l2">คำตัวอย่างเป็นฉบับร่าง เอกสารจริงมีผู้แปลตรวจก่อนส่งมอบ</span>' + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
   }
   document.addEventListener("change", function (ev) { if (ev.target.name === "n" || ev.target.id === "lang1" || ev.target.id === "lang2") draw(); });
   document.addEventListener("click", function (ev) { var k = ev.target.closest("[data-kind]"); if (k) { $("kind").value = k.getAttribute("data-kind"); } });
@@ -162,7 +167,7 @@
     if (v("desc").length < 10) { say("เล่ารายละเอียดของงานอย่างน้อย 10 ตัวอักษร", true); return; }
     if (!f.elements.consent.checked) { say("ติ๊กยินยอมก่อนส่งคำขอ", true); return; }
     busy = true; var btn = f.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "กำลังส่ง…";
-    B.call("request", { name: v("name"), email: v("email").toLowerCase(), contact: v("contact"), org: v("org"), kind: v("kind"), items: v("items"), lang1: v("lang1"), lang2: two ? v("lang2") : "", std: f.elements.stdPick.options[f.elements.stdPick.selectedIndex].text + (v("law") ? " · กฎหมาย: " + v("law") : ""), qty: +v("qty") || 1, due: v("due"), desc: v("desc"), consent: true })
+    B.call("request", { name: v("name"), email: v("email").toLowerCase(), contact: v("contact"), org: v("org"), kind: v("kind"), items: v("items"), lang1: v("lang1"), lang2: two ? v("lang2") : "", std: (function (o) { return o.getAttribute("data-src") || o.text; })(f.elements.stdPick.options[f.elements.stdPick.selectedIndex]) + (v("law") ? " · กฎหมาย: " + v("law") : ""), qty: +v("qty") || 1, due: v("due"), desc: v("desc"), consent: true })
       .then(function (r) { f.reset(); draw(); say("ส่งคำขอ " + r.request.id + " แล้ว · ร้านส่งอีเมลยืนยันให้แล้ว และตอบใบเสนอราคาภายใน 3 วันทำการ"); })
       .catch(function (e) { say(e && e.message ? e.message : "ส่งไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
       .then(function () { busy = false; btn.disabled = false; btn.textContent = "ส่งคำขอ"; });
