@@ -2,6 +2,13 @@
 (function () {
   "use strict";
   var doc = document, root = doc.documentElement;
+  (function () { /* 3 Nov 2026: find the office on Google Maps. A plain link that opens a new tab. Nothing loads until the reader presses it. */
+    var MAP = { "k-build.html": ["กองช่าง เทศบาล สำนักงานเขต", "หาหน่วยงานที่รับคำขอใกล้คุณบน Google Maps"], "k-extend.html": ["กองช่าง เทศบาล สำนักงานเขต", "หาหน่วยงานที่รับคำขอใกล้คุณบน Google Maps"], "k-change-use.html": ["กองช่าง เทศบาล สำนักงานเขต", "หาหน่วยงานที่รับคำขอใกล้คุณบน Google Maps"], "k-highrise.html": ["กองช่าง เทศบาล สำนักงานเขต", "หาหน่วยงานที่รับคำขอใกล้คุณบน Google Maps"], "k-factory.html": ["สำนักงานอุตสาหกรรมจังหวัด", "หาสำนักงานอุตสาหกรรมจังหวัดบน Google Maps"], "k-venue.html": ["สถานีตำรวจ ที่ว่าการอำเภอ", "หาสถานีตำรวจและที่ว่าการอำเภอบน Google Maps"], "k-method-statement.html": ["โรงพยาบาล", "หาโรงพยาบาลใกล้หน้างานบน Google Maps"] };
+    var here = (location.pathname.split("/").pop() || "").toLowerCase(), m = MAP[here], hook = doc.querySelector(".k-notice"); if (!m || !hook) return;
+    var p = doc.createElement("p"), a = doc.createElement("a"); p.style.margin = "0 0 12px"; a.textContent = m[1]; a.rel = "noopener noreferrer"; a.target = "_blank";
+    var q = function () { var t = window.I18N_TR ? window.I18N_TR(m[0]) : m[0]; return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(t); };
+    a.href = q(); a.addEventListener("click", function () { a.href = q(); }); p.appendChild(a); hook.parentNode.insertBefore(p, hook);
+  })();
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
   if (store("build_k_big") === "1") root.classList.add("k-big");
 

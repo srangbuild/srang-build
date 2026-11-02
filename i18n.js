@@ -27,9 +27,9 @@
   /* Languages other than Thai and English (1 Nov 2026): Thai -> English -> core word list. */
   var LANG = "en", CORE = {}, NOTE = "";
   try { LANG = localStorage.getItem("build_lang") || "en"; } catch (e) {}
-  (function () { var L = (window.I18N_CORE || {})[LANG], K = window.I18N_KEYS || []; if (!L && LANG !== "lo") { LANG = "en"; return; } (L || "").split("|").forEach(function (w, i) { if (K[i] === "NOTE") NOTE = w; else if (K[i]) CORE[K[i]] = w; }); })();
+  (function () { var L = (window.I18N_CORE || {})[LANG], K = window.I18N_KEYS || []; if (!L && !/^(lo|he)$/.test(LANG)) { LANG = "en"; return; } (L || "").split("|").forEach(function (w, i) { if (K[i] === "NOTE") NOTE = w; else if (K[i]) CORE[K[i]] = w; }); })();
   /* Full dictionary English -> this language, built by the back end (i18nBuildAll) and fetched once a day. Kept in this browser only. */
-  var EV = window.EnVar ? window.EnVar.cur() : "US", LOC = LANG === "en" ? "en-" + EV : LANG; /* 3 Nov 2026: English of the US or the UK */
+  var EV = window.EnVar ? window.EnVar.cur() : "US", LOC = window.REGION ? window.REGION.loc(LANG) : LANG; /* 3 Nov 2026: English of the US or the UK */
   var I18N_VER = "20261103"; /* change this when the dictionaries change, so a returning visitor gets them at once */
   var FULL = {}, FIX = (window.I18N_FIX || {})[LANG] || {}; /* 2 Nov 2026: corrections by reviewers per language (i18n-fix.js) win over the machine dictionary */
   (function () { if (LANG === "en") return; try { var raw = localStorage.getItem("build_i18n_" + LANG); if (raw) { var j = JSON.parse(raw); if (j && j.map) FULL = j.map; } } catch (e) {} })();
@@ -160,7 +160,7 @@
   var TITLE0 = document.title;
   function again() { walk(document.body); var tv = tr(TITLE0); if (tv !== null) document.title = tv; }
   document.documentElement.lang = LOC;
-  if (LANG === "ar" || LANG === "ur") { document.documentElement.dir = "rtl"; var rs = document.createElement("style"); rs.textContent = ".skip:not(:focus){left:auto!important;right:-9999px!important}"; document.head.appendChild(rs); }
+  if (LANG === "ar" || LANG === "ur" || LANG === "he") { document.documentElement.dir = "rtl"; var rs = document.createElement("style"); rs.textContent = ".skip:not(:focus){left:auto!important;right:-9999px!important}"; document.head.appendChild(rs); }
   function doNav() { /* the menu is drawn in English by nav.js and marked data-noi18n */
     if (LANG === "en") return;
     var w = document.createTreeWalker(document.querySelector(".bh") || document.body, NodeFilter.SHOW_TEXT), n, list = [];

@@ -19,7 +19,7 @@
   function labelIn(cc, lg) { try { var n = new Intl.DisplayNames([lg], { type: "region", style: "short" }).of(cc); if (n && n !== cc) return n; } catch (e) {} return REC[cc] ? REC[cc].country : cc; }
   function defaultCc() { return LANG_CC[lang] || "TH"; }
   function data(cc, sheet) { var c = REFS.cc && REFS.cc[cc]; return (c && c.sheets && c.sheets[sheet]) || null; }
-  function countries() { var first = defaultCc(); return Object.keys(REC).sort(function (a, b) { return a === first ? -1 : b === first ? 1 : a === "TH" ? -1 : b === "TH" ? 1 : label(a).localeCompare(label(b), lang); }); }
+  function countries() { var first = defaultCc(), zone = window.REGION ? window.REGION.list(lang) : [], rank = function (c) { var i = zone.indexOf(c); return c === first ? -2 : i >= 0 ? i : c === "TH" ? 900 : 999; }; return Object.keys(REC).sort(function (a, b) { return rank(a) - rank(b) || label(a).localeCompare(label(b), lang); }); }
   function ccOptions(sheet, sel) {
     var all = countries(), yes = all.filter(function (c) { return data(c, sheet); }), no = all.filter(function (c) { return !data(c, sheet); });
     var o = function (c) { return '<option value="' + esc(c) + '"' + (c === sel ? " selected" : "") + ">" + esc(label(c)) + "</option>"; };

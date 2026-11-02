@@ -38,7 +38,7 @@
 .preview { border:1px dashed #B9C3CF; border-radius:12px; padding:10px 14px; background:#FBFCFD; font-size:14.5px; }
 .preview b { color:var(--navy); } .preview .l2 { color:#3F4A58; font-size:13.5px; display:block; }
 </style>
-<script src="data.js"></script>
+<script src="region.js"></script><script src="data.js"></script>
 <script src="app.js"></script><script src="doc-cov.js"></script>
 <style>.docform .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}</style>
 <link rel="stylesheet" href="doc-form.css">
@@ -64,6 +64,7 @@
       <div class="note" id="ccInfo" style="margin:0"></div><div class="note" id="lawInfo" style="margin:0"></div><div id="stdBox" hidden></div><div class="note" id="c2wrapNote" style="margin:0" hidden>ทั้ง 2 ประเทศจะพิมพ์กรอบกฎหมายในภาคผนวก ข ท้ายเอกสาร</div>
       <label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI 318"><option value="Eurocode 2"><option value="BS EN 206"><option value="JIS A 5308"><option value="ASTM C94"><option value="IEC 60364"></datalist></label>
       <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
+      <div class="g3" style="align-items:end"><label>พิกัดหน้างาน (ไม่บังคับ)<input type="text" id="geo" maxlength="40" inputmode="decimal" autocomplete="off" placeholder="13.7563,100.5018"></label><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px"><button class="b line sm" type="button" id="geoBtn">ใช้ตำแหน่งปัจจุบัน</button><a id="geoMap" hidden target="_blank" rel="noopener noreferrer">เปิดใน Google Maps</a></div><p class="note" style="margin:0">พิกัดอยู่ในเครื่องนี้ และพิมพ์บนเอกสารเท่านั้น ระบบไม่เก็บ</p></div>
       <button class="b pri" type="submit">สร้างเอกสาร</button><div class="dn" id="freeNow" style="margin:0" hidden></div>
       <p class="note" style="margin:0">ซื้อใบนี้แล้วสร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับที่ซื้อ (ฉบับอังกฤษ-ไทย = ไทยและอังกฤษ มาตรฐานไทย) · ภาษาและมาตรฐานอื่นซื้อเป็นฉบับประเทศ · ฉบับฟรีมีข้อหลัก 1 ภาษา เลือกได้ทุกภาษา · 2 ภาษาต้องซื้อ · ค่าเกณฑ์นอกฉบับไทยให้กรอกตามข้อกำหนดของโครงการ ระบบไม่เดาตัวเลขแทนคุณ</p>
       <p class="note" style="margin:0">ภาษาอื่นนอกจากไทยและอังกฤษแปลด้วยเครื่อง ระบบตรวจตัวเลข ช่องกรอก และแปลกลับทุกช่อง แต่ไม่แทนการตรวจโดยผู้แปล ถ้าเอกสารไม่มีไทยหรืออังกฤษ ระบบเติมบรรทัดควบคุมอังกฤษตัวเล็กให้</p>

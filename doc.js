@@ -4,8 +4,8 @@
 (function () {
   "use strict";
   var B = window.BUILD, esc = B.esc, $ = function (id) { return document.getElementById(id); };
-  var LANGS = [["en-US", "English (US)"], ["en-GB", "English (UK)"], ["th", "ไทย"], ["zh", "中文"], ["hi", "हिन्दी"], ["es", "Español"], ["fr", "Français"], ["ar", "العربية"], ["bn", "বাংলা"], ["pt", "Português"], ["ru", "Русский"], ["ur", "اردو"], ["id", "Indonesia"], ["de", "Deutsch"], ["ja", "日本語"], ["tr", "Türkçe"], ["sw", "Kiswahili"], ["ta", "தமிழ்"], ["vi", "Tiếng Việt"], ["tl", "Tagalog"], ["ko", "한국어"], ["it", "Italiano"], ["nl", "Nederlands"], ["my", "မြန်မာ"], ["ms", "Melayu"], ["km", "ខ្មែរ"], ["lo", "ລາວ"]];
-  var RTL = { ar: 1, ur: 1 };
+  var LANGS = [["en-US", "English (US)"], ["en-GB", "English (UK)"], ["th", "ไทย"], ["zh", "中文"], ["hi", "हिन्दी"], ["es", "Español"], ["fr", "Français"], ["ar", "العربية"], ["bn", "বাংলা"], ["pt", "Português"], ["ru", "Русский"], ["ur", "اردو"], ["id", "Indonesia"], ["de", "Deutsch"], ["ja", "日本語"], ["tr", "Türkçe"], ["sw", "Kiswahili"], ["ta", "தமிழ்"], ["vi", "Tiếng Việt"], ["tl", "Tagalog"], ["ko", "한국어"], ["it", "Italiano"], ["nl", "Nederlands"], ["my", "မြန်မာ"], ["ms", "Melayu"], ["km", "ខ្មែរ"], ["lo", "ລາວ"], ["he", "עברית"]];
+  var RTL = { ar: 1, ur: 1, he: 1 };
   // ภาษา → ประเทศของมาตรฐาน · อังกฤษใช้หลายประเทศ จึงตามประเทศของภาษาคู่ หรือข้อกำหนดโครงการ
   var LANG_CC = window.LANG_CC || {};
   var CODE = window.CC_OF || {};
@@ -24,8 +24,9 @@
   }
   $("lang1").innerHTML = opts(LANGS, siteLang === "en" ? EN_DEF : LANGS.some(function (x) { return x[0] === siteLang; }) ? siteLang : "th");
   $("lang2").innerHTML = opts(LANGS, siteLang === "th" ? EN_DEF : "th");
+  function zr(c) { var z = window.REGION && siteLang !== "th" ? window.REGION.list(siteLang) : [], i = z.indexOf(c); return i >= 0 ? i : c === "TH" ? 900 : 999; } /* countries that use the language of the page come first */
   function ccOpts(none) {
-    var SP = window.StdPick, list = LAW.map(function (x) { return [CODE[x.country], SP ? SP.label(CODE[x.country]) : x.countryTh + " · " + x.country]; }).filter(function (x) { return x[0]; }).sort(function (a, b) { return a[0] === "TH" ? -1 : b[0] === "TH" ? 1 : a[1].localeCompare(b[1], siteLang); });
+    var SP = window.StdPick, list = LAW.map(function (x) { return [CODE[x.country], SP ? SP.label(CODE[x.country]) : x.countryTh + " · " + x.country]; }).filter(function (x) { return x[0]; }).sort(function (a, b) { return zr(a[0]) - zr(b[0]) || a[1].localeCompare(b[1], siteLang); });
     return (none ? '<option value="">' + esc(none) + "</option>" : "") + '<option value="INT">ตามข้อกำหนดโครงการ (กรอกค่าเอง)</option>' + list.map(function (x) { return '<option value="' + x[0] + '">' + esc(x[1]) + "</option>"; }).join("");
   }
   $("c1").innerHTML = ccOpts(""); $("c2").innerHTML = ccOpts("ไม่เทียบประเทศที่ 2");
@@ -60,6 +61,16 @@
     else if (t.id === "sheet") drawCc();
   });
   $("swapPick").addEventListener("click", function () { var a = $("lang1").value; $("lang1").value = $("lang2").value; $("lang2").value = a; if (touched.c1 || touched.c2) { var x = $("c1").value, y = $("c2").value; if (y) { $("c1").value = y; $("c2").value = x; } } follow(); }); // สลับลำดับภาษาก่อนสร้างเอกสาร · บรรทัดหลักและกล่องกรอกย้ายตาม
+  /* 3 Nov 2026: site coordinates. They stay on this device and print on the sheet. No map script loads and no key is used: the link opens Google Maps in a new tab. */
+  function geoVal() { var g = $("geo"), m = g ? /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/.exec(g.value) : null; return m && Math.abs(+m[1]) <= 90 && Math.abs(+m[2]) <= 180 ? m[1] + ", " + m[2] : ""; }
+  function geoDraw() { var a = $("geoMap"); if (!a) return; var g = geoVal(); a.hidden = !g; if (g) a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(g.replace(" ", "")); }
+  if ($("geoBtn")) {
+    $("geo").addEventListener("input", geoDraw);
+    $("geoBtn").addEventListener("click", function () {
+      if (!navigator.geolocation) { say("เครื่องนี้ไม่รองรับการระบุตำแหน่ง พิมพ์พิกัดเองได้", true); return; }
+      navigator.geolocation.getCurrentPosition(function (p) { $("geo").value = p.coords.latitude.toFixed(5) + "," + p.coords.longitude.toFixed(5); geoDraw(); }, function () { say("เปิดสิทธิ์ตำแหน่งในเบราว์เซอร์ หรือพิมพ์พิกัดเองได้", true); }, { enableHighAccuracy: true, timeout: 15000 });
+    });
+  }
   var q = new URLSearchParams(location.search);
   if (q.get("item") && sheets.some(function (x) { return x.id === q.get("item"); })) $("sheet").value = q.get("item");
   if (q.get("lang") === "en") $("lang1").value = EN_DEF; else if (q.get("lang") && LANGS.some(function (x) { return x[0] === q.get("lang"); })) $("lang1").value = q.get("lang");
@@ -304,7 +315,7 @@
     var pick2 = nLang() === 2 ? v("lang2") : "", pick1 = v("lang1"); if (base(pick1) === base(pick2)) { say("เลือกภาษาที่ 2 ให้ต่างจากภาษาที่ 1", true); return; }
     busy = true; var b = f.querySelector("button[type=submit]"), old = b.textContent; b.disabled = true; b.textContent = "กำลังสร้างเอกสาร…"; say("ครั้งแรกของภาษานั้นอาจใช้เวลาประมาณ 1 นาที เพราะระบบแปลและตรวจทุกช่อง");
     B.call("docBuild", { token: tok, sheet: v("sheet"), lang1: base(pick1), lang2: base(pick2), std: v("c1"), std2: v("c2"), stdName: v("stdName"), stds: window.StdPick && $("stdBox") ? window.StdPick.selected($("stdBox")) : [] })
-      .then(function (r) { say(""); render(enDoc(r.doc, /^en-/.test(pick1) ? pick1 : pick2), { project: v("project"), contractor: v("contractor"), location: v("location") }); })
+      .then(function (r) { say(""); render(enDoc(r.doc, /^en-/.test(pick1) ? pick1 : pick2), { project: v("project"), contractor: v("contractor"), location: [v("location"), geoVal()].filter(Boolean).join(" · ") }); })
       .catch(function (e) { say(e.message || "สร้างเอกสารไม่สำเร็จ ลองใหม่อีกครั้ง", true); })
       .then(function () { busy = false; b.disabled = false; b.textContent = old; });
   });

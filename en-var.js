@@ -51,10 +51,6 @@
     G2U.forEach(function (r) { t = t.replace(r.re, function (m) { return cap(m, r.to); }); });
     return t;
   }
-  function cur() {
-    var v = ""; try { v = localStorage.getItem("build_en") || ""; } catch (e) {}
-    if (v === "US" || v === "GB") return v;
-    return /^en-(gb|au|nz|ie|za|in|sg|my|hk|pk|ng|ke|mt)/i.test(navigator.language || "") ? "GB" : "US";
-  }
+  function cur() { return window.REGION ? window.REGION.ev() : "US"; }
   window.EnVar = { conv: conv, cur: cur, loc: function () { return "en-" + cur(); } };
 })();
