@@ -1,0 +1,1929 @@
+(function () {
+  "use strict";
+  var B = window.BUILD, esc = B.esc, ST = B.ST, P = B.P, M = B.M, q = B.preview;
+  var $ = function (id) {
+    return document.getElementById(id);
+  };
+  $("yr").textContent = new Date().getFullYear();
+  if (B.demo) $("demo").hidden = false;
+  if (q) [].forEach.call(document.querySelectorAll('a[href$=".html"]'), function (a) {
+    a.href = a.getAttribute("href") + q;
+  });
+  var me = null, mode = "reg", busy = false, pending = null, forgot = { step: 1, email: "" },
+    regWait = null, tab = "home", avDraft = null, payWatch = null;
+  var want = (function () {
+    try {
+      return new URLSearchParams(location.search).get("buy") || "";
+    } catch (e) {
+      return "";
+    }
+  })();
+  // รายการที่ติ๊กไว้ให้ก่อน: จากลิงก์ ?buy=F-01,B-ST (ตะกร้า) หรือจากตะกร้าที่ค้างในเครื่องนี้
+  var wantList = (want ? want.split(",") : (B.cart ? B.cart.get() : [])).map(function (k) {
+    return k === "F-01" ? "B-PL" : k;
+  }); // ลิงก์เก่า F-01 (ก่อนแยกเข็มตอกและเข็มเจาะ 23 ต.ค. 2026) = ชุดเสาเข็ม
+  var HERE = location.origin + location.pathname; // ที่อยู่กลับของ LINE และ TikTok ต้องตรงกับที่ตั้งในหน้าผู้พัฒนาของแต่ละค่าย
+  var PROV = { google: "Google", line: "LINE", facebook: "Facebook", tiktok: "TikTok" }, PLIST = ["google",
+    "line", "facebook", "tiktok"];
+  var ON = {
+    google: B.demo || /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""),
+    line: B.demo || /^\d{8,12}$/.test(String(M.lineChannelId || "")),
+    facebook: B.demo || /^\d{8,20}$/.test(String(M.facebookAppId || "")),
+    tiktok: B.demo || /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey || ""))
+  };
+  // อวาตาร์สัตว์ 12 ตัวของแก๊งสัตว์ (รหัสตรงกับหลังบ้าน Code.gs ตัวแปร AVATARS)
+  var AV = [["otter", "นากช่าง"], ["koon", "คูน"], ["sloth", "ลอธ"], ["somo", "ส้มโอ"], ["nim",
+    "นิ่ม"], ["jib", "จิ๊บ"], ["kaew", "แก้ว"], ["langan", "หลังอาน"], ["plai", "พลายพ่น"], ["jok",
+      "จอก"], ["sinsae", "ซินแส"], ["hoi", "ห้อย"]];
+  var PROVINCES = ["กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น",
+    "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่",
+    "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", "นครราชสีมา", "นครศรีธรรมราช", "นครสวรรค์",
+    "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์",
+    "ปราจีนบุรี", "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก",
+    "เพชรบุรี", "เพชรบูรณ์", "แพร่", "ภูเก็ต", "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร",
+    "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", "ราชบุรี", "ลพบุรี", "ลำปาง", "ลำพูน", "เลย", "ศรีสะเกษ",
+    "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี",
+    "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", "หนองบัวลำภู",
+    "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"];
+  var PAYM = B.pay.LABEL;
+  var TABS = [["home", "ภาพรวม"], ["docs", "เอกสารของฉัน"], ["orders", "คำสั่งซื้อ"], ["shop",
+    "ซื้อฉบับมืออาชีพ"], ["ask", "ถามร้าน"], ["profile", "โปรไฟล์"], ["security", (function () {
+      try {
+        return (localStorage.getItem("build_lang") || "th") === "th";
+      } catch (e) {
+        return true;
+      }
+    })() ? "ความปลอดภัย" : "ความปลอดภัยของบัญชี"]];
+
+  function say(t, bad) {
+    var m = $("msg");
+    if (!t) {
+      m.hidden = true;
+      return;
+    }
+      m.hidden = false;
+    m.className = "msg " + (bad ? "bad" : "ok");
+    m.textContent = t;
+    m.scrollIntoView({ block: "nearest" });
+  }
+    function lock(on) {
+      busy = on;
+      [].forEach.call(document.querySelectorAll("#view button"), function (b) {
+        b.disabled = on;
+      });
+    }
+    function run(p, okText) {
+      if (busy) return;
+      lock(true);
+      return p.then(function (r) {
+        lock(false);
+        if (okText) say(okText);
+        return r;
+      }).catch(function (e) {
+        lock(false);
+        say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true);
+      });
+    }
+    function docLink(id) {
+      return '<a class="b pri sm" href="doc.html?item=' + encodeURIComponent(B.rootOf(id)) + "&cc="
+        + encodeURIComponent(B.varOf(id)) + '">สร้างเอกสาร ' + esc(B.rootOf(id)) + " " + esc(B.LANGS[B.varOf(id)]
+          || "") + "</a>";
+    }
+    function title(id) {
+      var x = B.find(id);
+      return (x ? B.code(x) + " " + x.title : id) + (B.isCtry(B.varOf(id)) ? " · " + B.LANGS[B.varOf(id)] : "")
+        + (B.isUpd(id) ? " · แบบรับฉบับใหม่ตลอด" : "");
+    }
+    // เข้าระบบสำเร็จ: ถ้ามาจากหน้าชำระเงิน (ร้านแบบอีคอมเมิร์ซ 24 ต.ค. 2026) พากลับไปหน้านั้น ตะกร้ายังอยู่ครบ
+    function nextPage() {
+      var n = "";
+      try {
+        n = sessionStorage.getItem("build_next") || "";
+        sessionStorage.removeItem("build_next");
+      } catch (e) {} return /^(checkout\.html(\?preview=1)?|doc\.html(\?[\w=&%.-]*)?)$/.test(n) ? n : "";
+    }
+    function signedIn(r) {
+      B.token.set(r.token);
+      pending = null;
+      regWait = null;
+      var nx = nextPage();
+      if (nx) {
+        location.replace(nx);
+        return new Promise(function () {});
+      }
+        return refresh(true);
+    }
+    function dmy(iso) {
+      var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || ""));
+      return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || "");
+    }
+
+    // ---------- รหัสผ่าน (กติกาเดียวกับหลังบ้าน · ผู้ใช้เลือก 18 ต.ค. 2026: มาตรฐานทั่วไป) ----------
+    var COMMON = ["12345678", "123456789", "1234567890", "password", "password1", "password123",
+      "passw0rd", "p@ssw0rd", "qwerty12", "qwerty123", "1q2w3e4r", "q1w2e3r4", "1qaz2wsx",
+      "abc12345", "abcd1234", "a1234567", "aa123456", "asdf1234", "zxcvbnm1", "iloveyou1",
+      "admin123", "welcome1", "letmein1", "thailand1", "bangkok1", "bangkok123", "test1234",
+      "11223344", "12341234", "12121212", "123123123", "987654321"];
+  function pwRules(p, email, name) {
+    p = String(p || "");
+    var low = p.toLowerCase(), local = String(email || "").split("@")[0].toLowerCase().replace(/[^a-z0-9]/g,
+      ""), nm = String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+    return [
+      ["len", "อย่างน้อย 8 ตัวอักษร", p.length >= 8 && p.length <= 128],
+      ["mix", "มีทั้งตัวอักษรและตัวเลข", /[A-Za-zก-๎]/.test(p) && /[0-9๐-๙]/.test(p)],
+      ["easy", "ไม่ใช่รหัสที่เดาง่ายหรือตัวซ้ำ", !!p && COMMON.indexOf(low) < 0 && !/^(.)\1+$/.test(p)
+        && !/(.)\1{4,}/.test(p) && !/^(.{1,4})\1+$/.test(low)],
+      ["own", "ไม่มีชื่อหรือชื่ออีเมลของคุณอยู่ในรหัส", !!p && !(local.length >= 4 && low.replace(/[^a-z0-9]/g,
+        "").indexOf(local) >= 0) && !(nm.length >= 4 && low.replace(/\s+/g, "").indexOf(nm) >= 0)]
+    ];
+  }
+    function pwScore(p) {
+      p = String(p || "");
+      var s = 0;
+      if (p.length >= 8) s++;
+      if (p.length >= 12) s++;
+      if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++;
+      if (/[^A-Za-z0-9฀-๿\s]/.test(p)) s++;
+      if (/[0-9]/.test(p)) s++;
+      return Math.min(4, s);
+    }
+    // ช่องรหัสผ่านพร้อมปุ่มแสดงรหัส · meter = แถบความแข็งแรงและรายการกติกา (ใช้กับรหัสผ่านใหม่)
+    function pwField(name, label, ac, meter) {
+      return '<label>' + label + '<span class="pw"><input type="password" name="' + name + '" maxlength="128" autocomplete="'
+        + ac + '" required' + (meter ? ' data-pw="1" aria-describedby="pwr-' + name + '"' : "") + '><button type="button" class="eye" data-eye="1" aria-label="แสดงรหัสผ่าน">แสดง</button></span></label>'
+        +
+        (meter ? '<div class="pwm" aria-hidden="true"><i id="pwb-' + name + '"></i></div><ul class="pwr" id="pwr-'
+          + name + '">' + pwRules("").map(function (r) {
+            return '<li data-r="' + r[0] + '">' + r[1] + "</li>";
+          }).join("") + '<li data-r="lvl" class="lvl">ความแข็งแรง: -</li></ul>' : "");
+    }
+    function pwPaint(f) {
+      if (!f) return;
+      var inp = f.querySelector("input[data-pw]");
+      if (!inp) return;
+      var email = f.elements.email ? f.elements.email.value : (forgot.email || (me && me.member && me.member.email)
+        || ""), name = f.elements.name ? f.elements.name.value : ((me && me.member && me.member.name)
+          || "");
+      var rules = pwRules(inp.value, email, name), list = $("pwr-" + inp.name), bar = $("pwb-" + inp.name),
+        sc = pwScore(inp.value), allOk = rules.every(function (r) {
+          return r[2];
+        });
+      rules.forEach(function (r) {
+        var li = list && list.querySelector('[data-r="' + r[0] + '"]');
+        if (li) li.className = r[2] ? "ok" : "";
+      });
+      var lv = !inp.value ? "-" : !allOk ? "ยังใช้ไม่ได้" : ["พอใช้", "พอใช้", "ดี", "แข็งแรง",
+        "แข็งแรงมาก"][sc];
+      var lvl = list && list.querySelector('[data-r="lvl"]');
+      if (lvl) lvl.textContent = "ความแข็งแรง: " + lv;
+      if (bar) {
+        bar.style.width = (!inp.value ? 0 : allOk ? 40 + sc * 15 : 15) + "%";
+        bar.className = !allOk ? "w" : sc >= 3 ? "s" : "m";
+      }
+        var p2 = f.querySelector("input[name$='2']");
+      if (p2 && p2.value) p2.setCustomValidity(p2.value === inp.value ? "" : "ไม่ตรงกัน");
+    }
+    // ตรวจก่อนส่ง: ผ่านทุกข้อและ 2 ช่องตรงกัน · คืนข้อความผิดข้อแรก (หลังบ้านตรวจซ้ำเสมอ)
+    function pwOk(f, a, b) {
+      var p = f.elements[a].value, email = f.elements.email ? f.elements.email.value : (forgot.email
+        || (me && me.member && me.member.email) || ""), name = f.elements.name ? f.elements.name.value : ((me
+          && me.member && me.member.name) || "");
+      var bad1 = pwRules(p, email, name).filter(function (r) {
+        return !r[2];
+      })[0];
+      if (bad1) return "รหัสผ่าน: " + bad1[1];
+      if (b && f.elements[b] && f.elements[b].value !== p) return "รหัสผ่านทั้ง 2 ช่องไม่ตรงกัน";
+      return "";
+    }
+    // ผลจาก social: เข้าระบบเลย หรือต้องยืนยันการสมัครก่อน (สมาชิกใหม่)
+    function afterSocial(r) {
+      if (r.pending) {
+        pending = r;
+        say("");
+        pendingView();
+        return;
+      }
+        return signedIn(r);
+    }
+
+    // ---------- เข้าสู่ระบบด้วยบริการภายนอก ----------
+    var ICON = {
+      google: '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>',
+      line: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 2.5C6.5 2.5 2 6.1 2 10.6c0 4 3.6 7.4 8.4 8 .3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.6 1.1-.5 6-3.5 8.2-6 1.5-1.7 2.2-3.3 2.2-5.1 0-4.5-4.5-8-10-8zM8.3 13H6.3c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.4h1.5c.3 0 .5.2.5.5s-.2.5-.5.5zm2.1-.5c0 .3-.2.5-.5.5s-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.9zm4.7 0c0 .2-.1.4-.3.5h-.2c-.2 0-.3-.1-.4-.2l-2-2.7v2.4c0 .3-.2.5-.5.5s-.5-.2-.5-.5V8.6c0-.2.1-.4.3-.5h.2c.2 0 .3.1.4.2l2 2.7V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.9zm3.2-2.5c.3 0 .5.2.5.5s-.2.5-.5.5h-1.5v.9h1.5c.3 0 .5.2.5.5s-.2.5-.5.5h-2c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5h2c.3 0 .5.2.5.5s-.2.5-.5.5h-1.5v.9h1.5z"/></svg>',
+      facebook: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>',
+      tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.8 5.8 0 1 0 5 5.7V9.1a7.4 7.4 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.3-1.6z"/></svg>'
+    };
+  function socButtons(act, only) {
+    var list = (only || PLIST).filter(function (p) {
+      return ON[p];
+    });
+    if (!list.length) return "";
+    return '<div class="soc">' + list.map(function (p) {
+      if (p === "google" && !B.demo) return '<div class="gwrap" id="g-btn" data-act="' + act + '"></div>';
+      var cls = p === "line" ? "sb line" : p === "facebook" ? "sb fb" : p === "tiktok" ? "sb tt" : "sb";
+      var label = (act === "link" ? "เชื่อมบัญชี " : "ดำเนินการต่อด้วย ") + PROV[p] + (B.demo ? " (ทดลอง)" : "");
+      return '<button type="button" class="' + cls + '" data-soc="' + p + '" data-act="' + act + '">'
+        + ICON[p] + "<span>" + label + "</span></button>";
+    }).join("") + "</div>";
+  }
+    // Google: ปุ่มของ Google เอง (Google Identity Services)
+    var gReady = false, gAct = "login";
+  function gDraw() {
+    var el = $("g-btn");
+    if (!el || B.demo) return;
+    gAct = el.dataset.act || "login";
+    if (!gReady) {
+      if (!document.getElementById("gsi")) {
+        var sc = document.createElement("script");
+        sc.id = "gsi";
+        sc.src = "https://accounts.google.com/gsi/client";
+        sc.async = true;
+        sc.onload = function () {
+          gReady = true;
+          google.accounts.id.initialize({ client_id: M.googleClientId, callback: gDone, ux_mode: "popup" });
+          gDraw();
+        };
+        document.head.appendChild(sc);
+      }
+        return;
+    }
+      google.accounts.id.renderButton(el, {
+        theme: "outline",
+        size: "large",
+        width: Math.min(360, el.clientWidth || 320),
+        text: gAct === "link" ? "continue_with" : mode === "reg" ? "signup_with" : "signin_with",
+        locale: "th",
+        shape: "rectangular"
+      });
+  }
+    function gDone(resp) {
+      soc("google", gAct, { credential: resp.credential });
+    }
+    // LINE และ TikTok: เปิดหน้าเข้าสู่ระบบของค่ายนั้น แล้วกลับมาที่หน้านี้พร้อมรหัสชั่วคราว (หลังบ้านแลกรหัสด้วยคีย์ลับของร้าน)
+    function b64url(buf) {
+      return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g,
+        "_").replace(/=+$/, "");
+    }
+    function lineGo(act) {
+      var st = {
+        state: B.rand(16),
+        nonce: B.rand(16),
+        verifier: B.rand(32),
+        act: act,
+        t: Date.now()
+      };
+      return crypto.subtle.digest("SHA-256", new TextEncoder().encode(st.verifier)).then(function (h) {
+        try {
+          sessionStorage.setItem("build_line_auth", JSON.stringify(st));
+        } catch (e) {}
+          location.href = (M.lineAuthUrl || "https://access.line.me/oauth2/v2.1/authorize") + "?response_type=code&client_id="
+          + encodeURIComponent(M.lineChannelId) + "&redirect_uri=" + encodeURIComponent(HERE) + "&state="
+          + st.state + "&scope=" + encodeURIComponent("profile openid email") + "&nonce=" + st.nonce
+          + "&code_challenge=" + b64url(h) + "&code_challenge_method=S256&ui_locales=th" + (M.lineBotPrompt
+            ? "&bot_prompt=" + encodeURIComponent(M.lineBotPrompt) : "");
+      });
+    }
+    function tiktokGo(act) {
+      var st = { state: B.rand(16), act: act, t: Date.now() };
+      try {
+        sessionStorage.setItem("build_tt_auth", JSON.stringify(st));
+      } catch (e) {}
+        location.href = "https://www.tiktok.com/v2/auth/authorize/?client_key=" + encodeURIComponent(M.tiktokClientKey)
+        + "&response_type=code&scope=user.info.basic&redirect_uri=" + encodeURIComponent(HERE) + "&state="
+        + st.state;
+      return Promise.resolve();
+    }
+    function oauthBack() { // กลับจาก LINE หรือ TikTok: ตรวจ state ก่อนส่งรหัสไปหลังบ้าน แล้วล้างพารามิเตอร์ออกจากแถบที่อยู่
+      var sp;
+      try {
+        sp = new URLSearchParams(location.search);
+      } catch (e) {
+        return null;
+      }
+        if (!sp.get("state") || (!sp.get("code") && !sp.get("error"))) return null;
+      var keys = { line: "build_line_auth", tiktok: "build_tt_auth" }, hit = null;
+      Object.keys(keys).forEach(function (p) {
+        var st = null;
+        try {
+          st = JSON.parse(sessionStorage.getItem(keys[p]) || "null");
+        } catch (e) {} if (st && st.state === sp.get("state")) hit = { p: p, st: st };
+      });
+      try {
+        sessionStorage.removeItem("build_line_auth");
+        sessionStorage.removeItem("build_tt_auth");
+        history.replaceState(null, "", HERE + (q || ""));
+      } catch (e) {}
+        if (sp.get("error")) {
+          say("ยกเลิกการเข้าสู่ระบบ" + (hit ? "ด้วย " + PROV[hit.p] : ""), true);
+          return null;
+        }
+        if (!hit || Date.now() - hit.st.t > 600000) {
+          say("การเข้าสู่ระบบหมดเวลาหรือไม่ตรงกัน กดปุ่มอีกครั้ง", true);
+          return null;
+        }
+        var data = hit.p === "line" ? {
+          code: sp.get("code"),
+          redirectUri: HERE,
+          nonce: hit.st.nonce,
+          verifier: hit.st.verifier
+        } : { code: sp.get("code"), redirectUri: HERE };
+      return { p: hit.p, act: hit.st.act, data: data };
+    }
+    // Facebook: Facebook SDK เปิดหน้าต่างเข้าสู่ระบบ แล้วหลังบ้านตรวจโทเคนด้วย debug_token
+    var fbWait = null;
+  function fbSdk() {
+    if (fbWait) return fbWait;
+    fbWait = new Promise(function (res, rej) {
+      if (window.FB) {
+        res(window.FB);
+        return;
+      }
+        window.fbAsyncInit = function () {
+          window.FB.init({
+            appId: String(M.facebookAppId),
+            cookie: false,
+            xfbml: false,
+            version: M.fbVersion || "v26.0"
+          });
+          res(window.FB);
+        };
+      var sc = document.createElement("script");
+      sc.src = "https://connect.facebook.net/th_TH/sdk.js";
+      sc.async = true;
+      sc.crossOrigin = "anonymous";
+      sc.onerror = function () {
+        fbWait = null;
+        rej(new Error("โหลด Facebook ไม่สำเร็จ ลองใหม่อีกครั้ง"));
+      };
+      document.head.appendChild(sc);
+    });
+    return fbWait;
+  }
+    function fbGo() {
+      return fbSdk().then(function (FB) {
+        return new Promise(function (res, rej) {
+          FB.login(function (r) {
+            if (r && r.authResponse && r.authResponse.accessToken) res(r.authResponse.accessToken);
+            else rej(new Error("ยกเลิกการเข้าสู่ระบบด้วย Facebook"));
+          }, { scope: "public_profile,email" });
+        });
+      })
+        .then(function (t) {
+          return { accessToken: t };
+        });
+    }
+    // ส่งผลไปหลังบ้าน: act = login (เข้าสู่ระบบหรือสมัคร) หรือ link (เชื่อมกับบัญชีที่เข้าอยู่)
+    function soc(p, act, data) {
+      var cb = document.querySelector("#f-reg input[name=consent]");
+      var body = { provider: p };
+      Object.keys(data).forEach(function (k) {
+        body[k] = data[k];
+      });
+      if (act === "link") return run(B.call("link", body).then(function (r) {
+        me.member = mergeMember(r.member);
+        tab = "security";
+        paint();
+      }), "เชื่อมบัญชี " + PROV[p] + " แล้ว");
+      body.consent = !!(cb && cb.checked);
+      return run(B.call("social", body).then(afterSocial), "");
+    }
+    function socClick(p, act) {
+      if (B.demo) { // โหมดทดลอง: ตัวจำลองตอบแทนผู้ให้บริการ (LINE และ TikTok ทดลองไม่มีอีเมล เพื่อให้เห็นขั้นกรอกและยืนยันอีเมล)
+        var back = HERE.replace(/[^\/]*$/, "") + "member.html";
+        var d = p === "google" ? { credential: "EMU_GOOGLE_" + B.rand(2) } : p === "line" ? { code: "EMU_LINE_"
+          + B.rand(2), redirectUri: back, nonce: B.rand(8) } : p === "tiktok" ? { code: "EMU_TT_" + B.rand(2),
+            redirectUri: back } : { accessToken: "EMU_FB_" + B.rand(12) };
+        return soc(p, act, d);
+      }
+        if (p === "line") {
+          run(lineGo(act), "");
+          return;
+        }
+        if (p === "tiktok") {
+          run(tiktokGo(act), "");
+          return;
+        }
+        if (p === "facebook") {
+          if (busy) return;
+          lock(true);
+          fbGo().then(function (d) {
+            lock(false);
+            soc("facebook", act, d);
+          }).catch(function (e) {
+            lock(false);
+            say(e.message, true);
+          });
+        }
+    }
+
+    // ---------- ยังไม่เข้าสู่ระบบ ----------
+    function anySoc() {
+      return PLIST.some(function (p) {
+        return ON[p];
+      });
+    }
+    function authView() {
+      var perks = (M.perks || []).map(function (p) {
+        return "<li>" + esc(p) + "</li>";
+      }).join("");
+      if (mode === "forgot") return forgotView();
+      if (mode === "verify" && regWait) return verifyView();
+      var tabs = '<div class="tabs2"><button class="chip" type="button" data-mode="reg" aria-pressed="'
+        + (mode === "reg") + '">สมัครสมาชิก</button><button class="chip" type="button" data-mode="in" aria-pressed="'
+        + (mode === "in") + '">เข้าสู่ระบบ</button></div>';
+      var consent = '<label class="ck"><input type="checkbox" name="consent" required><span>' + esc(M.consent
+        || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>';
+      var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>'
+        + pwField("pass", "ตั้งรหัสผ่าน", "new-password", true) + pwField("pass2",
+          "ยืนยันรหัสผ่าน (พิมพ์ซ้ำอีกครั้ง)", "new-password", false) + '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label>'
+        + consent + '<button class="b pri" type="submit">สมัครสมาชิกด้วยอีเมล</button><p class="note" style="margin:0">ระบบส่งรหัส 6 หลักไปที่อีเมล เพื่อยืนยันว่าเป็นอีเมลของคุณ ก่อนสร้างบัญชี</p></form>';
+      var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>'
+        + pwField("pass", "รหัสผ่าน", "current-password", false) + '<button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="forgot">ลืมรหัสผ่าน หรือสมัครด้วย Google LINE Facebook TikTok แล้วอยากตั้งรหัสผ่าน</button></p></form>';
+      var soc = socButtons("login");
+      $("view").innerHTML = '<h1 class="pageh">สมาชิก</h1><p class="lead" style="margin:0 0 16px">'
+        + (anySoc() ? "สมัครฟรี · ใช้บัญชีที่มีอยู่แล้วได้ ไม่ต้องจำรหัสผ่านใหม่" : "สมัครฟรีด้วยอีเมล ใช้เวลาไม่ถึง 1 นาที")
+        + '</p>' +
+        '<div class="card pad">' + tabs + (soc ? soc + '<p class="note" style="text-align:center;margin:8px 0 0">'
+          + (mode === "reg" ? "สมัครครั้งแรกด้วยปุ่มด้านบน ระบบจะขอให้กดยินยอมก่อนสร้างบัญชี" : "เข้าสู่ระบบด้วยบัญชีที่เคยใช้สมัคร")
+          + '</p><div class="or">หรือใช้อีเมล</div>' : "") + (mode === "reg" ? reg : inn) + "</div>"
+        + (perks ? '<div class="card pad" style="margin-top:14px"><h2 style="margin:0 0 8px;font-size:18px">สมาชิกได้อะไร</h2><ul class="tick">'
+          + perks + "</ul></div>" : "");
+      gDraw();
+    }
+    function pendingView() {
+      var p = pending, need = !!p.needEmail, sent = p.codeEmail || "", demoHint = "";
+      if (B.demo && sent) {
+        var mm = B.demoMail(sent);
+        var mt = mm && /คือ (\d{6})/.exec(mm.body);
+        demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>"
+          + mt[1] + "</b>" : "") + "</p>";
+      }
+        $("view").innerHTML = '<h1 class="pageh">ยืนยันการสมัครสมาชิก</h1><p class="lead" style="margin:0 0 16px">ด้วยบัญชี '
+        + esc(PROV[p.provider] || p.provider) + "</p>" +
+        '<form class="f card pad" id="f-pend" novalidate><p style="margin:0">ชื่อ: <b>' + pv(p.name
+          || "-") + "</b>" + (p.email ? "<br>อีเมล: <b>" + pv(p.email) + "</b>" : "") + "</p>" +
+        (need ? '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือนคำสั่งซื้อ<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required value="'
+          + esc(sent) + '"' + (sent ? " readonly" : "") + '></label><p class="note" style="margin:0">บัญชี '
+          + esc(PROV[p.provider]) + " ไม่ได้ส่งอีเมลมาให้ร้าน จึงขออีเมลที่คุณใช้งาน และยืนยันด้วยรหัส 6 หลัก</p>" : "")
+        +
+        (sent ? demoHint + '<label>รหัส 6 หลักที่ส่งไปที่ ' + esc(sent) + '<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-pend="again">ส่งรหัสใหม่</button> · <button type="button" class="linkbtn" data-pend="edit">แก้อีเมล</button></p>' : "")
+        +
+        '<label class="ck"><input type="checkbox" name="consent" required' + (p.consentOk ? " checked" : "")
+        + '><span>' + esc(M.consent || "ฉันยินยอมให้เก็บข้อมูลเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html'
+        + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>' +
+        '<button class="b pri" type="submit">' + (need && !sent ? "ส่งรหัสยืนยันไปที่อีเมล" : "ยืนยันและสร้างบัญชี")
+        + '</button><p class="note" style="margin:0">ถ้ามีบัญชีด้วยอีเมลอยู่แล้ว ให้ <button type="button" class="linkbtn" data-mode="in">เข้าสู่ระบบด้วยอีเมล</button> แล้วกด เชื่อมบัญชี ในเมนู ความปลอดภัย</p></form>';
+      var c = document.querySelector("#f-pend input[name=code]");
+      if (c) c.focus();
+    }
+    // ยืนยันอีเมลตอนสมัคร: ระบบส่งรหัส 6 หลัก · บัญชีถูกสร้างเมื่อใส่รหัสถูกเท่านั้น
+    function verifyView() {
+      var w = regWait, demoHint = "";
+      if (B.demo) {
+        var mm = B.demoMail(w.email);
+        var mt = mm && /คือ (\d{6})/.exec(mm.body);
+        demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>"
+          + mt[1] + "</b>" : "") + "</p>";
+      }
+        $("view").innerHTML = '<h1 class="pageh">ยืนยันอีเมล</h1><p class="lead" style="margin:0 0 16px">อีกขั้นเดียว บัญชีจะถูกสร้างเมื่อยืนยันอีเมลแล้ว</p>'
+        +
+        '<form class="f card pad" id="f-vr" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัส 6 หลักไปที่ <b>'
+        + pv(w.email) + '</b> แล้ว ใช้ได้ 15 นาที · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะหรือโปรโมชัน</p>'
+        +
+        '<label>รหัส 6 หลักจากอีเมล<input type="text" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required></label>'
+        +
+        '<button class="b pri" type="submit">ยืนยันและสร้างบัญชี</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-vr="again">ส่งรหัสใหม่</button> · <button type="button" class="linkbtn" data-vr="edit">แก้อีเมล</button></p></form>';
+      var c = document.querySelector("#f-vr input[name=code]");
+      if (c) c.focus();
+    }
+    function forgotView() {
+      var demoHint = "";
+      if (B.demo && forgot.step === 2) {
+        var mm = B.demoMail(forgot.email);
+        var mt = mm && /รหัสของคุณคือ (\d{6})/.exec(mm.body);
+        demoHint = '<p class="msg ok" style="margin:0">โหมดทดลอง: อีเมลไม่ได้ส่งจริง ' + (mt ? "รหัสคือ <b>"
+          + mt[1] + "</b>" : "ไม่มีบัญชีของอีเมลนี้ในเครื่อง ระบบจึงไม่ได้ส่งรหัส") + "</p>";
+      }
+        $("view").innerHTML = '<h1 class="pageh">ตั้งรหัสผ่านใหม่</h1><p class="lead" style="margin:0 0 16px">ระบบส่งรหัส 6 หลักไปที่อีเมลที่สมัครไว้ ใช้ได้ 15 นาที</p>'
+        +
+        (forgot.step === 1 ? '<form class="f card pad" id="f-fg1" novalidate><label>อีเมลที่สมัครไว้<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required value="'
+          + esc(forgot.email) + '"></label><button class="b pri" type="submit">ส่งรหัสไปที่อีเมล</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>'
+          : '<form class="f card pad" id="f-fg2" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัสไปที่ <b>'
+          + pv(forgot.email) + '</b> แล้ว (ถ้าเป็นอีเมลสมาชิก) · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะ</p><label>รหัส 6 หลัก<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label>'
+          + pwField("newPass", "รหัสผ่านใหม่", "new-password", true) + pwField("newPass2",
+            "ยืนยันรหัสผ่านใหม่ (พิมพ์ซ้ำ)", "new-password", false) + '<button class="b pri" type="submit">ตั้งรหัสผ่านใหม่และเข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fg="again">ขอรหัสใหม่</button> · <button type="button" class="linkbtn" data-mode="in">กลับไปหน้าเข้าสู่ระบบ</button></p></form>');
+    }
+
+    // ---------- เข้าสู่ระบบแล้ว: ตัวช่วย ----------
+    function mergeMember(m) {
+      var src = me && me.member && me.member.avatarSrc;
+      if (m && m.avatar === "photo" && !m.avatarSrc && src) m.avatarSrc = src;
+      return m;
+    }
+    function avatarHtml(m, cls) {
+      var a = String(m.avatar || ""), k = /^a:(.+)$/.exec(a), init = esc((String(m.name || "?").trim()[0]
+        || "?").toUpperCase());
+      if (k) return '<img class="av ' + (cls || "") + '" src="img/avatar/' + esc(k[1]) + '.jpg" alt="">';
+      if (a === "photo" && m.avatarSrc && /^data:image\//.test(m.avatarSrc)) return '<img class="av '
+        + (cls || "") + '" src="' + esc(m.avatarSrc) + '" alt="">';
+      return '<span class="av ini ' + (cls || "") + '" aria-hidden="true">' + init + "</span>";
+    }
+    // หลังบ้านรุ่น 2026-10-23 ขึ้นไปตอบ pay ใน me · รุ่นเก่ายังไม่มีโปรไฟล์เต็ม คลังเอกสาร และชำระออนไลน์ หน้าเว็บจึงซ่อนส่วนนั้นไว้ (ไม่มีปุ่มที่กดแล้วไม่บันทึก)
+    function full() {
+      return !!(me && me.pay);
+    }
+    // ---------- ประทับสิทธิ์ผู้ซื้อลงไฟล์ฉบับมืออาชีพ (คำสั่งผู้ใช้ 23 ต.ค. 2026) ----------
+    // ข้อมูลผู้ซื้อและเวลามาจากหลังบ้าน (ไม่ใช่เครื่องลูกค้า) · เบราว์เซอร์วาดข้อความเป็นภาพ จึงพิมพ์ชื่อภาษาใดก็ได้ · บรรทัดเดียว ตัวเล็ก สีเทา ใต้หัวกระดาษท้ายหน้า ไม่บังเนื้อหา
+    var PDFLIB = {
+      src: "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js",
+      sri: "sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
+    }, pdfLibReady = null;
+  function loadPdfLib() {
+    if (window.PDFLib) return Promise.resolve();
+    if (!pdfLibReady) pdfLibReady = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = PDFLIB.src;
+      s.integrity = PDFLIB.sri;
+      s.crossOrigin = "anonymous";
+      s.referrerPolicy = "no-referrer";
+      s.onload = res;
+      s.onerror = function () {
+        pdfLibReady = null;
+        rej(new Error("pdf-lib"));
+      };
+      document.head.appendChild(s);
+    });
+    return pdfLibReady;
+  }
+    // 2 บรรทัด อังกฤษบน ไทยล่าง (แบบเดียวกับแบบฟอร์ม) · ตัวอักษรอย่างน้อยราว 5.5 pt อ่านได้เมื่อพิมพ์
+    function licLines(l) {
+      var no = l.no || l.order; // เลขสิทธิ์ = เลขคำสั่งซื้อ/รหัสเอกสาร (หลังบ้าน 24 ต.ค. 2026) · รุ่นก่อนหน้าใช้เลขคำสั่งซื้อ
+      return ["Licensed to " + l.name + " (" + l.email + ") · Licence " + no + " · " + (l.plan === "updates"
+        ? "Updates plan" : "This edition") + (l.rev ? " " + dmy(l.rev) : "") + " · Downloaded " + l.at
+        + " · Not for resale or sharing",
+        "สิทธิ์ใช้งานของ " + l.name + " · เลขสิทธิ์ " + no + " · " + (l.plan === "updates" ? "แบบรับฉบับใหม่" : "แบบฉบับนี้")
+        + (l.rev ? " ฉบับ " + dmy(l.rev) : "") + " · ดาวน์โหลด " + l.at + " · ห้ามจำหน่ายหรือแจกจ่ายต่อ"];
+    }
+    function licText(l) {
+      return licLines(l).join("  |  ");
+    }
+    function licPng(lines, wPt, hPt) { // ภาพความละเอียด 4 เท่า ให้คมเมื่อพิมพ์ · พื้นโปร่งใส ไม่บังอะไรบนหน้า
+      var k = 4, c = document.createElement("canvas");
+      c.width = Math.round(wPt * k);
+      c.height = Math.round(hPt * k);
+      var x = c.getContext("2d"), rowH = c.height / lines.length;
+      x.fillStyle = "#4A4A4A";
+      x.textAlign = "center";
+      x.textBaseline = "middle";
+      lines.forEach(function (t, i) {
+        var fs = 6.2 * k;
+        do {
+          x.font = fs + 'px "Segoe UI", "Leelawadee UI", Tahoma, sans-serif';
+          if (x.measureText(t).width <= c.width - 8) break;
+          fs -= 0.25 * k;
+        }
+          while (fs > 4.2 * k);
+        x.fillText(t, c.width / 2, rowH * i + rowH / 2 + 0.5);
+      });
+      return c.toDataURL("image/png");
+    }
+    function stampPdf(j) {
+      return loadPdfLib().then(function () {
+        var L = window.PDFLib, raw = atob(j.b64), u = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i);
+        return L.PDFDocument.load(u).then(function (doc) {
+          var text = licText(j.lic);
+          return doc.embedPng(licPng(licLines(j.lic), 560, 15)).then(function (img) {
+            // วางเหนือบรรทัดท้ายกระดาษเดิมของใบงาน (รหัส · ฉบับ · หน้า อยู่ที่ 22–30 pt จากขอบล่าง วัดจากไฟล์ขอบล่าง 19 มม. จริง 24 ต.ค. 2026) และใต้เนื้อหา (เริ่มเหนือ 54 pt)
+            // 32–47 pt จากขอบล่าง = 11.3–16.6 มม. อยู่ในพื้นที่ที่เครื่องพิมพ์ทั่วไปพิมพ์ได้ (ห่างขอบเกิน 4.2 มม.)
+            doc.getPages().forEach(function (pg) {
+              var sz = pg.getSize(), w = Math.min(560, sz.width - 30);
+              pg.drawImage(img, { x: (sz.width - w) / 2, y: 32, width: w, height: w * 15 / 560 });
+            });
+            doc.setSubject(text);
+            doc.setKeywords(["BUILD TH", j.lic.order, j.lic.member]);
+            doc.setProducer("สร้าง | BUILD TH");
+            doc.setModificationDate(new Date());
+            return doc.save();
+          });
+        });
+      });
+    }
+    function saveBytes(name, bytes) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        URL.revokeObjectURL(a.href);
+        a.remove();
+      }, 4000);
+    }
+    function libOf() {
+      return me.lib || (me.owned || []).map(function (id) {
+        var s = B.find(id) || {};
+        return {
+          id: id,
+          title: s.title || id,
+          rev: s.revDate || "",
+          lastAt: "",
+          lastRev: "",
+          newer: false
+        };
+      });
+    }
+    function payOnline() {
+      return B.pay.online(me);
+    } // ฝั่งหลังบ้านเปิดแล้ว + คีย์ถูก (pay.js)
+    var capNames = null;
+  B.pay.capability().then(function (c) {
+    if (c) {
+      capNames = c.names;
+      if (me && tab === "orders") paint();
+    }
+  });
+  function payMethods(amount) {
+    return B.pay.methods(me, capNames, amount);
+  }
+    B.pay.onCur = function () {
+      if (me && tab === "orders") paint();
+    };
+  function counts() {
+    var o = me.orders || [], lib = libOf();
+    return {
+      todo: o.filter(function (x) {
+        return x.status === ST.wait || x.status === ST.reject;
+      }).length,
+      check: o.filter(function (x) {
+        return x.status === ST.check;
+      }).length,
+      docs: lib.length,
+      newer: lib.filter(function (x) {
+        return x.newer;
+      }).length,
+      asksOpen: (me.asks || []).filter(function (a) {
+        return !a.answer;
+      }).length
+    };
+  }
+    function fmtPhone(v) {
+      var d = String(v || "").replace(/[^\d+]/g, "");
+      if (/^0\d{9}$/.test(d)) return d.slice(0, 3) + "-" + d.slice(3, 6) + "-" + d.slice(6);
+      if (/^0\d{8}$/.test(d)) return d.slice(0, 2) + "-" + d.slice(2, 5) + "-" + d.slice(5);
+      return d;
+    }
+    function taxOk(id) {
+      var d = String(id || "").replace(/\D/g, "");
+      if (!/^\d{13}$/.test(d)) return false;
+      var s = 0;
+      for (var i = 0; i < 12; i++) s += +d[i] * (13 - i);
+      return (11 - s % 11) % 10 === +d[12];
+    }
+    function fmtTax(id) {
+      var d = String(id || "").replace(/\D/g, "").slice(0, 13);
+      var parts = [d.slice(0, 1), d.slice(1, 5), d.slice(5, 10), d.slice(10, 12), d.slice(12, 13)];
+      return parts.filter(String).join("-");
+    }
+
+    // ---------- คำสั่งซื้อ ----------
+    function pv(x) {
+      return '<span data-noi18n="1">' + esc(x) + "</span>";
+    } // ข้อมูลของลูกค้าไม่ส่งไปแปล
+    function copyBtn(text, label) {
+      return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก")
+        + "</button>";
+    }
+    function payBox(o) { // โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ไม่มีค่าธรรมเนียม ร้านตรวจยอดเอง)
+      var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">'
+        + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>"
+          + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + pv(P.name) + "</dd>" : "")
+        + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, ""))
+          + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
+      return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน'
+        + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows
+        + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+        '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="'
+        + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
+    }
+    function payChooser(o) { // ชำระออนไลน์: ระบบตรวจยอดและเปิดสิทธิ์ดาวน์โหลดเองทันที
+      var ms = payMethods(o.amount);
+      if (!ms.length) return "";
+      return '<div class="payopts" role="group" aria-label="เลือกวิธีชำระ"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>'
+        + B.pay.curBar(me, o.amount) + B.pay.GROUPS.map(function (g) {
+          var list = ms.filter(function (k) {
+            return PAYM[k][2] === g[0];
+          });
+          return list.length ? B.pay.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
+            '<div class="po">' + list.map(function (k) {
+              return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id)
+                + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small>" + B.pay.feeHtml(k)
+                + "</button>";
+            }).join("") + "</div>") : "";
+        }).join("") + B.pay.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
+        + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "")
+        + "</p></div>";
+    }
+    // ตัวติดตาม 5 ขั้น: สั่งซื้อ → ชำระ → ร้านตรวจยอด → พร้อมดาวน์โหลด → ได้รับไฟล์แล้ว
+    function tracker(o) {
+      if (o.status === ST.cancel) return "";
+      var stp = o.status === ST.wait || o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid
+        ? (o.dl1 ? 5 : 4) : 0;
+      var times = [o.created, o.slipAt, o.status === ST.paid ? o.okAt : "", o.okAt, o.dl1];
+      var sw = function (iso) {
+        var w = B.when(iso);
+        return w.replace(/ \d{4} /, " ");
+      }; // วันที่สั้น ให้พอดีจอมือถือ
+      return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "ชำระเงิน",
+        "ตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
+          var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "",
+            t = done && times[i] ? '<small>' + esc(sw(times[i])) + "</small>" : "";
+          return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + t + "</span>";
+        }).join("") + "</div>";
+    }
+    function orderCard(o) {
+      var cls = o.status === ST.paid ? "ok" : o.status === ST.cancel ? "gray" : o.status === ST.reject
+        ? "bad" : "";
+      var body = "";
+      if (o.status === ST.wait || o.status === ST.reject) {
+        var minOn = +(me && me.minOnline) || 20;
+        if (P.on !== true) body = '<p class="note">ร้านยังไม่เปิดรับชำระเงิน</p>';
+        else if (payOnline() && payMethods().length && o.amount >= minOn) body = payChooser(o) + '<details class="alt"><summary>หรือโอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ร้านตรวจยอดภายใน '
+          + esc(P.hours || 24) + ' ชั่วโมง)</summary>' + payBox(o) + "</details>";
+        else body = (payOnline() && payMethods().length ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : "")
+          + payBox(o);
+      } else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt))
+        + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + " · ผลจะส่งไปที่อีเมลของคุณ</p>"
+        + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
+      else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">'
+        + B.expand(o.items).map(function (id) {
+          return B.isCtry(B.varOf(id)) ? docLink(id) : '<button class="b line sm" type="button" data-dl="'
+            + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>";
+        }).join("") + '<button class="b line sm" type="button" data-rcpt="' + esc(o.id) + '">ใบเสร็จรับเงิน'
+        + (o.receipt && o.receipt !== "pending" ? " " + esc(o.receipt) : "") + '</button></div>';
+      var how = o.method ? '<span class="note" style="margin:0"> · ' + esc(o.method) + "</span>" : "";
+      // ลิงก์ติดตามส่วนตัว (เปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีหรือผู้ร่วมงานได้) + ข้อมูลพัสดุเมื่อร้านส่งของจริง
+      var tl = o.track ? location.origin + location.pathname.replace(/[^\/]*$/, "") + "track.html?o="
+        + encodeURIComponent(o.id) + "&k=" + encodeURIComponent(o.track) : "";
+      var trk2 = (o.ship ? '<p class="note" style="margin:8px 0 0">📦 ส่งพัสดุแล้ว · ' + esc(o.ship.carrier)
+        + " เลขพัสดุ <b>" + esc(o.ship.no) + "</b>" + copyBtn(o.ship.no, "คัดลอกเลขพัสดุ") + (o.ship.at
+          ? " · " + esc(o.ship.at) : "") + "</p>" : "") +
+        (tl && o.status !== ST.cancel ? '<p class="note" style="margin:8px 0 0">ติดตามสถานะแบบไม่ต้องเข้าระบบ: <a href="'
+          + esc(tl) + '" target="_blank" rel="noopener">เปิดหน้าติดตาม</a> ' + copyBtn(tl,
+            "คัดลอกลิงก์") + "</p>" : "");
+      return '<div class="card ord" id="o-' + esc(o.id) + '"><div class="top"><b>' + esc(o.id) + '</b><span class="pill '
+        + cls + '">' + esc(o.status) + '</span><span class="note" style="margin:0">' + esc(B.when(o.created))
+        + " · " + B.thb(o.amount) + "</span>" + how + "</div><ul>" + o.items.map(function (id) {
+          return "<li>" + esc(title(id)) + "</li>";
+        }).join("") + "</ul>" + tracker(o) + trk2 + body + "</div>";
+    }
+    function receipt(o) { // หลักฐานการชำระเงิน (ไม่ใช่ใบกำกับภาษี) เปิดหน้าต่างใหม่แล้วสั่งพิมพ์ หรือบันทึกเป็น PDF
+      var w = window.open("", "_blank", "width=760,height=940");
+      if (!w) {
+        say("เบราว์เซอร์บล็อกหน้าต่างใหม่ อนุญาตป๊อปอัปของเว็บนี้แล้วลองอีกครั้ง", true);
+        return;
+      }
+        var TT = function (x) {
+          return window.I18N_TR ? window.I18N_TR(x) : x;
+        }, uiL = "th";
+      try {
+        uiL = localStorage.getItem("build_lang") || "th";
+      } catch (e) {} // คำบนเอกสารตามภาษาของเว็บ ข้อมูลลูกค้าไม่แปล
+        var m = me.member, t = m.tax, rows = B.expand(o.items).map(function (id) {
+          return "<tr><td>" + esc(TT(title(id))) + "</td></tr>";
+        }).join("");
+      var buyer = t ? "<tr><th>" + TT("ออกในนาม") + "</th><td>" + pv(t.name) + (t.id ? "<br>" + TT("เลขประจำตัวผู้เสียภาษี")
+        + " " + pv(fmtTax(t.id)) : "") + (t.type === "company" && t.branch ? " · " + pv(t.branch) : "")
+        + (t.addr ? "<br>" + pv(t.addr) : "") + "</td></tr>" : "<tr><th>" + TT("ชื่อผู้ซื้อ") + "</th><td>"
+        + pv(m.name) + "</td></tr>";
+      w.document.write('<!doctype html><html lang="' + esc(uiL) + '"><head><meta charset="utf-8"><title>'
+        + TT("หลักฐานการชำระเงิน") + ' ' + esc(o.id) + '</title><style>body{font:16px/1.6 "Leelawadee UI","Sarabun",sans-serif;color:#16202B;margin:40px}h1{font-size:22px;margin:0}table{width:100%;border-collapse:collapse;margin:14px 0}td,th{border:1px solid #C9D2DC;padding:6px 10px;text-align:left;vertical-align:top}th{width:32%;background:#F6F4EF}.mute{color:#5A6573;font-size:14px}</style></head><body><p style="font-weight:700;color:#0F2A44;margin:0">สร้าง | BUILD TH</p><h1>'
+        + TT("หลักฐานการชำระเงิน") + '</h1><p class="mute">' + TT("เอกสารนี้ไม่ใช่ใบกำกับภาษี") + '</p><table><tr><th>'
+        + TT("เลขคำสั่งซื้อ") + '</th><td>' + esc(o.id) + "</td></tr>" + buyer + "<tr><th>" + TT("อีเมล")
+        + "</th><td>" + pv(m.email) + "</td></tr><tr><th>" + TT("วันที่สั่งซื้อ") + "</th><td>" + esc(B.when(o.created))
+        + "</td></tr><tr><th>" + TT("ชำระด้วย") + "</th><td>" + esc(TT(o.method || "โอนเงินเข้าบัญชีร้าน"))
+        + "</td></tr><tr><th>" + TT("ยืนยันยอดเมื่อ") + "</th><td>" + esc(B.when(o.okAt) || "-") + "</td></tr><tr><th>"
+        + TT("ยอดชำระ") + "</th><td><b>" + B.thb(o.amount) + '</b></td></tr></table><table><tr><th style="width:auto">'
+        + TT("รายการ (ไฟล์ PDF ดาวน์โหลดจากหน้าสมาชิก)") + '</th></tr>' + rows + '</table><p class="mute">'
+        + TT("พิมพ์จากหน้าสมาชิก") + ' ' + esc(location.host) + " · " + esc(B.when(new Date().toISOString()))
+        + "</p><script>window.onload=function(){window.print()}<\/script></body></html>");
+      w.document.close();
+    }
+    // 2 แบบสิทธิ์ (คำสั่งผู้ใช้ 23 ต.ค. 2026): ซื้อฉบับนี้ (เก็บได้ตลอด) · รับฉบับใหม่ตลอด (อีกราคา) · ลูกค้าเลือกครั้งเดียวต่อคำสั่งซื้อ
+    function planOf() {
+      var r = document.querySelector("#f-order input[name=plan]:checked");
+      return r ? r.value : "ed";
+    }
+    function shopBox() {
+      var owned = me.owned || [], hiddenWant = B.allSheets.filter(function (x) {
+        return x.hidden === true && wantList.indexOf(x.id) >= 0;
+      });
+      var list = B.bundles.concat(B.sheets, hiddenWant).filter(function (x) {
+        return B.canSell(x) && (B.isBundle(x) ? !x.items.every(function (id) {
+          return owned.indexOf(id) >= 0;
+        }) : owned.indexOf(x.id) < 0);
+      });
+      if (!list.length) return '<div class="card pad"><p style="margin:0">' + (B.sheets.some(function (x) {
+        return owned.indexOf(x.id) < 0;
+      }) ? "ฉบับมืออาชีพยังไม่เปิดขาย เมื่อเปิดจะแจ้งทางอีเมลที่สมัครไว้" : "คุณมีครบทุกใบแล้ว") + '</p><p class="note"><a href="sheets.html'
+        + q + '">ดูใบตรวจงานทั้งหมด</a></p></div>';
+      var how = payOnline() && payMethods().length ? "ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ เปิดไฟล์ได้ทันที หรือโอนเงินแล้วแนบสลิป" : "ชำระด้วยการโอนเงินหรือพร้อมเพย์แล้วแนบสลิป · ไฟล์เปิดดาวน์โหลดหลังร้านตรวจยอดแล้ว";
+      var anyU = list.some(function (x) {
+        return +x.priceU > 0;
+      }), wantU = wantList.some(function (k) {
+        return B.isUpd(k);
+      });
+      var plans = anyU ? '<fieldset class="plan" role="radiogroup" aria-label="แบบสิทธิ์"><legend>เลือกแบบสิทธิ์ <small>ใช้กับทุกรายการในคำสั่งซื้อนี้</small></legend>'
+        +
+        '<label><input type="radio" name="plan" value="ed"' + (wantU ? "" : " checked") + '><span><b>ซื้อฉบับนี้ เก็บได้ตลอด</b><small>ได้ไฟล์ฉบับวันที่ซื้อ เปิด ดาวน์โหลด และพิมพ์ได้ตลอด · ถ้าภายหลังมีฉบับใหม่ อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง</small></span></label>'
+        +
+        '<label><input type="radio" name="plan" value="up"' + (wantU ? " checked" : "") + '><span><b>รับฉบับใหม่ตลอด</b><small>เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ฟรีทุกครั้ง และได้อีเมลแจ้ง</small></span></label></fieldset>' : "";
+      return '<form class="card pad" id="f-order">' + plans + '<div class="pick">' + list.map(function (x) {
+        var p = B.memberPrice(x.price), pu = +x.priceU > 0 ? B.memberPrice(x.priceU) : 0, want = wantList.indexOf(x.id) >= 0
+          || wantList.indexOf(x.id + "+U") >= 0;
+        return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + p
+          + '" data-priceu="' + pu + '"' + (want ? " checked" : "") + "><span>" + esc(B.code(x) + " "
+            + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro)
+              + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(p) + (pu ? '<small class="pu">รับฉบับใหม่ '
+                + B.baht(pu) + "</small>" : "") + "</em></label>";
+      }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">'
+        + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ</p></form>";
+    }
+    /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
+    function askBox() {
+      var list = (me.asks || []).map(function (a) {
+        return '<div class="card pad" style="margin-top:10px"><p style="margin:0;font-size:13.5px;color:#5A6573">'
+          + esc(a.id) + " · " + esc(a.topic) + " · " + esc(B.when(a.created)) + '</p><p style="margin:6px 0 0;white-space:pre-wrap">'
+          + pv(a.text) + "</p>" +
+          (a.answer ? '<div class="answer"><b style="color:#0F2A44">คำตอบจากร้าน</b>' + (a.answeredAt
+            ? ' <span style="font-size:13px;color:#5A6573">' + esc(B.when(a.answeredAt)) + "</span>" : "")
+            + '<p style="margin:4px 0 0;white-space:pre-wrap">' + pv(a.answer) + "</p></div>" : '<p class="note" style="margin:8px 0 0">รอร้านตอบ'
+            + (B.demo ? ' · <button type="button" class="linkbtn" data-qa="' + esc(a.id) + '">โหมดทดลอง: จำลองว่าร้านตอบแล้ว</button>' : "")
+            + "</p>") + "</div>";
+      }).join("");
+      return '<form class="f card pad" id="f-ask" novalidate><label>หัวข้อ<select name="topic" required><option value="">เลือกหัวข้อ</option>'
+        + (B.ASK || []).map(function (t) {
+          return "<option>" + esc(t) + "</option>";
+        }).join("") + '</select></label><label>คำถามของคุณ (10–1000 ตัวอักษร)<textarea name="text" rows="4" maxlength="1000" required></textarea></label><button class="b dark" type="submit">ส่งคำถาม</button><p class="note" style="margin:8px 0 0">ร้านตอบภายใน 2 วันทำการ คำตอบขึ้นที่หน้านี้และส่งไปที่อีเมลของคุณ · คำตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่ใช่การรับรองทางวิศวกรรมของงานคุณ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในคำถาม</p></form>'
+        + list;
+    }
+
+    // ---------- แท็บต่าง ๆ ----------
+    function paneHome() {
+      var c = counts(), m = me.member, perks = (M.perks || []).map(function (p) {
+        return "<li>" + esc(p) + "</li>";
+      }).join(""), todo = [];
+      if (!m.email) todo.push(["profile",
+        "ใส่อีเมลในเมนู โปรไฟล์ ก่อนสั่งซื้อ เพื่อรับไฟล์และการแจ้งเตือน", "bad"]);
+      (me.orders || []).filter(function (o) {
+        return o.status === ST.wait || o.status === ST.reject;
+      }).forEach(function (o) {
+        todo.push(["orders", (o.status === ST.reject ? "แนบสลิปใหม่ของ " : "ชำระคำสั่งซื้อ ") + o.id
+          + " ยอด " + B.thb(o.amount), o.status === ST.reject ? "bad" : ""]);
+      });
+      if (c.newer) todo.push(["docs", "มีฉบับใหม่ของเอกสารที่คุณซื้อ " + c.newer + " ใบ ดาวน์โหลดได้ฟรี",
+        ""]);
+      // การแจ้งเตือน (30 ต.ค. 2026): คำตอบจากร้านที่ยังไม่ได้เปิดอ่าน · สินค้าที่ส่งแล้ว
+      var seenAsk = "";
+      try {
+        seenAsk = localStorage.getItem("build_ask_seen") || "";
+      } catch (e) {}
+        (me.asks || []).filter(function (a) {
+          return a.answer && String(a.answeredAt || "") > seenAsk;
+        }).forEach(function (a) {
+          todo.push(["ask", "ร้านตอบคำถาม " + a.id + " แล้ว กดเพื่ออ่าน", ""]);
+        });
+      (me.orders || []).filter(function (o) {
+        var at = o.ship && Date.parse(String(o.ship.at || "").replace(" ", "T"));
+        return o.ship && o.ship.no && (!at || Date.now() - at < 1209600000);
+      }).slice(0, 3).forEach(function (o) {
+        todo.push(["orders", "คำสั่งซื้อ " + o.id + " จัดส่งแล้ว เลขพัสดุ " + o.ship.no, ""]);
+      });
+      if (full() && (!m.phone || !m.avatar)) todo.push(["profile",
+        "เพิ่มรูปโปรไฟล์และเบอร์โทร (ไม่บังคับ) ให้บัญชีดูครบ", "soft"]);
+      if (!PLIST.some(function (p) {
+        return m.linked && m.linked[p];
+      }) && anySoc()) todo.push(["security",
+        "เชื่อมบัญชี Google LINE Facebook หรือ TikTok เพื่อเข้าสู่ระบบได้ในคลิกเดียว", "soft"]);
+      var tile = function (t, n, label, sub) {
+        return '<a class="tile" href="#' + t + '"><b>' + n + "</b><span>" + label + "</span>" + (sub
+          ? "<small>" + sub + "</small>" : "") + "</a>";
+      };
+      return '<div class="tiles">' + tile("orders", c.todo, "คำสั่งซื้อรอชำระ", c.check ? "รอร้านตรวจ "
+        + c.check : "") + tile("docs", c.docs, "เอกสารของฉัน", c.newer ? "ฉบับใหม่ " + c.newer : "")
+        + tile("ask", c.asksOpen, "คำถามรอตอบ", "") + "</div>" +
+        (todo.length ? '<section class="sec"><h2>สิ่งที่ควรทำต่อ</h2><div class="card todo">' + todo.map(function (x) {
+          return '<a href="#' + x[0] + '" class="' + x[2] + '">' + esc(x[1]) + "<i>›</i></a>";
+        }).join("") + "</div></section>" : '<section class="sec"><div class="card pad"><p style="margin:0">ทุกอย่างเรียบร้อย ไม่มีงานค้าง</p></div></section>')
+        +
+        nextStage() + '<section class="sec"><h2>สิทธิ์สมาชิก</h2><div class="card pad"><ul class="tick">'
+        + perks + '</ul><p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="TH">ไฟล์รวมฉบับฟรี ภาษาไทย</button><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="EN">ไฟล์รวมฉบับฟรี ภาษาอังกฤษ</button><a class="b line sm" href="knowledge.html'
+        + q + '">อ่านความรู้ก่อสร้าง</a><a class="b line sm" href="sheets.html' + q + '">ดูใบตรวจงานทั้งหมด</a></p></div></section>';
+    }
+    // งานถัดไปตามลำดับงานทั่วไป: ซื้อใบไหนแล้ว แนะนำใบของงวดถัดไป 2 ใบ · ไม่มีส่วนลดหลอก ไม่เร่ง (ซื้อซ้ำ ข้อ 9 · 31 ต.ค. 2026)
+    var STAGE = ["F-01A", "F-01B", "F-02", "F-04", "F-03", "F-05", "F-07", "F-06", "F-10", "F-11",
+      "F-08", "F-09", "F-13", "F-15", "F-14", "F-12", "F-18"];
+  function nextStage() {
+    var own = libOf().map(function (d) {
+      return d.id;
+    }), last = -1;
+    STAGE.forEach(function (id, i) {
+      if (own.indexOf(id) >= 0) last = i;
+    });
+    if (last < 0) return "";
+    var list = STAGE.slice(last + 1).filter(function (id) {
+      var x = B.find(id);
+      return x && x.ok === true && +x.price > 0 && own.indexOf(id) < 0 && !(id === "F-01B" && own.indexOf("F-01A") >= 0);
+    }).slice(0, 2);
+    if (!list.length) return "";
+    return '<section class="sec"><h2>งานถัดไปที่ควรตรวจ</h2><div class="card pad"><p class="note" style="margin:0 0 10px">เรียงตามลำดับงานทั่วไป ลำดับจริงขึ้นกับแบบและผู้รับเหมา</p>'
+      + list.map(function (id) {
+        var x = B.find(id);
+        return '<p style="margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center"><span>'
+          + esc(B.code(x) + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="product.html?id='
+          + encodeURIComponent(id) + (q ? "&" + q.replace(/^\?/, "") : "") + '">ดูใบนี้</a></p>';
+      }).join("") + "</div></section>";
+  }
+    function paneDocs() {
+      var lib = libOf();
+      var rows = lib.map(function (d) {
+        if (d.doc || B.isCtry(B.varOf(d.id))) return '<div class="doc card"><div><b>' + esc(d.id) + "</b> "
+          + esc(d.title) + "<small>ฉบับประเทศ สร้างจากหน้าเอกสารอัจฉริยะ เลือกภาษาและพิมพ์ได้ทุกครั้ง"
+          + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">' + esc(d.lic) + "</span>" : "")
+          + '</small></div><span class="row" style="display:flex;gap:6px;flex-wrap:wrap">' + docLink(d.id)
+          + "</span></div>";
+        // สินค้าฝากขาย (26 ต.ค. 2026): ส่งมอบแบบไฟล์ = ปุ่มดาวน์โหลด · ส่งพัสดุหรือส่งทางอีเมล = ข้อความบอกวิธีรับ
+        var mx = B.find(d.id);
+        if (B.isMarket(mx)) {
+          var fl = mx.delivery === "file";
+          return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + "<small>สินค้าฝากขาย"
+            + (mx.seller ? " โดย " + esc(mx.seller) : "") + " · " + (fl ? (d.lastAt ? "ดาวน์โหลดล่าสุด "
+              + esc(B.when(d.lastAt)) : "ยังไม่เคยดาวน์โหลด") : mx.delivery === "ship" ? "ร้านส่งพัสดุ ดูเลขพัสดุที่เมนู คำสั่งซื้อ" : "ร้านส่งรายละเอียดทางอีเมลของคุณ")
+            + "</small></div>" + (fl ? '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b '
+              + (d.lastAt ? "line" : "pri") + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด</button></span>' : '<span class="pill gray">'
+              + (mx.delivery === "ship" ? "ส่งพัสดุ" : "ส่งทางอีเมล") + "</span>") + "</div>";
+        }
+          var ed = d.plan === "edition", has = d.has || d.rev;
+        var st = ed && d.newer ? '<span class="pill">มีฉบับใหม่ ' + esc(dmy(d.rev)) + "</span>" : d.newer
+          ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">' + (ed ? "ฉบับของคุณ" : "ฉบับล่าสุดแล้ว")
+          + "</span>" : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
+        var planTx = ed ? "แบบฉบับนี้ (ฉบับ " + esc(dmy(has) || "-") + " เก็บได้ตลอด)" : d.plan === "updates"
+          ? "แบบรับฉบับใหม่ตลอด" : "";
+        var upg = ed && d.upgrade ? '<button class="b line sm" type="button" data-upg="' + esc(d.id)
+          + '">อัปเกรดเป็นรับฉบับใหม่ ' + B.baht(d.upgrade) + "</button>" : "";
+        return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + '<small>' + (planTx
+          ? planTx + (ed && !d.lastAt ? "" : " · ") : "") + (ed ? "" : "ฉบับวันที่ " + esc(dmy(d.rev)
+            || "-")) + (d.lastAt ? (ed ? "" : " · ") + "ดาวน์โหลดล่าสุด " + esc(B.when(d.lastAt)) + (d.lastRev
+              ? " (ฉบับ " + esc(dmy(d.lastRev)) + ")" : "") : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">'
+                + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b '
+          + ((d.newer && !ed) || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id)
+          + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + "</span></div>";
+      }).join("");
+      return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + (lib.length ? '<div class="docs">'
+        + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>')
+        + "</section>" +
+        '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="TH">ไฟล์รวมฉบับฟรี ภาษาไทย</button><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="EN">ไฟล์รวมฉบับฟรี ภาษาอังกฤษ</button><a class="b line sm" href="doc.html'
+        + q + '">ฉบับฟรีภาษาอื่น</a><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
+    }
+    function paneOrders() {
+      var list = me.orders || [];
+      return '<section class="sec"><h2>คำสั่งซื้อของฉัน</h2><div style="display:grid;gap:12px">' + (list.map(orderCard).join("")
+        || '<div class="card pad"><p style="margin:0">ยังไม่มีคำสั่งซื้อ</p><p class="note"><a href="#shop">ซื้อฉบับมืออาชีพ</a></p></div>')
+        + "</div></section>";
+    }
+    function paneShop() {
+      var n = B.cart ? B.cart.get().length : 0;
+      return '<section class="sec"><h2>ซื้อฉบับมืออาชีพ</h2><div class="card pad" style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span style="flex:1;min-width:200px">เลือกดูรายละเอียดทีละใบ เลือกแบบสิทธิ์ แล้วชำระในหน้าชำระเงิน</span><a class="b line sm" href="sheets.html'
+        + q + '">ดูร้านใบตรวจงาน</a>' + (n ? '<a class="b pri sm" href="checkout.html' + q + '">ชำระเงิน ('
+          + n + " รายการในตะกร้า)</a>" : "") + "</div>" + shopBox() + "</section>";
+    }
+    function paneAsk() {
+      try {
+        var la = (me.asks || []).map(function (a) {
+          return String(a.answeredAt || "");
+        }).sort().pop();
+        if (la) localStorage.setItem("build_ask_seen", la);
+      } catch (e) {} return '<section class="sec" id="askbox"><h2>ถามร้าน</h2>' + askBox() + "</section>";
+    }
+    // ลิงก์ Google Maps จากพิกัดหรือลิงก์ที่บันทึกไว้ · ไม่มีหมุด = เปิดแผนที่เปล่าให้ค้นหาแล้วคัดลอกลิงก์
+    function mapLink(v) {
+      var s = String(v || "").trim();
+      if (/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(s)) return "https://www.google.com/maps/search/?api=1&query="
+        + encodeURIComponent(s);
+      if (/^https:\/\//.test(s)) return s;
+      return "https://www.google.com/maps";
+    }
+    function provOptions(sel) {
+      return '<option value="">เลือกจังหวัด</option>' + PROVINCES.map(function (p) {
+        return "<option" + (p === sel ? " selected" : "") + ">" + esc(p) + "</option>";
+      }).join("");
+    }
+    function paneProfile() {
+      var m = me.member, a = m.addr || {}, t = m.tax || {}, pr = m.prefs || { newEdition: true, news: false },
+        cur = String(m.avatar || "");
+      var thai = (a.country || "ไทย") === "ไทย";
+      if (!full()) return '<section class="sec"><h2>ข้อมูลพื้นฐาน</h2><form class="f card pad" id="f-basic" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" value="'
+        + esc(m.name) + '" required></label>' + (m.email ? '<label>อีเมล<input type="email" value="'
+          + esc(m.email) + '" readonly aria-readonly="true"></label>' : '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือน (ต้องใส่ก่อนสั่งซื้อ)<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>')
+        + '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off" value="'
+        + esc(m.line) + '"></label><button class="b pri" type="submit">บันทึกข้อมูล</button></form><p class="note">รูปโปรไฟล์ เบอร์โทร ที่อยู่จัดส่ง และข้อมูลออกใบเสร็จ เปิดให้ใช้เร็ว ๆ นี้</p></section>';
+      var avGrid = AV.map(function (x) {
+        return '<label class="avpick"><input type="radio" name="av" value="a:' + x[0] + '"' + (cur === "a:"
+          + x[0] ? " checked" : "") + '><img src="img/avatar/' + x[0] + '.jpg" alt="" loading="lazy"><span>'
+          + esc(x[1]) + "</span></label>";
+      }).join("");
+      return '<section class="sec"><h2>รูปโปรไฟล์</h2><form class="f card pad" id="f-avatar" novalidate><div class="avnow">'
+        + avatarHtml(avDraft ? { avatar: "photo", avatarSrc: avDraft, name: m.name } : m, "xl") + '<div><p style="margin:0">เลือกตัวละครจากแก๊งสัตว์ หรืออัปโหลดรูปของคุณ (ระบบตัดเป็นสี่เหลี่ยมจัตุรัสให้เอง)</p><label class="b line sm upl">อัปโหลดรูป<input type="file" name="photo" accept="image/jpeg,image/png" hidden></label>'
+        + (cur ? ' <button type="button" class="linkbtn" data-avdel="1">ลบรูปโปรไฟล์</button>' : "")
+        + '</div></div><div class="avgrid">' + avGrid + '</div><button class="b pri" type="submit">บันทึกรูปโปรไฟล์</button></form></section>'
+        +
+        '<section class="sec"><h2>ข้อมูลพื้นฐาน</h2><form class="f card pad" id="f-basic" novalidate><div class="g2"><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" value="'
+        + esc(m.name) + '" required></label>' +
+        (m.email ? '<label>อีเมล<input type="email" value="' + esc(m.email) + '" readonly aria-readonly="true"></label>' : '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือน (ต้องใส่ก่อนสั่งซื้อ)<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>')
+        +
+        '<label>เบอร์โทรศัพท์ (ไม่บังคับ)<input type="tel" name="phone" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="08x-xxx-xxxx" data-phone="1" value="'
+        + esc(fmtPhone(m.phone)) + '"></label><label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off" value="'
+        + esc(m.line) + '"></label><label>อาชีพ (ไม่บังคับ)<input type="text" name="occ" maxlength="60" list="occs" autocomplete="organization-title" value="'
+        + esc(m.occ || "") + '"><datalist id="occs"><option value="เจ้าของบ้าน"><option value="ผู้รับเหมา"><option value="ช่างและหัวหน้าช่าง"><option value="ผู้ควบคุมงาน"><option value="วิศวกร"><option value="สถาปนิก"><option value="ผู้จัดการโครงการ"><option value="เจ้าของโรงงานหรือฝ่ายอาคาร"><option value="นิสิตนักศึกษา"></datalist></label><label>ตำแหน่งงาน (ไม่บังคับ)<input type="text" name="pos" maxlength="60" autocomplete="organization-title" value="'
+        + esc(m.pos || "") + '"></label><label>บริษัทหรือหน่วยงาน (ไม่บังคับ)<input type="text" name="org" maxlength="100" autocomplete="organization" value="'
+        + esc(m.org || "") + '"></label></div><p class="note" style="margin:0">อาชีพ ตำแหน่ง และหน่วยงานช่วยให้ร้านทำเอกสารที่ตรงกับงานของคุณมากขึ้น ไม่กรอกก็ใช้งานได้ครบ</p>'
+        + (m.email ? '<p class="note" style="margin:0">เปลี่ยนอีเมลของบัญชี: ถามร้านในเมนู ถามร้าน (เพื่อความปลอดภัย ร้านยืนยันตัวตนก่อนเปลี่ยน)</p>' : "")
+        + '<button class="b pri" type="submit">บันทึกข้อมูลพื้นฐาน</button></form></section>' +
+        '<section class="sec"><h2>ที่อยู่จัดส่ง <small class="opt">ไม่บังคับ · ใช้กับสินค้าที่ต้องส่งของในอนาคต</small></h2><form class="f card pad" id="f-addr" novalidate><div class="g2"><label>ประเทศ<select name="country" data-country="1"><option'
+        + (thai ? " selected" : "") + '>ไทย</option><option value="ต่างประเทศ"' + (!thai ? " selected" : "")
+        + '>ต่างประเทศ</option></select></label>' + (thai ? "<span></span>" : '<label>ชื่อประเทศ (Country)<select name="ctry" data-country-name="1" autocomplete="shipping country-name">'
+          + (function (now) {
+            var R = window.REGION, ui = "th";
+            try {
+              ui = localStorage.getItem("build_lang") || "th";
+            } catch (e) {} var rows = R && R.all ? R.all().filter(function (k) {
+              return k !== "TH";
+            }).map(function (k) {
+              return [R.regionName(k, "en"), R.regionName(k, ui), k];
+            }) : [];
+            var has = rows.some(function (x) {
+              return x[0] === now;
+            });
+            return '<option value="">เลือกประเทศ</option>' + (now && !has ? '<option value="' + esc(now)
+              + '" selected>' + esc(now) + "</option>" : "") + rows.map(function (x) {
+                return '<option value="' + esc(x[0]) + '" data-lc="' + x[2] + '" data-noi18n="1"' + (x[0] === now
+                  ? " selected" : "") + ">" + esc(x[1]) + "</option>";
+              }).join("");
+          })(a.country && a.country !== "ต่างประเทศ" ? a.country : "") + '</select></label>') +
+        '<label>ชื่อผู้รับ<input type="text" name="name" maxlength="80" autocomplete="shipping name" value="'
+        + esc(a.name || "") + '"></label><label>เบอร์โทรผู้รับ<input type="tel" name="phone" maxlength="16" inputmode="tel" autocomplete="shipping tel" data-phone="1" value="'
+        + esc(fmtPhone(a.phone)) + '"></label></div>' +
+        '<label>' + (thai ? "บ้านเลขที่ อาคาร หมู่บ้าน ซอย ถนน" : "ที่อยู่ (Street address)") + '<input type="text" name="line1" maxlength="200" autocomplete="shipping address-line1" value="'
+        + esc(a.line1 || "") + '"></label><div class="g2">' +
+        '<label>' + (thai ? "ตำบล / แขวง" : "ย่าน (District, ไม่บังคับ)") + '<input type="text" name="sub" maxlength="60" autocomplete="shipping address-level3" value="'
+        + esc(a.sub || "") + '"></label><label>' + (thai ? "อำเภอ / เขต" : "เมือง (City)") + '<input type="text" name="dist" maxlength="60" autocomplete="shipping address-level2" value="'
+        + esc(a.dist || "") + '"></label>' +
+        '<label>' + (thai ? "จังหวัด" : "รัฐหรือจังหวัด (State / Province)") + (thai ? '<select name="prov" autocomplete="shipping address-level1">'
+          + provOptions(a.prov) + "</select>" : '<input type="text" name="prov" maxlength="60" autocomplete="shipping address-level1" value="'
+          + esc(a.prov || "") + '">') + '</label><label>รหัสไปรษณีย์<input type="text" name="zip" maxlength="10" inputmode="'
+        + (thai ? "numeric" : "text") + '" autocomplete="shipping postal-code" value="' + esc(a.zip
+          || "") + '"></label></div>' +
+        '<label>หมุดบน Google Maps (ไม่บังคับ · ช่วยให้ขนส่งหาง่าย)<input type="text" name="map" maxlength="300" inputmode="url" placeholder="วางลิงก์จาก Google Maps หรือกดปุ่มใช้ตำแหน่งปัจจุบัน" value="'
+        + esc(a.map || "") + '"></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-geo="1">ใช้ตำแหน่งปัจจุบันของเครื่องนี้</button> · <a href="'
+        + esc(mapLink(a.map)) + '" target="_blank" rel="noopener" id="maplink">เปิด Google Maps</a></p>'
+        +
+        '<label>หมายเหตุถึงผู้ส่ง (ไม่บังคับ)<input type="text" name="note" maxlength="150" value="'
+        + esc(a.note || "") + '"></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fill="addr">ใช้ชื่อและเบอร์จากข้อมูลพื้นฐาน</button></p><div class="sum" style="margin:0"><button class="b pri" type="submit">บันทึกที่อยู่</button>'
+        + (m.addr ? '<button class="b line sm" type="button" data-clear="addr">ลบที่อยู่</button>' : "")
+        + "</div></form></section>" +
+        '<section class="sec"><h2>ข้อมูลออกใบเสร็จ <small class="opt">ไม่บังคับ · แสดงในใบเสร็จรับเงินของคำสั่งซื้อที่ชำระหลังจากบันทึก</small></h2><form class="f card pad" id="f-tax" novalidate><div class="chips" role="radiogroup"><label class="ck"><input type="radio" name="type" value="person"'
+        + (t.type !== "company" ? " checked" : "") + '><span>บุคคลธรรมดา</span></label><label class="ck"><input type="radio" name="type" value="company"'
+        + (t.type === "company" ? " checked" : "") + '><span>นิติบุคคล (บริษัท ห้าง หน่วยงาน)</span></label></div><div class="g2">'
+        +
+        '<label>ชื่อ' + (t.type === "company" ? "บริษัทหรือหน่วยงาน" : "ผู้ซื้อ") + '<input type="text" name="name" maxlength="120" autocomplete="organization" value="'
+        + esc(t.name || "") + '"></label><label>เลขประจำตัวผู้เสียภาษี 13 หลัก' + (t.type === "company"
+          ? "" : " (ไม่บังคับ)") + '<input type="text" name="taxid" maxlength="17" inputmode="numeric" data-taxid="1" value="'
+        + esc(fmtTax(t.id)) + '"><small class="hint" id="taxhint"></small></label>' +
+        (t.type === "company" ? '<label>สาขา<input type="text" name="branch" maxlength="40" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" value="'
+          + esc(t.branch || "") + '"></label><span></span>' : "") + '</div><label>ที่อยู่สำหรับออกเอกสาร<textarea name="addr" rows="3" maxlength="300">'
+        + esc(t.addr || "") + '</textarea></label><p class="note" style="margin:0"><button type="button" class="linkbtn" data-fill="tax">ใช้ที่อยู่จัดส่ง</button> · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารที่ออกจึงเป็นใบเสร็จรับเงิน ไม่ใช่ใบกำกับภาษี</p><div class="sum" style="margin:0"><button class="b pri" type="submit">บันทึกข้อมูลออกใบเสร็จ</button>'
+        + (m.tax ? '<button class="b line sm" type="button" data-clear="tax">ลบข้อมูลนี้</button>' : "")
+        + "</div></form></section>" +
+        '<section class="sec"><h2>การแจ้งเตือนทางอีเมล</h2><form class="f card pad" id="f-prefs" novalidate><label class="ck"><input type="checkbox" name="newEdition"'
+        + (pr.newEdition !== false ? " checked" : "") + '><span>แจ้งเมื่อเอกสารที่ฉันซื้อมีฉบับใหม่ (แนะนำ)</span></label><label class="ck"><input type="checkbox" name="news"'
+        + (pr.news ? " checked" : "") + '><span>ข่าวคลิปใหม่ เอกสารใหม่ และโปรโมชัน (ไม่เกินเดือนละ 2 ฉบับ)</span></label><p class="note" style="margin:0">อีเมลเรื่องคำสั่งซื้อและความปลอดภัยของบัญชีส่งเสมอ</p><button class="b line" type="submit">บันทึกการแจ้งเตือน</button></form></section>';
+    }
+    function paneSecurity() {
+      var m = me.member, L = m.linked || {}, has = PLIST.filter(function (p) {
+        return L[p];
+      }), can = PLIST.filter(function (p) {
+        return ON[p] && !L[p];
+      }), social = m.via && m.via !== "email";
+      return '<section class="sec"><h2>บัญชีที่เชื่อมไว้</h2><div class="card pad"><div class="links">'
+        + (has.length ? has.map(function (p) {
+          return '<span class="pill ok">' + PROV[p] + "</span>";
+        }).join("") : '<span class="note" style="margin:0">ยังไม่ได้เชื่อม</span>') + "</div>" +
+        (can.length ? '<p class="note" style="margin:10px 0 6px">เชื่อมไว้แล้วเข้าสู่ระบบด้วยปุ่มนั้นได้ทันที บัญชีเดิมและไฟล์ที่ซื้อยังอยู่ครบ</p>'
+          + socButtons("link", can) : "") + "</div></section>" +
+        '<section class="sec"><h2>' + (social ? "ตั้งหรือเปลี่ยนรหัสผ่าน" : "เปลี่ยนรหัสผ่าน") + '</h2><div class="card pad">'
+        + (social ? '<p style="margin:0">บัญชีนี้สมัครด้วย ' + esc(PROV[m.via] || m.via) + ' · ถ้าอยากเข้าด้วยอีเมลและรหัสผ่านด้วย ให้ออกจากระบบ แล้วกด ลืมรหัสผ่าน ที่หน้าเข้าสู่ระบบ</p>' : '<form class="f" id="f-pass" novalidate>'
+          + pwField("pass", "รหัสผ่านเดิม", "current-password", false) + pwField("newPass",
+            "รหัสผ่านใหม่", "new-password", true) + pwField("newPass2",
+              "ยืนยันรหัสผ่านใหม่ (พิมพ์ซ้ำ)", "new-password", false) + '<button class="b line" type="submit">บันทึกรหัสผ่านใหม่</button></form>')
+        + "</div></section>" +
+        '<section class="sec"><h2>อุปกรณ์และข้อมูลของฉัน</h2><div class="card pad">' + (full() ? '<div class="rowbtn"><button class="b line sm" type="button" data-outall="1">ออกจากระบบทุกเครื่อง</button><span class="note" style="margin:0">ใช้เมื่อลืมออกจากระบบที่เครื่องอื่น หรือสงสัยว่ามีคนอื่นใช้บัญชี</span></div><div class="rowbtn"><button class="b line sm" type="button" data-export="1">ดาวน์โหลดข้อมูลของฉัน</button><span class="note" style="margin:0">ไฟล์ JSON ของข้อมูลบัญชี คำสั่งซื้อ คำถาม และประวัติดาวน์โหลด (สิทธิ์ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล)</span></div>' : "")
+        + '<div class="rowbtn"><button class="b line sm danger" type="button" data-erase="1">ลบบัญชีของฉัน</button><span class="note" style="margin:0">ลบบัญชีและข้อมูลส่วนตัวทั้งหมด รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ · คำสั่งซื้อที่ชำระแล้วเก็บเป็นหลักฐานการขายโดยไม่มีข้อมูลติดต่อ</span></div></div></section>';
+    }
+    function paint() {
+      if (!me) return authView();
+      var m = me.member, c = counts();
+      if (!TABS.some(function (t) {
+        return t[0] === tab;
+      })) tab = "home";
+      var badge = { orders: c.todo, docs: c.newer, ask: 0 };
+      $("view").innerHTML = '<div class="acct-head card pad">' + avatarHtml(m, "lg") + '<div class="who"><h1>สวัสดี '
+        + pv(m.name) + '</h1><p class="note" style="margin:0">' + (m.email ? pv(m.email) : "ยังไม่มีอีเมล")
+        + " · สมาชิกตั้งแต่ " + esc(B.when(m.created).replace(/,? \d\d:\d\d(\u2069?)$/, "$1")) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>'
+        +
+        '<nav class="acct-nav" aria-label="เมนูบัญชี">' + TABS.map(function (t) {
+          return '<a href="#' + t[0] + '"' + (t[0] === tab ? ' aria-current="page"' : "") + ">" + t[1]
+            + (badge[t[0]] ? '<em>' + badge[t[0]] + "</em>" : "") + "</a>";
+        }).join("") + "</nav>" +
+        '<div id="pane">' + ({
+          home: paneHome,
+          docs: paneDocs,
+          orders: paneOrders,
+          shop: paneShop,
+          ask: paneAsk,
+          profile: paneProfile,
+          security: paneSecurity
+        }[tab])() + "</div>";
+      [].forEach.call(document.querySelectorAll("img.qr"), function (im) {
+        im.addEventListener("error", function () {
+          im.parentNode.remove();
+        });
+      });
+      [].forEach.call(document.querySelectorAll("img.av"), function (im) {
+        im.addEventListener("error", function () {
+          var s = document.createElement("span");
+          s.className = im.className + " ini";
+          s.textContent = (String(me.member.name || "?").trim()[0] || "?").toUpperCase();
+          im.replaceWith(s);
+        });
+      });
+      var cur = document.querySelector('.acct-nav a[aria-current]');
+      if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "nearest", inline: "center" });
+      total();
+      gDraw();
+      taxHint();
+    }
+    function go(t) {
+      if (location.hash !== "#" + t) location.hash = t;
+      else {
+        tab = t;
+        paint();
+      }
+    }
+    function total() {
+      var t = 0, up = planOf() === "up";
+      [].forEach.call(document.querySelectorAll("#f-order input[name=it]"), function (c) {
+        var pu = +c.dataset.priceu;
+        if (up && !pu) {
+          c.checked = false;
+          c.disabled = true;
+        } else c.disabled = false;
+        if (c.checked) t += up ? pu : +c.dataset.price;
+      });
+      [].forEach.call(document.querySelectorAll("#f-order .pick label"), function (l) {
+        var c = l.querySelector("input");
+        l.classList.toggle("off", !!(c && c.disabled));
+      });
+      var e = $("total");
+      if (e) e.textContent = B.baht(t);
+    }
+    function taxHint() {
+      var i = document.querySelector("#f-tax input[name=taxid]"), h = $("taxhint");
+      if (!i || !h) return;
+      var d = i.value.replace(/\D/g, "");
+      h.textContent = !d ? "" : d.length < 13 ? "ยังไม่ครบ 13 หลัก" : taxOk(d) ? "รูปแบบเลขถูกต้อง" : "ตรวจเลขอีกครั้ง (เลขหลักสุดท้ายไม่ตรงกับสูตรตรวจของเลขประจำตัว)";
+      h.className = "hint" + (d.length === 13 ? (taxOk(d) ? " ok" : " bad") : "");
+    }
+    function refresh(keepMsg) {
+      if (!B.token.get()) {
+        me = null;
+        authView();
+        return Promise.resolve();
+      }
+        return B.call("me").then(function (r) {
+          me = r;
+          paint();
+        }).catch(function (e) {
+          B.token.clear();
+          me = null;
+          authView();
+          if (!keepMsg) say(e.message, true);
+        });
+    }
+    function readHash() {
+      var h = String(location.hash || "").replace(/^#/, "");
+      return TABS.some(function (t) {
+        return t[0] === h;
+      }) ? h : "home";
+    }
+    window.addEventListener("hashchange", function () {
+      if (!me) return;
+      tab = readHash();
+      say("");
+      paint();
+      window.scrollTo({ top: 0 });
+    });
+  tab = readHash();
+  if (want && !location.hash) tab = "shop"; // ลิงก์ซื้อ member.html?buy=รหัส เปิดหน้าซื้อทันทีหลังเข้าระบบหรือสมัคร
+
+  // ---------- รูปโปรไฟล์: ตัดเป็นสี่เหลี่ยมจัตุรัส 256 จุดในเครื่องผู้ใช้ก่อนส่ง ----------
+  function cropAvatar(file) {
+    return new Promise(function (res, rej) {
+      if (!file || !/^image\/(jpeg|png)$/.test(file.type)) return rej(new Error("รูปโปรไฟล์ต้องเป็น JPG หรือ PNG"));
+      if (file.size > 15 * 1024 * 1024) return rej(new Error("ไฟล์ใหญ่เกิน 15 MB"));
+      var fr = new FileReader();
+      fr.onerror = function () {
+        rej(new Error("อ่านไฟล์ไม่ได้"));
+      };
+      fr.onload = function () {
+        var im = new Image();
+        im.onerror = function () {
+          rej(new Error("ไฟล์นี้ไม่ใช่รูปภาพ"));
+        };
+        im.onload = function () {
+          var s = Math.min(im.width, im.height), c = document.createElement("canvas");
+          c.width = c.height = 256;
+          var g = c.getContext("2d");
+          g.fillStyle = "#fff";
+          g.fillRect(0, 0, 256, 256);
+          g.drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, 256, 256);
+          var qv = 0.86, out = c.toDataURL("image/jpeg", qv);
+          while (out.length > 120000 && qv > 0.4) {
+            qv -= 0.1;
+            out = c.toDataURL("image/jpeg", qv);
+          }
+            res(out);
+        };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+
+    // ---------- ชำระออนไลน์ (pay.js) ----------
+    function payOpen(oid, method) { // ทุกช่องทางใช้ pay.js ชุดเดียวกับหน้าชำระเงิน (30 ต.ค. 2026)
+      var o = (me.orders || []).filter(function (x) {
+        return x.id === oid;
+      })[0];
+      if (!o || busy) return;
+      B.pay.start(o, method, {
+        back: "",
+        lock: lock,
+        msg: function (t, bad) {
+          say(t, bad);
+        },
+        paid: function () {
+          return refresh(true).then(function () {
+            go("docs");
+            say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว ระบบส่งหลักฐานไปที่อีเมล");
+          });
+        }
+      });
+    }
+    function payReturn() { // กลับจากหน้ายืนยันของธนาคาร ทรูมันนี่ หรือ 3-D Secure
+      var sp;
+      try {
+        sp = new URLSearchParams(location.search);
+      } catch (e) {
+        return null;
+      }
+        var oid = sp.get("pay");
+      if (!oid) return null;
+      var from = "";
+      try {
+        from = sessionStorage.getItem("build_pay_from") || "";
+      } catch (e) {}
+        if (from === "checkout") {
+          location.replace("checkout.html" + location.search);
+          return true;
+        } // หลังบ้านรุ่นก่อน 2026-10-25 ส่งกลับมาหน้านี้เสมอ
+        var emu = sp.get("emudone");
+      try {
+        sessionStorage.removeItem("build_pay_wait");
+        history.replaceState(null, "", HERE + (q || "") + "#orders");
+      } catch (e) {}
+        tab = "orders";
+      return (B.demo && emu ? B.ensureEmu().then(function () {
+        window.EMU.payDone(emu);
+      }) : Promise.resolve()).then(function () {
+        return B.call("payCheck", { order: oid }).then(function (c) {
+          return refresh(true).then(function () {
+            if (c.status === "successful") {
+              go("docs");
+              say("ชำระเงินสำเร็จ ดาวน์โหลดไฟล์ได้แล้ว");
+            } else say(c.message || "กำลังรอผลจากผู้ให้บริการ ถ้าชำระแล้ว ระบบจะเปิดไฟล์และแจ้งทางอีเมลภายใน 10 นาที",
+              !!c.message);
+          });
+        });
+      }).catch(function (e) {
+        refresh(true);
+        say(e.message, true);
+      });
+    }
+
+    // ---------- เหตุการณ์ ----------
+    $("view").addEventListener("click", function (ev) {
+      var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear]");
+      if (!t) return;
+      if (t.dataset.eye) {
+        ev.preventDefault();
+        var pi = t.parentNode.querySelector("input");
+        var show = pi.type === "password";
+        pi.type = show ? "text" : "password";
+        t.textContent = show ? "ซ่อน" : "แสดง";
+        t.setAttribute("aria-label", show ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน");
+        return;
+      }
+        if (t.dataset.vr === "again") {
+          run(B.call("registerResend", { email: regWait.email }).then(function () {
+            verifyView();
+          }), "ส่งรหัสใหม่แล้ว");
+          return;
+        }
+        if (t.dataset.vr === "edit") {
+          mode = "reg";
+          regWait = null;
+          say("");
+          authView();
+          return;
+        }
+        if (t.dataset.pend === "again") {
+          run(B.call("socialFinish", { ticket: pending.pending, consent: true, email: pending.codeEmail }).then(function () {
+            pendingView();
+          }), "ส่งรหัสใหม่แล้ว");
+          return;
+        }
+        if (t.dataset.pend === "edit") {
+          pending.codeEmail = "";
+          say("");
+          pendingView();
+          return;
+        }
+        if (t.dataset.soc) {
+          socClick(t.dataset.soc, t.dataset.act || "login");
+          return;
+        }
+        if (t.dataset.pay) {
+          payOpen(t.dataset.oid, t.dataset.pay);
+          return;
+        }
+        if (t.dataset.copy != null) {
+          var tx = t.dataset.copy;
+          if (navigator.clipboard) navigator.clipboard.writeText(tx).then(function () {
+            t.textContent = "คัดลอกแล้ว";
+          }, function () {});
+          return;
+        }
+        if (t.dataset.rcpt) {
+          var o0 = (me.orders || []).filter(function (o) {
+            return o.id === t.dataset.rcpt;
+          })[0];
+          if (o0 && o0.track) {
+            window.open("receipt.html?o=" + encodeURIComponent(o0.id) + "&k=" + encodeURIComponent(o0.track),
+              "_blank", "noopener");
+          } else if (o0) receipt(o0);
+          return;
+        } // ใบเสร็จรับเงินฉบับร้าน (รุ่น 2026-10-27) · คำสั่งซื้อรุ่นเก่าที่ไม่มีกุญแจ ใช้หลักฐานการชำระเงินแบบเดิม
+        if (t.dataset.qa) {
+          run(B.callAdmin("adminAnswer", {
+            ask: t.dataset.qa,
+            answer: "ตัวอย่างคำตอบในโหมดทดลอง: เมื่อต่อหลังบ้านแล้ว ร้านตอบจากหน้าหลังบ้าน แล้วคำตอบจะขึ้นที่นี่ และส่งไปที่อีเมลของคุณ"
+          }).then(function () {
+            return refresh(true);
+          }), "โหมดทดลอง: ร้านตอบแล้ว");
+          return;
+        }
+        if (t.dataset.fg) {
+          forgot.step = 1;
+          authView();
+          return;
+        }
+        if (t.dataset.mode) {
+          mode = t.dataset.mode;
+          pending = null;
+          if (mode === "forgot") forgot = { step: 1, email: "" };
+          say("");
+          authView();
+          return;
+        }
+        if (t.dataset.out) {
+          run(B.call("logout").then(function () {
+            B.token.clear();
+            me = null;
+            mode = "in";
+            authView();
+          }), "ออกจากระบบแล้ว");
+          return;
+        }
+        if (t.dataset.outall) {
+          if (!confirm("ออกจากระบบทุกเครื่อง? เครื่องนี้จะยังเข้าสู่ระบบอยู่")) return;
+          run(B.call("logoutAll").then(function (r) {
+            B.token.set(r.token);
+          }), "ออกจากระบบเครื่องอื่นทั้งหมดแล้ว");
+          return;
+        }
+        if (t.dataset.export) {
+          run(B.call("exportMe").then(function (r) {
+            var s = JSON.stringify(r.file, null, 2), b64 = btoa(unescape(encodeURIComponent(s)));
+            B.saveFile("BUILD_TH_ข้อมูลของฉัน_" + new Date().toISOString().slice(0, 10) + ".json",
+              b64, "application/json");
+          }), "เริ่มดาวน์โหลดข้อมูลของคุณแล้ว");
+          return;
+        }
+        if (t.dataset.avdel) {
+          if (!confirm("ลบรูปโปรไฟล์?")) return;
+          avDraft = null;
+          run(B.call("profile", { avatar: "" }).then(function (r) {
+            me.member = r.member;
+            paint();
+          }), "ลบรูปโปรไฟล์แล้ว");
+          return;
+        }
+        if (t.dataset.geo) {
+          if (!navigator.geolocation) {
+            say("เครื่องนี้ไม่รองรับการหาตำแหน่ง วางลิงก์จาก Google Maps แทนได้", true);
+            return;
+          }
+            say("กำลังหาตำแหน่ง… ถ้าเบราว์เซอร์ถาม ให้กดอนุญาต");
+          navigator.geolocation.getCurrentPosition(function (p) {
+            var fm = $("f-addr");
+            if (!fm) return;
+            fm.elements.map.value = p.coords.latitude.toFixed(6) + "," + p.coords.longitude.toFixed(6);
+            var ml = $("maplink");
+            if (ml) ml.href = mapLink(fm.elements.map.value);
+            say("ใส่พิกัดแล้ว ตรวจในแผนที่ แล้วกด บันทึกที่อยู่");
+          }, function () {
+            say("หาตำแหน่งไม่สำเร็จ วางลิงก์จาก Google Maps แทนได้", true);
+          }, { enableHighAccuracy: true, timeout: 12000 });
+          return;
+        }
+        if (t.dataset.fill === "addr") {
+          var fa = $("f-addr");
+          if (fa) {
+            fa.elements.name.value = me.member.name || "";
+            fa.elements.phone.value = fmtPhone(me.member.phone || "");
+          }
+            return;
+        }
+        if (t.dataset.fill === "tax") {
+          var ft = $("f-tax"), ad = me.member.addr;
+          if (ft && ad) ft.elements.addr.value = [ad.line1, ad.sub, ad.dist, ad.prov, ad.zip].filter(String).join(" ");
+          else say("ยังไม่มีที่อยู่จัดส่ง", true);
+          return;
+        }
+        if (t.dataset.clear) {
+          if (!confirm(t.dataset.clear === "addr" ? "ลบที่อยู่จัดส่ง?" : "ลบข้อมูลออกใบเสร็จ?")) return;
+          var body = {};
+          body[t.dataset.clear] = null;
+          run(B.call("profile", body).then(function (r) {
+            me.member = mergeMember(r.member);
+            paint();
+          }), "ลบข้อมูลแล้ว");
+          return;
+        }
+        if (t.dataset.dl) {
+          var id = t.dataset.dl;
+          run(B.call("download", { sheet: id, lang: t.dataset.lang || "" }).then(function (j) {
+            if (B.demo && !/^JVBER/.test(String(j.b64 || ""))) {
+              say("โหมดทดลอง: สิทธิ์ถูกต้อง ระบบบันทึกการดาวน์โหลดแล้ว · ไฟล์จริง " + j.name + " ส่งจากหลังบ้านเมื่อต่อระบบแล้ว");
+              return null;
+            }
+              if (!j.lic) {
+                B.saveFile(j.name, j.b64, j.type);
+                say("เริ่มดาวน์โหลด " + j.name);
+                return null;
+              }
+              return stampPdf(j).then(function (bytes) {
+                saveBytes(j.name, bytes);
+                say("เริ่มดาวน์โหลด " + j.name + " · ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลด");
+              }, function () {
+                B.saveFile(j.name, j.b64, j.type);
+                say("เริ่มดาวน์โหลด " + j.name + " · ประทับชื่อผู้ซื้อไม่สำเร็จ (เบราว์เซอร์โหลดตัวช่วยไม่ได้) ลองดาวน์โหลดใหม่ภายหลัง",
+                  true);
+              });
+          }).then(function () {
+            return me && id !== "FREE-ALL" ? B.call("me").then(function (r) {
+              me = r;
+              paint();
+            }) : null;
+          }));
+          return;
+        }
+        if (t.dataset.upg) {
+          var uid0 = t.dataset.upg;
+          run(B.call("order", { items: [uid0 + "+U"] }).then(function () {
+            return refresh(true).then(function () {
+              go("orders");
+              say("สร้างคำสั่งซื้ออัปเกรด " + uid0 + " แล้ว จ่ายเฉพาะส่วนต่าง");
+            });
+          }));
+          return;
+        }
+        if (t.dataset.cancel) {
+          if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return;
+          run(B.call("cancel", { order: t.dataset.cancel }).then(function () {
+            return refresh(true);
+          }), "ยกเลิกคำสั่งซื้อแล้ว");
+          return;
+        }
+        if (t.dataset.approve) {
+          run(B.callAdmin("adminOrder", { order: t.dataset.approve, status: ST.paid }).then(function () {
+            return refresh(true);
+          }), "โหมดทดลอง: ร้านยืนยันยอดแล้ว เปิดสิทธิ์ดาวน์โหลด");
+          return;
+        }
+        if (t.dataset.erase) {
+          if (!confirm("ลบบัญชีและข้อมูลทั้งหมดของคุณ รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ ?")) return;
+          run(B.call("erase").then(function () {
+            B.token.clear();
+            me = null;
+            authView();
+          }), "ลบบัญชีแล้ว");
+        }
+    });
+  $("view").addEventListener("change", function (ev) {
+    var e = ev.target;
+    if (e.name === "it" || e.name === "plan") total();
+    if (e.form && e.form.id === "f-avatar" && e.name === "photo" && e.files && e.files[0]) {
+      cropAvatar(e.files[0]).then(function (d) {
+        avDraft = d;
+        [].forEach.call(e.form.querySelectorAll("input[name=av]"), function (r) {
+          r.checked = false;
+        });
+        var holder = e.form.querySelector(".avnow");
+        if (holder) holder.firstElementChild.outerHTML = avatarHtml({ avatar: "photo", avatarSrc: d,
+          name: me.member.name }, "xl");
+        say("ตรวจรูปตัวอย่าง แล้วกด บันทึกรูปโปรไฟล์");
+      }).catch(function (er) {
+        say(er.message, true);
+      });
+    }
+      if (e.form && e.form.id === "f-avatar" && e.name === "av") {
+        avDraft = null;
+        var holder2 = e.form.querySelector(".avnow");
+        if (holder2) holder2.firstElementChild.outerHTML = avatarHtml({ avatar: e.value, name: me.member.name },
+          "xl");
+      }
+      if (e.dataset && e.dataset.country) {
+        var f = e.form, data = {};
+        ["name", "phone", "line1", "sub", "dist", "prov", "zip", "note", "map"].forEach(function (k) {
+          data[k] = f.elements[k] ? f.elements[k].value : "";
+        });
+        data.country = e.value;
+        var keep = me.member.addr;
+        me.member.addr = data;
+        paint();
+        me.member.addr = keep;
+      }
+      if (e.form && e.form.id === "f-tax" && e.name === "type") {
+        var ft = e.form, keepT = me.member.tax;
+        me.member.tax = {
+          type: e.value,
+          name: ft.elements.name.value,
+          id: ft.elements.taxid.value,
+          branch: ft.elements.branch ? ft.elements.branch.value : "",
+          addr: ft.elements.addr.value
+        };
+        paint();
+        me.member.tax = keepT;
+      }
+  });
+  $("view").addEventListener("input", function (ev) {
+    var e = ev.target, f = e.form;
+    if (f && f.querySelector("input[data-pw]")) pwPaint(f);
+    if (e.dataset && e.dataset.taxid) {
+      var pos = e.value.length;
+      e.value = fmtTax(e.value);
+      taxHint();
+    }
+      if (e.name === "zip" && f && f.id === "f-addr" && f.elements.country.value === "ไทย") e.value = e.value.replace(/\D/g,
+        "").slice(0, 5);
+  });
+  $("view").addEventListener("focusout", function (ev) {
+    var e = ev.target;
+    if (e.dataset && e.dataset.phone) e.value = fmtPhone(e.value);
+  });
+  $("view").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var f = ev.target, v = function (n) {
+      return f.elements[n] ? f.elements[n].value : "";
+    };
+    if (f.id === "f-reg") {
+      var em1 = v("email").trim().toLowerCase();
+      if (!v("name").trim()) {
+        say("กรอกชื่อที่ใช้เรียก", true);
+        return;
+      }
+        if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(em1)) {
+          say("อีเมลไม่ถูกรูปแบบ", true);
+          return;
+        }
+        var pe = pwOk(f, "pass", "pass2");
+      if (pe) {
+        say(pe, true);
+        return;
+      }
+        if (!f.elements.consent.checked) {
+          say("กดยินยอมการเก็บข้อมูลก่อนสมัคร", true);
+          return;
+        }
+        // หลังบ้านรุ่นใหม่ตอบ verify (ต้องยืนยันอีเมล) · รุ่นเก่าตอบ token (สร้างบัญชีทันที) ใช้ได้ทั้ง 2 แบบ
+        run(B.call("register", {
+          name: v("name"),
+          email: em1,
+          pass: v("pass"),
+          pass2: v("pass2"),
+          line: v("line"),
+          consent: true
+        }).then(function (r) {
+          if (r && r.token) return signedIn(r).then(function () {
+            say("สมัครสมาชิกแล้ว");
+          });
+          regWait = { email: em1 };
+          mode = "verify";
+          verifyView();
+          say("ส่งรหัสยืนยันไปที่อีเมลแล้ว");
+        }));
+      return;
+    }
+      if (f.id === "f-vr") {
+        var cd = v("code").replace(/\D/g, "");
+        if (cd.length !== 6) {
+          say("ใส่รหัส 6 หลักจากอีเมล", true);
+          return;
+        }
+          run(B.call("registerVerify", { email: regWait.email, code: cd }).then(function (r) {
+            mode = "in";
+            tab = "home";
+            return signedIn(r);
+          }), "สมัครสมาชิกแล้ว ยินดีต้อนรับ");
+        return;
+      }
+      if (f.id === "f-in") {
+        run(B.call("login", { email: v("email"), pass: v("pass") }).then(signedIn),
+          "เข้าสู่ระบบแล้ว");
+        return;
+      }
+      if (f.id === "f-pend") {
+        if (!f.elements.consent.checked) {
+          say("กดยินยอมการเก็บข้อมูลก่อนสมัคร", true);
+          return;
+        }
+          pending.consentOk = true;
+        var body = {
+          ticket: pending.ticket || pending.pending,
+          consent: true,
+          email: v("email")
+        };
+        if (f.elements.code) body.code = v("code").replace(/\D/g, "");
+        run(B.call("socialFinish", body).then(function (r) {
+          if (r.verifyEmail) {
+            pending.codeEmail = r.email;
+            pendingView();
+            say("ส่งรหัสยืนยันไปที่ " + r.email + " แล้ว");
+            return;
+          }
+            tab = "home";
+          return signedIn(r).then(function () {
+            say("สมัครสมาชิกแล้ว ยินดีต้อนรับ");
+          });
+        }));
+        return;
+      }
+      if (f.id === "f-fg1") {
+        var em = v("email").trim().toLowerCase();
+        run(B.call("resetRequest", { email: em }).then(function () {
+          forgot = { step: 2, email: em };
+          authView();
+        }), "ถ้าอีเมลนี้เป็นสมาชิก ระบบส่งรหัสไปแล้ว");
+        return;
+      }
+      if (f.id === "f-fg2") {
+        var pe2 = pwOk(f, "newPass", "newPass2");
+        if (pe2) {
+          say(pe2, true);
+          return;
+        }
+          run(B.call("resetConfirm", {
+            email: forgot.email,
+            code: v("code"),
+            newPass: v("newPass"),
+            newPass2: v("newPass2")
+          }).then(function (r) {
+            mode = "in";
+            return signedIn(r);
+          }), "ตั้งรหัสผ่านใหม่แล้ว");
+        return;
+      }
+      if (f.id === "f-ask") {
+        run(B.call("ask", { topic: v("topic"), text: v("text") }).then(function (r) {
+          me.asks = r.asks;
+          paint();
+        }), "ส่งคำถามแล้ว ร้านจะตอบภายใน 2 วันทำการ");
+        return;
+      }
+      var saved = function (txt) {
+        return function (r) {
+          me.member = mergeMember(r.member);
+          avDraft = null;
+          paint();
+          say(txt);
+        };
+      };
+    if (f.id === "f-avatar") {
+      var pick = f.querySelector("input[name=av]:checked");
+      if (avDraft) {
+        run(B.call("profile", { avatar: "photo", photo: avDraft }).then(saved("บันทึกรูปโปรไฟล์แล้ว")));
+        return;
+      }
+        if (pick) {
+          run(B.call("profile", { avatar: pick.value }).then(saved("บันทึกรูปโปรไฟล์แล้ว")));
+          return;
+        }
+        say("เลือกตัวละครหรืออัปโหลดรูปก่อน", true);
+      return;
+    }
+      if (f.id === "f-basic") {
+        if (!v("name").trim()) {
+          say("กรอกชื่อที่ใช้เรียก", true);
+          return;
+        }
+          var bb = { name: v("name"), line: v("line"), email: v("email") };
+        if (f.elements.phone) bb.phone = v("phone");
+        if (f.elements.occ) {
+          bb.occ = v("occ");
+          bb.pos = v("pos");
+          bb.org = v("org");
+        }
+          run(B.call("profile", bb).then(saved("บันทึกข้อมูลพื้นฐานแล้ว")));
+        return;
+      }
+      if (f.id === "f-addr") {
+        var ad = {
+          country: v("country") === "ไทย" ? "ไทย" : (v("ctry").trim() || "ต่างประเทศ"),
+          name: v("name"),
+          phone: v("phone"),
+          line1: v("line1"),
+          sub: v("sub"),
+          dist: v("dist"),
+          prov: v("prov"),
+          zip: v("zip"),
+          note: v("note"),
+          map: v("map").trim()
+        };
+        if (!ad.name.trim() || !ad.line1.trim()) {
+          say("กรอกชื่อผู้รับและบ้านเลขที่ ถนน", true);
+          return;
+        }
+          if (ad.country === "ไทย" && (!ad.sub.trim() || !ad.dist.trim() || !ad.prov || !/^\d{5}$/.test(ad.zip))) {
+            say("กรอกตำบลหรือแขวง อำเภอหรือเขต จังหวัด และรหัสไปรษณีย์ 5 หลัก", true);
+            return;
+          }
+          run(B.call("profile", { addr: ad }).then(saved("บันทึกที่อยู่จัดส่งแล้ว")));
+        return;
+      }
+      if (f.id === "f-tax") {
+        var tx2 = {
+          type: (f.querySelector("input[name=type]:checked") || {}).value || "person",
+          name: v("name"),
+          id: v("taxid").replace(/\D/g, ""),
+          branch: v("branch"),
+          addr: v("addr")
+        };
+        if (!tx2.name.trim()) {
+          say("กรอกชื่อสำหรับออกเอกสาร", true);
+          return;
+        }
+          if (tx2.id && tx2.id.length !== 13) {
+            say("เลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก", true);
+            return;
+          }
+          if (tx2.type === "company" && !tx2.id) {
+            say("นิติบุคคลต้องมีเลขประจำตัวผู้เสียภาษี 13 หลัก", true);
+            return;
+          }
+          if (tx2.id && !taxOk(tx2.id) && !confirm("เลขนี้ไม่ผ่านสูตรตรวจของเลขประจำตัว 13 หลัก ยืนยันว่าพิมพ์ถูกต้อง?")) return;
+        run(B.call("profile", { tax: tx2 }).then(saved("บันทึกข้อมูลออกใบเสร็จแล้ว")));
+        return;
+      }
+      if (f.id === "f-prefs") {
+        run(B.call("profile", {
+          prefs: {
+            newEdition: f.elements.newEdition.checked,
+            news: f.elements.news.checked
+          }
+        }).then(saved("บันทึกการแจ้งเตือนแล้ว")));
+        return;
+      }
+      if (f.id === "f-pass") {
+        var pe3 = pwOk(f, "newPass", "newPass2");
+        if (pe3) {
+          say(pe3, true);
+          return;
+        }
+          if (v("newPass") === v("pass")) {
+            say("รหัสผ่านใหม่ต้องไม่ซ้ำรหัสผ่านเดิม", true);
+            return;
+          }
+          run(B.call("passwd", { pass: v("pass"), newPass: v("newPass"), newPass2: v("newPass2") }).then(function (r) {
+            f.reset();
+            if (r && r.token) B.token.set(r.token);
+          }), "เปลี่ยนรหัสผ่านแล้ว · ระบบออกจากระบบในเครื่องอื่นให้แล้ว และส่งอีเมลแจ้ง");
+        return;
+      }
+      if (f.id === "f-order") {
+        var upP = planOf() === "up", ids = [].map.call(f.querySelectorAll("input[name=it]:checked"),
+          function (c) {
+            return c.value + (upP ? "+U" : "");
+          });
+        if (!ids.length) {
+          say("เลือกอย่างน้อย 1 รายการ", true);
+          return;
+        }
+          want = "";
+        wantList = [];
+        run(B.call("order", { items: ids }).then(function () {
+          if (B.cart) B.cart.clear();
+          return refresh(true).then(function () {
+            go("orders");
+            say("สร้างคำสั่งซื้อแล้ว เลือกวิธีชำระด้านล่าง");
+          });
+        }));
+        return;
+      }
+      if (f.dataset.slip) {
+        var file = f.elements.slip.files[0], at = v("paidAt");
+        if (!file || !at) {
+          say("เลือกรูปสลิปและใส่เวลาที่โอน", true);
+          return;
+        }
+          run(B.shrink(file).then(function (img) {
+            return B.call("slip", { order: f.dataset.slip, image: img, paidAt: at });
+          }).then(function () {
+            return refresh(true);
+          }), "ส่งสลิปแล้ว ร้านจะตรวจยอดและเปิดสิทธิ์ดาวน์โหลดให้ ผลส่งไปที่อีเมล");
+      }
+  });
+
+  // ปุ่มเข้าระบบด้วยบัญชีอื่น: ขึ้นเฉพาะเมื่อหลังบ้านตั้งคีย์ไว้แล้วด้วย (กันปุ่มที่กดแล้วไม่ทำงาน)
+  function applyLogin(r) {
+    if (!r || !r.login || B.demo) return;
+    var off = PLIST.filter(function (p) {
+      return ON[p] && !r.login[p];
+    });
+    if (!off.length) return;
+    off.forEach(function (p) {
+      ON[p] = false;
+    });
+    var typed = [].some.call(document.querySelectorAll("#view input[type=text],#view input[type=email],#view input[type=password]"),
+      function (i) {
+        return i.value && !i.readOnly;
+      });
+    if (!busy && !typed && !regWait && !pending) {
+      if (me) paint();
+      else authView();
+      return;
+    }
+      off.forEach(function (p) {
+        [].forEach.call(document.querySelectorAll('[data-soc="' + p + '"]' + (p === "google" ? ",#g-btn" : "")),
+          function (el) {
+            el.remove();
+          });
+      });
+    [].forEach.call(document.querySelectorAll("#view .soc"), function (s) {
+      if (!s.children.length) {
+        var n = s.nextElementSibling;
+        if (n && n.classList.contains("note")) {
+          var o = n.nextElementSibling;
+          n.remove();
+          if (o && o.classList.contains("or")) o.remove();
+        }
+          s.remove();
+      }
+    });
+  }
+    if (!B.demo && anySoc()) B.ping().then(applyLogin).catch(function () {});
+
+  // เริ่มหน้า: กลับจากการชำระเงิน → ตรวจผล · กลับจาก LINE หรือ TikTok → ส่งรหัสไปตรวจ · ไม่งั้นโหลดบัญชี
+  if (!payReturn()) {
+    var back = oauthBack();
+    if (back) {
+      if (back.act === "link" && B.token.get()) refresh(true).then(function () {
+        if (me) soc(back.p, "link", back.data);
+      });
+      else {
+        authView();
+        soc(back.p, "login", back.data);
+      }
+    } else refresh(true);
+  }
+})();
