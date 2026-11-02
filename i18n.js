@@ -149,8 +149,23 @@
   }
   window.I18N_TR = function (s) { var v = tr(s); return v === null ? s : v; }; /* for text that is not on the page, such as the print window */
   window.I18N_WAIT = function () { return Object.keys(NEED).length; }; /* how many texts wait for the translator (test page only) */
+  /* 2 Nov 2026: translations of web text made in advance. A first visitor downloads them once, so the page is translated at once. */
+  var TRXP = false;
+  function fetchTrx() {
+    var api = S.member && S.member.api; if (!api) return;
+    var key = "build_trxp_" + LANG, at = 0; try { at = +localStorage.getItem(key) || 0; } catch (e) {}
+    if (at && Date.now() - at < 864e5) return;
+    TRXP = true;
+    fetch(api + "?action=trx&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) { return r.json(); }).then(function (j) {
+      TRXP = false; if (!j || !j.ok || !j.map) return;
+      var n = 0; Object.keys(j.map).forEach(function (k) { if (!EXTRA[k]) { EXTRA[k] = j.map[k]; n++; } if (NEED[k]) delete NEED[k]; });
+      try { localStorage.setItem(extraKey, JSON.stringify(EXTRA)); localStorage.setItem(key, String(Date.now())); } catch (e) {}
+      if (n) again();
+    }).catch(function () { TRXP = false; });
+  }
   function fetchExtra() {
     needTimer = 0;
+    if (TRXP) { needTimer = setTimeout(fetchExtra, 300); return; }
     var list = Object.keys(NEED); if (!list.length) return;
     var batches = []; while (list.length) batches.push(list.splice(0, 60)); batches = batches.slice(0, 5);
     (function next() { var items = batches.shift(); if (!items) { if (Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 900); return; }
@@ -171,7 +186,7 @@
   });
   function start() {
     if (LANG !== "en") { var es = document.getElementById("en-summary"); if (es) es.hidden = true; } /* the English summary of privacy and terms: for English readers only */
-    doNav(); window.addEventListener("load", doNav); fetchFull();
+    doNav(); window.addEventListener("load", doNav); fetchFull(); fetchTrx();
     if (NOTE && document.getElementById("main")) { var nb = document.createElement("div"); nb.setAttribute("data-noi18n", "1"); nb.style.cssText = "background:#FFF4D6;color:#3A2B05;padding:8px 16px;font-size:14px"; nb.textContent = NOTE; var mn = document.getElementById("main"); mn.parentNode.insertBefore(nb, mn); }
     var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย ข้อความแปลด้วยเครื่องจากภาษาไทย ให้ยึดภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop() || "") ? "ข้อความภาษาไทยคือฉบับที่มีผลผูกพัน ข้อความในภาษานี้แปลเพื่อให้อ่านเข้าใจ" : "";
     if (hint && document.getElementById("main")) { var d = document.createElement("div"); d.style.cssText = "background:#E4EAF1;color:#0F2A44;padding:10px 16px;font-size:15px"; d.textContent = hint; var m = document.getElementById("main"); m.parentNode.insertBefore(d, m); }
