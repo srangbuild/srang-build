@@ -1,0 +1,6 @@
+body { margin:0; min-height:100vh; display:grid; place-items:center; background:#0F2A44; color:#fff; font-family:"IBM Plex Sans Thai","Leelawadee UI",system-ui,sans-serif; text-align:center; padding:24px; }
+  a { color:#FF6B1A; font-weight:700; }
+  .box { max-width:420px; }
+  h1 { font-size:22px; margin:0 0 8px; }
+  p { color:#C9D6E3; margin:0 0 18px; }
+  .btn { display:inline-block; background:#FF6B1A; color:#fff; text-decoration:none; padding:12px 22px; border-radius:14px; }
