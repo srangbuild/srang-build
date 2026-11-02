@@ -186,7 +186,7 @@
   if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
   // 2 พ.ย. 2026: ลูกค้าภาษาอื่นเห็นว่ามาตรฐานตามประเทศของตน มีข้อมูลแล้วกี่ใบ
   (function () {
-    var lg = "th"; try { lg = localStorage.getItem("build_lang") || "th"; } catch (e) {} if (lg === "th" || lg === "en") return;
+    var lg = "th"; try { lg = localStorage.getItem("build_lang") || "th"; } catch (e) {} if (lg === "th") return;
     var load = function (u, cb) { var s = document.createElement("script"); s.src = u; s.onload = cb; document.head.appendChild(s); };
     load("doc-cov.js", function () { load("doc-law.js", function () {
       var cc = (window.LANG_CC || {})[lg], bar = $("ccBar"); if (!cc || !bar) return;

@@ -27,8 +27,9 @@
   /* Languages other than Thai and English (1 Nov 2026): Thai -> English -> core word list. */
   var LANG = "en", CORE = {}, NOTE = "";
   try { LANG = localStorage.getItem("build_lang") || "en"; } catch (e) {}
-  (function () { var L = (window.I18N_CORE || {})[LANG], K = window.I18N_KEYS || []; if (!L) { LANG = "en"; return; } L.split("|").forEach(function (w, i) { if (K[i] === "NOTE") NOTE = w; else if (K[i]) CORE[K[i]] = w; }); })();
+  (function () { var L = (window.I18N_CORE || {})[LANG], K = window.I18N_KEYS || []; if (!L && LANG !== "lo") { LANG = "en"; return; } (L || "").split("|").forEach(function (w, i) { if (K[i] === "NOTE") NOTE = w; else if (K[i]) CORE[K[i]] = w; }); })();
   /* Full dictionary English -> this language, built by the back end (i18nBuildAll) and fetched once a day. Kept in this browser only. */
+  var EV = window.EnVar ? window.EnVar.cur() : "US", LOC = LANG === "en" ? "en-" + EV : LANG; /* 3 Nov 2026: English of the US or the UK */
   var I18N_VER = "20261103"; /* change this when the dictionaries change, so a returning visitor gets them at once */
   var FULL = {}, FIX = (window.I18N_FIX || {})[LANG] || {}; /* 2 Nov 2026: corrections by reviewers per language (i18n-fix.js) win over the machine dictionary */
   (function () { if (LANG === "en") return; try { var raw = localStorage.getItem("build_i18n_" + LANG); if (raw) { var j = JSON.parse(raw); if (j && j.map) FULL = j.map; } } catch (e) {} })();
@@ -61,11 +62,16 @@
     var m = DATE_ONLY.exec(t); if (!m || (!m[1] && !m[3])) return null;
     var y = m[3] ? +m[3] : new Date().getFullYear(); if (y >= 2400) y -= 543;
     var o = { month: "short", timeZone: "UTC", numberingSystem: "latn" }; if (m[1]) o.day = "numeric"; if (m[3]) o.year = "numeric";
-    try { return new Intl.DateTimeFormat(LANG, o).format(new Date(Date.UTC(y, TH_M[m[2]], m[1] ? +m[1] : 1))); } catch (e) { return null; }
+    try { return new Intl.DateTimeFormat(LOC, o).format(new Date(Date.UTC(y, TH_M[m[2]], m[1] ? +m[1] : 1))); } catch (e) { return null; }
   }
   /* A label beside the brand name ("Cart — BUILD TH") is translated alone. A brand name inside a sentence stays in the sentence: the back end writes it in Latin letters and the translator keeps it. */
   var BRAND_IN = /(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)/, BRAND_SEP = /(^|[—–·:|]\s*)(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)(\s*[—–·:|]|\s*$)/;
-  function tr(raw) {
+  function tr(raw) { /* English: the result, and text already in English, take the spelling and terms of the chosen country */
+    var v = tr0(raw); if (LANG !== "en" || !window.EnVar) return v;
+    if (v !== null) return window.EnVar.conv(v, EV);
+    var t = norm(raw); if (!t || THAI.test(t)) return null; var c = window.EnVar.conv(t, EV); return c === t ? null : c;
+  }
+  function tr0(raw) {
     var t = norm(raw);
     if (!t || BRAND.test(t)) return null;
     if (BRAND_SEP.test(t)) {
@@ -153,7 +159,7 @@
   }
   var TITLE0 = document.title;
   function again() { walk(document.body); var tv = tr(TITLE0); if (tv !== null) document.title = tv; }
-  document.documentElement.lang = LANG;
+  document.documentElement.lang = LOC;
   if (LANG === "ar" || LANG === "ur") { document.documentElement.dir = "rtl"; var rs = document.createElement("style"); rs.textContent = ".skip:not(:focus){left:auto!important;right:-9999px!important}"; document.head.appendChild(rs); }
   function doNav() { /* the menu is drawn in English by nav.js and marked data-noi18n */
     if (LANG === "en") return;
@@ -210,7 +216,7 @@
     if (NOTE && document.getElementById("main")) { var nb = document.createElement("div"); nb.setAttribute("data-noi18n", "1"); nb.style.cssText = "background:#FFF4D6;color:#3A2B05;padding:8px 16px;font-size:14px"; nb.textContent = NOTE; var mn = document.getElementById("main"); mn.parentNode.insertBefore(nb, mn); }
     var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย ข้อความแปลด้วยเครื่องจากภาษาไทย ให้ยึดภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop() || "") ? "ข้อความภาษาไทยคือฉบับที่มีผลผูกพัน ข้อความในภาษานี้แปลเพื่อให้อ่านเข้าใจ" : "";
     if (hint && document.getElementById("main")) { var d = document.createElement("div"); d.style.cssText = "background:#E4EAF1;color:#0F2A44;padding:10px 16px;font-size:15px"; d.textContent = hint; var m = document.getElementById("main"); m.parentNode.insertBefore(d, m); }
-    if (document.body.classList.contains("k-body") && document.getElementById("main") && LANG !== "en") { /* knowledge pages explain Thai law: a card gives the law of the country of the reader */
+    if (document.body.classList.contains("k-body") && document.getElementById("main")) { /* knowledge pages explain Thai law: a card gives the law of the country of the reader */
       var ls = document.createElement("script"); ls.src = "doc-law.js"; ls.onload = function () {
         var cc = (window.LANG_CC || {})[LANG], rec = (window.LAWDB || []).filter(function (x) { return (window.CC_OF || {})[x.country] === cc; })[0]; if (!rec || cc === "TH") return;
         var dn = ""; try { dn = new Intl.DisplayNames([LANG], { type: "region", style: "short" }).of(cc); } catch (e) { dn = rec.country; }

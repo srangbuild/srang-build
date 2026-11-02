@@ -24,15 +24,16 @@
   // ค่าอื่นนอกจากบาทเป็นค่าประมาณจากอัตราแลกเปลี่ยนล่าสุด · อักขระ U+2068 U+2069 กันทิศทางข้อความในภาษาขวาไปซ้าย และบอก i18n.js ว่านี่คือราคา ไม่ต้องแปล
   function thb(n) { return "฿" + Number(n || 0).toLocaleString("th-TH"); }
   var LANG_CUR = { th: "THB", en: "USD", zh: "CNY", hi: "INR", es: "EUR", fr: "EUR", ar: "SAR", bn: "BDT", pt: "BRL", ru: "RUB", ur: "PKR", id: "IDR", de: "EUR", ja: "JPY", tr: "TRY", sw: "TZS", ta: "INR", vi: "VND", tl: "PHP", ko: "KRW", it: "EUR", nl: "EUR", my: "MMK", ms: "MYR", km: "KHR", lo: "LAK" };
-  var FX0 = { USD:0.029625,CNY:0.197842,INR:2.812735,EUR:0.026545,SAR:0.111091,BDT:3.673813,BRL:0.161063,RUB:2.388268,PKR:8.197044,IDR:536.552651,JPY:4.666575,TRY:1.479806,TZS:78.086048,VND:763.850492,PHP:1.886672,KRW:39.56349,MMK:62.300689,MYR:0.120188,KHR:121.68,LAK:663.212163 }, siteLang = "th", FX = FX0; // FX0 = อัตราสำรองวันที่สร้างไฟล์ · ใช้เมื่ออ่านอัตราล่าสุดไม่ได้
+  var FX0 = { USD:0.029625,CNY:0.197842,INR:2.812735,EUR:0.026545,SAR:0.111091,BDT:3.673813,BRL:0.161063,RUB:2.388268,PKR:8.197044,IDR:536.552651,JPY:4.666575,TRY:1.479806,TZS:78.086048,VND:763.850492,PHP:1.886672,KRW:39.56349,MMK:62.300689,MYR:0.120188,KHR:121.68,LAK:663.212163,GBP:0.0222 }, siteLang = "th", FX = FX0; // FX0 = อัตราสำรองวันที่สร้างไฟล์ · ใช้เมื่ออ่านอัตราล่าสุดไม่ได้
   try { siteLang = localStorage.getItem("build_lang") || "th"; var fxs = JSON.parse(localStorage.getItem("build_fx") || "null"); if (fxs && fxs.rates && fxs.rates.USD > 0) FX = fxs.rates; } catch (e) {}
+  var enV = "US"; try { enV = localStorage.getItem("build_en") || (/^en-(gb|au|nz|ie|za|in|sg|my|hk|pk|ng|ke|mt)/i.test(navigator.language || "") ? "GB" : "US"); } catch (e) {} var LOC = siteLang === "en" ? "en-" + enV : siteLang; if (siteLang === "en" && enV === "GB") LANG_CUR.en = "GBP"; /* 3 Nov 2026: English of the UK shows pounds and UK dates */
   function fxFmt(v, cur, loc) {
-    var nd = /^(USD|EUR|BRL|MYR|SAR|CNY|TRY)$/.test(cur) ? 2 : 0;
+    var nd = /^(USD|GBP|EUR|BRL|MYR|SAR|CNY|TRY)$/.test(cur) ? 2 : 0;
     if (!nd) { if (v >= 1000) { var p = Math.pow(10, Math.floor(Math.log(v) / Math.LN10) - 2); v = Math.round(v / p) * p; } else v = Math.round(v); }
     try { return new Intl.NumberFormat(loc + "-u-nu-latn", { style: "currency", currency: cur, currencyDisplay: "narrowSymbol", minimumFractionDigits: nd, maximumFractionDigits: nd }).format(v); }
     catch (e) { return cur + " " + v.toLocaleString("en-US", { minimumFractionDigits: nd, maximumFractionDigits: nd }); }
   }
-  function fxOf(n, cur) { var r = +FX[cur] || +FX0[cur]; return r > 0 ? fxFmt(n * r, cur, cur === "USD" ? "en-US" : siteLang) : ""; }
+  function fxOf(n, cur) { var r = +FX[cur] || +FX0[cur]; return r > 0 ? fxFmt(n * r, cur, cur === "USD" ? "en-US" : LOC) : ""; }
   function baht(n) { // ราคาที่แสดงในร้าน
     n = Number(n || 0); if (!n) return thb(0);
     var cur = LANG_CUR[siteLang] || "THB", us = fxOf(n, "USD"), main = cur === "THB" ? thb(n) : fxOf(n, cur) || thb(n);
@@ -140,7 +141,7 @@
   var MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
   function when(iso) {
     var d = new Date(iso); if (!iso || isNaN(d)) return "";
-    if (siteLang !== "th") { try { return "⁨" + new Intl.DateTimeFormat(siteLang, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, numberingSystem: "latn" }).format(d) + "⁩"; } catch (e) {} } // 2 พ.ย. 2026: รูปแบบวันที่ของภาษานั้น · อักขระ U+2068 U+2069 บอก i18n.js ว่าไม่ต้องแปล
+    if (siteLang !== "th") { try { return "⁨" + new Intl.DateTimeFormat(LOC, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, numberingSystem: "latn" }).format(d) + "⁩"; } catch (e) {} } // 2 พ.ย. 2026: รูปแบบวันที่ของภาษานั้น · อักขระ U+2068 U+2069 บอก i18n.js ว่าไม่ต้องแปล
     return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
   }
   function rand(n) { var a = new Uint8Array(n || 16); (window.crypto || window.msCrypto).getRandomValues(a); return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
