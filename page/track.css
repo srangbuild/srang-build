@@ -1,0 +1,11 @@
+.tl { list-style: none; margin: 18px 0 0; padding: 0; position: relative; }
+  .tl li { position: relative; padding: 0 0 22px 44px; }
+  .tl li::before { content: ""; position: absolute; left: 15px; top: 30px; bottom: -2px; width: 2px; background: #DDE2E8; }
+  .tl li:last-child::before { display: none; }
+  .tl li > b { position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 15px/1 "Kanit", sans-serif; background: #fff; border: 2px solid #C9D2DC; color: #5A6573; }
+  .tl li.d > b { background: #1F7A4C; border-color: #1F7A4C; color: #fff; } .tl li.d::before { background: #1F7A4C; }
+  .tl li.a > b { border-color: #FF6B1A; color: #C24A08; box-shadow: 0 0 0 4px rgba(255,107,26,.15); }
+  .tl li.x > b { border-color: #B3261E; color: #B3261E; }
+  .tl h3 { margin: 4px 0 2px; font-size: 17px; color: #0F2A44; } .tl li:not(.d):not(.a) h3 { color: #5A6573; }
+  .tl p { margin: 0; color: #3F4A58; font-size: 14.5px; } .tl time { display: block; font-size: 13.5px; color: #5A6573; }
+  .sumrow { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; } .sumrow b.big { font: 700 22px/1.2 "Kanit", sans-serif; color: #0F2A44; }
