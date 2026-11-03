@@ -243,11 +243,11 @@
       });
       if (!list.length) return "";
       var had = first;
-      return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", list.map(function (k) {
+      return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", PAY.groupNote(list) + list.map(function (k) {
         var c = first;
         first = false;
         return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>"
-          + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k)
+          + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k, list)
           + "</label>";
       }).join(""), had);
     }).join("");
@@ -286,9 +286,9 @@
           return PAY.LABEL[k][2] === g[0];
         });
         return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
-          '<div class="po">' + list.map(function (k) {
+          PAY.groupNote(list) + '<div class="po">' + list.map(function (k) {
             return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0])
-              + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</button>";
+              + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k, list) + "</button>";
           }).join("") + "</div>") : "";
       }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
       + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";

@@ -715,9 +715,9 @@
           return PAYM[k][2] === g[0];
         });
         return list.length ? B.pay.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
-          '<div class="po">' + list.map(function (k) {
+          B.pay.groupNote(list) + '<div class="po">' + list.map(function (k) {
             return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id)
-              + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small>" + B.pay.feeHtml(k)
+              + '"><b>' + esc(PAYM[k][0]) + "</b><small>" + esc(PAYM[k][1]) + "</small>" + B.pay.feeHtml(k, list)
               + "</button>";
           }).join("") + "</div>") : "";
       }).join("") + B.pay.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
