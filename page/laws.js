@@ -33,7 +33,7 @@
     "singaporestandardseshop.sg", "standardsforhighways.co.uk", "bcsa.org.uk", "theiet.org",
     "iiee.org.ph", "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org",
     "circe.hn", "occ.cd", "anor.cm", "abnorm.bf", "hbrc.edu.eg", "coe.or.th", "act.or.th",
-    "eit.or.th", "engc.org.uk", "arb.org.uk"];
+    "eit.or.th", "engc.org.uk", "arb.org.uk", "ncees.org", "ncarb.org"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
     "worldbank.org"];
   function hostOf(url) {
