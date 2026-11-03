@@ -13,17 +13,29 @@
     };
 
   /* Who publishes a link. A government page comes first, and the badge says what the reader is opening. */
-  var GOV = /(^|\.)(gov|go|gob|gouv|gub|govt|gv|gc)\.[a-z]{2,3}$|\.gov$|(^|\.)gov\.[a-z]{2,3}$|\.admin\.ch$|\.europa\.eu$|\.mil$/i;
+  var GOV = /(^|\.)(gov|go|gob|gouv|gub|govt|gv|gc)\.[a-z]{2}$|\.gov$|\.admin\.ch$|\.europa\.eu$|\.mil$/i;
   var OFFICIAL = ["boe.es", "codigotecnico.org", "normattiva.it", "gazzettaufficiale.it",
     "riksdagen.se", "boverket.se", "retsinformation.dk", "regjeringen.no", "lovdata.no",
     "slov-lex.sk", "minv.sk", "mrrb.bg", "mi.government.bg", "overheid.nl", "legilux.public.lu",
-    "legimonaco.mc", "nn.hr", "diariodarepublica.pt", "chinhphu.vn", "irishstatutebook.ie",
+    "legimonaco.mc", "nn.hr", "diariodarepublica.pt", "chinhphu.vn", "cdnchinhphu.vn",
+    "irishstatutebook.ie",
     "saskatchewan.ca", "vlaanderen.be", "wallonie.be", "ch.ch", "gesetze.li", "llv.li", "governo.cv",
     "incv.cv", "consigliograndeegenerale.sm", "legis.md", "pravno-informacioni-sistem.rs",
-    "vladars.rs", "ym.fi", "kenyalaw.org", "batowncouncil.com.fj"];
+    "vladars.rs", "ym.fi", "kenyalaw.org", "batowncouncil.com.fj", "gov.scot", "gov.wales", "nic.in",
+    "almeezan.qa", "u.ae", "impo.com.uy", "joradp.dz", "conseildetat.dz", "idaraty.tn", "ibst.vn",
+    "sbma.com", "opamss.org.sv", "bund.de", "gesetze-im-internet.de", "economie-ivoirienne.ci",
+    "investindrc.cd", "sgg-mali.ml", "pravo.by", "etalonline.by", "lex.uz", "mc.uz", "egov.tj",
+    "portali-huquqi.tj", "anp.ne", "hauqe.tg", "zan.kz"];
   var BODY = ["din.de", "dibt.de", "oib.or.at", "iccsafe.org", "pec.org.pk", "psqca.com.pk",
     "sgpstandard.cz", "aipalync.org", "bsigroup.com", "iso.org", "pkn.pl", "piib.org.pl",
-    "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org"];
+    "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org",
+    "singaporestandardseshop.sg", "standardsforhighways.co.uk", "bcsa.org.uk", "theiet.org",
+    "iiee.org.ph",
+    "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org", "circe.hn", "occ.cd",
+    "anor.cm",
+    "abnorm.bf"];
+  var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
+    "worldbank.org"];
   function hostOf(url) {
     try {
       return new URL(url).hostname.replace(/^www\./, "");
@@ -39,10 +51,12 @@
   function kindOf(url) {
     var h = hostOf(url);
     if (GOV.test(h) || inList(h, OFFICIAL)) return 0;
-    return inList(h, BODY) ? 1 : 2;
+    if (inList(h, BODY)) return 1;
+    return inList(h, INTL) ? 2 : 3;
   }
-  var BADGE = [["ok", "หน่วยงานรัฐ"], ["body", "หน่วยงานมาตรฐานหรือสภาวิชาชีพ"], ["other",
-    "แหล่งอื่น ควรยืนยันกับหน่วยงาน"]];
+  var BADGE = [["ok", "หน่วยงานรัฐ"], ["body", "หน่วยงานมาตรฐานหรือสภาวิชาชีพ"], ["intl",
+    "องค์การระหว่างประเทศ"],
+    ["other", "แหล่งอื่น ควรยืนยันกับหน่วยงาน"]];
 
   function sourcesOf(x, cc) {
     var seen = {}, list = [x.sourceUrl, x.sourceUrl2].concat((REFS[cc] && REFS[cc].src) || []).filter(function (u) {
@@ -86,9 +100,9 @@
   function srcHtml(src) {
     if (!src.length) return '<p class="note">ยังไม่พบหน้าทางการที่ยืนยันได้</p>';
     var main = src.filter(function (u) {
-      return kindOf(u) < 2;
+      return kindOf(u) < 3;
     }), rest = src.filter(function (u) {
-      return kindOf(u) === 2;
+      return kindOf(u) === 3;
     });
     return (main.length ? '<ul class="lw-src">' + main.slice(0, 8).map(linkRow).join("") + "</ul>" : '<p class="note">ยังไม่พบหน้าทางการที่ยืนยันได้</p>')
       + (main.length > 8 ? '<details class="lw-std"><summary>หน้าทางการเพิ่มเติม <span data-noi18n="1">('

@@ -20,6 +20,7 @@
 .lw-b { font-size: 12.5px; padding: 2px 8px; border-radius: 999px; white-space: normal; }
 .lw-b.ok { background: #E3F4E8; color: #17643A; }
 .lw-b.body { background: #E5EEF9; color: #1F4C86; }
+.lw-b.intl { background: #EFEAF8; color: #4B3A82; }
 .lw-b.other { background: #F1F3F6; color: #475466; }
 .lw-meta { margin: 10px 14px 12px; }
 .lw-std { margin: 0 14px 14px; }
