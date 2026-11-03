@@ -30,25 +30,25 @@
         return l;
       }
     }
-    function lgOpt(l, sel) {
-      var R = window.REGION, c = LCODE[l], n = lgName(l), o = c && R && R.ownName ? R.ownName(c) : "";
-      return '<option value="' + esc(l) + '"' + (l === sel ? " selected" : "") + (c ? ' data-lc="' + c
-        + '"' + (UI !== "th" ? ' data-noi18n="1"' : "") : ' data-last="1"') + ">" + esc(o && o !== n
-          ? n + " · " + o : n) + "</option>";
-    }
-    (function () {
-      var R = window.REGION, sp = $("stdPick"), oth = sp.querySelector('[value="other"]');
-      if (!B.CTRY || !R) return;
-      Object.keys(B.CTRY).forEach(function (k) {
-        var o = document.createElement("option");
-        o.value = k;
-        o.setAttribute("data-lc", k);
-        o.setAttribute("data-src", B.CTRY[k][0]);
-        o.setAttribute("data-noi18n", "1");
-        o.textContent = UI === "th" ? B.CTRY[k][0] : R.regionName(k, UI);
-        sp.insertBefore(o, oth);
-      });
-    })();
+  function lgOpt(l, sel) {
+    var R = window.REGION, c = LCODE[l], n = lgName(l), o = c && R && R.ownName ? R.ownName(c) : "";
+    return '<option value="' + esc(l) + '"' + (l === sel ? " selected" : "") + (c ? ' data-lc="' + c
+      + '"' + (UI !== "th" ? ' data-noi18n="1"' : "") : ' data-last="1"') + ">" + esc(o && o !== n
+        ? n + " · " + o : n) + "</option>";
+  }
+  (function () {
+    var R = window.REGION, sp = $("stdPick"), oth = sp.querySelector('[value="other"]');
+    if (!B.CTRY || !R) return;
+    Object.keys(B.CTRY).forEach(function (k) {
+      var o = document.createElement("option");
+      o.value = k;
+      o.setAttribute("data-lc", k);
+      o.setAttribute("data-src", B.CTRY[k][0]);
+      o.setAttribute("data-noi18n", "1");
+      o.textContent = UI === "th" ? B.CTRY[k][0] : R.regionName(k, UI);
+      sp.insertBefore(o, oth);
+    });
+  })();
   $("lang1").innerHTML = LANGS.map(function (l) {
     return lgOpt(l, "อังกฤษ (สหรัฐอเมริกา)");
   }).join("");
@@ -60,24 +60,24 @@
     $("items").value = String(P.get("item")).replace(/[^\w .,+-]/g, "").slice(0, 300);
     $("kind").value = "ใบตรวจงานภาษาอื่น";
   }
-    if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
+  if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
   function nLang() {
     var r = document.querySelector("input[name=n]:checked");
     return r ? +r.value : 2;
   }
-    function draw() {
-      var two = nLang() === 2;
-      $("l2w").hidden = !two;
-      $("l1t").textContent = two ? "ภาษาบรรทัดบน (มีช่องกรอก)" : "ภาษาของเอกสาร";
-      var a = $("lang1").value, b = $("lang2").value;
-      $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + '<span data-noi18n="1">' + esc(SAMPLE[a]
-        || a) + "</span> [ ช่องกรอก ] มม." + (two ? '<span class="l2"><span data-noi18n="1">' + esc(SAMPLE[b]
-          || b) + "</span> ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + '<span class="l2">คำตัวอย่างเป็นฉบับร่าง เอกสารจริงมีผู้แปลตรวจก่อนส่งมอบ</span>'
-        + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
-    }
-    document.addEventListener("change", function (ev) {
-      if (ev.target.name === "n" || ev.target.id === "lang1" || ev.target.id === "lang2") draw();
-    });
+  function draw() {
+    var two = nLang() === 2;
+    $("l2w").hidden = !two;
+    $("l1t").textContent = two ? "ภาษาบรรทัดบน (มีช่องกรอก)" : "ภาษาของเอกสาร";
+    var a = $("lang1").value, b = $("lang2").value;
+    $("pv").innerHTML = "<b>ตัวอย่างหน้าตา 1 ข้อ</b><br>" + '<span data-noi18n="1">' + esc(SAMPLE[a]
+      || a) + "</span> [ ช่องกรอก ] มม." + (two ? '<span class="l2"><span data-noi18n="1">' + esc(SAMPLE[b]
+        || b) + "</span> ① (บรรทัดล่างชี้กล่องเดียวกัน)</span>" : "") + '<span class="l2">คำตัวอย่างเป็นฉบับร่าง เอกสารจริงมีผู้แปลตรวจก่อนส่งมอบ</span>'
+      + (two && a === b ? '<span class="l2" style="color:var(--bad)">เลือกภาษาบรรทัดล่างให้ต่างจากบรรทัดบน</span>' : "");
+  }
+  document.addEventListener("change", function (ev) {
+    if (ev.target.name === "n" || ev.target.id === "lang1" || ev.target.id === "lang2") draw();
+  });
   document.addEventListener("click", function (ev) {
     var k = ev.target.closest("[data-kind]");
     if (k) {
@@ -92,7 +92,7 @@
     m.textContent = t || "";
     if (t) m.scrollIntoView({ block: "nearest" });
   }
-    var busy = false;
+  var busy = false;
   $("f-rq").addEventListener("submit", function (ev) {
     ev.preventDefault();
     if (busy) return;
@@ -103,23 +103,23 @@
       say("กรอกชื่อและอีเมลให้ถูกต้อง", true);
       return;
     }
-      if (!v("kind")) {
-        say("เลือกประเภทงาน", true);
-        return;
-      }
-      if (two && v("lang1") === v("lang2")) {
-        say("ภาษาบรรทัดล่างต้องต่างจากบรรทัดบน หรือเลือก 1 ภาษา", true);
-        return;
-      }
-      if (v("desc").length < 10) {
-        say("เล่ารายละเอียดของงานอย่างน้อย 10 ตัวอักษร", true);
-        return;
-      }
-      if (!f.elements.consent.checked) {
-        say("ติ๊กยินยอมก่อนส่งคำขอ", true);
-        return;
-      }
-      busy = true;
+    if (!v("kind")) {
+      say("เลือกประเภทงาน", true);
+      return;
+    }
+    if (two && v("lang1") === v("lang2")) {
+      say("ภาษาบรรทัดล่างต้องต่างจากบรรทัดบน หรือเลือก 1 ภาษา", true);
+      return;
+    }
+    if (v("desc").length < 10) {
+      say("เล่ารายละเอียดของงานอย่างน้อย 10 ตัวอักษร", true);
+      return;
+    }
+    if (!f.elements.consent.checked) {
+      say("ติ๊กยินยอมก่อนส่งคำขอ", true);
+      return;
+    }
+    busy = true;
     var btn = f.querySelector("button[type=submit]");
     btn.disabled = true;
     btn.textContent = "กำลังส่ง…";

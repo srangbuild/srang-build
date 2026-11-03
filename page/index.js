@@ -49,10 +49,10 @@
       + "</a>" : esc(S.announce.text);
   }
 
-    // ปุ่มหลัก
-    var firstCh = PLAT.filter(function (p) {
-      return ok(L[p[0]]);
-    })[0];
+  // ปุ่มหลัก
+  var firstCh = PLAT.filter(function (p) {
+    return ok(L[p[0]]);
+  })[0];
   var cta = "";
   cta += '<a class="b pri" href="sheets.html' + pv + '#compare">โหลดใบตรวจงานฟรี</a>'; /* มติสภา 30 ต.ค. 2026: ชูใบตรวจงาน เลิกแจกเช็กลิสต์จากคลิปบนหน้าเว็บ */
   if (firstCh) cta += '<a class="b sec" href="' + esc(L[firstCh[0]]) + '"' + ext + ">ดูคลิปบน " + firstCh[1]
@@ -161,8 +161,8 @@
         + pv + '">' + (onSale.length ? "บัญชีสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" : "") + "</span>";
   }
 
-    // ตอน
-    var topics = [];
+  // ตอน
+  var topics = [];
   shown.forEach(function (e) {
     if (e.topic && topics.indexOf(e.topic) < 0) topics.push(e.topic);
   });
@@ -176,26 +176,26 @@
         + p[1] + "</a>";
     }).join("");
   }
-    function drawEps() {
-      $("eps").innerHTML = shown.filter(function (e) {
-        return cur === "ทั้งหมด" || e.topic === cur;
-      }).map(function (e) {
-        var w = links(e.watch, "p"), s = links(e.song, "");
-        var badge = w ? '<span class="pill ok">ดูได้แล้ว</span>' : (future(e.date) ? '<span class="pill">ปล่อย '
-          + fmt(e.date, true) + "</span>" : '<span class="pill gray">เร็ว ๆ นี้</span>');
-        return '<article class="card ep"><div class="im">' + (e.cover ? '<img src="' + esc(e.cover)
-          + '" alt="ปกตอน #' + esc(e.no) + '" loading="lazy" width="360" height="480">' : "") + badge
-          + '</div><div class="tx"><h3>#' + esc(e.no) + " " + esc(e.title) + '</h3><div class="meta">'
-          + esc(e.topic || "") + (e.date ? " · " + fmt(e.date) : "") + "</div>" + (w ? '<div class="acts">'
-            + w + "</div>" : "") + (e.songTitle ? '<div class="song">เพลง “' + esc(e.songTitle) + "”"
-              + (s ? ' <span class="acts" style="display:inline-flex;margin-left:4px">' + s + "</span>" : (e.songDate
-                ? " · " + fmt(e.songDate, true) : "")) + "</div>" : "") + "</div></article>";
-      }).join("");
-    }
-    $("chips").innerHTML = ["ทั้งหมด"].concat(topics).map(function (t) {
-      return '<button class="chip" type="button" data-v="' + esc(t) + '" aria-pressed="' + (t === cur)
-        + '">' + esc(t) + "</button>";
+  function drawEps() {
+    $("eps").innerHTML = shown.filter(function (e) {
+      return cur === "ทั้งหมด" || e.topic === cur;
+    }).map(function (e) {
+      var w = links(e.watch, "p"), s = links(e.song, "");
+      var badge = w ? '<span class="pill ok">ดูได้แล้ว</span>' : (future(e.date) ? '<span class="pill">ปล่อย '
+        + fmt(e.date, true) + "</span>" : '<span class="pill gray">เร็ว ๆ นี้</span>');
+      return '<article class="card ep"><div class="im">' + (e.cover ? '<img src="' + esc(e.cover)
+        + '" alt="ปกตอน #' + esc(e.no) + '" loading="lazy" width="360" height="480">' : "") + badge
+        + '</div><div class="tx"><h3>#' + esc(e.no) + " " + esc(e.title) + '</h3><div class="meta">'
+        + esc(e.topic || "") + (e.date ? " · " + fmt(e.date) : "") + "</div>" + (w ? '<div class="acts">'
+          + w + "</div>" : "") + (e.songTitle ? '<div class="song">เพลง “' + esc(e.songTitle) + "”"
+            + (s ? ' <span class="acts" style="display:inline-flex;margin-left:4px">' + s + "</span>" : (e.songDate
+              ? " · " + fmt(e.songDate, true) : "")) + "</div>" : "") + "</div></article>";
     }).join("");
+  }
+  $("chips").innerHTML = ["ทั้งหมด"].concat(topics).map(function (t) {
+    return '<button class="chip" type="button" data-v="' + esc(t) + '" aria-pressed="' + (t === cur)
+      + '">' + esc(t) + "</button>";
+  }).join("");
   $("chips").addEventListener("click", function (ev) {
     var b = ev.target.closest(".chip");
     if (!b) return;
@@ -223,20 +223,20 @@
     }).join("");
   }
 
-    // บริการ ร้าน เพลง คำถาม
-    // รายการที่มีหน้าในเว็บนี้เอง (ช่อง page เช่น sheets.html) ได้ปุ่มไปหน้านั้น · รายการที่ยังไม่เปิดได้ปุ่มแจ้งเตือนทาง LINE
-    // บริการหรือของที่ยังไม่เปิด: ผู้ใช้เห็นชื่อ + เร็ว ๆ นี้ + ปุ่มรับแจ้งเตือน · รายละเอียดและราคาอยู่ในหลังบ้าน (คำสั่งผู้ใช้ 30 ต.ค. 2026)
-    function item(x) {
-      var open = ok(x.url), pg = /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "") ? x.page : "",
-        live = open || !!pg;
-      return '<div class="card it' + (live ? "" : " soon") + '"><h3>' + esc(x.title) + ' <span class="pill'
-        + (live ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : pg ? (x.price || "เปิดขายแล้ว") : "เร็ว ๆ นี้")
-        + "</span></h3>" + (live ? "<p>" + esc(x.text) + "</p>" : "") + (open ? '<a class="b line sm" href="'
-          + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (pg ? '<a class="b line sm" href="' + esc(pg)
-            + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="'
-              + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>";
-    }
-    $("services").innerHTML = (S.services || []).map(item).join("");
+  // บริการ ร้าน เพลง คำถาม
+  // รายการที่มีหน้าในเว็บนี้เอง (ช่อง page เช่น sheets.html) ได้ปุ่มไปหน้านั้น · รายการที่ยังไม่เปิดได้ปุ่มแจ้งเตือนทาง LINE
+  // บริการหรือของที่ยังไม่เปิด: ผู้ใช้เห็นชื่อ + เร็ว ๆ นี้ + ปุ่มรับแจ้งเตือน · รายละเอียดและราคาอยู่ในหลังบ้าน (คำสั่งผู้ใช้ 30 ต.ค. 2026)
+  function item(x) {
+    var open = ok(x.url), pg = /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "") ? x.page : "",
+      live = open || !!pg;
+    return '<div class="card it' + (live ? "" : " soon") + '"><h3>' + esc(x.title) + ' <span class="pill'
+      + (live ? " ok" : "") + '">' + esc(open ? (x.price || "เปิดแล้ว") : pg ? (x.price || "เปิดขายแล้ว") : "เร็ว ๆ นี้")
+      + "</span></h3>" + (live ? "<p>" + esc(x.text) + "</p>" : "") + (open ? '<a class="b line sm" href="'
+        + esc(x.url) + '"' + ext + ">ดูรายละเอียด →</a>" : (pg ? '<a class="b line sm" href="' + esc(pg)
+          + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="'
+            + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>";
+  }
+  $("services").innerHTML = (S.services || []).map(item).join("");
   $("shopitems").innerHTML = (S.shop || []).map(item).join("");
   $("musiclinks").innerHTML = (S.music || []).map(function (m) {
     var on = ok(m.url);

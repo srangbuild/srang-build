@@ -34,36 +34,36 @@
       $("chips").hidden = true;
       return;
     }
-      $("cards").innerHTML = list.map(function (x) {
-        var sell = B.canSell(x);
-        return '<article class="card mk"><a class="im" href="' + esc(pLink(x.id)) + '" tabindex="-1" aria-hidden="true">'
-          + (x.img ? '<img src="' + esc(x.img) + '" alt="" loading="lazy">' : esc(x.kind || "สินค้า"))
-          + '</a><div class="tx"><span class="kind">' + esc(x.kind) + " · " + esc(x.id) + '</span><h3><a href="'
-          + esc(pLink(x.id)) + '">' + esc(x.title) + "</a></h3>" + (x.seller ? '<span class="by">โดย '
-            + esc(x.seller) + "</span>" : "") + "<p>" + esc(x.sum || "") + '</p><span class="by">' + esc(DEL[x.delivery]
-              || DEL.manual) + (x.format ? " · " + esc(x.format) : "") + '</span><div class="ft"><span class="price">'
-          + (+x.price > 0 ? B.baht(B.memberPrice(x.price)) : "") + "</span>" + (sell ? '<button class="b pri sm" type="button" data-add="'
-            + esc(x.id) + '">ใส่ตะกร้า</button>' : '<span class="pill gray">เร็ว ๆ นี้</span>') + "</div></div></article>";
-      }).join("") || '<p class="note">ไม่มีสินค้าในประเภทนี้</p>';
+    $("cards").innerHTML = list.map(function (x) {
+      var sell = B.canSell(x);
+      return '<article class="card mk"><a class="im" href="' + esc(pLink(x.id)) + '" tabindex="-1" aria-hidden="true">'
+        + (x.img ? '<img src="' + esc(x.img) + '" alt="" loading="lazy">' : esc(x.kind || "สินค้า"))
+        + '</a><div class="tx"><span class="kind">' + esc(x.kind) + " · " + esc(x.id) + '</span><h3><a href="'
+        + esc(pLink(x.id)) + '">' + esc(x.title) + "</a></h3>" + (x.seller ? '<span class="by">โดย '
+          + esc(x.seller) + "</span>" : "") + "<p>" + esc(x.sum || "") + '</p><span class="by">' + esc(DEL[x.delivery]
+            || DEL.manual) + (x.format ? " · " + esc(x.format) : "") + '</span><div class="ft"><span class="price">'
+        + (+x.price > 0 ? B.baht(B.memberPrice(x.price)) : "") + "</span>" + (sell ? '<button class="b pri sm" type="button" data-add="'
+          + esc(x.id) + '">ใส่ตะกร้า</button>' : '<span class="pill gray">เร็ว ๆ นี้</span>') + "</div></div></article>";
+    }).join("") || '<p class="note">ไม่มีสินค้าในประเภทนี้</p>';
     try {
       window.dispatchEvent(new Event("build-cart"));
     } catch (e) {}
   }
-    if (kinds.length > 1) {
-      $("chips").innerHTML = ["ทั้งหมด"].concat(kinds).map(function (k) {
-        return '<button class="chip" type="button" data-v="' + esc(k) + '" aria-pressed="' + (k === cur)
-          + '">' + esc(k) + "</button>";
-      }).join("");
-      $("chips").addEventListener("click", function (ev) {
-        var b = ev.target.closest(".chip");
-        if (!b) return;
-        cur = b.getAttribute("data-v") || b.textContent;
-        [].forEach.call($("chips").children, function (c) {
-          c.setAttribute("aria-pressed", String(c === b));
-        });
-        draw();
+  if (kinds.length > 1) {
+    $("chips").innerHTML = ["ทั้งหมด"].concat(kinds).map(function (k) {
+      return '<button class="chip" type="button" data-v="' + esc(k) + '" aria-pressed="' + (k === cur)
+        + '">' + esc(k) + "</button>";
+    }).join("");
+    $("chips").addEventListener("click", function (ev) {
+      var b = ev.target.closest(".chip");
+      if (!b) return;
+      cur = b.getAttribute("data-v") || b.textContent;
+      [].forEach.call($("chips").children, function (c) {
+        c.setAttribute("aria-pressed", String(c === b));
       });
-    } else $("chips").hidden = true;
+      draw();
+    });
+  } else $("chips").hidden = true;
   draw();
 
   // ใบสมัครฝากขาย → หลังบ้าน (action consign) · กันส่งซ้ำระหว่างรอ
@@ -74,7 +74,7 @@
     m.textContent = t || "";
     if (t) m.scrollIntoView({ block: "nearest" });
   }
-    var busy = false;
+  var busy = false;
   $("f-cs").addEventListener("submit", function (ev) {
     ev.preventDefault();
     if (busy) return;
@@ -85,23 +85,23 @@
       say("กรอกชื่อและอีเมลให้ถูกต้อง", true);
       return;
     }
-      if (!v("kind")) {
-        say("เลือกประเภทสินค้า", true);
-        return;
-      }
-      if (v("title").length < 3 || v("desc").length < 20) {
-        say("กรอกชื่อสินค้า และรายละเอียดอย่างน้อย 20 ตัวอักษร", true);
-        return;
-      }
-      if (v("url") && !/^https:\/\//.test(v("url"))) {
-        say("ลิงก์ตัวอย่างต้องขึ้นต้นด้วย https://", true);
-        return;
-      }
-      if (!f.elements.own.checked) {
-        say("ยืนยันเรื่องลิขสิทธิ์และเงื่อนไขก่อนส่ง", true);
-        return;
-      }
-      busy = true;
+    if (!v("kind")) {
+      say("เลือกประเภทสินค้า", true);
+      return;
+    }
+    if (v("title").length < 3 || v("desc").length < 20) {
+      say("กรอกชื่อสินค้า และรายละเอียดอย่างน้อย 20 ตัวอักษร", true);
+      return;
+    }
+    if (v("url") && !/^https:\/\//.test(v("url"))) {
+      say("ลิงก์ตัวอย่างต้องขึ้นต้นด้วย https://", true);
+      return;
+    }
+    if (!f.elements.own.checked) {
+      say("ยืนยันเรื่องลิขสิทธิ์และเงื่อนไขก่อนส่ง", true);
+      return;
+    }
+    busy = true;
     var btn = f.querySelector("button[type=submit]");
     btn.disabled = true;
     btn.textContent = "กำลังส่ง…";

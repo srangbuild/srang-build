@@ -28,468 +28,468 @@
       m.hidden = true;
       return;
     }
-      m.hidden = false;
+    m.hidden = false;
     m.className = "msg " + (bad ? "bad" : "ok");
     m.textContent = t;
     m.scrollIntoView({ block: "nearest" });
   }
-    function lock(on) {
-      busy = on;
-      [].forEach.call(document.querySelectorAll("#view button, #view input, #view select, #view textarea"),
-        function (b) {
-          if (on) {
-            b.dataset.was = b.disabled ? "1" : "";
-            b.disabled = true;
-          } else b.disabled = b.dataset.was === "1";
-        });
-      var s = document.querySelector("#view [data-go]");
-      if (s) {
+  function lock(on) {
+    busy = on;
+    [].forEach.call(document.querySelectorAll("#view button, #view input, #view select, #view textarea"),
+      function (b) {
         if (on) {
-          s.dataset.txt = s.textContent;
-          s.textContent = "กำลังดำเนินการ…";
-        } else if (s.dataset.txt) s.textContent = s.dataset.txt;
-      }
-    }
-    function steps(n) {
-      [].forEach.call($("steps").children, function (li, i) {
-        li.className = i < n ? "done" : i === n ? "on" : "";
-        if (i === n) li.setAttribute("aria-current", "step");
-        else li.removeAttribute("aria-current");
+          b.dataset.was = b.disabled ? "1" : "";
+          b.disabled = true;
+        } else b.disabled = b.dataset.was === "1";
       });
+    var s = document.querySelector("#view [data-go]");
+    if (s) {
+      if (on) {
+        s.dataset.txt = s.textContent;
+        s.textContent = "กำลังดำเนินการ…";
+      } else if (s.dataset.txt) s.textContent = s.dataset.txt;
     }
-    function title(id) {
-      var x = B.find(id);
-      return (x ? B.code(x) + " " + x.title : id) + (B.isCtry(B.varOf(id)) ? " · " + B.LANGS[B.varOf(id)] : "");
-    }
-    function planTx(id) {
-      var x = B.find(id);
-      return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ",
-        manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด";
-    }
-    function trackUrl(o) {
-      return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k="
-        + encodeURIComponent(o.track) : "";
-    }
-    function pv(x) {
-      return '<span data-noi18n="1">' + esc(x) + "</span>";
-    } // ข้อมูลของลูกค้าไม่ส่งไปแปล
-    function copyBtn(text, label) {
-      return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก")
-        + "</button>";
-    }
-    function taxOk(id) {
-      var d = String(id || "").replace(/\D/g, "");
-      if (!/^\d{13}$/.test(d)) return false;
-      var s = 0;
-      for (var i = 0; i < 12; i++) s += +d[i] * (13 - i);
-      return (11 - s % 11) % 10 === +d[12];
-    }
-    function fmtTax(id) {
-      var d = String(id || "").replace(/\D/g, "").slice(0, 13);
-      return [d.slice(0, 1), d.slice(1, 5), d.slice(5, 10), d.slice(10, 12), d.slice(12, 13)].filter(String).join("-");
-    }
-    function findOrder(oid) {
-      return ((me && me.orders) || []).filter(function (o) {
-        return o.id === oid;
-      })[0] || null;
-    }
-    function refresh() {
-      return B.call("me").then(function (r) {
-        me = r;
-        return r;
-      });
-    }
-
-    // ---------- ยอดตามสิทธิ์ที่มีอยู่ (กติกาเดียวกับหลังบ้าน) ----------
-    function rights() {
-      var r = {};
-      ((me && me.lib) || []).forEach(function (d) {
-        r[d.id] = d.plan === "edition" ? "edition" : "updates";
-      });
+  }
+  function steps(n) {
+    [].forEach.call($("steps").children, function (li, i) {
+      li.className = i < n ? "done" : i === n ? "on" : "";
+      if (i === n) li.setAttribute("aria-current", "step");
+      else li.removeAttribute("aria-current");
+    });
+  }
+  function title(id) {
+    var x = B.find(id);
+    return (x ? B.code(x) + " " + x.title : id) + (B.isCtry(B.varOf(id)) ? " · " + B.LANGS[B.varOf(id)] : "");
+  }
+  function planTx(id) {
+    var x = B.find(id);
+    return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ",
+      manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด";
+  }
+  function trackUrl(o) {
+    return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k="
+      + encodeURIComponent(o.track) : "";
+  }
+  function pv(x) {
+    return '<span data-noi18n="1">' + esc(x) + "</span>";
+  } // ข้อมูลของลูกค้าไม่ส่งไปแปล
+  function copyBtn(text, label) {
+    return '<button type="button" class="copy" data-copy="' + esc(text) + '">' + (label || "คัดลอก")
+      + "</button>";
+  }
+  function taxOk(id) {
+    var d = String(id || "").replace(/\D/g, "");
+    if (!/^\d{13}$/.test(d)) return false;
+    var s = 0;
+    for (var i = 0; i < 12; i++) s += +d[i] * (13 - i);
+    return (11 - s % 11) % 10 === +d[12];
+  }
+  function fmtTax(id) {
+    var d = String(id || "").replace(/\D/g, "").slice(0, 13);
+    return [d.slice(0, 1), d.slice(1, 5), d.slice(5, 10), d.slice(10, 12), d.slice(12, 13)].filter(String).join("-");
+  }
+  function findOrder(oid) {
+    return ((me && me.orders) || []).filter(function (o) {
+      return o.id === oid;
+    })[0] || null;
+  }
+  function refresh() {
+    return B.call("me").then(function (r) {
+      me = r;
       return r;
-    }
-    function lineAmt(id) {
-      var x = B.find(id), own = rights()[B.baseOf(id)];
-      if (!B.isBundle(x) && own) {
-        if (own === "edition" && B.isUpd(id)) return {
-          amt: Math.max(1, B.memberPrice(x.priceU) - B.memberPrice(x.price)),
-          up: true
-        };
-        return { amt: 0, block: true };
-      }
-        return { amt: B.cart.price(id) };
-    }
+    });
+  }
 
-    // ---------- ตัวติดตาม 5 ขั้น ----------
-    function tracker(o) {
-      if (o.status === ST.cancel) return "";
-      var stp = o.status === ST.wait || o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid
-        ? (o.dl1 ? 5 : 4) : 0;
-      var times = [o.created, o.slipAt, o.status === ST.paid ? o.okAt : "", o.okAt, o.dl1], sw = function (iso) {
-        return B.when(iso).replace(/ \d{4} /, " ");
+  // ---------- ยอดตามสิทธิ์ที่มีอยู่ (กติกาเดียวกับหลังบ้าน) ----------
+  function rights() {
+    var r = {};
+    ((me && me.lib) || []).forEach(function (d) {
+      r[d.id] = d.plan === "edition" ? "edition" : "updates";
+    });
+    return r;
+  }
+  function lineAmt(id) {
+    var x = B.find(id), own = rights()[B.baseOf(id)];
+    if (!B.isBundle(x) && own) {
+      if (own === "edition" && B.isUpd(id)) return {
+        amt: Math.max(1, B.memberPrice(x.priceU) - B.memberPrice(x.price)),
+        up: true
       };
-      return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "ชำระเงิน",
-        "ตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
-          var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "";
-          return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + (done && times[i]
-            ? "<small>" + esc(sw(times[i])) + "</small>" : "") + "</span>";
-        }).join("") + "</div>";
+      return { amt: 0, block: true };
     }
+    return { amt: B.cart.price(id) };
+  }
 
-    // ---------- หน้าเข้าระบบก่อนสั่งซื้อ ----------
-    function gateView() {
-      steps(1);
-      var ids = B.cart.get(), total = ids.reduce(function (t, id) {
-        return t + B.cart.price(id);
-      }, 0);
-      $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>เข้าสู่ระบบเพื่อสั่งซื้อ</h2><p style="margin:0">ไฟล์ที่ซื้อเก็บไว้ในบัญชีของคุณ ดาวน์โหลดซ้ำได้ทุกเมื่อ และระบบพิมพ์ชื่อผู้ซื้อกับเลขสิทธิ์ท้ายทุกหน้า จึงต้องมีบัญชีก่อนสั่งซื้อ · สมัครฟรี ใช้เวลาราว 1 นาที</p>'
-        +
-        '<div class="buy" style="margin:0"><a class="b pri" href="' + L("member.html") + '" data-next="1">เข้าสู่ระบบ หรือสมัครสมาชิก</a></div><p class="note">เข้าด้วย Google LINE Facebook TikTok หรืออีเมลก็ได้ · เข้าระบบแล้วระบบพากลับมาหน้านี้ ตะกร้ายังอยู่ครบ</p></div>'
-        + summary(ids, total, false) + "</div>";
-    }
-    function summary(ids, total, withOwn) {
-      return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) {
-        var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) };
-        return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "")
-          + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt))
-          + "</b></li>";
-      }).join("") + "</ul>" +
-        '<dl><dt>ค่าส่ง</dt><dd>ไม่มี (ไฟล์ดิจิทัล)</dd></dl><div class="tot"><span>ยอดชำระ</span><b id="sumtot">'
-        + B.thbFx(total) + '</b></div><p class="note"><a href="' + L("cart.html") + '">แก้ไขตะกร้า</a></p></div></aside>';
-    }
+  // ---------- ตัวติดตาม 5 ขั้น ----------
+  function tracker(o) {
+    if (o.status === ST.cancel) return "";
+    var stp = o.status === ST.wait || o.status === ST.reject ? 1 : o.status === ST.check ? 2 : o.status === ST.paid
+      ? (o.dl1 ? 5 : 4) : 0;
+    var times = [o.created, o.slipAt, o.status === ST.paid ? o.okAt : "", o.okAt, o.dl1], sw = function (iso) {
+      return B.when(iso).replace(/ \d{4} /, " ");
+    };
+    return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "ชำระเงิน",
+      "ตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
+        var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "";
+        return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + (done && times[i]
+          ? "<small>" + esc(sw(times[i])) + "</small>" : "") + "</span>";
+      }).join("") + "</div>";
+  }
 
-    // ---------- หน้าชำระเงินหลัก ----------
-    function formView() {
-      steps(1);
-      var ids = B.cart.get(), m = me.member, t = m.tax || {}, blocked = 0, total = 0;
-      ids.forEach(function (id) {
-        var a = lineAmt(id);
-        if (a.block) blocked++;
-        else total += a.amt;
+  // ---------- หน้าเข้าระบบก่อนสั่งซื้อ ----------
+  function gateView() {
+    steps(1);
+    var ids = B.cart.get(), total = ids.reduce(function (t, id) {
+      return t + B.cart.price(id);
+    }, 0);
+    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>เข้าสู่ระบบเพื่อสั่งซื้อ</h2><p style="margin:0">ไฟล์ที่ซื้อเก็บไว้ในบัญชีของคุณ ดาวน์โหลดซ้ำได้ทุกเมื่อ และระบบพิมพ์ชื่อผู้ซื้อกับเลขสิทธิ์ท้ายทุกหน้า จึงต้องมีบัญชีก่อนสั่งซื้อ · สมัครฟรี ใช้เวลาราว 1 นาที</p>'
+      +
+      '<div class="buy" style="margin:0"><a class="b pri" href="' + L("member.html") + '" data-next="1">เข้าสู่ระบบ หรือสมัครสมาชิก</a></div><p class="note">เข้าด้วย Google LINE Facebook TikTok หรืออีเมลก็ได้ · เข้าระบบแล้วระบบพากลับมาหน้านี้ ตะกร้ายังอยู่ครบ</p></div>'
+      + summary(ids, total, false) + "</div>";
+  }
+  function summary(ids, total, withOwn) {
+    return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) {
+      var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) };
+      return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "")
+        + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt))
+        + "</b></li>";
+    }).join("") + "</ul>" +
+      '<dl><dt>ค่าส่ง</dt><dd>ไม่มี (ไฟล์ดิจิทัล)</dd></dl><div class="tot"><span>ยอดชำระ</span><b id="sumtot">'
+      + B.thbFx(total) + '</b></div><p class="note"><a href="' + L("cart.html") + '">แก้ไขตะกร้า</a></p></div></aside>';
+  }
+
+  // ---------- หน้าชำระเงินหลัก ----------
+  function formView() {
+    steps(1);
+    var ids = B.cart.get(), m = me.member, t = m.tax || {}, blocked = 0, total = 0;
+    ids.forEach(function (id) {
+      var a = lineAmt(id);
+      if (a.block) blocked++;
+      else total += a.amt;
+    });
+    var open = (me.orders || []).filter(function (o) {
+      return o.status === ST.wait || o.status === ST.reject;
+    });
+    if (!ids.length) {
+      $("view").innerHTML = '<div class="card empty" style="margin-top:14px"><p style="font-size:18px;color:var(--navy);font-weight:600">ตะกร้าว่าง</p>'
+        + (open.length ? '<p>คุณมีคำสั่งซื้อที่ยังไม่ได้ชำระ ' + open.length + " รายการ</p>" + open.map(function (o) {
+          return '<p><button class="b pri" type="button" data-payorder="' + esc(o.id) + '">ชำระ '
+            + esc(o.id) + " · " + B.thb(o.amount) + "</button></p>";
+        }).join("") : "") + '<a class="b line" href="' + L("sheets.html") + '">เลือกใบตรวจงาน</a></div>';
+      return;
+    }
+    var online = PAY.online(me), minOn = PAY.minOnline(me), ms = PAY.methods(me, capNames, total),
+      canOnline = online && ms.length && total >= minOn;
+    var drawPm = function () {
+      ms = PAY.methods(me, capNames, total);
+      var thb = PAY.cur(me) === "THB", can2 = online && ms.length && total >= minOn;
+      return (can2 ? methodGroups(ms) + PAY.instTable(ms, total) : "") + (thb || !can2 ? transferRow(can2) : '<p class="note" style="margin:8px 0 0">ช่องทางอื่นและการโอนเงินจ่ายเป็นบาท เลือกสกุลเงิน THB เพื่อดูทั้งหมด</p>');
+    };
+    var transferRow = function (can2) {
+      return '<p class="kn pmh">โอนเงินเข้าบัญชีร้าน</p><label><input type="radio" name="pm" value="transfer"'
+        + (can2 ? "" : " checked") + "><b>โอนเงินแล้วแนบสลิป</b><small>" + esc(P.bank ? "ธนาคาร "
+          + P.bank + " หรือพร้อมเพย์ของร้าน · " : "") + (me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปกับธนาคารอัตโนมัติ เปิดไฟล์ได้ในไม่กี่วินาที" : "ร้านตรวจยอดภายใน "
+            + esc(P.hours || 24) + " ชั่วโมง แล้วเปิดไฟล์ให้") + "</small></label>";
+    };
+    PAY.onCur = function () {
+      var b = $("pmbox");
+      if (b) b.innerHTML = drawPm();
+    };
+    var why = online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
+      && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
+    var hasTax = !!(t.name || t.id);
+    taxOpen = taxOpen || hasTax;
+    $("view").innerHTML = '<div class="cog"><form class="f" id="f-co" novalidate style="gap:14px">'
+      +
+      '<div class="card cosec"><h2>1. ผู้ซื้อ</h2><div class="who2"><div><b>' + pv(m.name) + "</b><br>"
+      + (m.email ? pv(m.email) : '<span class="note">ยังไม่มีอีเมล</span>') + '</div><button class="b line sm" type="button" data-out="1">ไม่ใช่คุณ? ออกจากระบบ</button></div>'
+      +
+      (m.email ? '<p class="note">ระบบส่งอีเมลยืนยันคำสั่งซื้อ ผลการชำระ และลิงก์ติดตามไปที่อีเมลนี้</p>' : '<label>อีเมลสำหรับรับการแจ้งเตือนคำสั่งซื้อ<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>')
+      + "</div>" +
+      '<div class="card cosec"><h2>2. ข้อมูลออกใบเสร็จ <small>ไม่บังคับ</small></h2><label class="ck"><input type="checkbox" name="wantTax"'
+      + (taxOpen ? " checked" : "") + '><span>ออกใบเสร็จในนามบริษัท หรือใส่ชื่อ ที่อยู่ และเลขประจำตัวผู้เสียภาษี (ใบเสร็จออกอัตโนมัติทุกคำสั่งซื้อ)</span></label>'
+      +
+      '<div id="taxbox"' + (taxOpen ? "" : " hidden") + ' style="display:grid;gap:12px"><div class="chips" role="radiogroup" aria-label="ประเภทผู้ซื้อ"><label class="ck"><input type="radio" name="ttype" value="person"'
+      + (t.type !== "company" ? " checked" : "") + '><span>บุคคลธรรมดา</span></label><label class="ck"><input type="radio" name="ttype" value="company"'
+      + (t.type === "company" ? " checked" : "") + '><span>นิติบุคคล</span></label></div>' +
+      '<div class="g2"><label>ชื่อบนเอกสาร<input type="text" name="tname" maxlength="120" autocomplete="organization" value="'
+      + esc(t.name || m.name || "") + '"></label><label>เลขประจำตัวผู้เสียภาษี 13 หลัก<input type="text" name="taxid" maxlength="17" inputmode="numeric" value="'
+      + esc(fmtTax(t.id)) + '"><small class="hint" id="taxhint"></small></label></div>' +
+      '<label id="brl"' + (t.type === "company" ? "" : " hidden") + '>สาขา<input type="text" name="branch" maxlength="40" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" value="'
+      + esc(t.branch || "") + '"></label><label>ที่อยู่สำหรับออกเอกสาร<textarea name="taddr" rows="2" maxlength="300">'
+      + esc(t.addr || "") + '</textarea></label><p class="note">บันทึกในโปรไฟล์ของคุณ ใช้ครั้งต่อไปได้ · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารเป็นใบเสร็จรับเงิน ไม่ใช่ใบกำกับภาษี</p></div></div>'
+      +
+      '<div class="card cosec"><h2>3. วิธีชำระเงิน</h2><fieldset class="paym"><legend class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">เลือกวิธีชำระเงิน</legend>'
+      + (canOnline ? PAY.curBar(me, total) : "") + '<div id="pmbox">' + drawPm() + "</div></fieldset>"
+      + why + "</div>" +
+      '<div class="card cosec"><p class="note refund" style="margin:10px 0 0"><b>การคืนเงิน:</b> ยังไม่ได้ดาวน์โหลดไฟล์ แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · ดาวน์โหลดแล้วไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านส่งไฟล์ที่ถูกต้องให้หรือคืนเงิน)</p><label class="ck" style="margin-top:10px"><input type="checkbox" name="agree" required><span>ฉันอ่านและยอมรับ <a href="'
+      + L("terms.html") + '" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a> และเข้าใจว่าสินค้าเป็นไฟล์ดิจิทัล ใช้ในงานของตนเองและหน่วยงานของตน ห้ามขายหรือแจกจ่ายต่อ · ไฟล์ทุกหน้ามีชื่อและอีเมลของฉันพิมพ์ท้ายกระดาษ</span></label>'
+      +
+      (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html")
+        + '">แก้ไขในตะกร้า</a> ก่อนสั่งซื้อ</p>' : "") +
+      '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ "
+      + B.thb(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>'
+      +
+      "</form>" + summary(ids, total, true) + "</div>";
+    taxHint();
+  }
+  // ช่องทางชำระออนไลน์ จัดเป็นกลุ่ม: แนะนำ · สากล · แอปธนาคาร · กระเป๋าเงิน (รุ่น 26 ต.ค. 2026)
+  function methodGroups(ms) {
+    var first = true;
+    return PAY.GROUPS.map(function (g) {
+      var list = ms.filter(function (k) {
+        return PAY.LABEL[k][2] === g[0];
       });
-      var open = (me.orders || []).filter(function (o) {
-        return o.status === ST.wait || o.status === ST.reject;
-      });
-      if (!ids.length) {
-        $("view").innerHTML = '<div class="card empty" style="margin-top:14px"><p style="font-size:18px;color:var(--navy);font-weight:600">ตะกร้าว่าง</p>'
-          + (open.length ? '<p>คุณมีคำสั่งซื้อที่ยังไม่ได้ชำระ ' + open.length + " รายการ</p>" + open.map(function (o) {
-            return '<p><button class="b pri" type="button" data-payorder="' + esc(o.id) + '">ชำระ '
-              + esc(o.id) + " · " + B.thb(o.amount) + "</button></p>";
-          }).join("") : "") + '<a class="b line" href="' + L("sheets.html") + '">เลือกใบตรวจงาน</a></div>';
-        return;
-      }
-        var online = PAY.online(me), minOn = PAY.minOnline(me), ms = PAY.methods(me, capNames, total),
-        canOnline = online && ms.length && total >= minOn;
-      var drawPm = function () {
-        ms = PAY.methods(me, capNames, total);
-        var thb = PAY.cur(me) === "THB", can2 = online && ms.length && total >= minOn;
-        return (can2 ? methodGroups(ms) + PAY.instTable(ms, total) : "") + (thb || !can2 ? transferRow(can2) : '<p class="note" style="margin:8px 0 0">ช่องทางอื่นและการโอนเงินจ่ายเป็นบาท เลือกสกุลเงิน THB เพื่อดูทั้งหมด</p>');
-      };
-      var transferRow = function (can2) {
-        return '<p class="kn pmh">โอนเงินเข้าบัญชีร้าน</p><label><input type="radio" name="pm" value="transfer"'
-          + (can2 ? "" : " checked") + "><b>โอนเงินแล้วแนบสลิป</b><small>" + esc(P.bank ? "ธนาคาร "
-            + P.bank + " หรือพร้อมเพย์ของร้าน · " : "") + (me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปกับธนาคารอัตโนมัติ เปิดไฟล์ได้ในไม่กี่วินาที" : "ร้านตรวจยอดภายใน "
-              + esc(P.hours || 24) + " ชั่วโมง แล้วเปิดไฟล์ให้") + "</small></label>";
-      };
-      PAY.onCur = function () {
-        var b = $("pmbox");
-        if (b) b.innerHTML = drawPm();
-      };
-      var why = online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
-        && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
-      var hasTax = !!(t.name || t.id);
-      taxOpen = taxOpen || hasTax;
-      $("view").innerHTML = '<div class="cog"><form class="f" id="f-co" novalidate style="gap:14px">'
-        +
-        '<div class="card cosec"><h2>1. ผู้ซื้อ</h2><div class="who2"><div><b>' + pv(m.name) + "</b><br>"
-        + (m.email ? pv(m.email) : '<span class="note">ยังไม่มีอีเมล</span>') + '</div><button class="b line sm" type="button" data-out="1">ไม่ใช่คุณ? ออกจากระบบ</button></div>'
-        +
-        (m.email ? '<p class="note">ระบบส่งอีเมลยืนยันคำสั่งซื้อ ผลการชำระ และลิงก์ติดตามไปที่อีเมลนี้</p>' : '<label>อีเมลสำหรับรับการแจ้งเตือนคำสั่งซื้อ<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>')
-        + "</div>" +
-        '<div class="card cosec"><h2>2. ข้อมูลออกใบเสร็จ <small>ไม่บังคับ</small></h2><label class="ck"><input type="checkbox" name="wantTax"'
-        + (taxOpen ? " checked" : "") + '><span>ออกใบเสร็จในนามบริษัท หรือใส่ชื่อ ที่อยู่ และเลขประจำตัวผู้เสียภาษี (ใบเสร็จออกอัตโนมัติทุกคำสั่งซื้อ)</span></label>'
-        +
-        '<div id="taxbox"' + (taxOpen ? "" : " hidden") + ' style="display:grid;gap:12px"><div class="chips" role="radiogroup" aria-label="ประเภทผู้ซื้อ"><label class="ck"><input type="radio" name="ttype" value="person"'
-        + (t.type !== "company" ? " checked" : "") + '><span>บุคคลธรรมดา</span></label><label class="ck"><input type="radio" name="ttype" value="company"'
-        + (t.type === "company" ? " checked" : "") + '><span>นิติบุคคล</span></label></div>' +
-        '<div class="g2"><label>ชื่อบนเอกสาร<input type="text" name="tname" maxlength="120" autocomplete="organization" value="'
-        + esc(t.name || m.name || "") + '"></label><label>เลขประจำตัวผู้เสียภาษี 13 หลัก<input type="text" name="taxid" maxlength="17" inputmode="numeric" value="'
-        + esc(fmtTax(t.id)) + '"><small class="hint" id="taxhint"></small></label></div>' +
-        '<label id="brl"' + (t.type === "company" ? "" : " hidden") + '>สาขา<input type="text" name="branch" maxlength="40" placeholder="สำนักงานใหญ่ หรือ สาขาที่ 00001" value="'
-        + esc(t.branch || "") + '"></label><label>ที่อยู่สำหรับออกเอกสาร<textarea name="taddr" rows="2" maxlength="300">'
-        + esc(t.addr || "") + '</textarea></label><p class="note">บันทึกในโปรไฟล์ของคุณ ใช้ครั้งต่อไปได้ · ร้านยังไม่ได้จดภาษีมูลค่าเพิ่ม เอกสารเป็นใบเสร็จรับเงิน ไม่ใช่ใบกำกับภาษี</p></div></div>'
-        +
-        '<div class="card cosec"><h2>3. วิธีชำระเงิน</h2><fieldset class="paym"><legend class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">เลือกวิธีชำระเงิน</legend>'
-        + (canOnline ? PAY.curBar(me, total) : "") + '<div id="pmbox">' + drawPm() + "</div></fieldset>"
-        + why + "</div>" +
-        '<div class="card cosec"><p class="note refund" style="margin:10px 0 0"><b>การคืนเงิน:</b> ยังไม่ได้ดาวน์โหลดไฟล์ แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · ดาวน์โหลดแล้วไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านส่งไฟล์ที่ถูกต้องให้หรือคืนเงิน)</p><label class="ck" style="margin-top:10px"><input type="checkbox" name="agree" required><span>ฉันอ่านและยอมรับ <a href="'
-        + L("terms.html") + '" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a> และเข้าใจว่าสินค้าเป็นไฟล์ดิจิทัล ใช้ในงานของตนเองและหน่วยงานของตน ห้ามขายหรือแจกจ่ายต่อ · ไฟล์ทุกหน้ามีชื่อและอีเมลของฉันพิมพ์ท้ายกระดาษ</span></label>'
-        +
-        (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html")
-          + '">แก้ไขในตะกร้า</a> ก่อนสั่งซื้อ</p>' : "") +
-        '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ "
-        + B.thb(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>'
-        +
-        "</form>" + summary(ids, total, true) + "</div>";
-      taxHint();
-    }
-    // ช่องทางชำระออนไลน์ จัดเป็นกลุ่ม: แนะนำ · สากล · แอปธนาคาร · กระเป๋าเงิน (รุ่น 26 ต.ค. 2026)
-    function methodGroups(ms) {
-      var first = true;
-      return PAY.GROUPS.map(function (g) {
+      if (!list.length) return "";
+      var had = first;
+      return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", list.map(function (k) {
+        var c = first;
+        first = false;
+        return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>"
+          + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k)
+          + "</label>";
+      }).join(""), had);
+    }).join("");
+  }
+  function taxHint() {
+    var f = $("f-co");
+    if (!f) return;
+    var i = f.elements.taxid, h = $("taxhint");
+    if (!i || !h) return;
+    var d = i.value.replace(/\D/g, "");
+    h.textContent = !d ? "" : d.length < 13 ? "ยังไม่ครบ 13 หลัก" : taxOk(d) ? "รูปแบบเลขถูกต้อง" : "ตรวจเลขอีกครั้ง (เลขหลักสุดท้ายไม่ตรงกับสูตรตรวจ)";
+    h.className = "hint" + (d.length === 13 ? (taxOk(d) ? " ok" : " bad") : "");
+  }
+
+  // ---------- ขั้นชำระของคำสั่งซื้อที่สร้างแล้ว ----------
+  function payBox(o) {
+    var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">'
+      + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>"
+        + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + pv(P.name) + "</dd>" : "")
+      + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, ""))
+        + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
+    return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน'
+      + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows
+      + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
+      '<form class="f" id="f-slip" data-oid="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><button class="b pri" type="submit">ส่งสลิป</button></form></div>';
+  }
+  function payView(o, method, keep) {
+    PAY.onCur = function () {
+      payView(o, method, true);
+    };
+    steps(1);
+    var ms = PAY.methods(me, capNames, o.amount), online = PAY.online(me) && ms.length && o.amount >= PAY.minOnline(me);
+    var on = online ? '<div class="payopts" role="group" aria-label="ชำระออนไลน์"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>'
+      + PAY.curBar(me, o.amount) + PAY.GROUPS.map(function (g) {
         var list = ms.filter(function (k) {
           return PAY.LABEL[k][2] === g[0];
         });
-        if (!list.length) return "";
-        var had = first;
-        return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", list.map(function (k) {
-          var c = first;
-          first = false;
-          return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>"
-            + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k)
-            + "</label>";
-        }).join(""), had);
-      }).join("");
-    }
-    function taxHint() {
-      var f = $("f-co");
-      if (!f) return;
-      var i = f.elements.taxid, h = $("taxhint");
-      if (!i || !h) return;
-      var d = i.value.replace(/\D/g, "");
-      h.textContent = !d ? "" : d.length < 13 ? "ยังไม่ครบ 13 หลัก" : taxOk(d) ? "รูปแบบเลขถูกต้อง" : "ตรวจเลขอีกครั้ง (เลขหลักสุดท้ายไม่ตรงกับสูตรตรวจ)";
-      h.className = "hint" + (d.length === 13 ? (taxOk(d) ? " ok" : " bad") : "");
-    }
-
-    // ---------- ขั้นชำระของคำสั่งซื้อที่สร้างแล้ว ----------
-    function payBox(o) {
-      var rows = '<dt>ยอดที่ต้องโอน</dt><dd style="font-family:Kanit,sans-serif;font-size:24px;color:#0F2A44">'
-        + B.thb(o.amount) + copyBtn(String(o.amount), "คัดลอกยอด") + "</dd>" + (P.bank ? "<dt>ธนาคาร</dt><dd>"
-          + esc(P.bank) + "</dd>" : "") + (P.name ? "<dt>ชื่อบัญชี</dt><dd>" + pv(P.name) + "</dd>" : "")
-        + (P.acc ? "<dt>เลขบัญชี</dt><dd>" + esc(P.acc) + copyBtn(String(P.acc).replace(/\D/g, ""))
-          + "</dd>" : "") + "<dt>อ้างอิง</dt><dd>" + esc(o.id) + copyBtn(o.id) + "</dd>";
-      return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน'
-        + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows
-        + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
-        '<form class="f" id="f-slip" data-oid="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><button class="b pri" type="submit">ส่งสลิป</button></form></div>';
-    }
-    function payView(o, method, keep) {
-      PAY.onCur = function () {
-        payView(o, method, true);
-      };
-      steps(1);
-      var ms = PAY.methods(me, capNames, o.amount), online = PAY.online(me) && ms.length && o.amount >= PAY.minOnline(me);
-      var on = online ? '<div class="payopts" role="group" aria-label="ชำระออนไลน์"><p class="kn" style="margin:0 0 8px;color:#0F2A44;font-weight:700">ชำระออนไลน์ เปิดไฟล์ได้ทันที</p>'
-        + PAY.curBar(me, o.amount) + PAY.GROUPS.map(function (g) {
-          var list = ms.filter(function (k) {
-            return PAY.LABEL[k][2] === g[0];
-          });
-          return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
-            '<div class="po">' + list.map(function (k) {
-              return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0])
-                + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</button>";
-            }).join("") + "</div>") : "";
-        }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
-        + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
-      var slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours
-        || 24) + " ชั่วโมง";
-      $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id)
-        + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.thb(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>"
-        + tracker(o) +
-        (method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "")
-          + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
-          : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx
-            + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
-        '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ · <button type="button" class="linkbtn" data-cancel="'
-        + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></p></div>' +
-        '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) {
-          return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
-        }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.thb(o.amount) + "</b></div></div></aside></div>";
-    }
-    function startOnline(o, method) {
-      return PAY.start(o, method, {
-        back: "checkout",
-        lock: lock,
-        msg: function (t, bad) {
-          say(t, bad);
-        },
-        paid: function () {
-          return refresh().then(function () {
-            doneView(o.id);
-          });
-        }
-      });
-    }
-
-    // ---------- เสร็จสิ้น ----------
-    function doneView(oid, note) {
-      var o = findOrder(oid);
-      if (!o) {
-        say("ไม่พบคำสั่งซื้อ " + oid + " ในบัญชีนี้", true);
-        return formView();
+        return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
+          '<div class="po">' + list.map(function (k) {
+            return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0])
+              + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k) + "</button>";
+          }).join("") + "</div>") : "";
+      }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
+      + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
+    var slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours
+      || 24) + " ชั่วโมง";
+    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id)
+      + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.thb(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>"
+      + tracker(o) +
+      (method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "")
+        + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
+        : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx
+          + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
+      '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ · <button type="button" class="linkbtn" data-cancel="'
+      + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></p></div>' +
+      '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) {
+        return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
+      }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.thb(o.amount) + "</b></div></div></aside></div>";
+  }
+  function startOnline(o, method) {
+    return PAY.start(o, method, {
+      back: "checkout",
+      lock: lock,
+      msg: function (t, bad) {
+        say(t, bad);
+      },
+      paid: function () {
+        return refresh().then(function () {
+          doneView(o.id);
+        });
       }
-        if (o.status === ST.wait || o.status === ST.reject) {
-          say(note || "", !!note);
-          return payView(o);
-        }
-        steps(o.status === ST.paid ? 3 : 2);
-      var paid = o.status === ST.paid, tl = trackUrl(o);
-      var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
-        + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
-        : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>ร้านกำลังตรวจยอดเข้าบัญชี ภายใน '
-        + esc(P.hours || 24) + " ชั่วโมง · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
-        : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
-      $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">'
-        + esc(o.id) + "</span>" + tracker(o) +
-        '<ul class="mini" style="width:100%;max-width:560px;text-align:left">' + o.items.map(function (id) {
-          return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
-        }).join("") + '<li><span><b>ยอดชำระ</b></span><b>' + B.thb(o.amount) + "</b></li></ul>" +
-        '<div class="row">' + (paid ? '<a class="b pri" href="' + L("member.html") + '#docs">ดาวน์โหลดเอกสาร</a><a class="b line" href="'
-          + L("member.html") + '#orders">ใบเสร็จรับเงิน</a>' : '<a class="b pri" href="' + L("member.html")
-          + '#orders">ดูคำสั่งซื้อของฉัน</a>') + (tl ? '<a class="b line" href="' + esc(tl) + '" target="_blank" rel="noopener">หน้าติดตามสถานะ</a>' : "")
-        + "</div>" +
-        (tl ? '<p class="note">ลิงก์ติดตามเปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีได้ ' + copyBtn(tl,
-          "คัดลอกลิงก์") + "</p>" : "") + '<p class="note"><a href="' + L("sheets.html") + '">เลือกซื้อใบตรวจงานต่อ</a></p></div>';
-      try {
-        history.replaceState(null, "", HERE + (q || "") + (q ? "&" : "?") + "done=" + encodeURIComponent(o.id));
-      } catch (e) {}
-    }
+    });
+  }
 
-    // ---------- สร้างคำสั่งซื้อ ----------
-    function sameItems(a, b) {
-      return a.length === b.length && a.slice().sort().join(",") === b.slice().sort().join(",");
+  // ---------- เสร็จสิ้น ----------
+  function doneView(oid, note) {
+    var o = findOrder(oid);
+    if (!o) {
+      say("ไม่พบคำสั่งซื้อ " + oid + " ในบัญชีนี้", true);
+      return formView();
     }
-    function submit(f) {
-      var ids = B.cart.get(), pm = (f.querySelector("input[name=pm]:checked") || {}).value || "transfer";
-      if (!ids.length) {
-        say("ตะกร้าว่าง", true);
+    if (o.status === ST.wait || o.status === ST.reject) {
+      say(note || "", !!note);
+      return payView(o);
+    }
+    steps(o.status === ST.paid ? 3 : 2);
+    var paid = o.status === ST.paid, tl = trackUrl(o);
+    var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
+      + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
+      : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>ร้านกำลังตรวจยอดเข้าบัญชี ภายใน '
+      + esc(P.hours || 24) + " ชั่วโมง · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
+      : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
+    $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">'
+      + esc(o.id) + "</span>" + tracker(o) +
+      '<ul class="mini" style="width:100%;max-width:560px;text-align:left">' + o.items.map(function (id) {
+        return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
+      }).join("") + '<li><span><b>ยอดชำระ</b></span><b>' + B.thb(o.amount) + "</b></li></ul>" +
+      '<div class="row">' + (paid ? '<a class="b pri" href="' + L("member.html") + '#docs">ดาวน์โหลดเอกสาร</a><a class="b line" href="'
+        + L("member.html") + '#orders">ใบเสร็จรับเงิน</a>' : '<a class="b pri" href="' + L("member.html")
+        + '#orders">ดูคำสั่งซื้อของฉัน</a>') + (tl ? '<a class="b line" href="' + esc(tl) + '" target="_blank" rel="noopener">หน้าติดตามสถานะ</a>' : "")
+      + "</div>" +
+      (tl ? '<p class="note">ลิงก์ติดตามเปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีได้ ' + copyBtn(tl,
+        "คัดลอกลิงก์") + "</p>" : "") + '<p class="note"><a href="' + L("sheets.html") + '">เลือกซื้อใบตรวจงานต่อ</a></p></div>';
+    try {
+      history.replaceState(null, "", HERE + (q || "") + (q ? "&" : "?") + "done=" + encodeURIComponent(o.id));
+    } catch (e) {}
+  }
+
+  // ---------- สร้างคำสั่งซื้อ ----------
+  function sameItems(a, b) {
+    return a.length === b.length && a.slice().sort().join(",") === b.slice().sort().join(",");
+  }
+  function submit(f) {
+    var ids = B.cart.get(), pm = (f.querySelector("input[name=pm]:checked") || {}).value || "transfer";
+    if (!ids.length) {
+      say("ตะกร้าว่าง", true);
+      return;
+    }
+    if (!f.elements.agree.checked) {
+      say("กดยอมรับข้อตกลงการใช้งานก่อนสั่งซื้อ", true);
+      f.elements.agree.focus();
+      return;
+    }
+    var steps0 = [], m = me.member;
+    if (!m.email) {
+      var em = String(f.elements.email.value || "").trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(em)) {
+        say("ใส่อีเมลให้ถูกรูปแบบ", true);
+        f.elements.email.focus();
         return;
       }
-        if (!f.elements.agree.checked) {
-          say("กดยอมรับข้อตกลงการใช้งานก่อนสั่งซื้อ", true);
-          f.elements.agree.focus();
-          return;
-        }
-        var steps0 = [], m = me.member;
-      if (!m.email) {
-        var em = String(f.elements.email.value || "").trim().toLowerCase();
-        if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(em)) {
-          say("ใส่อีเมลให้ถูกรูปแบบ", true);
-          f.elements.email.focus();
-          return;
-        }
-          steps0.push(function () {
-            return B.call("profile", { name: m.name, email: em });
-          });
+      steps0.push(function () {
+        return B.call("profile", { name: m.name, email: em });
+      });
+    }
+    if (f.elements.wantTax.checked) {
+      var tx = {
+        type: (f.querySelector("input[name=ttype]:checked") || {}).value || "person",
+        name: f.elements.tname.value.trim(),
+        id: f.elements.taxid.value.replace(/\D/g, ""),
+        branch: f.elements.branch ? f.elements.branch.value.trim() : "",
+        addr: f.elements.taddr.value.trim()
+      };
+      if (!tx.name) {
+        say("กรอกชื่อบนเอกสาร", true);
+        return;
       }
-        if (f.elements.wantTax.checked) {
-          var tx = {
-            type: (f.querySelector("input[name=ttype]:checked") || {}).value || "person",
-            name: f.elements.tname.value.trim(),
-            id: f.elements.taxid.value.replace(/\D/g, ""),
-            branch: f.elements.branch ? f.elements.branch.value.trim() : "",
-            addr: f.elements.taddr.value.trim()
-          };
-          if (!tx.name) {
-            say("กรอกชื่อบนเอกสาร", true);
-            return;
-          }
-            if (tx.id && tx.id.length !== 13) {
-              say("เลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก", true);
-              return;
-            }
-            if (tx.type === "company" && !tx.id) {
-              say("นิติบุคคลต้องมีเลขประจำตัวผู้เสียภาษี 13 หลัก", true);
-              return;
-            }
-            if (tx.id && !taxOk(tx.id) && !confirm("เลขนี้ไม่ผ่านสูตรตรวจของเลขประจำตัว 13 หลัก ยืนยันว่าพิมพ์ถูกต้อง?")) return;
-          var old = m.tax || {};
-          if (tx.type !== (old.type || "person") || tx.name !== (old.name || "") || tx.id !== (old.id
-            || "") || tx.branch !== (old.branch || "") || tx.addr !== (old.addr || "")) steps0.push(function () {
-              return B.call("profile", { tax: tx });
-            });
-        }
-        if (busy) return;
+      if (tx.id && tx.id.length !== 13) {
+        say("เลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก", true);
+        return;
+      }
+      if (tx.type === "company" && !tx.id) {
+        say("นิติบุคคลต้องมีเลขประจำตัวผู้เสียภาษี 13 หลัก", true);
+        return;
+      }
+      if (tx.id && !taxOk(tx.id) && !confirm("เลขนี้ไม่ผ่านสูตรตรวจของเลขประจำตัว 13 หลัก ยืนยันว่าพิมพ์ถูกต้อง?")) return;
+      var old = m.tax || {};
+      if (tx.type !== (old.type || "person") || tx.name !== (old.name || "") || tx.id !== (old.id
+        || "") || tx.branch !== (old.branch || "") || tx.addr !== (old.addr || "")) steps0.push(function () {
+          return B.call("profile", { tax: tx });
+        });
+    }
+    if (busy) return;
+    lock(true);
+    say("");
+    var chain = steps0.reduce(function (p, fn) {
+      return p.then(fn);
+    }, Promise.resolve());
+    chain.then(function () {
+      // คำสั่งซื้อที่ยังไม่ชำระและมีรายการเดียวกัน ใช้ต่อ ไม่สร้างซ้ำ
+      var reuse = (me.orders || []).filter(function (o) {
+        return (o.status === ST.wait || o.status === ST.reject) && sameItems(o.items, ids);
+      })[0];
+      return reuse ? { order: reuse, reused: true } : B.call("order", { items: ids });
+    }).then(function (r) {
+      var o = r.order;
+      B.cart.clear();
+      try {
+        sessionStorage.setItem("build_co_order", o.id);
+      } catch (e) {}
+        return refresh().then(function () {
+          lock(false);
+          var o2 = findOrder(o.id) || o;
+          if (r.reused) say("ใช้คำสั่งซื้อ " + o.id + " ที่ยังไม่ได้ชำระ (รายการเดียวกัน) ไม่สร้างซ้ำ");
+          payView(o2, pm);
+          if (pm !== "transfer" && PAY.online(me) && o2.amount >= PAY.minOnline(me)) startOnline(o2,
+            pm);
+        });
+    }).catch(function (e) {
+      lock(false);
+      say(e && e.message ? e.message : "สร้างคำสั่งซื้อไม่สำเร็จ", true);
+    });
+  }
+
+  // ---------- เหตุการณ์ ----------
+  $("view").addEventListener("click", function (ev) {
+    var t = ev.target.closest("[data-next],[data-out],[data-pay],[data-copy],[data-cancel],[data-payorder]");
+    if (!t) return;
+    if (t.dataset.next) {
+      try {
+        sessionStorage.setItem("build_next", "checkout.html" + (q || ""));
+      } catch (e) {} return;
+    }
+    if (t.dataset.copy != null) {
+      if (navigator.clipboard) navigator.clipboard.writeText(t.dataset.copy).then(function () {
+        t.textContent = "คัดลอกแล้ว";
+      }, function () {});
+      return;
+    }
+    if (busy) return;
+    if (t.dataset.out) {
+      B.call("logout").catch(function () {}).then(function () {
+        B.token.clear();
+        me = null;
+        gateView();
+        say("ออกจากระบบแล้ว");
+      });
+      return;
+    }
+    if (t.dataset.payorder) {
+      var o0 = findOrder(t.dataset.payorder);
+      if (o0) payView(o0);
+      return;
+    }
+    if (t.dataset.pay) {
+      var oid = (document.querySelector("#f-slip") || {}).dataset ? document.querySelector("#f-slip").dataset.oid : "";
+      var o1 = findOrder(oid);
+      if (o1) startOnline(o1, t.dataset.pay);
+      return;
+    }
+    if (t.dataset.cancel) {
+      if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return;
       lock(true);
-      say("");
-      var chain = steps0.reduce(function (p, fn) {
-        return p.then(fn);
-      }, Promise.resolve());
-      chain.then(function () {
-        // คำสั่งซื้อที่ยังไม่ชำระและมีรายการเดียวกัน ใช้ต่อ ไม่สร้างซ้ำ
-        var reuse = (me.orders || []).filter(function (o) {
-          return (o.status === ST.wait || o.status === ST.reject) && sameItems(o.items, ids);
-        })[0];
-        return reuse ? { order: reuse, reused: true } : B.call("order", { items: ids });
-      }).then(function (r) {
-        var o = r.order;
-        B.cart.clear();
-        try {
-          sessionStorage.setItem("build_co_order", o.id);
-        } catch (e) {}
-          return refresh().then(function () {
-            lock(false);
-            var o2 = findOrder(o.id) || o;
-            if (r.reused) say("ใช้คำสั่งซื้อ " + o.id + " ที่ยังไม่ได้ชำระ (รายการเดียวกัน) ไม่สร้างซ้ำ");
-            payView(o2, pm);
-            if (pm !== "transfer" && PAY.online(me) && o2.amount >= PAY.minOnline(me)) startOnline(o2,
-              pm);
-          });
+      B.call("cancel", { order: t.dataset.cancel }).then(refresh).then(function () {
+        lock(false);
+        say("ยกเลิกคำสั่งซื้อแล้ว · สั่งใหม่ได้จากตะกร้า");
+        formView();
       }).catch(function (e) {
         lock(false);
-        say(e && e.message ? e.message : "สร้างคำสั่งซื้อไม่สำเร็จ", true);
+        say(e.message, true);
       });
     }
-
-    // ---------- เหตุการณ์ ----------
-    $("view").addEventListener("click", function (ev) {
-      var t = ev.target.closest("[data-next],[data-out],[data-pay],[data-copy],[data-cancel],[data-payorder]");
-      if (!t) return;
-      if (t.dataset.next) {
-        try {
-          sessionStorage.setItem("build_next", "checkout.html" + (q || ""));
-        } catch (e) {} return;
-      }
-        if (t.dataset.copy != null) {
-          if (navigator.clipboard) navigator.clipboard.writeText(t.dataset.copy).then(function () {
-            t.textContent = "คัดลอกแล้ว";
-          }, function () {});
-          return;
-        }
-        if (busy) return;
-      if (t.dataset.out) {
-        B.call("logout").catch(function () {}).then(function () {
-          B.token.clear();
-          me = null;
-          gateView();
-          say("ออกจากระบบแล้ว");
-        });
-        return;
-      }
-        if (t.dataset.payorder) {
-          var o0 = findOrder(t.dataset.payorder);
-          if (o0) payView(o0);
-          return;
-        }
-        if (t.dataset.pay) {
-          var oid = (document.querySelector("#f-slip") || {}).dataset ? document.querySelector("#f-slip").dataset.oid : "";
-          var o1 = findOrder(oid);
-          if (o1) startOnline(o1, t.dataset.pay);
-          return;
-        }
-        if (t.dataset.cancel) {
-          if (!confirm("ยกเลิกคำสั่งซื้อ " + t.dataset.cancel + " ?")) return;
-          lock(true);
-          B.call("cancel", { order: t.dataset.cancel }).then(refresh).then(function () {
-            lock(false);
-            say("ยกเลิกคำสั่งซื้อแล้ว · สั่งใหม่ได้จากตะกร้า");
-            formView();
-          }).catch(function (e) {
-            lock(false);
-            say(e.message, true);
-          });
-        }
-    });
+  });
   $("view").addEventListener("change", function (ev) {
     var e = ev.target, f = e.form;
     if (f) f.dataset.touched = "1";
@@ -497,11 +497,11 @@
       taxOpen = e.checked;
       $("taxbox").hidden = !e.checked;
     }
-      if (e.name === "ttype") {
-        var br = $("brl");
-        if (br) br.hidden = e.value !== "company";
-      }
-      if (f && f.id === "f-slip" && e.name === "slip") say("");
+    if (e.name === "ttype") {
+      var br = $("brl");
+      if (br) br.hidden = e.value !== "company";
+    }
+    if (f && f.id === "f-slip" && e.name === "slip") say("");
   });
   $("view").addEventListener("input", function (ev) {
     var e = ev.target;
@@ -518,23 +518,23 @@
       submit(f);
       return;
     }
-      if (f.id === "f-slip") {
-        var file = f.elements.slip.files[0], at = f.elements.paidAt.value, oid = f.dataset.oid;
-        if (!file || !at) {
-          say("เลือกรูปสลิปและใส่เวลาที่โอน", true);
-          return;
-        }
-          lock(true);
-        B.shrink(file).then(function (img) {
-          return B.call("slip", { order: oid, image: img, paidAt: at });
-        }).then(refresh).then(function () {
-          lock(false);
-          doneView(oid);
-        }).catch(function (e) {
-          lock(false);
-          say(e.message, true);
-        });
+    if (f.id === "f-slip") {
+      var file = f.elements.slip.files[0], at = f.elements.paidAt.value, oid = f.dataset.oid;
+      if (!file || !at) {
+        say("เลือกรูปสลิปและใส่เวลาที่โอน", true);
+        return;
       }
+      lock(true);
+      B.shrink(file).then(function (img) {
+        return B.call("slip", { order: oid, image: img, paidAt: at });
+      }).then(refresh).then(function () {
+        lock(false);
+        doneView(oid);
+      }).catch(function (e) {
+        lock(false);
+        say(e.message, true);
+      });
+    }
   });
   window.addEventListener("build-cart", function () {
     if (me && $("f-co") && !busy) formView();
@@ -554,35 +554,35 @@
         + L("member.html") + '#orders">ไปหน้าสมาชิก</a></div>';
       return;
     }
-      gateView();
+    gateView();
     return;
   }
-    if (back) {
-      steps(2);
-      $("view").innerHTML = '<div class="card done" style="margin-top:14px"><div class="ic wait" aria-hidden="true">⏳</div><h1>กำลังตรวจผลการชำระเงิน</h1><p>รอสักครู่ ระบบกำลังถามผลจากผู้ให้บริการรับชำระ</p></div>';
-      back.check.then(function (c) {
-        return refresh().then(function () {
-          doneView(back.oid, c.status === "successful" ? "" : (c.message || ""));
-          if (c.status !== "successful" && !c.message) say("ยังไม่ได้รับผลการชำระ · ถ้าชำระแล้ว ระบบจะเปิดไฟล์และแจ้งทางอีเมลภายใน 10 นาที");
+  if (back) {
+    steps(2);
+    $("view").innerHTML = '<div class="card done" style="margin-top:14px"><div class="ic wait" aria-hidden="true">⏳</div><h1>กำลังตรวจผลการชำระเงิน</h1><p>รอสักครู่ ระบบกำลังถามผลจากผู้ให้บริการรับชำระ</p></div>';
+    back.check.then(function (c) {
+      return refresh().then(function () {
+        doneView(back.oid, c.status === "successful" ? "" : (c.message || ""));
+        if (c.status !== "successful" && !c.message) say("ยังไม่ได้รับผลการชำระ · ถ้าชำระแล้ว ระบบจะเปิดไฟล์และแจ้งทางอีเมลภายใน 10 นาที");
+      });
+    })
+      .catch(function (e) {
+        refresh().then(function () {
+          doneView(back.oid);
+          say(e.message, true);
+        }, function () {
+          say(e.message, true);
         });
-      })
-        .catch(function (e) {
-          refresh().then(function () {
-            doneView(back.oid);
-            say(e.message, true);
-          }, function () {
-            say(e.message, true);
-          });
-        });
-      return;
-    }
-    refresh().then(function () {
-      if (doneId && findOrder(doneId)) doneView(doneId);
-      else formView();
-    }).catch(function (e) {
-      B.token.clear();
-      me = null;
-      gateView();
-      say(e.message + " · เข้าสู่ระบบอีกครั้ง", true);
-    });
+      });
+    return;
+  }
+  refresh().then(function () {
+    if (doneId && findOrder(doneId)) doneView(doneId);
+    else formView();
+  }).catch(function (e) {
+    B.token.clear();
+    me = null;
+    gateView();
+    say(e.message + " · เข้าสู่ระบบอีกครั้ง", true);
+  });
 })();
