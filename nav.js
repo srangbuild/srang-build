@@ -56,9 +56,10 @@
     {
       t: "ความรู้",
       e: "Knowledge",
-      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"], ["knowledge.html", "permit",
-        "ขออนุญาตก่อสร้างและโรงงาน", "Permits"], ["knowledge.html", "ms", "Method statement",
-          "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]]
+      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"], ["laws.html", "",
+        "กฎหมายและมาตรฐานรายประเทศ", "Laws and standards by country"], ["knowledge.html", "permit",
+          "ขออนุญาตก่อสร้างและโรงงาน", "Permits"], ["knowledge.html", "ms", "Method statement",
+            "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]]
     },
     {
       t: "คลิปและเพลง",
