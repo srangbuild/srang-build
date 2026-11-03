@@ -28,6 +28,13 @@
 .lw-std ul { margin: 6px 0 0; padding-left: 20px; columns: 2; column-gap: 24px; }
 .lw-std li { margin: 0 0 4px; break-inside: avoid; overflow-wrap: anywhere; font-size: 14.5px; }
 .lw-std .lw-src { margin: 6px 0 0; columns: 1; }
+.lw-rel { margin: 0 14px 6px; }
+.lw-rel h4 { margin: 12px 0 2px; font-size: 15px; color: #475466; }
+.lw-rel .lw-src { margin: 0; }
+.lw-rt { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lw-rt a { overflow-wrap: anywhere; font-weight: 600; }
+.lw-rt .note { font-size: 13.5px; line-height: 1.5; }
+.lw-rt a.note { font-weight: 400; }
 @media (max-width: 640px) {
   .lw-dl { grid-template-columns: 1fr; gap: 2px 0; }
   .lw-dl dd { margin-bottom: 8px; }

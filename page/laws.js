@@ -4,6 +4,7 @@
   var R = window.REGION, B = window.BUILD, esc = B.esc;
   var LAW = window.LAWDB || [], CC_OF = window.CC_OF || {}, REFS = (window.DOCREFS || { cc: {} }).cc
     || {};
+  var REL = window.LAWREL || {};
   var ui = "th";
   try {
     ui = localStorage.getItem("build_lang") || "th";
@@ -33,7 +34,7 @@
     "iiee.org.ph",
     "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org", "circe.hn", "occ.cd",
     "anor.cm",
-    "abnorm.bf", "hbrc.edu.eg"];
+    "abnorm.bf", "hbrc.edu.eg", "coe.or.th", "act.or.th", "eit.or.th"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
     "worldbank.org"];
   function hostOf(url) {
@@ -112,6 +113,35 @@
       + (rest.length ? '<details class="lw-std"><summary>แหล่งประกอบอื่น <span data-noi18n="1">(' + rest.length
         + ')</span></summary><ul class="lw-src">' + rest.map(linkRow).join("") + "</ul></details>" : "");
   }
+  /* Related laws: one block per topic, in the order a builder meets them. */
+  var TOPIC = [["plan", "ผังเมืองและการใช้ที่ดิน"], ["land", "ที่ดิน"], ["gov",
+    "หน่วยงานท้องถิ่นผู้อนุญาต"],
+    ["eng", "วิศวกร"], ["arch", "สถาปนิก"], ["fire", "อัคคีภัย"], ["elec", "ไฟฟ้า"],
+    ["osh", "ความปลอดภัยในการทำงาน"], ["env", "สิ่งแวดล้อม"], ["std", "มาตรฐานวิชาการ"]];
+  function relRow(r, cc) {
+    var own = R.langsOf(cc).indexOf(ui) >= 0, main = own && r.l ? r.l : r.n, sub = main === r.n ? r.l : r.n,
+      k = BADGE[kindOf(r.u)];
+    return '<li><div class="lw-rt"><a href="' + esc(r.u) + '" target="_blank" rel="noopener nofollow" data-noi18n="1">'
+      + esc(main) + "</a>" + (sub ? '<span class="note" data-noi18n="1">' + esc(sub) + "</span>" : "")
+      + (r.b ? '<span class="note" data-noi18n="1">' + esc(r.b) + "</span>" : "")
+      + (r.x ? '<span class="note" data-noi18n="1">' + esc(r.x) + "</span>" : "")
+      + (r.u2 ? '<a class="note" href="' + esc(r.u2) + '" target="_blank" rel="noopener nofollow" data-noi18n="1">'
+        + esc(hostOf(r.u2)) + "</a>" : "")
+      + '</div><span class="lw-b ' + k[0] + '">' + esc(k[1]) + "</span>"
+      + (r.o ? "" : '<span class="lw-b other">ยังต้องยืนยันกับหน่วยงาน</span>') + "</li>";
+  }
+  function relHtml(cc) {
+    var list = REL[cc] || [];
+    if (!list.length) return '<h3 class="lw-h">กฎหมายที่เกี่ยวข้อง</h3><p class="note lw-meta">กำลังรวบรวมกฎหมายที่เกี่ยวข้องของประเทศนี้</p>';
+    return '<h3 class="lw-h">กฎหมายที่เกี่ยวข้อง</h3>' + TOPIC.map(function (t) {
+      var items = list.filter(function (r) {
+        return r.t === t[0];
+      });
+      return items.length ? '<div class="lw-rel"><h4>' + esc(t[1]) + '</h4><ul class="lw-src">' + items.map(function (r) {
+        return relRow(r, cc);
+      }).join("") + "</ul></div>" : "";
+    }).join("");
+  }
   function body(x, cc) {
     var src = sourcesOf(x, cc), std = standardsOf(cc), ev = (REFS[cc] && REFS[cc].ev) || {};
     return '<dl class="lw-dl">' + row("กฎหมายหลัก", x.lawName) + row("ชื่อในภาษาของประเทศ", x.lawNameLocal)
@@ -120,7 +150,7 @@
         x.note)
       + "</dl>" + '<h3 class="lw-h">แหล่งอ้างอิง</h3>' + srcHtml(src) + '<p class="note lw-meta">ตรวจล่าสุด <span data-noi18n="1">'
       + esc(x.checked || "") + "</span> · " + (x.confidence === "official" ? "อ่านจากหน้าเว็บทางการ" : "ยังต้องยืนยันกับหน่วยงาน")
-      + "</p>"
+      + "</p>" + relHtml(cc)
       + (std.length ? '<details class="lw-std"><summary>มาตรฐานที่ใบตรวจอ้างถึง <span data-noi18n="1">('
         + std.length + ")</span></summary><ul>"
         + std.map(function (n) {
@@ -140,7 +170,9 @@
   }
   rows.forEach(function (r) {
     r.key = norm([r.cc, r.name, R.regionName(r.cc, "en"), R.regionName(r.cc, "th"), r.x.lawName, r.x.lawNameLocal,
-      r.x.authority].join(" "));
+      r.x.authority].concat((REL[r.cc] || []).map(function (z) {
+        return z.n + " " + (z.l || "");
+      })).join(" "));
   });
   var want = (location.hash || "").slice(1).toUpperCase();
   if (!want) want = ui === "th" ? "TH" : R.of(ui);
