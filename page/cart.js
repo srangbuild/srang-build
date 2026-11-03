@@ -112,20 +112,16 @@
       if (info.block) blocked++;
       else total += info.amt;
       if (!info.block) sv += s;
-      var sel = B.isMarket(x) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="'
+      var sel = B.isMarket(x) || B.isCtry(B.varOf(id)) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="'
         + esc(x.id) + '" aria-label="แบบสิทธิ์ของ ' + esc(x.id) + '"><option value="ed"' + (B.isUpd(id)
           ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.memberPrice(x.price)) + "</option>"
         + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · "
           + B.baht(B.memberPrice(x.priceU)) + "</option>" : "") + "</select></label>";
-      // ภาษาบนใบ (โปรเจกต์กำแพง): เปลี่ยนได้ในตะกร้า ราคาเท่าเดิม · ภาษาอื่นหรือมาตรฐานประเทศอื่น = สั่งทำ
-      var lv = B.langsOf(x);
-      if (B.isCtry(B.varOf(id))) lv = lv.concat([B.varOf(id)]);
-      var lang = B.isMarket(x) ? "" : '<label class="ctl"><span class="note" style="margin:0">ภาษาบนใบ</span><select data-lang="'
-        + esc(x.id) + '" aria-label="ภาษาบนใบของ ' + esc(x.id) + '"' + (lv.length < 2 ? " disabled" : "")
-        + ">" + lv.map(function (v) {
-          return '<option value="' + v + '"' + (B.varOf(id) === v ? " selected" : "") + ">" + esc(B.LANGS[v])
-            + (B.isCtry(v) ? " (สร้างที่หน้าเอกสารอัจฉริยะ)" : v ? " (1 ภาษา)" : " (2 ภาษา)") + "</option>";
-        }).join("") + "</select></label>";
+      // 3 Nov 2026 (สภา + คำสั่งเจ้าของ): ตั้งภาษา มาตรฐาน และที่ตั้งงานได้ที่เดียว คือหน้าต่างตั้งค่า · ในตะกร้าแสดงสรุปและปุ่มแก้
+      var cl = !B.isMarket(x) && B.cfg ? B.cfg.line(x.id) : "", ctry = B.isCtry(B.varOf(id));
+      var opt = B.isMarket(x) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
+        + esc(cl || "ภาษา: " + B.LANGS[B.varOf(id)] + " · มาตรฐาน: ไทย") + '</small><button class="b line sm" type="button" data-cfg="' + esc(x.id)
+        + '">แก้ภาษา มาตรฐาน และที่ตั้งงาน</button></div>';
       return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="'
         + L("product.html", "id=" + encodeURIComponent(x.id)) + '">' + esc(B.code(x) + " " + x.title)
         + "</a><em>" + (info.block ? "–" : B.baht(info.amt)) + "</em></div>" +
@@ -133,13 +129,13 @@
           + " · " + esc({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งรายละเอียดทางอีเมล" }[x.delivery]
             || "ร้านส่งรายละเอียดทางอีเมล") : (B.isBundle(x) ? "ชุดรวม " + x.items.length + " ใบ: "
               + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " · " + esc(x.pages
-                || "") + " หน้า A4") + (B.isCtry(B.varOf(id)) ? " · ฉบับประเทศ " + esc(B.LANGS[B.varOf(id)])
-                  + " สร้างเป็น PDF ที่หน้าเอกสารอัจฉริยะ" : " · ไฟล์ PDF " + esc(B.LANGS[B.varOf(id)])))
-        + "</small>" +
+                || "") + " หน้า A4") + (ctry ? " · " + esc(B.LANGS[B.varOf(id)]) + " · ราคาปกติ × 1.5 · สร้างที่หน้าเอกสารอัจฉริยะ ข้อความแปลด้วยเครื่อง"
+                  : " · ได้ไฟล์ PDF และสร้างที่หน้าเอกสารอัจฉริยะได้"))
+        + "</small>" + opt +
         (s > 0 && !info.block ? '<small class="sv">ถูกกว่าซื้อแยก ' + B.baht(s) + "</small>" : "")
         + (info.note ? '<small class="' + (info.cls || "") + '">' + esc(info.note) + "</small>" : "")
         +
-        '<div class="ctl">' + lang + sel + '<button class="rm" type="button" data-rm="' + esc(x.id)
+        '<div class="ctl">' + sel + '<button class="rm" type="button" data-rm="' + esc(x.id)
         + '">เอาออก</button></div></div></article>';
     }).join("");
     var ups = upsell(ids).map(function (u) {
@@ -158,7 +154,7 @@
       +
       '<a class="b pri" href="' + L("checkout.html") + '"' + (blocked || !total ? ' aria-disabled="true" data-block="1"' : "")
       + ">ดำเนินการชำระเงิน →</a>" +
-      '<p class="note">ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์ · ดาวน์โหลดซ้ำได้ทุกเมื่อ</p>'
+      '<p class="note">เลือกวิธีชำระเงินในขั้นถัดไป · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์ · ดาวน์โหลดซ้ำได้ทุกเมื่อ</p>'
       +
       (me ? '<p class="note">ราคาคิดตามสิทธิ์ที่บัญชี ' + '<span data-noi18n="1">' + esc(me.member.email
         || me.member.name) + "</span>" + " มีอยู่แล้ว</p>" : '<p class="note">มีบัญชีอยู่แล้ว: ระบบตรวจใบที่คุณมีแล้วตอนชำระเงิน</p>')
@@ -175,8 +171,12 @@
     }
   });
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-rm],[data-swap],[data-block]");
+    var t = ev.target.closest("[data-rm],[data-swap],[data-block],[data-cfg]");
     if (!t) return;
+    if (t.dataset.cfg) {
+      if (B.cfg) B.cfg.open(t.dataset.cfg, { upd: B.isUpd(B.cart.line(t.dataset.cfg)), done: draw });
+      return;
+    }
     if (t.dataset.block) {
       ev.preventDefault();
       say("แก้รายการที่มีป้ายสีแดงก่อน แล้วกดอีกครั้ง", true);
@@ -194,6 +194,7 @@
   });
   window.addEventListener("build-cart", draw);
   draw();
+  document.addEventListener("DOMContentLoaded", draw); // cart.js โหลดหลังไฟล์นี้: วาดใหม่เมื่อหน้าต่างตั้งค่าพร้อม
   if (B.token.get()) B.call("me").then(function (r) {
     me = r;
     draw();

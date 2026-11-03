@@ -64,7 +64,8 @@
   function planTx(id) {
     var x = B.find(id);
     return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ",
-      manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด";
+      manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
+        + (B.cfg && x && B.cfg.line(x.id) ? " · " + B.cfg.line(x.id) : ""); // ค่าที่ตั้งตอนใส่ตะกร้า (ภาษา มาตรฐาน ที่ตั้งงาน)
   }
   function trackUrl(o) {
     return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k="

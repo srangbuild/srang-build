@@ -485,6 +485,10 @@
       else location.href = L("cart.html");
       return;
     }
+    if (B.cfg && !mk) { // 3 Nov 2026: ตั้งค่าภาษา มาตรฐาน และที่ตั้งงานก่อนใส่ตะกร้า
+      B.cfg.open(x.id, { now: act === "now", upd: up, done: redrawBuy });
+      return;
+    }
     var lv0 = lang(), err = B.cart.add(x.id + (lv0 ? "." + lv0 : ""), up);
     if (err) {
       toast(err);
