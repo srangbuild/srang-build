@@ -1,0 +1,34 @@
+/* laws.html */
+.lw-wrap { max-width: 900px; margin: 0 auto; padding: 22px 16px 48px; }
+.lw-wrap h1 { margin: 0 0 8px; font-size: clamp(26px, 5vw, 36px); color: var(--navy, #0F2A44); }
+.lw-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px 0 12px; }
+.lw-tools input { flex: 1 1 240px; min-height: 46px; padding: 0 14px; border: 1px solid #C9D1D9; border-radius: 12px; font: inherit; font-size: 16px; }
+.lw-tools input:focus { outline: 2px solid #F28C28; border-color: #F28C28; }
+.lw-warn { padding: 12px 14px; border-radius: 12px; background: #FFF6E9; border: 1px solid #F3D9B0; font-size: 14.5px; line-height: 1.55; }
+.lw-c { border: 1px solid #DDE3EA; border-radius: 12px; background: #fff; margin: 0 0 8px; scroll-margin-top: 76px; }
+.lw-c[hidden] { display: none; }
+.lw-c > summary { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 14px; cursor: pointer; font-size: 16.5px; }
+.lw-c > summary b { font-weight: 600; }
+.lw-c[open] > summary { border-bottom: 1px solid #EEF1F5; }
+.lw-dl { margin: 12px 14px 0; display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 8px 14px; }
+.lw-dl dt { font-weight: 600; color: #475466; }
+.lw-dl dd { margin: 0; overflow-wrap: anywhere; }
+.lw-h { margin: 16px 14px 6px; font-size: 16px; }
+.lw-src { margin: 0 14px; padding: 0; list-style: none; }
+.lw-src li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #F1F3F6; }
+.lw-src a { overflow-wrap: anywhere; font-weight: 600; }
+.lw-b { font-size: 12.5px; padding: 2px 8px; border-radius: 999px; white-space: normal; }
+.lw-b.ok { background: #E3F4E8; color: #17643A; }
+.lw-b.body { background: #E5EEF9; color: #1F4C86; }
+.lw-b.other { background: #F1F3F6; color: #475466; }
+.lw-meta { margin: 10px 14px 12px; }
+.lw-std { margin: 0 14px 14px; }
+.lw-std summary { cursor: pointer; font-weight: 600; min-height: 36px; }
+.lw-std ul { margin: 6px 0 0; padding-left: 20px; columns: 2; column-gap: 24px; }
+.lw-std li { margin: 0 0 4px; break-inside: avoid; overflow-wrap: anywhere; font-size: 14.5px; }
+.lw-std .lw-src { margin: 6px 0 0; columns: 1; }
+@media (max-width: 640px) {
+  .lw-dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .lw-dl dd { margin-bottom: 8px; }
+  .lw-std ul { columns: 1; }
+}
