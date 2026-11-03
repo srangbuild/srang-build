@@ -92,7 +92,7 @@
     })();
   /* Full dictionary English -> this language, built by the back end (i18nBuildAll) and fetched once a day. Kept in this browser only. */
   var EV = window.EnVar ? window.EnVar.cur() : "US", LOC = window.REGION ? window.REGION.loc(LANG) : LANG; /* 3 Nov 2026: English of the US or the UK */
-  var I18N_VER = "20261103"; /* change this when the dictionaries change, so a returning visitor gets them at once */
+  var I18N_VER = "20261103b"; /* change this when the dictionaries change, so a returning visitor gets them at once */
   var FULL = {}, FIX = (window.I18N_FIX || {})[LANG] || {}; /* 2 Nov 2026: corrections by reviewers per language (i18n-fix.js) win over the machine dictionary */
   (function () {
     if (LANG === "en") return;
