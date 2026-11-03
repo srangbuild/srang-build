@@ -82,6 +82,7 @@
   }
   $("c1").innerHTML = ccOpts("");
   $("c2").innerHTML = ccOpts("ไม่เทียบประเทศที่ 2");
+  if ($("site")) $("site").innerHTML = ccOpts("").replace(/<option value="INT">[^<]*<\/option>/, ""); // 3 Nov 2026: ประเทศที่ตั้งงาน กำหนดกฎหมายในภาคผนวก ข
   function nLang() {
     var r = document.querySelector("input[name=nlang]:checked");
     return r ? +r.value : 1;
@@ -242,6 +243,46 @@
       if (q.get("st")) pickFirst = String(q.get("st")).split("|").filter(Boolean);
     }
   }
+  /* 3 Nov 2026 (คำสั่งเจ้าของ): ค่าที่ลูกค้าตั้งตอนใส่ตะกร้า (ภาษา มาตรฐาน ประเทศที่ตั้งงาน เมือง) ตั้งให้เองเมื่อเปิดใบนั้น
+     ใช้เฉพาะเมื่อค่าตรงกับฉบับในลิงก์ (cc) ลิงก์ที่ระบุภาษาหรือมาตรฐานเองมีผลก่อน */
+  (function () {
+    var cf = null, sv = $("site");
+    try {
+      cf = (JSON.parse(localStorage.getItem("build_cart_cfg") || "{}") || {})[$("sheet").value] || null;
+    } catch (e) {}
+    var has = function (v) {
+      return sv && v && [].some.call(sv.options, function (o) {
+        return o.value === v;
+      });
+    };
+    if (sv) sv.value = has(String(q.get("site") || "").toUpperCase()) ? String(q.get("site")).toUpperCase()
+      : cf && has(cf.site) ? cf.site : has($("c1").value) ? $("c1").value : "TH";
+    if (!cf) return;
+    if (cf.city && !$("f-doc").elements.location.value) $("f-doc").elements.location.value = String(cf.city).slice(0, 100);
+    if (q.get("lang") || q.get("c1")) return;
+    var cc = q.has("cc") ? String(q.get("cc") || "").toUpperCase() : null, ls = [cf.l1, cf.n === 2 ? cf.l2 : ""].filter(Boolean),
+      local = ls.every(function (l) {
+        return base(l) === "th" || base(l) === "en";
+      }) && (cf.std === "TH" || cf.std === "INT"), fit = cc === null || ((cc === "" || cc === "EN" || cc === "TH") ? local
+        : cf.std === cc || ls.some(function (l) {
+          return LANG_CC[l] === cc || (window.REGION && window.REGION.langsOf(cc).indexOf(base(l)) >= 0);
+        }));
+    if (!fit) return;
+    var okL = function (l) {
+      return LANGS.some(function (x) {
+        return x[0] === l;
+      });
+    };
+    setN(cf.n === 1 ? 1 : 2);
+    if (okL(cf.l1)) $("lang1").value = cf.l1;
+    if (cf.n === 2 && okL(cf.l2)) $("lang2").value = cf.l2;
+    if (cf.std && (cf.std === "TH" || cf.std === "INT" || REC[cf.std])) {
+      $("c1").value = cf.std;
+      $("c2").value = "";
+      touched.c1 = true;
+      touched.c2 = true;
+    }
+  })();
   drawLang();
   follow();
   // ยังไม่เข้าสู่ระบบ: บอกตั้งแต่ต้นว่าอะไรดาวน์โหลดได้เลย · เข้าสู่ระบบแล้วกลับมาหน้านี้พร้อมตัวเลือกเดิม
@@ -635,7 +676,23 @@
       && x[2] ? '<span class="l2">' + esc(x[2]) + "</span>" : "") + (by ? ' <span style="color:#3F4A58">('
         + esc(by) + ")</span>" : "") + "</li>";
   }
-  function lawBlock(cc, c) {
+  function relBlock(cc) { // 3 Nov 2026: กฎหมายที่เกี่ยวข้องของประเทศที่ตั้งงาน (ผังเมือง ที่ดิน ผู้อนุญาต วิศวกร สถาปนิก อัคคีภัย ไฟฟ้า ความปลอดภัย สิ่งแวดล้อม มาตรฐาน)
+    var list = (window.LAWREL || {})[cc] || [], TOP = [["plan", "Town planning and land use"], ["land", "Land"], ["gov",
+      "Local permit authority"], ["eng", "Engineers"], ["arch", "Architects"], ["fire", "Fire safety"], ["elec", "Electrical"],
+      ["osh", "Occupational safety and health"], ["env", "Environment"], ["std", "Technical standards"]], site = window.SITE
+        && window.SITE.site && window.SITE.site.url ? String(window.SITE.site.url).replace(/\/+$/, "") : "";
+    if (!list.length) return "";
+    return '<div class="lawc"><h4><span data-en="Related laws">Related laws</span></h4>' + TOP.map(function (t) {
+      var it = list.filter(function (r) {
+        return r.t === t[0];
+      });
+      return it.length ? '<div><b><span data-en="' + esc(t[1]) + '">' + esc(t[1]) + "</span>:</b> " + it.map(function (r) {
+        return esc(r.n) + (r.l ? " (" + esc(r.l) + ")" : "") + (r.b ? " · " + esc(r.b) : "") + (r.o ? "" : " *");
+      }).join("; ") + "</div>" : "";
+    }).join("") + '<div><b><span data-en="Official links">Official links</span>:</b> ' + esc(site + "/laws.html#" + cc)
+      + ' · * <span data-en="confirm with the authority">confirm with the authority</span></div></div>';
+  }
+  function lawBlock(cc, c, tag) {
     var r = REC[cc] || null, x = (c && c.law) || {};
     if (!r && !c) return "";
     var tx = function (t) {
@@ -643,7 +700,7 @@
     }, row = function (k, v, keep) {
       return v ? "<div><b>" + tx(k) + ":</b> " + (keep ? esc(v) : tx(v)) + "</div>" : "";
     }, name = window.StdPick ? window.StdPick.labelIn(cc, langs()[0]) : r ? r.country : (c ? c.en : cc); // คำบนภาคผนวกตามภาษาของเอกสาร ชื่อทางการและลิงก์คงเดิม
-    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (r ? row("Law", r.lawName + (r.lawNameLocal
+    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (tag ? "<div><b>" + tx(tag) + "</b></div>" : "") + (r ? row("Law", r.lawName + (r.lawNameLocal
       ? " (" + r.lawNameLocal + ")" : ""), true) + row("Authority", r.authority) + row("Code", r.codeName,
         true) + row("Standards body", r.standardsBody, true) + row("Licensed persons", r.licensed) : "")
       + row("Permit body", x.permitBody) + row("Mandatory inspections", x.mandatoryInspections) + row("Licensed persons (detail)",
@@ -685,11 +742,14 @@
       ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(esc).join(" · ") + "</div>" : "")
       + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName)
         + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
-    var lawHtml = (d.ctry || []).filter(function (c) {
+    var site = $("site") ? $("site").value : "", inC = (d.ctry || []).some(function (c) {
+      return c.cc === site;
+    });
+    var lawHtml = (site && !inC && REC[site] ? lawBlock(site, null, "Construction site") : "") + (d.ctry || []).filter(function (c) {
       return c.cc !== "INT";
     }).map(function (c) {
-      return lawBlock(c.cc, c);
-    }).join("");
+      return lawBlock(c.cc, c, c.cc === site ? "Construction site" : "Country of the standard");
+    }).join("") + (site ? relBlock(site) : ""); // 3 Nov 2026: กฎหมายตามประเทศที่ตั้งงานขึ้นก่อน แล้วตามด้วยกฎหมายที่เกี่ยวข้อง
     if (lawHtml) h += '<section class="annex"><h3>' + M(L.annexB) + "</h3>" + lawHtml + '<div class="ord2">'
       + M(L.lnote) + "</div></section>";
     return h;

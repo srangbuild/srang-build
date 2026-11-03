@@ -44,6 +44,7 @@
       <div class="note" id="ccInfo" style="margin:0"></div><div class="note" id="lawInfo" style="margin:0"></div><div id="stdBox" hidden></div><div class="note" id="c2wrapNote" style="margin:0" hidden>ทั้ง 2 ประเทศจะพิมพ์กรอบกฎหมายในภาคผนวก ข ท้ายเอกสาร</div>
       <label>ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI 318"><option value="Eurocode 2"><option value="BS EN 206"><option value="JIS A 5308"><option value="ASTM C94"><option value="IEC 60364"></datalist></label>
       <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
+      <label>ประเทศที่ตั้งงาน (กฎหมายในภาคผนวก ข ใช้ประเทศนี้)<select id="site" data-country-name="1"></select></label>
       <div class="g3" style="align-items:end"><label>พิกัดหน้างาน (ไม่บังคับ)<input type="text" id="geo" maxlength="40" inputmode="decimal" autocomplete="off" placeholder="13.7563,100.5018"></label><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px"><button class="b line sm" type="button" id="geoBtn">ใช้ตำแหน่งปัจจุบัน</button><a id="geoMap" hidden target="_blank" rel="noopener noreferrer">เปิดใน Google Maps</a></div><p class="note" style="margin:0">พิกัดอยู่ในเครื่องนี้ และพิมพ์บนเอกสารเท่านั้น ระบบไม่เก็บ</p></div>
       <button class="b pri" type="submit">สร้างเอกสาร</button><div class="dn" id="freeNow" style="margin:0" hidden></div>
       <p class="note" style="margin:0">ซื้อใบนี้แล้วสร้างได้ครบทุกข้อ ในภาษาและมาตรฐานของฉบับที่ซื้อ (ฉบับอังกฤษ-ไทย = ไทยและอังกฤษ มาตรฐานไทย) · ภาษาและมาตรฐานอื่นซื้อเป็นฉบับประเทศ · ฉบับฟรีมีข้อหลัก 1 ภาษา เลือกได้ทุกภาษา · 2 ภาษาต้องซื้อ · ค่าเกณฑ์นอกฉบับไทยให้กรอกตามข้อกำหนดของโครงการ ระบบไม่เดาตัวเลขแทนคุณ</p>
@@ -65,6 +66,6 @@
   </div>
 </footer>
 
-<script src="en-var.js"></script><script src="doc-law.js"></script><script src="doc-refs.js"></script><script src="std-pick.js"></script><script src="doc.js"></script>
+<script src="en-var.js"></script><script src="doc-law.js"></script><script src="doc-refs.js"></script><script src="doc-related.js"></script><script src="std-pick.js"></script><script src="doc.js"></script>
 </body>
 </html>
