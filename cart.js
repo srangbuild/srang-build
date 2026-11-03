@@ -67,60 +67,60 @@
       msg.classList.remove("on");
     }, 2600);
   }
-    function open(o) {
-      bg.classList.toggle("on", o);
-      box.classList.toggle("on", o);
-      if (o) {
-        var c = box.querySelector("[data-bc-close]");
-        if (c) c.focus();
-      } else {
-        fab.focus();
-      }
+  function open(o) {
+    bg.classList.toggle("on", o);
+    box.classList.toggle("on", o);
+    if (o) {
+      var c = box.querySelector("[data-bc-close]");
+      if (c) c.focus();
+    } else {
+      fab.focus();
     }
-    function planTx(id) {
-      return B.isMarket(B.find(id)) ? "สินค้าฝากขาย" : (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
-        + " · " + B.LANGS[B.varOf(id)];
-    }
-    function draw() {
-      var ids = B.cart.get(), n = ids.length, total = B.cart.total();
-      fab.classList.toggle("on", n > 0 && !onCartPage);
-      fab.innerHTML = "ตะกร้า <i>" + n + "</i> " + esc(B.baht(total));
-      fab.setAttribute("aria-label", "เปิดตะกร้า มี " + n + " รายการ รวม " + total + " บาท");
-      [].forEach.call(document.querySelectorAll(".navcart i"), function (b) {
-        b.textContent = n;
-        b.hidden = !n;
-      });
-      var rows = ids.map(function (id) {
-        var x = B.find(id), bd = B.isBundle(x), sv = B.cart.saving(id);
-        return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id))
-          + '">' + esc(B.code(x) + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small><small>"
-          + (B.isMarket(x) ? esc(x.kind || "สินค้าฝากขาย") + (x.seller ? " โดย " + esc(x.seller) : "") : bd
-            ? "ชุดรวม " + x.items.length + " ใบ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : "ไฟล์ PDF") : esc(x.nPro)
-            + " ข้อ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : esc(x.pages || "")
-              + " หน้า · ไฟล์ PDF")) + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก ' + esc(B.baht(sv))
-                + "</small>" : "") + "</div><em>" + esc(B.baht(B.cart.price(id))) + '</em><button type="button" data-bc-del="'
-          + esc(id) + '" aria-label="เอา ' + esc(x.id) + ' ออกจากตะกร้า">×</button></li>';
-      }).join("");
-      box.innerHTML = '<div class="bc-hd"><h2>ตะกร้า (' + n + ')</h2><button type="button" data-bc-close="1" aria-label="ปิดตะกร้า">✕</button></div>'
-        +
-        (n ? '<ul class="bc-li">' + rows + "</ul>" : '<p class="bc-emp">ยังไม่มีรายการในตะกร้า</p>')
-        +
-        '<div class="bc-ft"><div class="bc-sum"><span>ยอดรวม ' + n + " รายการ</span><b>" + esc(B.baht(total))
-        + '</b></div><p class="bc-nt">ไฟล์ดิจิทัล PDF · ไม่มีค่าส่ง · ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงิน</p>'
-        +
-        (n ? '<a class="bc-go" href="' + esc(L("checkout.html")) + '">ชำระเงิน →</a><a class="bc-vw" href="'
-          + esc(L("cart.html")) + '">ดูและแก้ไขตะกร้า</a>' : '<a class="bc-vw" href="' + esc(L("sheets.html"))
-          + '">เลือกใบตรวจงาน</a>') + "</div>";
-      [].forEach.call(document.querySelectorAll("[data-add]"), function (b) {
-        var id = b.getAttribute("data-add"), inC = B.cart.has(id), cov = !inC && B.cart.covered(id);
-        b.textContent = inC ? "อยู่ในตะกร้า ✓" : cov ? "อยู่ในชุดที่เลือกแล้ว" : "ใส่ตะกร้า";
-        b.disabled = cov;
-        b.setAttribute("aria-pressed", String(inC));
-      });
-    }
-    fab.addEventListener("click", function () {
-      open(true);
+  }
+  function planTx(id) {
+    return B.isMarket(B.find(id)) ? "สินค้าฝากขาย" : (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
+      + " · " + B.LANGS[B.varOf(id)];
+  }
+  function draw() {
+    var ids = B.cart.get(), n = ids.length, total = B.cart.total();
+    fab.classList.toggle("on", n > 0 && !onCartPage);
+    fab.innerHTML = "ตะกร้า <i>" + n + "</i> " + esc(B.baht(total));
+    fab.setAttribute("aria-label", "เปิดตะกร้า มี " + n + " รายการ รวม " + total + " บาท");
+    [].forEach.call(document.querySelectorAll(".navcart i"), function (b) {
+      b.textContent = n;
+      b.hidden = !n;
     });
+    var rows = ids.map(function (id) {
+      var x = B.find(id), bd = B.isBundle(x), sv = B.cart.saving(id);
+      return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id))
+        + '">' + esc(B.code(x) + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small><small>"
+        + (B.isMarket(x) ? esc(x.kind || "สินค้าฝากขาย") + (x.seller ? " โดย " + esc(x.seller) : "") : bd
+          ? "ชุดรวม " + x.items.length + " ใบ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : "ไฟล์ PDF") : esc(x.nPro)
+          + " ข้อ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : esc(x.pages || "")
+            + " หน้า · ไฟล์ PDF")) + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก ' + esc(B.baht(sv))
+              + "</small>" : "") + "</div><em>" + esc(B.baht(B.cart.price(id))) + '</em><button type="button" data-bc-del="'
+        + esc(id) + '" aria-label="เอา ' + esc(x.id) + ' ออกจากตะกร้า">×</button></li>';
+    }).join("");
+    box.innerHTML = '<div class="bc-hd"><h2>ตะกร้า (' + n + ')</h2><button type="button" data-bc-close="1" aria-label="ปิดตะกร้า">✕</button></div>'
+      +
+      (n ? '<ul class="bc-li">' + rows + "</ul>" : '<p class="bc-emp">ยังไม่มีรายการในตะกร้า</p>')
+      +
+      '<div class="bc-ft"><div class="bc-sum"><span>ยอดรวม ' + n + " รายการ</span><b>" + esc(B.baht(total))
+      + '</b></div><p class="bc-nt">ไฟล์ดิจิทัล PDF · ไม่มีค่าส่ง · ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงิน</p>'
+      +
+      (n ? '<a class="bc-go" href="' + esc(L("checkout.html")) + '">ชำระเงิน →</a><a class="bc-vw" href="'
+        + esc(L("cart.html")) + '">ดูและแก้ไขตะกร้า</a>' : '<a class="bc-vw" href="' + esc(L("sheets.html"))
+        + '">เลือกใบตรวจงาน</a>') + "</div>";
+    [].forEach.call(document.querySelectorAll("[data-add]"), function (b) {
+      var id = b.getAttribute("data-add"), inC = B.cart.has(id), cov = !inC && B.cart.covered(id);
+      b.textContent = inC ? "อยู่ในตะกร้า ✓" : cov ? "อยู่ในชุดที่เลือกแล้ว" : "ใส่ตะกร้า";
+      b.disabled = cov;
+      b.setAttribute("aria-pressed", String(inC));
+    });
+  }
+  fab.addEventListener("click", function () {
+    open(true);
+  });
   bg.addEventListener("click", function () {
     open(false);
   });
@@ -142,7 +142,7 @@
       say("เอา " + id + " ออกจากตะกร้าแล้ว");
       return;
     }
-      var err = B.cart.add(id, false);
+    var err = B.cart.add(id, false);
     say(err || "ใส่ " + id + " ลงตะกร้าแล้ว · กดปุ่มตะกร้าเพื่อชำระเงิน");
   });
   window.addEventListener("build-cart", draw);

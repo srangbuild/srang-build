@@ -59,15 +59,15 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-    function safeHref(h) {
-      h = String(h || "");
-      return /^(https:\/\/|[a-z0-9-]+\.html([?#].*)?$)/i.test(h) ? h : "";
-    }
-    function apiOn() {
-      return typeof B.call === "function" && !!((S.member && S.member.api) || /\/_dev\//.test(location.pathname));
-    }
+  function safeHref(h) {
+    h = String(h || "");
+    return /^(https:\/\/|[a-z0-9-]+\.html([?#].*)?$)/i.test(h) ? h : "";
+  }
+  function apiOn() {
+    return typeof B.call === "function" && !!((S.member && S.member.api) || /\/_dev\//.test(location.pathname));
+  }
 
-    var css = ".bn-note{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;font-size:15px;line-height:1.5;background:#FFF1E8;color:#6F2B05;border-bottom:1px solid #FFD2B3}.bn-note.warn{background:#FDECEA;color:#7A1C14;border-color:#F5C4BE}.bn-note .x{margin-left:auto;background:none;border:0;font-size:22px;line-height:1;color:inherit;cursor:pointer;min-width:36px;min-height:36px}.bn-note a{color:inherit;font-weight:700}"
+  var css = ".bn-note{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;font-size:15px;line-height:1.5;background:#FFF1E8;color:#6F2B05;border-bottom:1px solid #FFD2B3}.bn-note.warn{background:#FDECEA;color:#7A1C14;border-color:#F5C4BE}.bn-note .x{margin-left:auto;background:none;border:0;font-size:22px;line-height:1;color:inherit;cursor:pointer;min-width:36px;min-height:36px}.bn-note a{color:inherit;font-weight:700}"
     +
     ".bt-fab{position:fixed;right:14px;bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:85;display:flex;align-items:center;gap:8px;min-height:50px;padding:0 18px;border:0;border-radius:999px;background:#0F2A44;color:#fff;font:600 15.5px/1 \"IBM Plex Sans Thai\",sans-serif;box-shadow:0 10px 26px rgba(15,42,68,.35);cursor:pointer}.bt-fab:hover{background:#16395C}.bt-fab svg{width:20px;height:20px}.bt-fab.bt-typing{display:none}"
     +
@@ -99,7 +99,7 @@
           && (!n.to || n.to >= today);
       });
   }
-    B.noticesNow = noticesNow;
+  B.noticesNow = noticesNow;
   function drawNotices() {
     var hdr = document.getElementById("hdr");
     if (!hdr) return;
@@ -123,19 +123,19 @@
     });
   }
 
-    /* ---------- helper ---------- */
-    var FAQ = (Array.isArray(S.botfaq) ? S.botfaq : []).map(function (x) {
-      return {
-        id: x.id,
-        q: EN && x.qEn ? x.qEn : x.q,
-        a: EN && x.aEn ? x.aEn : x.a,
-        href: x.href,
-        top: x.top,
-        words: String(x.k || "").split(/[\s,]+/).concat(String(x.qEn || "").toLowerCase().split(/\s+/).filter(function (w) {
-          return w.length > 3;
-        }))
-      };
-    });
+  /* ---------- helper ---------- */
+  var FAQ = (Array.isArray(S.botfaq) ? S.botfaq : []).map(function (x) {
+    return {
+      id: x.id,
+      q: EN && x.qEn ? x.qEn : x.q,
+      a: EN && x.aEn ? x.aEn : x.a,
+      href: x.href,
+      top: x.top,
+      words: String(x.k || "").split(/[\s,]+/).concat(String(x.qEn || "").toLowerCase().split(/\s+/).filter(function (w) {
+        return w.length > 3;
+      }))
+    };
+  });
   var indexReady = false, pan = null, logBox = null, lastId = "", lastQ = "";
   function loadIndex(done) {
     if (indexReady) return done();
@@ -169,185 +169,185 @@
     };
     document.head.appendChild(s);
   }
-    function norm(s) {
-      return String(s || "").toLowerCase().replace(/[?？!.,'"“”]/g, " ").replace(/\s+/g, " ").trim();
-    }
-    function score(q, it) {
-      var s = 0, nq = norm(it.q);
-      if (nq === q) s += 60;
-      else if (q.length >= 4 && nq.indexOf(q) >= 0) s += 12;
-      it.words.forEach(function (w) {
-        w = norm(w);
-        if (w.length >= 2 && q.indexOf(w) >= 0) s += Math.min(w.length, 10);
+  function norm(s) {
+    return String(s || "").toLowerCase().replace(/[?？!.,'"“”]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function score(q, it) {
+    var s = 0, nq = norm(it.q);
+    if (nq === q) s += 60;
+    else if (q.length >= 4 && nq.indexOf(q) >= 0) s += 12;
+    it.words.forEach(function (w) {
+      w = norm(w);
+      if (w.length >= 2 && q.indexOf(w) >= 0) s += Math.min(w.length, 10);
+    });
+    return s;
+  }
+  function rank(q) {
+    q = norm(q);
+    return FAQ.map(function (it) {
+      return { it: it, s: score(q, it) };
+    }).filter(function (x) {
+      return x.s >= 5;
+    }).sort(function (a, b) {
+      return b.s - a.s;
+    });
+  }
+  function say(text, me) {
+    var d = document.createElement("div");
+    d.className = "bt-m" + (me ? " me" : "");
+    if (me) d.setAttribute("data-noi18n", "1");
+    d.textContent = text;
+    logBox.appendChild(d);
+    logBox.scrollTop = logBox.scrollHeight;
+    return d;
+  }
+  function block(cls, html) {
+    var d = document.createElement("div");
+    d.className = cls;
+    d.innerHTML = html;
+    logBox.appendChild(d);
+    logBox.scrollTop = logBox.scrollHeight;
+    return d;
+  }
+  function lineBtn() {
+    var l = S.links && S.links.line;
+    return /^https:\/\//.test(l || "") ? '<a href="' + esc(l) + '" target="_blank" rel="noopener">'
+      + esc(T.line) + "</a>" : "";
+  }
+  function send(data) {
+    if (!apiOn()) return Promise.resolve({ id: "" });
+    data.page = here;
+    return B.call("botlog", data).catch(function () {
+      return { id: "" };
+    });
+  }
+  function answer(it, typed) {
+    say(it.a);
+    var href = safeHref(it.href);
+    block("bt-act", (href ? '<a class="pri" href="' + esc(href) + '">' + esc(T.more) + "</a>" : "")
+      + (typed ? '<button type="button" data-fb="good">' + esc(T.good) + '</button><button type="button" data-fb="bad">'
+        + esc(T.bad) + "</button>" : ""));
+  }
+  function askForm() {
+    block("bt-f", '<label for="bt-c" style="display:block">' + esc(T.contact) + '</label><input id="bt-c" type="text" maxlength="80" autocomplete="email"><label><input id="bt-ok" type="checkbox"><span>'
+      + esc(T.consent) + '</span></label><button type="button" data-bt="post">' + esc(T.form) + "</button>");
+    var ln = lineBtn();
+    if (ln) block("bt-act", ln);
+  }
+  function handle(text) {
+    text = String(text || "").trim();
+    if (!text) return;
+    say(text, true);
+    lastQ = text;
+    lastId = "";
+    loadIndex(function () {
+      var r = rank(text);
+      send({
+        q: text,
+        hit: r.length ? r[0].it.id : "",
+        res: r.length ? "ตอบได้" : "ไม่พบคำตอบ"
+      }).then(function (o) {
+        lastId = (o && o.id) || "";
       });
-      return s;
-    }
-    function rank(q) {
-      q = norm(q);
-      return FAQ.map(function (it) {
-        return { it: it, s: score(q, it) };
-      }).filter(function (x) {
-        return x.s >= 5;
-      }).sort(function (a, b) {
-        return b.s - a.s;
-      });
-    }
-    function say(text, me) {
-      var d = document.createElement("div");
-      d.className = "bt-m" + (me ? " me" : "");
-      if (me) d.setAttribute("data-noi18n", "1");
-      d.textContent = text;
-      logBox.appendChild(d);
-      logBox.scrollTop = logBox.scrollHeight;
-      return d;
-    }
-    function block(cls, html) {
-      var d = document.createElement("div");
-      d.className = cls;
-      d.innerHTML = html;
-      logBox.appendChild(d);
-      logBox.scrollTop = logBox.scrollHeight;
-      return d;
-    }
-    function lineBtn() {
-      var l = S.links && S.links.line;
-      return /^https:\/\//.test(l || "") ? '<a href="' + esc(l) + '" target="_blank" rel="noopener">'
-        + esc(T.line) + "</a>" : "";
-    }
-    function send(data) {
-      if (!apiOn()) return Promise.resolve({ id: "" });
-      data.page = here;
-      return B.call("botlog", data).catch(function () {
-        return { id: "" };
-      });
-    }
-    function answer(it, typed) {
-      say(it.a);
-      var href = safeHref(it.href);
-      block("bt-act", (href ? '<a class="pri" href="' + esc(href) + '">' + esc(T.more) + "</a>" : "")
-        + (typed ? '<button type="button" data-fb="good">' + esc(T.good) + '</button><button type="button" data-fb="bad">'
-          + esc(T.bad) + "</button>" : ""));
-    }
-    function askForm() {
-      block("bt-f", '<label for="bt-c" style="display:block">' + esc(T.contact) + '</label><input id="bt-c" type="text" maxlength="80" autocomplete="email"><label><input id="bt-ok" type="checkbox"><span>'
-        + esc(T.consent) + '</span></label><button type="button" data-bt="post">' + esc(T.form) + "</button>");
-      var ln = lineBtn();
-      if (ln) block("bt-act", ln);
-    }
-    function handle(text) {
-      text = String(text || "").trim();
-      if (!text) return;
-      say(text, true);
-      lastQ = text;
-      lastId = "";
-      loadIndex(function () {
-        var r = rank(text);
-        send({
-          q: text,
-          hit: r.length ? r[0].it.id : "",
-          res: r.length ? "ตอบได้" : "ไม่พบคำตอบ"
-        }).then(function (o) {
-          lastId = (o && o.id) || "";
+      if (r.length) {
+        answer(r[0].it, true);
+        var more = r.slice(1, 3).filter(function (x) {
+          return x.s >= 6;
         });
-        if (r.length) {
-          answer(r[0].it, true);
-          var more = r.slice(1, 3).filter(function (x) {
-            return x.s >= 6;
-          });
-          if (more.length) block("bt-chips", more.map(function (x) {
-            return '<button type="button" data-q="' + esc(x.it.id) + '">' + esc(x.it.q) + "</button>";
-          }).join(""));
-        } else {
+        if (more.length) block("bt-chips", more.map(function (x) {
+          return '<button type="button" data-q="' + esc(x.it.id) + '">' + esc(x.it.q) + "</button>";
+        }).join(""));
+      } else {
+        say(T.none);
+        askForm();
+      }
+    });
+  }
+  function build() {
+    if (pan) {
+      pan.hidden = false;
+      pan.querySelector("input").focus();
+      return;
+    }
+    pan = document.createElement("div");
+    pan.className = "bt-pan";
+    pan.setAttribute("role", "dialog");
+    pan.setAttribute("aria-label", T.title);
+    pan.innerHTML = '<div class="bt-hd"><span><b>' + esc(T.title) + "</b><small>" + esc(T.sub) + '</small></span><button type="button" data-bt="close" aria-label="'
+      + esc(T.close) + '">&times;</button></div><div class="bt-log" aria-live="polite"></div><form class="bt-in"><input type="text" maxlength="300" placeholder="'
+      + esc(T.ph) + '" aria-label="' + esc(T.ph) + '"><button type="submit">' + esc(T.send) + '</button></form><p class="bt-pv">'
+      + esc(T.privacy) + "</p>";
+    document.body.appendChild(pan);
+    logBox = pan.querySelector(".bt-log");
+    say(T.hello);
+    var tops = FAQ.filter(function (x) {
+      return x.top;
+    }).slice(0, 7);
+    if (tops.length) block("bt-chips", tops.map(function (x) {
+      return '<button type="button" data-q="' + esc(x.id) + '">' + esc(x.q) + "</button>";
+    }).join(""));
+    pan.querySelector("form").addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var i = pan.querySelector("form input");
+      handle(i.value);
+      i.value = "";
+    });
+    pan.addEventListener("click", function (ev) {
+      var t = ev.target.closest("button");
+      if (!t) return;
+      if (t.dataset.bt === "close") {
+        pan.hidden = true;
+        if (fab) fab.focus();
+        return;
+      }
+      if (t.dataset.q) {
+        var it = FAQ.filter(function (x) {
+          return x.id === t.dataset.q;
+        })[0];
+        if (it) {
+          say(it.q, true);
+          answer(it, false);
+        }
+        return;
+      }
+      if (t.dataset.fb) {
+        t.parentNode.querySelectorAll("[data-fb]").forEach(function (b) {
+          b.remove();
+        });
+        if (lastId) send({ id: lastId, res: t.dataset.fb === "good" ? "ตรงคำถาม" : "ไม่ตรงคำถาม" });
+        if (t.dataset.fb === "good") say(T.thanks);
+        else {
           say(T.none);
           askForm();
         }
-      });
-    }
-    function build() {
-      if (pan) {
-        pan.hidden = false;
-        pan.querySelector("input").focus();
         return;
       }
-        pan = document.createElement("div");
-      pan.className = "bt-pan";
-      pan.setAttribute("role", "dialog");
-      pan.setAttribute("aria-label", T.title);
-      pan.innerHTML = '<div class="bt-hd"><span><b>' + esc(T.title) + "</b><small>" + esc(T.sub) + '</small></span><button type="button" data-bt="close" aria-label="'
-        + esc(T.close) + '">&times;</button></div><div class="bt-log" aria-live="polite"></div><form class="bt-in"><input type="text" maxlength="300" placeholder="'
-        + esc(T.ph) + '" aria-label="' + esc(T.ph) + '"><button type="submit">' + esc(T.send) + '</button></form><p class="bt-pv">'
-        + esc(T.privacy) + "</p>";
-      document.body.appendChild(pan);
-      logBox = pan.querySelector(".bt-log");
-      say(T.hello);
-      var tops = FAQ.filter(function (x) {
-        return x.top;
-      }).slice(0, 7);
-      if (tops.length) block("bt-chips", tops.map(function (x) {
-        return '<button type="button" data-q="' + esc(x.id) + '">' + esc(x.q) + "</button>";
-      }).join(""));
-      pan.querySelector("form").addEventListener("submit", function (ev) {
-        ev.preventDefault();
-        var i = pan.querySelector("form input");
-        handle(i.value);
-        i.value = "";
-      });
-      pan.addEventListener("click", function (ev) {
-        var t = ev.target.closest("button");
-        if (!t) return;
-        if (t.dataset.bt === "close") {
-          pan.hidden = true;
-          if (fab) fab.focus();
+      if (t.dataset.bt === "post") {
+        var c = pan.querySelector("#bt-c"), ok = pan.querySelector("#bt-ok"), box = t.parentNode;
+        if (!c.value.trim() || !ok.checked) {
+          c.focus();
           return;
         }
-          if (t.dataset.q) {
-            var it = FAQ.filter(function (x) {
-              return x.id === t.dataset.q;
-            })[0];
-            if (it) {
-              say(it.q, true);
-              answer(it, false);
-            }
-              return;
-          }
-          if (t.dataset.fb) {
-            t.parentNode.querySelectorAll("[data-fb]").forEach(function (b) {
-              b.remove();
-            });
-            if (lastId) send({ id: lastId, res: t.dataset.fb === "good" ? "ตรงคำถาม" : "ไม่ตรงคำถาม" });
-            if (t.dataset.fb === "good") say(T.thanks);
-            else {
-              say(T.none);
-              askForm();
-            }
-              return;
-          }
-          if (t.dataset.bt === "post") {
-            var c = pan.querySelector("#bt-c"), ok = pan.querySelector("#bt-ok"), box = t.parentNode;
-            if (!c.value.trim() || !ok.checked) {
-              c.focus();
-              return;
-            }
-              t.disabled = true;
-            var body = { res: "ขอให้ร้านตอบ", contact: c.value.trim(), consent: true };
-            if (lastId) body.id = lastId;
-            else {
-              body.q = lastQ;
-              body.hit = "";
-            }
-              (apiOn() ? B.call("botlog", Object.assign({ page: here }, body)) : Promise.reject(new Error("off"))).then(function () {
-                box.remove();
-                say(T.sent);
-              }).catch(function () {
-                t.disabled = false;
-                say(T.fail);
-              });
-          }
-      });
-      loadIndex(function () {});
-      pan.querySelector("form input").focus();
-    }
-    var fab = document.createElement("button");
+        t.disabled = true;
+        var body = { res: "ขอให้ร้านตอบ", contact: c.value.trim(), consent: true };
+        if (lastId) body.id = lastId;
+        else {
+          body.q = lastQ;
+          body.hit = "";
+        }
+        (apiOn() ? B.call("botlog", Object.assign({ page: here }, body)) : Promise.reject(new Error("off"))).then(function () {
+          box.remove();
+          say(T.sent);
+        }).catch(function () {
+          t.disabled = false;
+          say(T.fail);
+        });
+      }
+    });
+    loadIndex(function () {});
+    pan.querySelector("form input").focus();
+  }
+  var fab = document.createElement("button");
   fab.type = "button";
   fab.className = "bt-fab";
   fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.7A8 8 0 1 1 21 12z"/></svg>'
@@ -376,14 +376,14 @@
     });
     fab.style.bottom = top < window.innerHeight ? Math.round(window.innerHeight - top + 10) + "px" : "";
   }
-    function start() {
-      document.body.appendChild(fab);
-      drawNotices();
-      dock();
-      new MutationObserver(dock).observe(document.body, { attributes: true, subtree: true,
-        attributeFilter: ["class"] });
-      window.addEventListener("resize", dock);
-    }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+  function start() {
+    document.body.appendChild(fab);
+    drawNotices();
+    dock();
+    new MutationObserver(dock).observe(document.body, { attributes: true, subtree: true,
+      attributeFilter: ["class"] });
+    window.addEventListener("resize", dock);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 })();
