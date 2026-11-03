@@ -11,20 +11,20 @@
     for (var i = 0; i < s.length; i++) {
       h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     }
-      return String(h >>> 0) + ":" + s.length;
+    return String(h >>> 0) + ":" + s.length;
   }
-    var BASE = hashOf(ORIG);
+  var BASE = hashOf(ORIG);
   try {
     var dr = localStorage.getItem(KEY), dj = dr ? JSON.parse(dr) : null;
     if (dj && dj.base === BASE && dj.data) {
       S = dj.data;
       dirty = JSON.stringify(S) !== ORIG;
     }
-      else if (dj) {
-        localStorage.setItem(KEY + "_old", dr);
-        localStorage.removeItem(KEY);
-        staleNote = "พบร่างเก่าที่แก้บนข้อมูลรุ่นก่อน จึงไม่นำมาใช้ (กันข้อมูลใหม่หาย) · ใช้ค่าจากไฟล์ data.js แทน";
-      }
+    else if (dj) {
+      localStorage.setItem(KEY + "_old", dr);
+      localStorage.removeItem(KEY);
+      staleNote = "พบร่างเก่าที่แก้บนข้อมูลรุ่นก่อน จึงไม่นำมาใช้ (กันข้อมูลใหม่หาย) · ใช้ค่าจากไฟล์ data.js แทน";
+    }
   } catch (e) {}
     function shape() {
       ["brand", "site", "links", "announce", "posts", "member", "pay"].forEach(function (k) {
@@ -36,7 +36,7 @@
         });
       if (!Array.isArray(S.member.perks)) S.member.perks = [];
     }
-    shape();
+  shape();
 
   var $ = function (id) {
     return document.getElementById(id);
@@ -54,34 +54,34 @@
       return a == null ? undefined : a[k];
     }, o);
   }
-    function set(o, p, v) {
-      var ks = p.split("."), last = ks.pop();
-      var t = ks.reduce(function (a, k) {
-        if (a[k] == null || typeof a[k] !== "object") a[k] = {};
-        return a[k];
-      }, o);
-      t[last] = v;
-    }
-    function toast(t) {
-      var e = $("toast");
-      e.textContent = t;
-      e.classList.add("show");
-      clearTimeout(toast.t);
-      toast.t = setTimeout(function () {
-        e.classList.remove("show");
-      }, 2200);
-    }
-    function touch() {
-      dirty = JSON.stringify(S) !== ORIG;
-      try {
-        if (dirty) localStorage.setItem(KEY, JSON.stringify({ base: BASE, at: Date.now(), data: S }));
-        else localStorage.removeItem(KEY);
-      } catch (e) {} var st = $("state");
-      st.textContent = dirty ? "มีการแก้ที่ยังไม่บันทึก" : (GH && GH.on === true ? "ตรงกับบนเว็บ" : "ตรงกับไฟล์");
-      st.classList.toggle("dirty", dirty);
-    }
-    var PL = [["tiktok", "TikTok"], ["youtube", "YouTube"], ["facebook", "Facebook"], ["instagram",
-      "Instagram"]];
+  function set(o, p, v) {
+    var ks = p.split("."), last = ks.pop();
+    var t = ks.reduce(function (a, k) {
+      if (a[k] == null || typeof a[k] !== "object") a[k] = {};
+      return a[k];
+    }, o);
+    t[last] = v;
+  }
+  function toast(t) {
+    var e = $("toast");
+    e.textContent = t;
+    e.classList.add("show");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () {
+      e.classList.remove("show");
+    }, 2200);
+  }
+  function touch() {
+    dirty = JSON.stringify(S) !== ORIG;
+    try {
+      if (dirty) localStorage.setItem(KEY, JSON.stringify({ base: BASE, at: Date.now(), data: S }));
+      else localStorage.removeItem(KEY);
+    } catch (e) {} var st = $("state");
+    st.textContent = dirty ? "มีการแก้ที่ยังไม่บันทึก" : (GH && GH.on === true ? "ตรงกับบนเว็บ" : "ตรงกับไฟล์");
+    st.classList.toggle("dirty", dirty);
+  }
+  var PL = [["tiktok", "TikTok"], ["youtube", "YouTube"], ["facebook", "Facebook"], ["instagram",
+    "Instagram"]];
 
   // ----- แบบฟอร์ม -----
   var OBJ = {
@@ -381,13 +381,13 @@
       ? "url" : "text") + '" data-p="' + p + '"' + (ty === "url" ? ' data-t="url" inputmode="url" placeholder="https://"' : "")
       + ' value="' + esc(v) + '"' + (ty === "url" && v && !ok(v) ? ' class="bad"' : "") + "></label>";
   }
-    function objCard(key, title, hint) {
-      return '<div class="card"><h2>' + title + "</h2>" + (hint ? '<p class="hint">' + hint + "</p>" : "")
-        + '<div class="grid">' + OBJ[key].map(function (f) {
-          return field(key, f);
-        }).join("") + "</div></div>";
-    }
-    var openAt = {};
+  function objCard(key, title, hint) {
+    return '<div class="card"><h2>' + title + "</h2>" + (hint ? '<p class="hint">' + hint + "</p>" : "")
+      + '<div class="grid">' + OBJ[key].map(function (f) {
+        return field(key, f);
+      }).join("") + "</div></div>";
+  }
+  var openAt = {};
   function listCard(key, title, hint) {
     var L = LIST[key];
     return '<div class="card"><h2>' + title + ' <span class="tag">' + S[key].length + " รายการ</span></h2>"
@@ -406,251 +406,251 @@
       + L.name + "</button></div></div>";
   }
 
-    // ----- ภาพรวม -----
-    function overview() {
-      var L = S.links, rows = [], add = function (cls, t, d) {
-        rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!")
-          + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>");
-      };
-      var ch = ["tiktok", "youtube", "facebook", "instagram", "x"].filter(function (k) {
-        return ok(L[k]);
+  // ----- ภาพรวม -----
+  function overview() {
+    var L = S.links, rows = [], add = function (cls, t, d) {
+      rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!")
+        + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>");
+    };
+    var ch = ["tiktok", "youtube", "facebook", "instagram", "x"].filter(function (k) {
+      return ok(L[k]);
+    });
+    add(ch.length >= 3 ? "ok" : ch.length ? "wa" : "no", "ช่องทาง " + ch.length + " จาก 5", ch.length < 5
+      ? "ช่องที่ยังว่างจะขึ้นว่า “เร็ว ๆ นี้” บนเว็บ" : "");
+    add(ok(L.line) ? "ok" : "no", "ลิงก์เพิ่มเพื่อน LINE", ok(L.line) ? "ปุ่มรับเช็กลิสต์ทาง LINE ทำงานแล้ว" : "ยังไม่ใส่ → เว็บจะให้เปิดฉบับพิมพ์เองแทน (ยังใช้ได้ แต่ไม่ได้รายชื่อผู้ติดตาม)");
+    add(ok(S.site.url) ? "ok" : "wa", "ที่อยู่เว็บ", ok(S.site.url) ? esc(S.site.url) : "ใส่หลังเผยแพร่ เพื่อให้ชุดโพสต์สร้างลิงก์ติดตามผลได้");
+    add(S.links.email ? "ok" : "wa", "อีเมลติดต่องาน", S.links.email ? "" : "สปอนเซอร์ติดต่อทางนี้");
+    var withLink = S.episodes.filter(function (e) {
+      return PL.some(function (p) {
+        return ok((e.watch || {})[p[0]]);
       });
-      add(ch.length >= 3 ? "ok" : ch.length ? "wa" : "no", "ช่องทาง " + ch.length + " จาก 5", ch.length < 5
-        ? "ช่องที่ยังว่างจะขึ้นว่า “เร็ว ๆ นี้” บนเว็บ" : "");
-      add(ok(L.line) ? "ok" : "no", "ลิงก์เพิ่มเพื่อน LINE", ok(L.line) ? "ปุ่มรับเช็กลิสต์ทาง LINE ทำงานแล้ว" : "ยังไม่ใส่ → เว็บจะให้เปิดฉบับพิมพ์เองแทน (ยังใช้ได้ แต่ไม่ได้รายชื่อผู้ติดตาม)");
-      add(ok(S.site.url) ? "ok" : "wa", "ที่อยู่เว็บ", ok(S.site.url) ? esc(S.site.url) : "ใส่หลังเผยแพร่ เพื่อให้ชุดโพสต์สร้างลิงก์ติดตามผลได้");
-      add(S.links.email ? "ok" : "wa", "อีเมลติดต่องาน", S.links.email ? "" : "สปอนเซอร์ติดต่อทางนี้");
-      var withLink = S.episodes.filter(function (e) {
-        return PL.some(function (p) {
-          return ok((e.watch || {})[p[0]]);
-        });
-      });
-      var late = S.episodes.filter(function (e) {
-        return e.date && new Date(e.date + "T00:00:00") <= new Date() && withLink.indexOf(e) < 0;
-      });
-      add(late.length ? "no" : "ok", "ตอนที่มีลิงก์คลิป " + withLink.length + " จาก " + S.episodes.length,
-        late.length ? "ถึงวันปล่อยแล้วแต่ยังไม่ใส่ลิงก์: " + late.map(function (e) {
-          return "#" + esc(e.no);
-        }).join(" ") : "ตอนที่ยังไม่ถึงวันปล่อยจะแสดงวันที่อัตโนมัติ");
-      var ids = {}, dup = [];
-      S.freebies.forEach(function (f) {
-        if (ids[f.id]) dup.push(f.id);
-        ids[f.id] = 1;
-      });
-      var kws = {}, dk = [];
-      S.freebies.forEach(function (f) {
-        if (f.keyword) {
-          if (kws[f.keyword]) dk.push(f.keyword);
-          kws[f.keyword] = 1;
-        }
-      });
-      add(dup.length || dk.length ? "no" : "ok", "เช็กลิสต์ " + S.freebies.length + " ชุด", dup.length
-        ? "รหัสซ้ำ: " + esc(dup.join(", ")) : dk.length ? "คำสั่ง LINE ซ้ำ: " + esc(dk.join(", ")) : "รหัสและคำสั่ง LINE ไม่ซ้ำกัน");
-      var act = S.products.filter(function (p) {
-        return p.on !== false && ok(p.url);
-      }), nets = {};
-      act.forEach(function (p) {
-        nets[p.network] = 1;
-      });
-      add(act.length ? "ok" : "wa", "ของแนะนำที่ใส่ลิงก์แล้ว " + act.length + " จาก " + S.products.length,
-        act.length ? "หมวด “ของที่ใช้ในคลิป” แสดงบนเว็บพร้อมข้อความเปิดเผยแอฟฟิลิเอต" : "ยังไม่ใส่ลิงก์ → หมวดนี้ถูกซ่อนจากเว็บ");
-      if (Object.keys(nets).length > 1 && nets.Shopee) add("no",
-        "มีลิงก์ Shopee ปนกับร้านอื่นในหน้าเดียวกัน",
-        "ข้อกำหนด Shopee Affiliate ห้ามเนื้อหาที่มีลิงก์ Shopee มีลิงก์ไปแพลตฟอร์มซื้อขายอื่น ให้เลือกร้านเดียวต่อหนึ่งหน้า");
-      var bad = [];
-      (function walk(o, p) {
-        if (o && typeof o === "object") Object.keys(o).forEach(function (k) {
-          walk(o[k], p + "." + k);
-        });
-        else if (typeof o === "string" && /(^|\.)(url|tiktok|youtube|facebook|instagram|x|line|naihang)$/.test(p)
-          && o && !ok(o)) bad.push(p.slice(1));
-      })(S, "");
-      add(bad.length ? "no" : "ok", "รูปแบบลิงก์", bad.length ? "ลิงก์ที่ไม่ได้ขึ้นต้นด้วย https:// : "
-        + esc(bad.join(", ")) : "ทุกลิงก์ขึ้นต้นด้วย http(s)");
-      var sh = S.sheets, rv = sh.filter(function (x) {
-        return x.ok === true;
-      }).length, sl = sh.filter(function (x) {
-        return x.sale === true;
-      }).length, apiOk = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(S.member.api
-        || "");
-      if (sh.length) {
-        add(rv === sh.length ? "ok" : rv ? "wa" : "no", "ใบตรวจงาน " + sh.length + " งาน · ตรวจรายการแล้ว "
-          + rv, rv < sh.length ? "ใบที่ยังไม่ตรวจจะขึ้นว่า “กำลังตรวจรายการ” และยังดาวน์โหลดไม่ได้ · ตรวจแล้วพิมพ์ ใช่ ในไฟล์ สินค้า\\เช็กชีต\\00_สถานะเช็กชีต.csv แล้วสั่ง Claude ว่า ทำเช็กชีต" : "ฉบับฟรีเปิดให้ดาวน์โหลดครบ");
-        add(S.member.on === false ? "wa" : apiOk ? "ok" : "no", "ระบบสมาชิก", S.member.on === false
-          ? "ปิดอยู่" : apiOk ? "ต่อกับหลังบ้านแล้ว" : (S.member.api ? "ที่อยู่หลังบ้านไม่ถูกรูปแบบ ต้องเป็น https://script.google.com/macros/s/…/exec" : "ยังเป็นโหมดทดลอง (ข้อมูลอยู่ในเบราว์เซอร์ของผู้ใช้เท่านั้น) · ทำตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md"));
-        var lo = ["googleClientId", "lineChannelId", "facebookAppId", "tiktokClientKey"].filter(function (k) {
-          return S.member[k];
-        });
-        add(/^skey_/.test(String(S.pay.opnKey || "")) ? "no" : /^pkey_/.test(String(S.pay.opnKey || ""))
-          ? "ok" : "wa", "ชำระออนไลน์ (Opn Payments)", /^skey_/.test(String(S.pay.opnKey || "")) ? "ช่องนี้มีคีย์ลับ skey_ ลบออกทันที ห้ามขึ้นเว็บ · คีย์ลับใส่ใน Script properties ชื่อ OPN_SKEY เท่านั้น" : /^pkey_/.test(String(S.pay.opnKey
-            || "")) ? (/^pkey_test_/.test(S.pay.opnKey) ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง")
-          + " · ต้องใส่ OPN_SKEY ใน Script properties ด้วย" : "ยังไม่ใส่คีย์ ลูกค้าชำระด้วยการโอนแล้วแนบสลิปได้ตามเดิม · สมัคร Opn Payments ตามคู่มือ");
-        add(lo.length ? "ok" : "wa", "เข้าสู่ระบบด้วย Google LINE Facebook TikTok: เปิด " + lo.length
-          + " จาก 4", lo.length < 4 ? "ทำตามคู่มือ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md ส่วนที่ 2 · ปุ่มที่ยังไม่ตั้งจะไม่แสดง สมัครด้วยอีเมลได้เสมอ" : "");
-        add(S.pay.qr ? "ok" : "wa", "รูปคิวอาร์รับเงิน", S.pay.qr ? esc(S.pay.qr) + " · ลูกค้าเห็นตอนชำระเงินเท่านั้น" : "วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในแท็บ สมาชิกและชำระเงิน");
-        add(S.pay.on === true && apiOk && sl ? "ok" : "wa", "รับชำระเงิน: " + (S.pay.on === true ? "เปิด" : "ปิด")
-          + " · เปิดขาย " + sl + " ใบ", S.pay.on === true ? (!apiOk ? "เปิดรับเงินแต่ยังไม่ต่อหลังบ้าน ลูกค้าจะส่งสลิปถึงร้านไม่ได้" : !(S.pay.name
-            && (S.pay.acc || S.pay.qr)) ? "ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl
-            ? "พร้อมขาย" : "ยังไม่เปิดขายใบใด") : "ใบที่เปิดขายได้ต้องตรวจรายการแล้วเท่านั้น");
+    });
+    var late = S.episodes.filter(function (e) {
+      return e.date && new Date(e.date + "T00:00:00") <= new Date() && withLink.indexOf(e) < 0;
+    });
+    add(late.length ? "no" : "ok", "ตอนที่มีลิงก์คลิป " + withLink.length + " จาก " + S.episodes.length,
+      late.length ? "ถึงวันปล่อยแล้วแต่ยังไม่ใส่ลิงก์: " + late.map(function (e) {
+        return "#" + esc(e.no);
+      }).join(" ") : "ตอนที่ยังไม่ถึงวันปล่อยจะแสดงวันที่อัตโนมัติ");
+    var ids = {}, dup = [];
+    S.freebies.forEach(function (f) {
+      if (ids[f.id]) dup.push(f.id);
+      ids[f.id] = 1;
+    });
+    var kws = {}, dk = [];
+    S.freebies.forEach(function (f) {
+      if (f.keyword) {
+        if (kws[f.keyword]) dk.push(f.keyword);
+        kws[f.keyword] = 1;
       }
-        return todayCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">'
-        + rows.join("") + "</ul></div>" +
-        '<div class="card"><h2>วิธีใช้ 4 ขั้น</h2><ul class="chk"><li><span>1</span><span>แก้ข้อมูลในแท็บด้านบน<small>ระบบจำร่างไว้ในเครื่องนี้ให้เอง ปิดหน้าแล้วเปิดใหม่ยังอยู่</small></span></li><li><span>2</span><span>กด “ดูตัวอย่าง” ตรวจหน้าเว็บด้วยข้อมูลร่าง</span></li><li><span>3</span><span>กด “บันทึกขึ้นเว็บ”<small>ใช้ได้ทุกที่ทุกเครื่อง เมื่อใส่ GITHUB_TOKEN ใน Script properties แล้ว (ข้อ D15) · ถ้ายังไม่ใส่ ปุ่มนี้ไม่แสดง ให้กด “ดาวน์โหลด data.js” นำไปวางทับในโฟลเดอร์ เว็บ แล้วอัปโหลดขึ้นโฮสต์</small></span></li><li><span>4</span><span>รอราว 1–2 นาที แล้วเปิดเว็บดู<small>ลิงก์ที่แปะไว้ตามช่องทางไม่ต้องแก้ เพราะชี้มาที่เว็บนี้ · ประวัติการแก้ทุกครั้งอยู่ใน GitHub ย้อนกลับได้</small></span></li></ul></div>';
+    });
+    add(dup.length || dk.length ? "no" : "ok", "เช็กลิสต์ " + S.freebies.length + " ชุด", dup.length
+      ? "รหัสซ้ำ: " + esc(dup.join(", ")) : dk.length ? "คำสั่ง LINE ซ้ำ: " + esc(dk.join(", ")) : "รหัสและคำสั่ง LINE ไม่ซ้ำกัน");
+    var act = S.products.filter(function (p) {
+      return p.on !== false && ok(p.url);
+    }), nets = {};
+    act.forEach(function (p) {
+      nets[p.network] = 1;
+    });
+    add(act.length ? "ok" : "wa", "ของแนะนำที่ใส่ลิงก์แล้ว " + act.length + " จาก " + S.products.length,
+      act.length ? "หมวด “ของที่ใช้ในคลิป” แสดงบนเว็บพร้อมข้อความเปิดเผยแอฟฟิลิเอต" : "ยังไม่ใส่ลิงก์ → หมวดนี้ถูกซ่อนจากเว็บ");
+    if (Object.keys(nets).length > 1 && nets.Shopee) add("no",
+      "มีลิงก์ Shopee ปนกับร้านอื่นในหน้าเดียวกัน",
+      "ข้อกำหนด Shopee Affiliate ห้ามเนื้อหาที่มีลิงก์ Shopee มีลิงก์ไปแพลตฟอร์มซื้อขายอื่น ให้เลือกร้านเดียวต่อหนึ่งหน้า");
+    var bad = [];
+    (function walk(o, p) {
+      if (o && typeof o === "object") Object.keys(o).forEach(function (k) {
+        walk(o[k], p + "." + k);
+      });
+      else if (typeof o === "string" && /(^|\.)(url|tiktok|youtube|facebook|instagram|x|line|naihang)$/.test(p)
+        && o && !ok(o)) bad.push(p.slice(1));
+    })(S, "");
+    add(bad.length ? "no" : "ok", "รูปแบบลิงก์", bad.length ? "ลิงก์ที่ไม่ได้ขึ้นต้นด้วย https:// : "
+      + esc(bad.join(", ")) : "ทุกลิงก์ขึ้นต้นด้วย http(s)");
+    var sh = S.sheets, rv = sh.filter(function (x) {
+      return x.ok === true;
+    }).length, sl = sh.filter(function (x) {
+      return x.sale === true;
+    }).length, apiOk = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(S.member.api
+      || "");
+    if (sh.length) {
+      add(rv === sh.length ? "ok" : rv ? "wa" : "no", "ใบตรวจงาน " + sh.length + " งาน · ตรวจรายการแล้ว "
+        + rv, rv < sh.length ? "ใบที่ยังไม่ตรวจจะขึ้นว่า “กำลังตรวจรายการ” และยังดาวน์โหลดไม่ได้ · ตรวจแล้วพิมพ์ ใช่ ในไฟล์ สินค้า\\เช็กชีต\\00_สถานะเช็กชีต.csv แล้วสั่ง Claude ว่า ทำเช็กชีต" : "ฉบับฟรีเปิดให้ดาวน์โหลดครบ");
+      add(S.member.on === false ? "wa" : apiOk ? "ok" : "no", "ระบบสมาชิก", S.member.on === false
+        ? "ปิดอยู่" : apiOk ? "ต่อกับหลังบ้านแล้ว" : (S.member.api ? "ที่อยู่หลังบ้านไม่ถูกรูปแบบ ต้องเป็น https://script.google.com/macros/s/…/exec" : "ยังเป็นโหมดทดลอง (ข้อมูลอยู่ในเบราว์เซอร์ของผู้ใช้เท่านั้น) · ทำตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md"));
+      var lo = ["googleClientId", "lineChannelId", "facebookAppId", "tiktokClientKey"].filter(function (k) {
+        return S.member[k];
+      });
+      add(/^skey_/.test(String(S.pay.opnKey || "")) ? "no" : /^pkey_/.test(String(S.pay.opnKey || ""))
+        ? "ok" : "wa", "ชำระออนไลน์ (Opn Payments)", /^skey_/.test(String(S.pay.opnKey || "")) ? "ช่องนี้มีคีย์ลับ skey_ ลบออกทันที ห้ามขึ้นเว็บ · คีย์ลับใส่ใน Script properties ชื่อ OPN_SKEY เท่านั้น" : /^pkey_/.test(String(S.pay.opnKey
+          || "")) ? (/^pkey_test_/.test(S.pay.opnKey) ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง")
+        + " · ต้องใส่ OPN_SKEY ใน Script properties ด้วย" : "ยังไม่ใส่คีย์ ลูกค้าชำระด้วยการโอนแล้วแนบสลิปได้ตามเดิม · สมัคร Opn Payments ตามคู่มือ");
+      add(lo.length ? "ok" : "wa", "เข้าสู่ระบบด้วย Google LINE Facebook TikTok: เปิด " + lo.length
+        + " จาก 4", lo.length < 4 ? "ทำตามคู่มือ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md ส่วนที่ 2 · ปุ่มที่ยังไม่ตั้งจะไม่แสดง สมัครด้วยอีเมลได้เสมอ" : "");
+      add(S.pay.qr ? "ok" : "wa", "รูปคิวอาร์รับเงิน", S.pay.qr ? esc(S.pay.qr) + " · ลูกค้าเห็นตอนชำระเงินเท่านั้น" : "วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในแท็บ สมาชิกและชำระเงิน");
+      add(S.pay.on === true && apiOk && sl ? "ok" : "wa", "รับชำระเงิน: " + (S.pay.on === true ? "เปิด" : "ปิด")
+        + " · เปิดขาย " + sl + " ใบ", S.pay.on === true ? (!apiOk ? "เปิดรับเงินแต่ยังไม่ต่อหลังบ้าน ลูกค้าจะส่งสลิปถึงร้านไม่ได้" : !(S.pay.name
+          && (S.pay.acc || S.pay.qr)) ? "ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl
+          ? "พร้อมขาย" : "ยังไม่เปิดขายใบใด") : "ใบที่เปิดขายได้ต้องตรวจรายการแล้วเท่านั้น");
     }
+    return todayCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">'
+      + rows.join("") + "</ul></div>" +
+      '<div class="card"><h2>วิธีใช้ 4 ขั้น</h2><ul class="chk"><li><span>1</span><span>แก้ข้อมูลในแท็บด้านบน<small>ระบบจำร่างไว้ในเครื่องนี้ให้เอง ปิดหน้าแล้วเปิดใหม่ยังอยู่</small></span></li><li><span>2</span><span>กด “ดูตัวอย่าง” ตรวจหน้าเว็บด้วยข้อมูลร่าง</span></li><li><span>3</span><span>กด “บันทึกขึ้นเว็บ”<small>ใช้ได้ทุกที่ทุกเครื่อง เมื่อใส่ GITHUB_TOKEN ใน Script properties แล้ว (ข้อ D15) · ถ้ายังไม่ใส่ ปุ่มนี้ไม่แสดง ให้กด “ดาวน์โหลด data.js” นำไปวางทับในโฟลเดอร์ เว็บ แล้วอัปโหลดขึ้นโฮสต์</small></span></li><li><span>4</span><span>รอราว 1–2 นาที แล้วเปิดเว็บดู<small>ลิงก์ที่แปะไว้ตามช่องทางไม่ต้องแก้ เพราะชี้มาที่เว็บนี้ · ประวัติการแก้ทุกครั้งอยู่ใน GitHub ย้อนกลับได้</small></span></li></ul></div>';
+  }
 
-    // ----- ชุดโพสต์ -----
-    var kitEp = (S.episodes[0] || {}).id, kitVer = "voice";
+  // ----- ชุดโพสต์ -----
+  var kitEp = (S.episodes[0] || {}).id, kitVer = "voice";
   var AI = "ภาพและเพลงสร้างด้วย AI · บทและข้อเท็จจริงเขียนและตรวจโดยคน";
   function utm(src, med, camp) {
     var u = (S.site.url || "").replace(/\/+$/, "");
     return ok(u) ? u + "/?utm_source=" + src + "&utm_medium=" + med + "&utm_campaign=" + camp : "";
   }
-    function cut(s, n) {
-      return s.length <= n ? s : s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…";
-    }
-    function kit() {
-      var e = S.episodes.filter(function (x) {
-        return x.id === kitEp;
-      })[0];
-      if (!e) return "";
-      if (!S.posts[e.id]) S.posts[e.id] = { caption: "", tags: "", question: "", free: "" };
-      var P = S.posts[e.id], song = kitVer === "song", L = S.links, show = S.brand.show || "", f = S.freebies.filter(function (x) {
-        return x.id === P.free;
-      })[0];
-      var camp = e.id + (song ? "s" : ""), cap = song ? "เวอร์ชันเพลงของตอน #" + e.no + " " + e.title
-        + " · เพลง “" + (e.songTitle || "") + "” เนื้อร้องมาจากบทของตอน" : (P.caption || e.title);
-      var tags = (P.tags || "") + (song ? " #เพลงAI" : ""), q = P.question || "";
-      var lineKw = f && f.keyword && (L.lineId || ok(L.line)) ? "อยากได้เช็กลิสต์ของตอนนี้ พิมพ์คำว่า “"
-        + f.keyword + "” ใน LINE" + (L.lineId ? " " + L.lineId : "") : "";
-      var out = [], add = function (t, v, tip) {
-        v = v.trim();
-        out.push('<div class="kit"><div class="top"><b>' + t + '</b><span class="tag">' + v.length + ' ตัวอักษร</span><button class="sm" type="button" data-act="copy">คัดลอก</button></div><textarea readonly rows="'
-          + Math.min(9, Math.max(2, Math.ceil(v.length / 60) + (v.match(/\n/g) || []).length)) + '">'
-          + esc(v) + "</textarea>" + (tip ? "<small>" + tip + "</small>" : "") + "</div>");
-      };
-      var ytT = cut(song ? "เพลง “" + (e.songTitle || "") + "” | " + show + " #" + e.no + " เวอร์ชันเพลง" : e.title
-        + " | " + show + " #" + e.no, 100);
-      add("YouTube Shorts · ชื่อคลิป", ytT, "ไม่เกิน 100 ตัวอักษร คำสำคัญอยู่ต้นชื่อ");
-      add("YouTube Shorts · คำอธิบาย", cap + (q && !song ? "\n\n" + q : "") + "\n\n" + (f ? "เช็กลิสต์ฟรีของตอนนี้อยู่ที่ลิงก์หน้าช่อง" : "ดูทุกตอนและเช็กลิสต์ฟรีที่ลิงก์หน้าช่อง")
-        + "\n" + AI + "\n" + tags + " #Shorts",
-        "ลิงก์ในคำอธิบายและคอมเมนต์ของ Shorts กดไม่ได้ ให้ใส่ลิงก์เว็บไว้ที่หน้าช่อง · ตอนอัปโหลดตอบ “ใช่” ที่ข้อเนื้อหาดัดแปลงหรือสังเคราะห์ · อัปโหลดปก "
-        + e.id + (song ? "_ปก_เพลง.jpg" : "_ปก.jpg") + " ที่ YouTube Studio บนคอมพิวเตอร์");
-      add("TikTok · แคปชัน", cap + (q && !song ? " " + q : "") + "\n" + tags,
-        "เปิดป้าย “สร้างโดย AI” · เลือกปกจากไฟล์ปก · ลิงก์เว็บใส่ที่โปรไฟล์ (ต้องมีผู้ติดตาม 1,000 คน หรือเป็นบัญชีธุรกิจ) · ถ้าคลิปพูดถึงสินค้าหรือมีลิงก์ขาย ให้เปิด “เปิดเผยเนื้อหาเชิงพาณิชย์”");
-      add("Facebook และ Instagram Reels · แคปชัน", cap + (q && !song ? "\n" + q : "") + "\n" + AI + "\n"
-        + tags, "อัปโหลดปกเดียวกัน · เปิดป้าย AI · ไม่ใส่ลิงก์ในตัวโพสต์");
-      var fb = utm("facebook", "comment", camp);
-      add("Facebook · คอมเมนต์แรก (ปักหมุด)", (q && !song ? q + "\n" : "") + (lineKw ? lineKw + "\n" : "")
-        + (fb ? (f ? "อ่านเช็กลิสต์บนเว็บ: " : "ดูทุกตอน: ") + fb : ""),
-        "วางลิงก์ในคอมเมนต์แทนตัวโพสต์ เพราะเพจที่ไม่ได้สมัครสมาชิกยืนยันตัวตนอาจถูกจำกัดโพสต์ที่มีลิงก์เหลือเดือนละ 2 โพสต์");
-      var xl = utm("x", "post", camp);
-      add("X · โพสต์", cut(cap, 280 - (xl ? xl.length + 1 : 0) - 1) + (xl ? "\n" + xl : ""),
-        "ไม่เกิน 280 ตัวอักษรรวมลิงก์ · แนบคลิปหรือปก");
-      add("TikTok และ YouTube · คอมเมนต์ปักหมุด", (song ? "ฟังแล้วท่อนไหนติดหูที่สุด?" : q) + (lineKw
-        ? "\n" + lineKw : ""), "ถามคำถามที่ตอบได้จริง ไม่ใช้ประโยคล่อให้พิมพ์คำเดียวเพื่อแลกของ");
-      var w = "";
-      ["tiktok", "youtube", "facebook", "instagram"].some(function (k) {
-        var u = ((song ? e.song : e.watch) || {})[k];
-        if (ok(u)) {
-          w = u;
-          return true;
-        }
-          return false;
-      });
-      add("LINE · ข้อความบรอดแคสต์", (song ? "เวอร์ชันเพลงมาแล้ว: “" + (e.songTitle || "") + "” จากตอน #"
-        + e.no : "ตอนใหม่ #" + e.no + ": " + e.title) + (w ? "\n" + w : "") + (f && f.keyword && !song
-          ? "\nอยากได้เช็กลิสต์ของตอนนี้ พิมพ์ “" + f.keyword + "” ได้เลย" : ""),
-        "บรอดแคสต์ 1 ครั้งใช้โควตาเท่าจำนวนเพื่อนที่ได้รับ (แพ็กเกจฟรี 300 ข้อความต่อเดือน) · ถ้ายังไม่มีลิงก์คลิป ให้ใส่ลิงก์ในแท็บ ตอน ก่อน");
-      return out.join("");
-    }
-    function kitTab() {
-      var e = S.episodes.filter(function (x) {
-        return x.id === kitEp;
-      })[0] || {};
-      if (!S.posts[kitEp]) S.posts[kitEp] = { caption: "", tags: "", question: "", free: "" };
-      var base = "posts." + kitEp;
-      return '<div class="card"><h2>ชุดโพสต์พร้อมคัดลอก</h2><p class="hint">เลือกตอนและเวอร์ชัน ระบบประกอบข้อความของทุกแพลตฟอร์มให้ ตามกฎของแต่ละที่</p><div class="grid"><label>ตอน<select id="kit-ep">'
-        + S.episodes.map(function (x) {
-          return '<option value="' + esc(x.id) + '"' + (x.id === kitEp ? " selected" : "") + ">#" + esc(x.no)
-            + " " + esc(x.title) + "</option>";
-        }).join("") + '</select></label><label>เวอร์ชัน<select id="kit-ver"><option value="voice"' + (kitVer === "voice"
-          ? " selected" : "") + '>เวอร์ชันเล่า (พากย์)</option><option value="song"' + (kitVer === "song"
-            ? " selected" : "") + ">เวอร์ชันเพลง</option></select></label></div></div>" +
-        '<div class="card"><h2>ข้อความต้นทางของตอน #' + esc(e.no) + '</h2><p class="hint">แก้ตรงนี้แล้วข้อความด้านล่างเปลี่ยนตาม</p><div class="grid">'
-        + field(base, ["caption", "แคปชันหลัก", "long", "full"]) + field(base, ["question",
-          "คำถามท้ายคลิป"]) + field(base, ["tags", "แฮชแท็ก 5 ตัว"]) + "<label>เช็กลิสต์ของตอนนี้<select data-p=\""
-        + base + '.free" data-re="1"><option value="">ไม่มี</option>' + S.freebies.map(function (f) {
-          return '<option value="' + esc(f.id) + '"' + (f.id === S.posts[kitEp].free ? " selected" : "")
-            + ">" + esc(f.title) + "</option>";
-        }).join("") + '</select></label></div></div><div class="card" id="kit-out">' + kit() + "</div>";
-    }
+  function cut(s, n) {
+    return s.length <= n ? s : s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…";
+  }
+  function kit() {
+    var e = S.episodes.filter(function (x) {
+      return x.id === kitEp;
+    })[0];
+    if (!e) return "";
+    if (!S.posts[e.id]) S.posts[e.id] = { caption: "", tags: "", question: "", free: "" };
+    var P = S.posts[e.id], song = kitVer === "song", L = S.links, show = S.brand.show || "", f = S.freebies.filter(function (x) {
+      return x.id === P.free;
+    })[0];
+    var camp = e.id + (song ? "s" : ""), cap = song ? "เวอร์ชันเพลงของตอน #" + e.no + " " + e.title
+      + " · เพลง “" + (e.songTitle || "") + "” เนื้อร้องมาจากบทของตอน" : (P.caption || e.title);
+    var tags = (P.tags || "") + (song ? " #เพลงAI" : ""), q = P.question || "";
+    var lineKw = f && f.keyword && (L.lineId || ok(L.line)) ? "อยากได้เช็กลิสต์ของตอนนี้ พิมพ์คำว่า “"
+      + f.keyword + "” ใน LINE" + (L.lineId ? " " + L.lineId : "") : "";
+    var out = [], add = function (t, v, tip) {
+      v = v.trim();
+      out.push('<div class="kit"><div class="top"><b>' + t + '</b><span class="tag">' + v.length + ' ตัวอักษร</span><button class="sm" type="button" data-act="copy">คัดลอก</button></div><textarea readonly rows="'
+        + Math.min(9, Math.max(2, Math.ceil(v.length / 60) + (v.match(/\n/g) || []).length)) + '">'
+        + esc(v) + "</textarea>" + (tip ? "<small>" + tip + "</small>" : "") + "</div>");
+    };
+    var ytT = cut(song ? "เพลง “" + (e.songTitle || "") + "” | " + show + " #" + e.no + " เวอร์ชันเพลง" : e.title
+      + " | " + show + " #" + e.no, 100);
+    add("YouTube Shorts · ชื่อคลิป", ytT, "ไม่เกิน 100 ตัวอักษร คำสำคัญอยู่ต้นชื่อ");
+    add("YouTube Shorts · คำอธิบาย", cap + (q && !song ? "\n\n" + q : "") + "\n\n" + (f ? "เช็กลิสต์ฟรีของตอนนี้อยู่ที่ลิงก์หน้าช่อง" : "ดูทุกตอนและเช็กลิสต์ฟรีที่ลิงก์หน้าช่อง")
+      + "\n" + AI + "\n" + tags + " #Shorts",
+      "ลิงก์ในคำอธิบายและคอมเมนต์ของ Shorts กดไม่ได้ ให้ใส่ลิงก์เว็บไว้ที่หน้าช่อง · ตอนอัปโหลดตอบ “ใช่” ที่ข้อเนื้อหาดัดแปลงหรือสังเคราะห์ · อัปโหลดปก "
+      + e.id + (song ? "_ปก_เพลง.jpg" : "_ปก.jpg") + " ที่ YouTube Studio บนคอมพิวเตอร์");
+    add("TikTok · แคปชัน", cap + (q && !song ? " " + q : "") + "\n" + tags,
+      "เปิดป้าย “สร้างโดย AI” · เลือกปกจากไฟล์ปก · ลิงก์เว็บใส่ที่โปรไฟล์ (ต้องมีผู้ติดตาม 1,000 คน หรือเป็นบัญชีธุรกิจ) · ถ้าคลิปพูดถึงสินค้าหรือมีลิงก์ขาย ให้เปิด “เปิดเผยเนื้อหาเชิงพาณิชย์”");
+    add("Facebook และ Instagram Reels · แคปชัน", cap + (q && !song ? "\n" + q : "") + "\n" + AI + "\n"
+      + tags, "อัปโหลดปกเดียวกัน · เปิดป้าย AI · ไม่ใส่ลิงก์ในตัวโพสต์");
+    var fb = utm("facebook", "comment", camp);
+    add("Facebook · คอมเมนต์แรก (ปักหมุด)", (q && !song ? q + "\n" : "") + (lineKw ? lineKw + "\n" : "")
+      + (fb ? (f ? "อ่านเช็กลิสต์บนเว็บ: " : "ดูทุกตอน: ") + fb : ""),
+      "วางลิงก์ในคอมเมนต์แทนตัวโพสต์ เพราะเพจที่ไม่ได้สมัครสมาชิกยืนยันตัวตนอาจถูกจำกัดโพสต์ที่มีลิงก์เหลือเดือนละ 2 โพสต์");
+    var xl = utm("x", "post", camp);
+    add("X · โพสต์", cut(cap, 280 - (xl ? xl.length + 1 : 0) - 1) + (xl ? "\n" + xl : ""),
+      "ไม่เกิน 280 ตัวอักษรรวมลิงก์ · แนบคลิปหรือปก");
+    add("TikTok และ YouTube · คอมเมนต์ปักหมุด", (song ? "ฟังแล้วท่อนไหนติดหูที่สุด?" : q) + (lineKw
+      ? "\n" + lineKw : ""), "ถามคำถามที่ตอบได้จริง ไม่ใช้ประโยคล่อให้พิมพ์คำเดียวเพื่อแลกของ");
+    var w = "";
+    ["tiktok", "youtube", "facebook", "instagram"].some(function (k) {
+      var u = ((song ? e.song : e.watch) || {})[k];
+      if (ok(u)) {
+        w = u;
+        return true;
+      }
+      return false;
+    });
+    add("LINE · ข้อความบรอดแคสต์", (song ? "เวอร์ชันเพลงมาแล้ว: “" + (e.songTitle || "") + "” จากตอน #"
+      + e.no : "ตอนใหม่ #" + e.no + ": " + e.title) + (w ? "\n" + w : "") + (f && f.keyword && !song
+        ? "\nอยากได้เช็กลิสต์ของตอนนี้ พิมพ์ “" + f.keyword + "” ได้เลย" : ""),
+      "บรอดแคสต์ 1 ครั้งใช้โควตาเท่าจำนวนเพื่อนที่ได้รับ (แพ็กเกจฟรี 300 ข้อความต่อเดือน) · ถ้ายังไม่มีลิงก์คลิป ให้ใส่ลิงก์ในแท็บ ตอน ก่อน");
+    return out.join("");
+  }
+  function kitTab() {
+    var e = S.episodes.filter(function (x) {
+      return x.id === kitEp;
+    })[0] || {};
+    if (!S.posts[kitEp]) S.posts[kitEp] = { caption: "", tags: "", question: "", free: "" };
+    var base = "posts." + kitEp;
+    return '<div class="card"><h2>ชุดโพสต์พร้อมคัดลอก</h2><p class="hint">เลือกตอนและเวอร์ชัน ระบบประกอบข้อความของทุกแพลตฟอร์มให้ ตามกฎของแต่ละที่</p><div class="grid"><label>ตอน<select id="kit-ep">'
+      + S.episodes.map(function (x) {
+        return '<option value="' + esc(x.id) + '"' + (x.id === kitEp ? " selected" : "") + ">#" + esc(x.no)
+          + " " + esc(x.title) + "</option>";
+      }).join("") + '</select></label><label>เวอร์ชัน<select id="kit-ver"><option value="voice"' + (kitVer === "voice"
+        ? " selected" : "") + '>เวอร์ชันเล่า (พากย์)</option><option value="song"' + (kitVer === "song"
+          ? " selected" : "") + ">เวอร์ชันเพลง</option></select></label></div></div>" +
+      '<div class="card"><h2>ข้อความต้นทางของตอน #' + esc(e.no) + '</h2><p class="hint">แก้ตรงนี้แล้วข้อความด้านล่างเปลี่ยนตาม</p><div class="grid">'
+      + field(base, ["caption", "แคปชันหลัก", "long", "full"]) + field(base, ["question",
+        "คำถามท้ายคลิป"]) + field(base, ["tags", "แฮชแท็ก 5 ตัว"]) + "<label>เช็กลิสต์ของตอนนี้<select data-p=\""
+      + base + '.free" data-re="1"><option value="">ไม่มี</option>' + S.freebies.map(function (f) {
+        return '<option value="' + esc(f.id) + '"' + (f.id === S.posts[kitEp].free ? " selected" : "")
+          + ">" + esc(f.title) + "</option>";
+      }).join("") + '</select></label></div></div><div class="card" id="kit-out">' + kit() + "</div>";
+  }
 
-    // ----- ลิงก์สั้นและติดตามผล -----
-    function linksTab() {
-      var u = (S.site.url || "").replace(/\/+$/, ""), base = ok(u) ? u : "https://เว็บของคุณ";
-      var rows = [["line", "เพิ่มเพื่อน LINE"], ["tiktok", "ช่อง TikTok"], ["youtube",
-        "ช่อง YouTube"], ["facebook", "เพจ Facebook"]].concat(S.episodes.slice(0, 2).map(function (e) {
-          return [e.id, "คลิปตอน #" + e.no + " (ใส่ s ต่อท้าย = เวอร์ชันเพลง)"];
-        }), S.freebies.slice(0, 2).map(function (f) {
-          return ["free-" + f.id, "เช็กลิสต์: " + f.title];
-        }), [["shop-1", "สินค้าของช่องลำดับที่ 1"]]);
-      return '<div class="card"><h2>ลิงก์สั้นของช่อง</h2><p class="hint">ใช้หน้า go.html เป็นตัวกลาง: แปะลิงก์นี้ในโปรไฟล์ คำอธิบายคลิป หรือคิวอาร์ แล้วเปลี่ยนปลายทางได้จากหลังบ้านโดยไม่ต้องไล่แก้ทุกโพสต์ · ใช้กับลิงก์ของช่องเอง ส่วนลิงก์แอฟฟิลิเอตให้ใช้ลิงก์ตรงจากโปรแกรม</p><table><thead><tr><th>ปลายทาง</th><th>ลิงก์ที่ใช้แปะ</th></tr></thead><tbody>'
-        + rows.map(function (r) {
-          return "<tr><td>" + esc(r[1]) + "</td><td><code>" + esc(base + "/go.html?to=" + r[0] + "&from=tiktok")
-            + "</code></td></tr>";
-        }).join("") + '</tbody></table><p class="hint" style="margin-top:10px">ค่า from = ที่มา เช่น tiktok, youtube, facebook, x, line, qr · ถ้าใส่รหัส GA4 ไว้ ระบบจะนับการกดแยกตามที่มาให้</p></div>'
-        +
-        '<div class="card"><h2>ตัวสร้างลิงก์ติดตามผล (UTM)</h2><p class="hint">ต่อท้ายลิงก์เว็บ เพื่อดูใน Google Analytics ว่าคนมาจากช่องไหน โพสต์ไหน</p><div class="grid"><label>ลิงก์ปลายทาง<input type="url" id="u-base" value="'
-        + esc(ok(u) ? u + "/" : "") + '" placeholder="https://"></label><label>ที่มา (source)<select id="u-src"><option>tiktok</option><option>youtube</option><option>facebook</option><option>instagram</option><option>x</option><option>line</option><option>qr</option></select></label><label>ตำแหน่ง (medium)<select id="u-med"><option>bio</option><option>comment</option><option>description</option><option>post</option><option>broadcast</option><option>richmenu</option></select></label><label>แคมเปญ (เช่น E03)<input type="text" id="u-camp" value="'
-        + esc(kitEp || "") + '"></label><label class="full">ผลลัพธ์<input type="text" id="u-out" readonly></label></div><div class="tools"><button type="button" data-act="copyutm">คัดลอกลิงก์</button></div></div>'
-        +
-        '<div class="card"><h2>ตั้งชื่อรหัสติดตามของโปรแกรมแอฟฟิลิเอต</h2><p class="hint">ตอนสร้างลิงก์ในหน้าโปรแกรม ให้ใส่รหัสย่อยแบบเดียวกันทุกครั้ง จะรู้ว่ารายได้มาจากช่องไหน ตอนไหน</p><table><thead><tr><th>ช่อง</th><th>รหัสย่อยที่ 1 (ช่อง)</th><th>รหัสย่อยที่ 2 (ตอน)</th><th>ตัวอย่าง</th></tr></thead><tbody><tr><td>เว็บ</td><td>web</td><td>E03</td><td><code>web-E03</code></td></tr><tr><td>YouTube</td><td>yt</td><td>E03</td><td><code>yt-E03</code></td></tr><tr><td>Facebook</td><td>fb</td><td>E03</td><td><code>fb-E03</code></td></tr><tr><td>X</td><td>x</td><td>E03</td><td><code>x-E03</code></td></tr><tr><td>LINE</td><td>line</td><td>E03</td><td><code>line-E03</code></td></tr></tbody></table></div>';
-    }
-    function drawUtm() {
-      var b = $("u-base");
-      if (!b) return;
-      var v = b.value.trim();
-      $("u-out").value = ok(v) ? v + (v.indexOf("?") < 0 ? "?" : "&") + "utm_source=" + $("u-src").value
-        + "&utm_medium=" + $("u-med").value + "&utm_campaign=" + encodeURIComponent($("u-camp").value.trim()) : "";
-    }
+  // ----- ลิงก์สั้นและติดตามผล -----
+  function linksTab() {
+    var u = (S.site.url || "").replace(/\/+$/, ""), base = ok(u) ? u : "https://เว็บของคุณ";
+    var rows = [["line", "เพิ่มเพื่อน LINE"], ["tiktok", "ช่อง TikTok"], ["youtube",
+      "ช่อง YouTube"], ["facebook", "เพจ Facebook"]].concat(S.episodes.slice(0, 2).map(function (e) {
+        return [e.id, "คลิปตอน #" + e.no + " (ใส่ s ต่อท้าย = เวอร์ชันเพลง)"];
+      }), S.freebies.slice(0, 2).map(function (f) {
+        return ["free-" + f.id, "เช็กลิสต์: " + f.title];
+      }), [["shop-1", "สินค้าของช่องลำดับที่ 1"]]);
+    return '<div class="card"><h2>ลิงก์สั้นของช่อง</h2><p class="hint">ใช้หน้า go.html เป็นตัวกลาง: แปะลิงก์นี้ในโปรไฟล์ คำอธิบายคลิป หรือคิวอาร์ แล้วเปลี่ยนปลายทางได้จากหลังบ้านโดยไม่ต้องไล่แก้ทุกโพสต์ · ใช้กับลิงก์ของช่องเอง ส่วนลิงก์แอฟฟิลิเอตให้ใช้ลิงก์ตรงจากโปรแกรม</p><table><thead><tr><th>ปลายทาง</th><th>ลิงก์ที่ใช้แปะ</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+        return "<tr><td>" + esc(r[1]) + "</td><td><code>" + esc(base + "/go.html?to=" + r[0] + "&from=tiktok")
+          + "</code></td></tr>";
+      }).join("") + '</tbody></table><p class="hint" style="margin-top:10px">ค่า from = ที่มา เช่น tiktok, youtube, facebook, x, line, qr · ถ้าใส่รหัส GA4 ไว้ ระบบจะนับการกดแยกตามที่มาให้</p></div>'
+      +
+      '<div class="card"><h2>ตัวสร้างลิงก์ติดตามผล (UTM)</h2><p class="hint">ต่อท้ายลิงก์เว็บ เพื่อดูใน Google Analytics ว่าคนมาจากช่องไหน โพสต์ไหน</p><div class="grid"><label>ลิงก์ปลายทาง<input type="url" id="u-base" value="'
+      + esc(ok(u) ? u + "/" : "") + '" placeholder="https://"></label><label>ที่มา (source)<select id="u-src"><option>tiktok</option><option>youtube</option><option>facebook</option><option>instagram</option><option>x</option><option>line</option><option>qr</option></select></label><label>ตำแหน่ง (medium)<select id="u-med"><option>bio</option><option>comment</option><option>description</option><option>post</option><option>broadcast</option><option>richmenu</option></select></label><label>แคมเปญ (เช่น E03)<input type="text" id="u-camp" value="'
+      + esc(kitEp || "") + '"></label><label class="full">ผลลัพธ์<input type="text" id="u-out" readonly></label></div><div class="tools"><button type="button" data-act="copyutm">คัดลอกลิงก์</button></div></div>'
+      +
+      '<div class="card"><h2>ตั้งชื่อรหัสติดตามของโปรแกรมแอฟฟิลิเอต</h2><p class="hint">ตอนสร้างลิงก์ในหน้าโปรแกรม ให้ใส่รหัสย่อยแบบเดียวกันทุกครั้ง จะรู้ว่ารายได้มาจากช่องไหน ตอนไหน</p><table><thead><tr><th>ช่อง</th><th>รหัสย่อยที่ 1 (ช่อง)</th><th>รหัสย่อยที่ 2 (ตอน)</th><th>ตัวอย่าง</th></tr></thead><tbody><tr><td>เว็บ</td><td>web</td><td>E03</td><td><code>web-E03</code></td></tr><tr><td>YouTube</td><td>yt</td><td>E03</td><td><code>yt-E03</code></td></tr><tr><td>Facebook</td><td>fb</td><td>E03</td><td><code>fb-E03</code></td></tr><tr><td>X</td><td>x</td><td>E03</td><td><code>x-E03</code></td></tr><tr><td>LINE</td><td>line</td><td>E03</td><td><code>line-E03</code></td></tr></tbody></table></div>';
+  }
+  function drawUtm() {
+    var b = $("u-base");
+    if (!b) return;
+    var v = b.value.trim();
+    $("u-out").value = ok(v) ? v + (v.indexOf("?") < 0 ? "?" : "&") + "utm_source=" + $("u-src").value
+      + "&utm_medium=" + $("u-med").value + "&utm_campaign=" + encodeURIComponent($("u-camp").value.trim()) : "";
+  }
 
-    // ----- ใบตรวจงาน (รายการสร้างจากไฟล์ต้นทางด้วย gen_sheets.ps1 · ที่นี่แก้ได้เฉพาะราคาและการเปิดขาย) -----
-    function sheetTab() {
-      var row = function (key, x, i, sub, flag) {
-        return '<details class="it"' + (openAt[key] === i ? " open" : "") + ' data-list="' + key + '" data-i="'
-          + i + '"><summary><span class="t">' + esc(x.id + " " + x.title) + '</span><span class="tag '
-          + flag[0] + '">' + esc(flag[1]) + '</span></summary><div class="bd"><p class="hint">' + esc(sub)
-          + '</p><div class="grid">' + field(key + "." + i, ["price",
-            "ราคาแบบซื้อฉบับนี้ เก็บได้ตลอด (บาท)"]) + field(key + "." + i, ["priceU",
-              "ราคาแบบรับฉบับใหม่ตลอด (บาท · ว่าง = ไม่ขายแบบนี้)"]) + field(key + "." + i, ["sale",
-                "เปิดขาย", "bool"]) + "</div></div></details>";
-      };
-      var pr = function (x) {
-        return "฿" + x.price + (+x.priceU > 0 ? " / รับฉบับใหม่ ฿" + x.priceU : "");
-      };
-      var a = S.sheets.map(function (x, i) {
-        return row("sheets", x, i, (x.hidden === true ? "รายการทดสอบของร้าน ซ่อนจากหน้าร้าน · ซื้อได้เฉพาะอีเมลใน ADMIN_EMAILS หรือ TEST_BUYERS · ไฟล์ที่ส่ง = ไฟล์ของ "
-          + (x.of || "-") + " · ลิงก์ซื้อ member.html?buy=" + x.id : x.group + " · ฟรี " + x.nFree + " จุด · มืออาชีพ "
-          + x.nPro + " ข้อ " + x.pages + " หน้า"), x.hidden === true ? ["", "ทดสอบ (ซ่อน) " + pr(x)] : x.ok === true
-          ? (x.sale === true ? ["ok", "เปิดขาย " + pr(x)] : ["", "ตรวจแล้ว ยังไม่เปิดขาย"]) : ["no",
-            "ร่าง รอตรวจรายการ"]);
-      }).join("");
-      var b = S.bundles.map(function (x, i) {
-        return row("bundles", x, i, (x.items || []).join(" · "), x.sale === true ? ["ok", "เปิดขาย "
-          + pr(x)] : ["", "ยังไม่เปิดขาย " + pr(x)]);
-      }).join("");
-      return '<div class="card"><h2>ใบตรวจงาน <span class="tag">' + S.sheets.filter(function (x) {
-        return x.hidden !== true;
-      }).length + ' งาน</span></h2><p class="hint">เนื้อหาแก้ที่ไฟล์ สินค้า\\เช็กชีต\\ต้นทาง แล้วสั่ง Claude ว่า “ทำเช็กชีต” · ใบที่เป็นร่างจะไม่ถูกขายแม้ติ๊กเปิดขาย · ราคาที่ตั้งไว้ตอนนี้เป็นราคาเสนอ</p>'
-        + (a || '<p class="hint">ยังไม่มีใบตรวจงาน</p>') + "</div>" + '<div class="card"><h2>ชุดรวม <span class="tag">'
-        + S.bundles.length + ' ชุด</span></h2><p class="hint">ชุดรวมขายได้เมื่อทุกใบในชุดตรวจรายการแล้ว</p>'
-        + b + "</div>" +
-        '<div class="card"><h2>ใบที่กำลังทำ</h2><p class="hint">แสดงในหน้าใบตรวจงาน เพื่อบอกว่าจะมีอะไรเพิ่ม</p><label class="full">รายการ (บรรทัดละ 1 งาน)<textarea data-p="sheetsNext" data-t="lines" rows="6">'
-        + esc(S.sheetsNext.join("\n")) + "</textarea></label></div>";
-    }
+  // ----- ใบตรวจงาน (รายการสร้างจากไฟล์ต้นทางด้วย gen_sheets.ps1 · ที่นี่แก้ได้เฉพาะราคาและการเปิดขาย) -----
+  function sheetTab() {
+    var row = function (key, x, i, sub, flag) {
+      return '<details class="it"' + (openAt[key] === i ? " open" : "") + ' data-list="' + key + '" data-i="'
+        + i + '"><summary><span class="t">' + esc(x.id + " " + x.title) + '</span><span class="tag '
+        + flag[0] + '">' + esc(flag[1]) + '</span></summary><div class="bd"><p class="hint">' + esc(sub)
+        + '</p><div class="grid">' + field(key + "." + i, ["price",
+          "ราคาแบบซื้อฉบับนี้ เก็บได้ตลอด (บาท)"]) + field(key + "." + i, ["priceU",
+            "ราคาแบบรับฉบับใหม่ตลอด (บาท · ว่าง = ไม่ขายแบบนี้)"]) + field(key + "." + i, ["sale",
+              "เปิดขาย", "bool"]) + "</div></div></details>";
+    };
+    var pr = function (x) {
+      return "฿" + x.price + (+x.priceU > 0 ? " / รับฉบับใหม่ ฿" + x.priceU : "");
+    };
+    var a = S.sheets.map(function (x, i) {
+      return row("sheets", x, i, (x.hidden === true ? "รายการทดสอบของร้าน ซ่อนจากหน้าร้าน · ซื้อได้เฉพาะอีเมลใน ADMIN_EMAILS หรือ TEST_BUYERS · ไฟล์ที่ส่ง = ไฟล์ของ "
+        + (x.of || "-") + " · ลิงก์ซื้อ member.html?buy=" + x.id : x.group + " · ฟรี " + x.nFree + " จุด · มืออาชีพ "
+        + x.nPro + " ข้อ " + x.pages + " หน้า"), x.hidden === true ? ["", "ทดสอบ (ซ่อน) " + pr(x)] : x.ok === true
+        ? (x.sale === true ? ["ok", "เปิดขาย " + pr(x)] : ["", "ตรวจแล้ว ยังไม่เปิดขาย"]) : ["no",
+          "ร่าง รอตรวจรายการ"]);
+    }).join("");
+    var b = S.bundles.map(function (x, i) {
+      return row("bundles", x, i, (x.items || []).join(" · "), x.sale === true ? ["ok", "เปิดขาย "
+        + pr(x)] : ["", "ยังไม่เปิดขาย " + pr(x)]);
+    }).join("");
+    return '<div class="card"><h2>ใบตรวจงาน <span class="tag">' + S.sheets.filter(function (x) {
+      return x.hidden !== true;
+    }).length + ' งาน</span></h2><p class="hint">เนื้อหาแก้ที่ไฟล์ สินค้า\\เช็กชีต\\ต้นทาง แล้วสั่ง Claude ว่า “ทำเช็กชีต” · ใบที่เป็นร่างจะไม่ถูกขายแม้ติ๊กเปิดขาย · ราคาที่ตั้งไว้ตอนนี้เป็นราคาเสนอ</p>'
+      + (a || '<p class="hint">ยังไม่มีใบตรวจงาน</p>') + "</div>" + '<div class="card"><h2>ชุดรวม <span class="tag">'
+      + S.bundles.length + ' ชุด</span></h2><p class="hint">ชุดรวมขายได้เมื่อทุกใบในชุดตรวจรายการแล้ว</p>'
+      + b + "</div>" +
+      '<div class="card"><h2>ใบที่กำลังทำ</h2><p class="hint">แสดงในหน้าใบตรวจงาน เพื่อบอกว่าจะมีอะไรเพิ่ม</p><label class="full">รายการ (บรรทัดละ 1 งาน)<textarea data-p="sheetsNext" data-t="lines" rows="6">'
+      + esc(S.sheetsNext.join("\n")) + "</textarea></label></div>";
+  }
 
-    // ----- ร้าน: คำสั่งซื้อ ยอดขาย สมาชิก คำถาม สต็อก (ต่อหลังบ้าน Code.gs ด้วยรหัสหลังบ้าน) -----
-    var SHOP = null, shopErr = "", shopBusy = false, shopFilter = "ต้องทำ", shopQ = "", AK = "build_admin_key";
+  // ----- ร้าน: คำสั่งซื้อ ยอดขาย สมาชิก คำถาม สต็อก (ต่อหลังบ้าน Code.gs ด้วยรหัสหลังบ้าน) -----
+  var SHOP = null, shopErr = "", shopBusy = false, shopFilter = "ต้องทำ", shopQ = "", AK = "build_admin_key";
   var STN = {
     "รอชำระ": "wait",
     "รอตรวจ": "check",
@@ -671,267 +671,267 @@
       return "";
     }
   }
-    function tokWho() {
-      try {
-        return sessionStorage.getItem(TW) || "";
-      } catch (e) {
-        return "";
+  function tokWho() {
+    try {
+      return sessionStorage.getItem(TW) || "";
+    } catch (e) {
+      return "";
+    }
+  }
+  function tokSet(t, who) {
+    try {
+      if (t) {
+        sessionStorage.setItem(TK, t);
+        sessionStorage.setItem(TW, who || "");
+      } else {
+        sessionStorage.removeItem(TK);
+        sessionStorage.removeItem(TW);
       }
-    }
-    function tokSet(t, who) {
-      try {
-        if (t) {
-          sessionStorage.setItem(TK, t);
-          sessionStorage.setItem(TW, who || "");
-        } else {
-          sessionStorage.removeItem(TK);
-          sessionStorage.removeItem(TW);
-        }
-      } catch (e) {}
-    }
-    function akGet() {
-      return tokGet();
-    }
-    function live() {
-      return !!(BB() && !BB().demo);
-    }
-    function gated() {
-      return (live() || /[?&]gate=1/.test(location.search)) && !tokGet();
-    }
-    // ทุกคำสั่งหลังบ้านผ่านทางนี้: แนบบัตรผ่าน · บัตรหมดอายุ = กลับไปหน้าเข้าสู่ระบบ
-    function adm(action, data) {
-      var d = {};
-      Object.keys(data || {}).forEach(function (k) {
-        d[k] = data[k];
-      });
-      if (tokGet()) d.adminToken = tokGet();
-      return BB().callAdmin(action, d, "").catch(function (e) {
-        if (/หมดเวลาเข้าหลังบ้าน/.test(e.message || "")) {
-          tokSet("");
-          SHOP = null;
-          loginErr = e.message;
-          render();
-        }
-          throw e;
-      });
-    }
-    function BB() {
-      return window.BUILD;
-    }
-    function money(n) {
-      return "฿" + Number(n || 0).toLocaleString("th-TH");
-    }
-    function wh(iso) {
-      return BB() && iso ? BB().when(iso) : "";
-    }
-    function stTag(s) {
-      return '<span class="st ' + (STN[s] || "") + '">' + esc(s) + "</span>";
-    }
-    function sheetTitle(id) {
-      var b = BB(), x = b ? b.find(id) : null, up = b && b.isUpd && b.isUpd(id);
-      return (x ? b.baseOf(id) + " " + x.title : id) + (up ? " · แบบรับฉบับใหม่ตลอด" : "");
-    }
-    function shopLoad() {
-      if (!BB()) {
-        shopErr = "โหลด app.js ไม่ได้";
+    } catch (e) {}
+  }
+  function akGet() {
+    return tokGet();
+  }
+  function live() {
+    return !!(BB() && !BB().demo);
+  }
+  function gated() {
+    return (live() || /[?&]gate=1/.test(location.search)) && !tokGet();
+  }
+  // ทุกคำสั่งหลังบ้านผ่านทางนี้: แนบบัตรผ่าน · บัตรหมดอายุ = กลับไปหน้าเข้าสู่ระบบ
+  function adm(action, data) {
+    var d = {};
+    Object.keys(data || {}).forEach(function (k) {
+      d[k] = data[k];
+    });
+    if (tokGet()) d.adminToken = tokGet();
+    return BB().callAdmin(action, d, "").catch(function (e) {
+      if (/หมดเวลาเข้าหลังบ้าน/.test(e.message || "")) {
+        tokSet("");
+        SHOP = null;
+        loginErr = e.message;
         render();
-        return;
       }
-        shopBusy = true;
-      shopErr = "";
+      throw e;
+    });
+  }
+  function BB() {
+    return window.BUILD;
+  }
+  function money(n) {
+    return "฿" + Number(n || 0).toLocaleString("th-TH");
+  }
+  function wh(iso) {
+    return BB() && iso ? BB().when(iso) : "";
+  }
+  function stTag(s) {
+    return '<span class="st ' + (STN[s] || "") + '">' + esc(s) + "</span>";
+  }
+  function sheetTitle(id) {
+    var b = BB(), x = b ? b.find(id) : null, up = b && b.isUpd && b.isUpd(id);
+    return (x ? b.baseOf(id) + " " + x.title : id) + (up ? " · แบบรับฉบับใหม่ตลอด" : "");
+  }
+  function shopLoad() {
+    if (!BB()) {
+      shopErr = "โหลด app.js ไม่ได้";
+      render();
+      return;
+    }
+    shopBusy = true;
+    shopErr = "";
+    if (SHOPTABS.indexOf(tab) >= 0) render();
+    adm("adminSummary", {}).then(function (r) {
+      SHOP = r;
+      SHOP._at = new Date().toISOString();
+      shopBusy = false;
       if (SHOPTABS.indexOf(tab) >= 0) render();
-      adm("adminSummary", {}).then(function (r) {
-        SHOP = r;
-        SHOP._at = new Date().toISOString();
+    })
+      .catch(function (e) {
+        shopErr = e.message || "โหลดไม่สำเร็จ";
         shopBusy = false;
         if (SHOPTABS.indexOf(tab) >= 0) render();
-      })
-        .catch(function (e) {
-          shopErr = e.message || "โหลดไม่สำเร็จ";
-          shopBusy = false;
-          if (SHOPTABS.indexOf(tab) >= 0) render();
-        });
-    }
-    function shopAct(action, data, okText) {
-      if (shopBusy) return;
-      shopBusy = true;
-      adm(action, data).then(function (r) {
+      });
+  }
+  function shopAct(action, data, okText) {
+    if (shopBusy) return;
+    shopBusy = true;
+    adm(action, data).then(function (r) {
+      shopBusy = false;
+      toast(okText + (r && r.mailed === false && /ชำระแล้ว|ไม่ผ่าน/.test(okText) ? " (ส่งอีเมลไม่สำเร็จ ดูชีต)" : ""));
+      shopLoad();
+    })
+      .catch(function (e) {
         shopBusy = false;
-        toast(okText + (r && r.mailed === false && /ชำระแล้ว|ไม่ผ่าน/.test(okText) ? " (ส่งอีเมลไม่สำเร็จ ดูชีต)" : ""));
-        shopLoad();
-      })
-        .catch(function (e) {
-          shopBusy = false;
-          toast(e.message || "ทำรายการไม่สำเร็จ");
-        });
-    }
-    function chart(days) { // ยอดชำระแล้วรายวัน 30 วัน · แท่งเดียว สีเดียว ชี้ที่แท่งเพื่อดูค่า
-      var W = 600, H = 150, pad = 22, max = Math.max.apply(null, days.map(function (d) {
-        return d.rev;
-      }).concat([1])), bw = (W - pad) / days.length;
-      var bars = days.map(function (d, i) {
-        var h = d.rev ? Math.max(3, (H - 30) * d.rev / max) : 0, x = pad + i * bw + 1, y = H - 18 - h;
-        return '<rect class="bar" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + Math.max(1,
-          bw - 2).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3"><title>' + esc(d.d) + " · ยอดชำระแล้ว "
-          + money(d.rev) + " · คำสั่งซื้อใหม่ " + d.n + "</title></rect>";
-      }).join("");
-      var lab = [0, Math.floor(days.length / 2), days.length - 1].map(function (i) {
-        return '<text x="' + (pad + i * bw + bw / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle">'
-          + esc(days[i].d.slice(5)) + "</text>";
-      }).join("");
-      return '<svg class="bars" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="ยอดขายที่ชำระแล้วรายวัน 30 วัน สูงสุด '
-        + money(max) + '"><line x1="' + pad + '" x2="' + W + '" y1="' + (H - 18) + '" y2="' + (H - 18)
-        + '" stroke="#D8DEE6"/><text x="0" y="12">' + esc(money(max)) + "</text>" + bars + lab + "</svg>";
-    }
-    function orderRowHtml(o) {
-      var acts = o.status === "รอตรวจ" ? '<button class="sm" type="button" data-sh="slip" data-id="'
-        + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="'
-        + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
-        + esc(o.id) + '">สลิปไม่ผ่าน</button>'
-        : o.status === "รอชำระ" ? '<button class="sm" type="button" data-sh="cancel" data-id="' + esc(o.id)
-        + '">ยกเลิก</button>'
-        : o.status === "สลิปไม่ผ่าน" ? '<button class="sm" type="button" data-sh="back" data-id="' + esc(o.id)
-        + '">ย้อนเป็นรอตรวจ</button>'
-        : o.status === "ชำระแล้ว" && (o.shipTo || o.items.some(function (id) {
-          return !(BB() && BB().find(id));
-        })) ? '<button class="sm" type="button" data-sh="ship" data-id="' + esc(o.id) + '">' + (o.ship
-          ? "แก้เลขพัสดุ" : "ใส่เลขพัสดุ") + "</button>" : ""; // เลขพัสดุเฉพาะสินค้าจริง · เอกสารส่งมอบแบบดิจิทัล
-      if (o.receiptUrl && /\/receipt\.html\?/.test(o.receiptUrl)) acts += '<a class="btn sm" href="'
-        + esc(o.receiptUrl) + '" target="_blank" rel="noopener">ใบเสร็จ' + (o.receipt ? " " + esc(o.receipt) : "")
-        + "</a>";
-      '<button class="sm" type="button" data-sh="trk" data-url="' + esc(o.trackUrl) + '">คัดลอกลิงก์ติดตาม</button>';
-      return "<tr><td><b>" + esc(o.id) + "</b><br><small>" + esc(wh(o.created)) + "</small></td><td>"
-        + esc(o.email || "(ลบบัญชีแล้ว)") + "</td><td>" + o.items.map(function (id) {
-          return esc(id);
-        }).join(" ") + "</td><td>" + money(o.amount) + "</td><td>" + stTag(o.status) + (o.note ? "<br><small>"
-          + esc(o.note) + "</small>" : "") + "</td><td><small>" + (o.method ? "ชำระด้วย " + esc(o.method)
-            + (o.payState && o.status !== "ชำระแล้ว" ? " (" + esc({ pending: "รอผล", failed: "ไม่สำเร็จ",
-              expired: "หมดอายุ", successful: "สำเร็จ" }[o.payState] || o.payState) + ")" : "") + "<br>" : "")
-        + (o.okAt ? "ยืนยัน " + esc(wh(o.okAt)) + (o.okBy ? " โดย " + esc(o.okBy) : "") + "<br>" : "")
-        + (o.dl1 ? "เปิดไฟล์ " + o.dlN + " ครั้ง ครั้งแรก " + esc(wh(o.dl1)) : o.status === "ชำระแล้ว"
-          ? "ยังไม่เปิดไฟล์" : "") + (o.ship ? "<br>ส่งพัสดุ " + esc(o.ship.carrier) + " " + esc(o.ship.no)
-            + " · " + esc(o.ship.at) : "") + (o.shipTo ? "<br><b>ส่งถึง</b> " + esc(o.shipTo) : "")
-        + "</small></td><td><div class=\"tools\" style=\"margin:0\">" + acts + "</div></td></tr>";
-    }
-    function shopTab() {
-      var b = BB(), demo = !b || b.demo;
-      var conn = '<div class="card"><h2>ร้าน · คำสั่งซื้อ ยอดขาย สมาชิก</h2>' + (demo ? '<p class="hint">โหมดทดลอง: ยังไม่ได้ใส่ที่อยู่หลังบ้านในแท็บ สมาชิกและชำระเงิน · ข้อมูลด้านล่างมาจากโหมดทดลองในเบราว์เซอร์เครื่องนี้ (สร้างข้อมูลทดลองได้ที่หน้า member.html ที่อยู่เดียวกัน)</p>' : '<p class="hint">ต่อกับหลังบ้านจริง · เข้าระบบในชื่อ <b>'
-        + esc(tokWho() || "ร้าน") + '</b> · ออกจากระบบเองเมื่อปิดแท็บ หรือไม่ได้ใช้ 6 ชั่วโมง</p>')
-        +
-        '<div class="tools"><button type="button" class="pri" data-sh="load">' + (SHOP ? "โหลดข้อมูลใหม่" : "เชื่อมต่อและโหลดข้อมูล")
-        + "</button>" + (SHOP ? '<button type="button" data-sh="csv">ส่งออกคำสั่งซื้อ (CSV)</button>' : "")
-        + (SHOP ? '<span class="hint" style="margin:0;align-self:center">โหลดเมื่อ ' + esc(wh(SHOP._at))
-          + " · หลังบ้านรุ่น " + esc(SHOP.setup.version) + "</span>" : "") + "</div>" + (shopBusy ? '<p class="hint" style="margin:8px 0 0">กำลังโหลด…</p>' : "")
-        + (shopErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0">' + esc(shopErr) + "</p>" : "")
-        + "</div>";
-      if (!SHOP) return conn;
-      var k = SHOP.kpi, todoO = SHOP.orders.filter(function (o) {
-        return o.status === "รอตรวจ";
-      }), todoQ = SHOP.asks.filter(function (a) {
-        return !a.answer;
+        toast(e.message || "ทำรายการไม่สำเร็จ");
       });
-      var kp = [["ยอดขายเดือนนี้", money(k.revenueMonth)], ["30 วันล่าสุด", money(k.revenue30)], ["ยอดขายทั้งหมด",
-        money(k.revenue), k.paid + " คำสั่งซื้อ · เฉลี่ย " + money(k.aov)], ["รอตรวจสลิป", k.check,
-          k.check ? "ต้องทำ" : "", k.check > 0], ["รอลูกค้าชำระ", k.wait], ["คำถามรอตอบ", k.asksOpen,
-            k.asksOpen ? "ต้องทำ" : "", k.asksOpen > 0], ["สมาชิก", k.members, "ใหม่ 30 วัน " + k.members30],
-        ["ลูกค้าเปิดไฟล์แล้ว", k.downloaded + " / " + k.paid, "คำสั่งซื้อที่ชำระแล้ว"]];
-      var kpis = '<div class="card"><div class="kpis">' + kp.map(function (x) {
-        return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1])
-          + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>";
-      }).join("") + "</div></div>";
-      var todo = '<div class="card"><h2>ต้องทำตอนนี้ <span class="tag ' + (todoO.length + todoQ.length
-        ? "no" : "ok") + '">' + (todoO.length + todoQ.length) + " งาน</span></h2>" + (todoO.length + todoQ.length
-          ? "" : '<p class="hint" style="margin:0">ไม่มีสลิปรอตรวจ และไม่มีคำถามรอตอบ</p>') +
-        todoO.map(function (o) {
-          return '<div class="todo-it"><b>' + esc(o.id) + "</b> " + stTag(o.status) + " · " + money(o.amount)
-            + " · " + esc(o.email) + "<br><small>แนบสลิป " + esc(wh(o.slipAt)) + (o.paidAt ? " · ลูกค้าแจ้งโอน "
-              + esc(o.paidAt.replace("T", " ")) : "") + " · " + o.items.map(function (id) {
-                return esc(sheetTitle(id));
-              }).join(" · ") + '</small><div class="tools"><button class="sm" type="button" data-sh="slip" data-id="'
-            + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="'
-            + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
-            + esc(o.id) + '">สลิปไม่ผ่าน</button></div><small>เปิดแอปธนาคารดูว่ายอด ' + money(o.amount)
-            + " เข้าจริงก่อนกดยืนยัน (รูปสลิปปลอมได้)</small></div>";
-        }).join("") +
-        todoQ.map(function (a) {
-          return '<div class="todo-it"><b>' + esc(a.id) + "</b> · " + esc(a.topic) + " · " + esc(a.email)
-            + " · " + esc(wh(a.created)) + '<p style="margin:6px 0;white-space:pre-wrap">' + esc(a.text)
-            + '</p><label>คำตอบของร้าน<textarea id="ans-' + esc(a.id) + '" rows="3"></textarea></label><div class="tools"><button class="sm pri" type="button" data-sh="ans" data-id="'
-            + esc(a.id) + '">ส่งคำตอบ (ขึ้นหน้าสมาชิก + อีเมล)</button></div></div>';
-        }).join("") + "</div>";
-      var sales = '<div class="card"><h2>ยอดขายที่ชำระแล้ว 30 วัน</h2><p class="hint">ชี้ที่แท่งเพื่อดูยอดของวันนั้น · ตารางรายสินค้าอยู่ด้านล่าง</p>'
-        + chart(SHOP.days) +
-        '<div class="tbl" style="margin-top:12px"><table><thead><tr><th>สินค้า</th><th>ขายได้ (คำสั่งซื้อ)</th><th>ยอดขาย</th></tr></thead><tbody>'
-        + (SHOP.items.length ? SHOP.items.map(function (x) {
-          return "<tr><td>" + esc(x.id + " " + x.title) + "</td><td>" + x.n + "</td><td>" + money(x.rev)
+  }
+  function chart(days) { // ยอดชำระแล้วรายวัน 30 วัน · แท่งเดียว สีเดียว ชี้ที่แท่งเพื่อดูค่า
+    var W = 600, H = 150, pad = 22, max = Math.max.apply(null, days.map(function (d) {
+      return d.rev;
+    }).concat([1])), bw = (W - pad) / days.length;
+    var bars = days.map(function (d, i) {
+      var h = d.rev ? Math.max(3, (H - 30) * d.rev / max) : 0, x = pad + i * bw + 1, y = H - 18 - h;
+      return '<rect class="bar" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + Math.max(1,
+        bw - 2).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3"><title>' + esc(d.d) + " · ยอดชำระแล้ว "
+        + money(d.rev) + " · คำสั่งซื้อใหม่ " + d.n + "</title></rect>";
+    }).join("");
+    var lab = [0, Math.floor(days.length / 2), days.length - 1].map(function (i) {
+      return '<text x="' + (pad + i * bw + bw / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle">'
+        + esc(days[i].d.slice(5)) + "</text>";
+    }).join("");
+    return '<svg class="bars" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="ยอดขายที่ชำระแล้วรายวัน 30 วัน สูงสุด '
+      + money(max) + '"><line x1="' + pad + '" x2="' + W + '" y1="' + (H - 18) + '" y2="' + (H - 18)
+      + '" stroke="#D8DEE6"/><text x="0" y="12">' + esc(money(max)) + "</text>" + bars + lab + "</svg>";
+  }
+  function orderRowHtml(o) {
+    var acts = o.status === "รอตรวจ" ? '<button class="sm" type="button" data-sh="slip" data-id="'
+      + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="'
+      + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
+      + esc(o.id) + '">สลิปไม่ผ่าน</button>'
+      : o.status === "รอชำระ" ? '<button class="sm" type="button" data-sh="cancel" data-id="' + esc(o.id)
+      + '">ยกเลิก</button>'
+      : o.status === "สลิปไม่ผ่าน" ? '<button class="sm" type="button" data-sh="back" data-id="' + esc(o.id)
+      + '">ย้อนเป็นรอตรวจ</button>'
+      : o.status === "ชำระแล้ว" && (o.shipTo || o.items.some(function (id) {
+        return !(BB() && BB().find(id));
+      })) ? '<button class="sm" type="button" data-sh="ship" data-id="' + esc(o.id) + '">' + (o.ship
+        ? "แก้เลขพัสดุ" : "ใส่เลขพัสดุ") + "</button>" : ""; // เลขพัสดุเฉพาะสินค้าจริง · เอกสารส่งมอบแบบดิจิทัล
+    if (o.receiptUrl && /\/receipt\.html\?/.test(o.receiptUrl)) acts += '<a class="btn sm" href="'
+      + esc(o.receiptUrl) + '" target="_blank" rel="noopener">ใบเสร็จ' + (o.receipt ? " " + esc(o.receipt) : "")
+      + "</a>";
+    '<button class="sm" type="button" data-sh="trk" data-url="' + esc(o.trackUrl) + '">คัดลอกลิงก์ติดตาม</button>';
+    return "<tr><td><b>" + esc(o.id) + "</b><br><small>" + esc(wh(o.created)) + "</small></td><td>"
+      + esc(o.email || "(ลบบัญชีแล้ว)") + "</td><td>" + o.items.map(function (id) {
+        return esc(id);
+      }).join(" ") + "</td><td>" + money(o.amount) + "</td><td>" + stTag(o.status) + (o.note ? "<br><small>"
+        + esc(o.note) + "</small>" : "") + "</td><td><small>" + (o.method ? "ชำระด้วย " + esc(o.method)
+          + (o.payState && o.status !== "ชำระแล้ว" ? " (" + esc({ pending: "รอผล", failed: "ไม่สำเร็จ",
+            expired: "หมดอายุ", successful: "สำเร็จ" }[o.payState] || o.payState) + ")" : "") + "<br>" : "")
+      + (o.okAt ? "ยืนยัน " + esc(wh(o.okAt)) + (o.okBy ? " โดย " + esc(o.okBy) : "") + "<br>" : "")
+      + (o.dl1 ? "เปิดไฟล์ " + o.dlN + " ครั้ง ครั้งแรก " + esc(wh(o.dl1)) : o.status === "ชำระแล้ว"
+        ? "ยังไม่เปิดไฟล์" : "") + (o.ship ? "<br>ส่งพัสดุ " + esc(o.ship.carrier) + " " + esc(o.ship.no)
+          + " · " + esc(o.ship.at) : "") + (o.shipTo ? "<br><b>ส่งถึง</b> " + esc(o.shipTo) : "")
+      + "</small></td><td><div class=\"tools\" style=\"margin:0\">" + acts + "</div></td></tr>";
+  }
+  function shopTab() {
+    var b = BB(), demo = !b || b.demo;
+    var conn = '<div class="card"><h2>ร้าน · คำสั่งซื้อ ยอดขาย สมาชิก</h2>' + (demo ? '<p class="hint">โหมดทดลอง: ยังไม่ได้ใส่ที่อยู่หลังบ้านในแท็บ สมาชิกและชำระเงิน · ข้อมูลด้านล่างมาจากโหมดทดลองในเบราว์เซอร์เครื่องนี้ (สร้างข้อมูลทดลองได้ที่หน้า member.html ที่อยู่เดียวกัน)</p>' : '<p class="hint">ต่อกับหลังบ้านจริง · เข้าระบบในชื่อ <b>'
+      + esc(tokWho() || "ร้าน") + '</b> · ออกจากระบบเองเมื่อปิดแท็บ หรือไม่ได้ใช้ 6 ชั่วโมง</p>')
+      +
+      '<div class="tools"><button type="button" class="pri" data-sh="load">' + (SHOP ? "โหลดข้อมูลใหม่" : "เชื่อมต่อและโหลดข้อมูล")
+      + "</button>" + (SHOP ? '<button type="button" data-sh="csv">ส่งออกคำสั่งซื้อ (CSV)</button>' : "")
+      + (SHOP ? '<span class="hint" style="margin:0;align-self:center">โหลดเมื่อ ' + esc(wh(SHOP._at))
+        + " · หลังบ้านรุ่น " + esc(SHOP.setup.version) + "</span>" : "") + "</div>" + (shopBusy ? '<p class="hint" style="margin:8px 0 0">กำลังโหลด…</p>' : "")
+      + (shopErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0">' + esc(shopErr) + "</p>" : "")
+      + "</div>";
+    if (!SHOP) return conn;
+    var k = SHOP.kpi, todoO = SHOP.orders.filter(function (o) {
+      return o.status === "รอตรวจ";
+    }), todoQ = SHOP.asks.filter(function (a) {
+      return !a.answer;
+    });
+    var kp = [["ยอดขายเดือนนี้", money(k.revenueMonth)], ["30 วันล่าสุด", money(k.revenue30)], ["ยอดขายทั้งหมด",
+      money(k.revenue), k.paid + " คำสั่งซื้อ · เฉลี่ย " + money(k.aov)], ["รอตรวจสลิป", k.check,
+        k.check ? "ต้องทำ" : "", k.check > 0], ["รอลูกค้าชำระ", k.wait], ["คำถามรอตอบ", k.asksOpen,
+          k.asksOpen ? "ต้องทำ" : "", k.asksOpen > 0], ["สมาชิก", k.members, "ใหม่ 30 วัน " + k.members30],
+      ["ลูกค้าเปิดไฟล์แล้ว", k.downloaded + " / " + k.paid, "คำสั่งซื้อที่ชำระแล้ว"]];
+    var kpis = '<div class="card"><div class="kpis">' + kp.map(function (x) {
+      return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1])
+        + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>";
+    }).join("") + "</div></div>";
+    var todo = '<div class="card"><h2>ต้องทำตอนนี้ <span class="tag ' + (todoO.length + todoQ.length
+      ? "no" : "ok") + '">' + (todoO.length + todoQ.length) + " งาน</span></h2>" + (todoO.length + todoQ.length
+        ? "" : '<p class="hint" style="margin:0">ไม่มีสลิปรอตรวจ และไม่มีคำถามรอตอบ</p>') +
+      todoO.map(function (o) {
+        return '<div class="todo-it"><b>' + esc(o.id) + "</b> " + stTag(o.status) + " · " + money(o.amount)
+          + " · " + esc(o.email) + "<br><small>แนบสลิป " + esc(wh(o.slipAt)) + (o.paidAt ? " · ลูกค้าแจ้งโอน "
+            + esc(o.paidAt.replace("T", " ")) : "") + " · " + o.items.map(function (id) {
+              return esc(sheetTitle(id));
+            }).join(" · ") + '</small><div class="tools"><button class="sm" type="button" data-sh="slip" data-id="'
+          + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="'
+          + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
+          + esc(o.id) + '">สลิปไม่ผ่าน</button></div><small>เปิดแอปธนาคารดูว่ายอด ' + money(o.amount)
+          + " เข้าจริงก่อนกดยืนยัน (รูปสลิปปลอมได้)</small></div>";
+      }).join("") +
+      todoQ.map(function (a) {
+        return '<div class="todo-it"><b>' + esc(a.id) + "</b> · " + esc(a.topic) + " · " + esc(a.email)
+          + " · " + esc(wh(a.created)) + '<p style="margin:6px 0;white-space:pre-wrap">' + esc(a.text)
+          + '</p><label>คำตอบของร้าน<textarea id="ans-' + esc(a.id) + '" rows="3"></textarea></label><div class="tools"><button class="sm pri" type="button" data-sh="ans" data-id="'
+          + esc(a.id) + '">ส่งคำตอบ (ขึ้นหน้าสมาชิก + อีเมล)</button></div></div>';
+      }).join("") + "</div>";
+    var sales = '<div class="card"><h2>ยอดขายที่ชำระแล้ว 30 วัน</h2><p class="hint">ชี้ที่แท่งเพื่อดูยอดของวันนั้น · ตารางรายสินค้าอยู่ด้านล่าง</p>'
+      + chart(SHOP.days) +
+      '<div class="tbl" style="margin-top:12px"><table><thead><tr><th>สินค้า</th><th>ขายได้ (คำสั่งซื้อ)</th><th>ยอดขาย</th></tr></thead><tbody>'
+      + (SHOP.items.length ? SHOP.items.map(function (x) {
+        return "<tr><td>" + esc(x.id + " " + x.title) + "</td><td>" + x.n + "</td><td>" + money(x.rev)
+          + "</td></tr>";
+      }).join("") : '<tr><td colspan="3">ยังไม่มียอดขาย</td></tr>') + "</tbody></table></div></div>";
+    var FL = ["ต้องทำ", "ทั้งหมด", "รอชำระ", "รอตรวจ", "ชำระแล้ว", "สลิปไม่ผ่าน", "ยกเลิก"];
+    var list = SHOP.orders.filter(function (o) {
+      return shopFilter === "ทั้งหมด" ? true : shopFilter === "ต้องทำ" ? (o.status === "รอตรวจ" || o.status === "รอชำระ") : o.status === shopFilter;
+    }).filter(function (o) {
+      var t = shopQ.toLowerCase();
+      return !t || (o.id + " " + o.email + " " + o.items.join(" ")).toLowerCase().indexOf(t) >= 0;
+    });
+    var orders = '<div class="card"><h2>คำสั่งซื้อ <span class="tag">' + SHOP.orders.length + " รายการ</span></h2>"
+      + '<div class="chips">' + FL.map(function (f) {
+        return '<button class="sm" type="button" data-sh="f" data-v="' + f + '" aria-pressed="' + (f === shopFilter)
+          + '">' + f + "</button>";
+      }).join("") + '</div><label>ค้นหาเลขคำสั่งซื้อ อีเมล หรือรหัสใบ<input type="text" id="shq" value="'
+      + esc(shopQ) + '"></label>' +
+      '<div class="tbl" style="margin-top:10px"><table><thead><tr><th>เลขที่</th><th>อีเมล</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th><th>ยืนยัน · การส่งไฟล์</th><th></th></tr></thead><tbody>'
+      + (list.length ? list.map(orderRowHtml).join("") : '<tr><td colspan="7">ไม่มีรายการในตัวกรองนี้</td></tr>')
+      + "</tbody></table></div></div>";
+    var mem = '<div class="card"><h2>สมาชิกล่าสุด <span class="tag">' + k.members + " คน</span></h2><div class=\"tbl\"><table><thead><tr><th>ชื่อ</th><th>อีเมล</th><th>สมัครด้วย</th><th>เชื่อมไว้</th><th>สมัครเมื่อ</th><th>เข้าล่าสุด</th></tr></thead><tbody>"
+      + (SHOP.members.length ? SHOP.members.map(function (m) {
+        return "<tr><td>" + esc(m.name) + "</td><td>" + esc(m.email || "-") + "</td><td>" + esc({ email: "อีเมล",
+          google: "Google", line: "LINE", facebook: "Facebook" }[m.via] || m.via) + "</td><td>" + esc(m.linked.join(" ")
+            || "-") + "</td><td>" + esc(wh(m.created)) + "</td><td>" + esc(wh(m.last)) + "</td></tr>";
+      }).join("") : '<tr><td colspan="6">ยังไม่มีสมาชิก</td></tr>') + "</tbody></table></div></div>";
+    var stock = '<div class="card"><h2>สินค้าและสต็อก</h2><p class="hint">ใบตรวจงานเป็นไฟล์ดิจิทัล ไม่มีสต็อก · สินค้าจริง (เช่นสินค้าด้อม) เพิ่มทีละแถวในแผ่น stock ของชีต แล้วกดโหลดข้อมูลใหม่ · แถวที่คงเหลือถึงจุดสั่งซื้อเพิ่มจะขึ้นป้าย สั่งเพิ่ม</p>'
+      + (SHOP.stock.length ? '<div class="tbl"><table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>ประเภท</th><th>ราคาขาย</th><th>ต้นทุน</th><th>กำไรต่อชิ้น</th><th>คงเหลือ</th><th>ผู้จำหน่าย</th></tr></thead><tbody>'
+        + SHOP.stock.map(function (s) {
+          var low = s.qty != null && s.reorder != null && s.qty <= s.reorder;
+          return "<tr><td>" + esc(s.sku) + "</td><td>" + esc(s.name) + "</td><td>" + esc(s.kind) + "</td><td>"
+            + money(s.price) + "</td><td>" + money(s.cost) + "</td><td>" + money(s.price - s.cost)
+            + "</td><td>" + (s.qty == null ? "-" : s.qty) + (low ? ' <span class="tag no">สั่งเพิ่ม</span>' : "")
+            + "</td><td>" + esc(s.supplier) + (s.lead ? "<br><small>ส่งของ " + esc(s.lead) + " วัน</small>" : "")
             + "</td></tr>";
-        }).join("") : '<tr><td colspan="3">ยังไม่มียอดขาย</td></tr>') + "</tbody></table></div></div>";
-      var FL = ["ต้องทำ", "ทั้งหมด", "รอชำระ", "รอตรวจ", "ชำระแล้ว", "สลิปไม่ผ่าน", "ยกเลิก"];
-      var list = SHOP.orders.filter(function (o) {
-        return shopFilter === "ทั้งหมด" ? true : shopFilter === "ต้องทำ" ? (o.status === "รอตรวจ" || o.status === "รอชำระ") : o.status === shopFilter;
-      }).filter(function (o) {
-        var t = shopQ.toLowerCase();
-        return !t || (o.id + " " + o.email + " " + o.items.join(" ")).toLowerCase().indexOf(t) >= 0;
-      });
-      var orders = '<div class="card"><h2>คำสั่งซื้อ <span class="tag">' + SHOP.orders.length + " รายการ</span></h2>"
-        + '<div class="chips">' + FL.map(function (f) {
-          return '<button class="sm" type="button" data-sh="f" data-v="' + f + '" aria-pressed="' + (f === shopFilter)
-            + '">' + f + "</button>";
-        }).join("") + '</div><label>ค้นหาเลขคำสั่งซื้อ อีเมล หรือรหัสใบ<input type="text" id="shq" value="'
-        + esc(shopQ) + '"></label>' +
-        '<div class="tbl" style="margin-top:10px"><table><thead><tr><th>เลขที่</th><th>อีเมล</th><th>รายการ</th><th>ยอด</th><th>สถานะ</th><th>ยืนยัน · การส่งไฟล์</th><th></th></tr></thead><tbody>'
-        + (list.length ? list.map(orderRowHtml).join("") : '<tr><td colspan="7">ไม่มีรายการในตัวกรองนี้</td></tr>')
-        + "</tbody></table></div></div>";
-      var mem = '<div class="card"><h2>สมาชิกล่าสุด <span class="tag">' + k.members + " คน</span></h2><div class=\"tbl\"><table><thead><tr><th>ชื่อ</th><th>อีเมล</th><th>สมัครด้วย</th><th>เชื่อมไว้</th><th>สมัครเมื่อ</th><th>เข้าล่าสุด</th></tr></thead><tbody>"
-        + (SHOP.members.length ? SHOP.members.map(function (m) {
-          return "<tr><td>" + esc(m.name) + "</td><td>" + esc(m.email || "-") + "</td><td>" + esc({ email: "อีเมล",
-            google: "Google", line: "LINE", facebook: "Facebook" }[m.via] || m.via) + "</td><td>" + esc(m.linked.join(" ")
-              || "-") + "</td><td>" + esc(wh(m.created)) + "</td><td>" + esc(wh(m.last)) + "</td></tr>";
-        }).join("") : '<tr><td colspan="6">ยังไม่มีสมาชิก</td></tr>') + "</tbody></table></div></div>";
-      var stock = '<div class="card"><h2>สินค้าและสต็อก</h2><p class="hint">ใบตรวจงานเป็นไฟล์ดิจิทัล ไม่มีสต็อก · สินค้าจริง (เช่นสินค้าด้อม) เพิ่มทีละแถวในแผ่น stock ของชีต แล้วกดโหลดข้อมูลใหม่ · แถวที่คงเหลือถึงจุดสั่งซื้อเพิ่มจะขึ้นป้าย สั่งเพิ่ม</p>'
-        + (SHOP.stock.length ? '<div class="tbl"><table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>ประเภท</th><th>ราคาขาย</th><th>ต้นทุน</th><th>กำไรต่อชิ้น</th><th>คงเหลือ</th><th>ผู้จำหน่าย</th></tr></thead><tbody>'
-          + SHOP.stock.map(function (s) {
-            var low = s.qty != null && s.reorder != null && s.qty <= s.reorder;
-            return "<tr><td>" + esc(s.sku) + "</td><td>" + esc(s.name) + "</td><td>" + esc(s.kind) + "</td><td>"
-              + money(s.price) + "</td><td>" + money(s.cost) + "</td><td>" + money(s.price - s.cost)
-              + "</td><td>" + (s.qty == null ? "-" : s.qty) + (low ? ' <span class="tag no">สั่งเพิ่ม</span>' : "")
-              + "</td><td>" + esc(s.supplier) + (s.lead ? "<br><small>ส่งของ " + esc(s.lead) + " วัน</small>" : "")
-              + "</td></tr>";
-          }).join("") + "</tbody></table></div>" : '<p class="hint" style="margin:0">ยังไม่มีสินค้าจริงในแผ่น stock</p>')
-        + "</div>";
-      var su = SHOP.setup, rows = [], add = function (cls, t, d) {
-        rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!")
-          + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>");
-      };
-      // รุ่นหลังบ้าน (23 ต.ค. 2026): เทียบรุ่นที่ทำงานอยู่จริงกับรุ่นล่าสุดในเครื่อง · ไม่ตรง = ต้องวาง Code.gs ใหม่แล้ว Deploy แบบ New version
-      add(su.version === NEED_API ? "ok" : "no", "รุ่นหลังบ้าน " + esc(su.version || "เก่ากว่า 2026-10-19"),
-        su.version === NEED_API ? "ล่าสุดแล้ว" : "รุ่นล่าสุดคือ " + NEED_API + " · วางไฟล์ รายได้\\หลังบ้านสมาชิก\\Code.gs ทับในโปรเจกต์ Apps Script → บันทึก → รัน setup → Deploy → Manage deployments → New version");
-      add(su.site ? "ok" : "no", "SITE_URL ของหลังบ้าน", su.site ? esc(su.site) : "ตั้งใน Script properties ให้ตรงกับที่อยู่เว็บ");
-      add(su.payOn ? "ok" : "wa", "เปิดรับชำระเงินในเว็บ", su.payOn ? "" : "ติ๊กในแท็บ สมาชิกและชำระเงิน แล้วบันทึกและอัปโหลด data.js");
-      add(su.sellable.length ? "ok" : "wa", "ใบที่ขายได้ตอนนี้ " + su.sellable.length + " ใบ", su.sellable.length
-        ? esc(su.sellable.join(" ")) : "ขายได้เมื่อตรวจรายการแล้ว + ติ๊กเปิดขาย + เปิดรับชำระ");
-      add(su.missingFiles.length ? "no" : "ok", "ไฟล์ฉบับมืออาชีพในโฟลเดอร์ไดรฟ์", su.missingFiles.length
-        ? "ยังไม่มีไฟล์ของ: " + esc(su.missingFiles.join(" ")) + " · อัปโหลดจาก สินค้า\\เช็กชีต\\pro" : "ครบทุกใบที่เปิดขาย");
-      add(su.login.google || su.login.line || su.login.facebook || su.login.tiktok ? "ok" : "wa",
-        "เข้าสู่ระบบด้วยบริการภายนอก", "Google " + (su.login.google ? "เปิด" : "ปิด") + " · LINE " + (su.login.line
-          ? "เปิด" : "ปิด") + " · Facebook " + (su.login.facebook ? "เปิด" : "ปิด") + " · TikTok " + (su.login.tiktok
-            ? "เปิด" : "ปิด") + " (ตั้งคีย์ใน Script properties ตามคู่มือ)");
-      if (su.pay) add(su.pay.opn ? "ok" : "wa", "ชำระออนไลน์ (Opn) ฝั่งหลังบ้าน", su.pay.opn ? (su.pay.test
-        ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง ตัดเงินจริง") : "ยังไม่ใส่ OPN_SKEY ใน Script properties · ลูกค้าโอนแล้วแนบสลิปได้ตามเดิม");
-      add(su.slipAuto ? "ok" : "wa", "ตรวจสลิปอัตโนมัติ (EasySlip)", su.slipAuto ? "เปิดแล้ว ร้านไม่ต้องตรวจสลิปเอง · สลิปที่ระบบตรวจไม่ได้ จะมีอีเมลแจ้งร้าน" : "ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ตอนนี้ร้านตรวจสลิปเอง (ดูขั้นตอนใน 00_สิ่งที่คุณต้องทำ.md ข้อ D13)");
-      if (su.receipt) add(su.receipt.ready ? "ok" : "wa", "ใบเสร็จรับเงินอัตโนมัติ" + (su.receipt.vat
-        ? " + ใบกำกับภาษี (VAT " + su.receipt.rate + "%)" : ""), su.receipt.ready ? "ออกเลขที่ใบเสร็จทุกคำสั่งซื้อที่ชำระแล้ว ลูกค้าเปิดและพิมพ์ได้จากหน้าสมาชิก อีเมล และหน้าติดตาม" : "ระบบออกเลขที่ใบเสร็จแล้ว แต่ยังขาดข้อมูลผู้ออก · ใส่ SHOP_LEGAL_NAME SHOP_TAX_ID SHOP_ADDRESS ใน Script properties (ข้อ D16)");
-      add(su.github ? "ok" : "wa", "แก้เว็บจากหลังบ้านออนไลน์ (GitHub)", su.github ? "เปิดแล้ว · กด บันทึกขึ้นเว็บ ได้จากทุกเครื่อง · ประวัติการแก้อยู่ใน GitHub" : "ยังไม่ใส่ GITHUB_TOKEN ใน Script properties · ตอนนี้แก้เนื้อหาแล้วต้องดาวน์โหลด data.js ไปอัปโหลดเอง (ข้อ D15)");
-      add(Array.isArray(S.pay.methods) && S.pay.methods.length ? "ok" : "wa",
-        "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ " + ((S.pay.methods || []).length) + " ช่องทาง",
-        "เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริง · ขอเปิดช่องทางเพิ่มที่ support@omise.co");
-      add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
-      var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("")
-        + "</ul></div>";
-      return conn + kpis + todo + sales + orders + mem + stock + setup;
-    }
-    // ----- ลูกค้า (26 ต.ค. 2026): สถานะลูกค้าทุกคนในหน้าเดียว · ข้อมูลจากหลังบ้านรุ่น 2026-10-26 -----
-    var custQ = "", custSeg = "ทั้งหมด", custSort = "new";
+        }).join("") + "</tbody></table></div>" : '<p class="hint" style="margin:0">ยังไม่มีสินค้าจริงในแผ่น stock</p>')
+      + "</div>";
+    var su = SHOP.setup, rows = [], add = function (cls, t, d) {
+      rows.push('<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : cls === "no" ? "✗" : "!")
+        + "</span><span>" + t + (d ? "<small>" + d + "</small>" : "") + "</span></li>");
+    };
+    // รุ่นหลังบ้าน (23 ต.ค. 2026): เทียบรุ่นที่ทำงานอยู่จริงกับรุ่นล่าสุดในเครื่อง · ไม่ตรง = ต้องวาง Code.gs ใหม่แล้ว Deploy แบบ New version
+    add(su.version === NEED_API ? "ok" : "no", "รุ่นหลังบ้าน " + esc(su.version || "เก่ากว่า 2026-10-19"),
+      su.version === NEED_API ? "ล่าสุดแล้ว" : "รุ่นล่าสุดคือ " + NEED_API + " · วางไฟล์ รายได้\\หลังบ้านสมาชิก\\Code.gs ทับในโปรเจกต์ Apps Script → บันทึก → รัน setup → Deploy → Manage deployments → New version");
+    add(su.site ? "ok" : "no", "SITE_URL ของหลังบ้าน", su.site ? esc(su.site) : "ตั้งใน Script properties ให้ตรงกับที่อยู่เว็บ");
+    add(su.payOn ? "ok" : "wa", "เปิดรับชำระเงินในเว็บ", su.payOn ? "" : "ติ๊กในแท็บ สมาชิกและชำระเงิน แล้วบันทึกและอัปโหลด data.js");
+    add(su.sellable.length ? "ok" : "wa", "ใบที่ขายได้ตอนนี้ " + su.sellable.length + " ใบ", su.sellable.length
+      ? esc(su.sellable.join(" ")) : "ขายได้เมื่อตรวจรายการแล้ว + ติ๊กเปิดขาย + เปิดรับชำระ");
+    add(su.missingFiles.length ? "no" : "ok", "ไฟล์ฉบับมืออาชีพในโฟลเดอร์ไดรฟ์", su.missingFiles.length
+      ? "ยังไม่มีไฟล์ของ: " + esc(su.missingFiles.join(" ")) + " · อัปโหลดจาก สินค้า\\เช็กชีต\\pro" : "ครบทุกใบที่เปิดขาย");
+    add(su.login.google || su.login.line || su.login.facebook || su.login.tiktok ? "ok" : "wa",
+      "เข้าสู่ระบบด้วยบริการภายนอก", "Google " + (su.login.google ? "เปิด" : "ปิด") + " · LINE " + (su.login.line
+        ? "เปิด" : "ปิด") + " · Facebook " + (su.login.facebook ? "เปิด" : "ปิด") + " · TikTok " + (su.login.tiktok
+          ? "เปิด" : "ปิด") + " (ตั้งคีย์ใน Script properties ตามคู่มือ)");
+    if (su.pay) add(su.pay.opn ? "ok" : "wa", "ชำระออนไลน์ (Opn) ฝั่งหลังบ้าน", su.pay.opn ? (su.pay.test
+      ? "คีย์ทดสอบ ยังไม่ตัดเงินจริง" : "คีย์จริง ตัดเงินจริง") : "ยังไม่ใส่ OPN_SKEY ใน Script properties · ลูกค้าโอนแล้วแนบสลิปได้ตามเดิม");
+    add(su.slipAuto ? "ok" : "wa", "ตรวจสลิปอัตโนมัติ (EasySlip)", su.slipAuto ? "เปิดแล้ว ร้านไม่ต้องตรวจสลิปเอง · สลิปที่ระบบตรวจไม่ได้ จะมีอีเมลแจ้งร้าน" : "ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ตอนนี้ร้านตรวจสลิปเอง (ดูขั้นตอนใน 00_สิ่งที่คุณต้องทำ.md ข้อ D13)");
+    if (su.receipt) add(su.receipt.ready ? "ok" : "wa", "ใบเสร็จรับเงินอัตโนมัติ" + (su.receipt.vat
+      ? " + ใบกำกับภาษี (VAT " + su.receipt.rate + "%)" : ""), su.receipt.ready ? "ออกเลขที่ใบเสร็จทุกคำสั่งซื้อที่ชำระแล้ว ลูกค้าเปิดและพิมพ์ได้จากหน้าสมาชิก อีเมล และหน้าติดตาม" : "ระบบออกเลขที่ใบเสร็จแล้ว แต่ยังขาดข้อมูลผู้ออก · ใส่ SHOP_LEGAL_NAME SHOP_TAX_ID SHOP_ADDRESS ใน Script properties (ข้อ D16)");
+    add(su.github ? "ok" : "wa", "แก้เว็บจากหลังบ้านออนไลน์ (GitHub)", su.github ? "เปิดแล้ว · กด บันทึกขึ้นเว็บ ได้จากทุกเครื่อง · ประวัติการแก้อยู่ใน GitHub" : "ยังไม่ใส่ GITHUB_TOKEN ใน Script properties · ตอนนี้แก้เนื้อหาแล้วต้องดาวน์โหลด data.js ไปอัปโหลดเอง (ข้อ D15)");
+    add(Array.isArray(S.pay.methods) && S.pay.methods.length ? "ok" : "wa",
+      "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ " + ((S.pay.methods || []).length) + " ช่องทาง",
+      "เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริง · ขอเปิดช่องทางเพิ่มที่ support@omise.co");
+    add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
+    var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("")
+      + "</ul></div>";
+    return conn + kpis + todo + sales + orders + mem + stock + setup;
+  }
+  // ----- ลูกค้า (26 ต.ค. 2026): สถานะลูกค้าทุกคนในหน้าเดียว · ข้อมูลจากหลังบ้านรุ่น 2026-10-26 -----
+  var custQ = "", custSeg = "ทั้งหมด", custSort = "new";
   var SEG = [["ทั้งหมด", function () {
     return true;
   }], ["ซื้อแล้ว", function (m) {
@@ -956,120 +956,120 @@
       + (shopBusy ? '<p class="hint">กำลังโหลด…</p>' : "") + (shopErr ? '<p class="hint" style="color:var(--bad)">'
         + esc(shopErr) + "</p>" : "") + "</div>";
   }
-    function custTab() {
-      if (!SHOP) return needShop("ลูกค้า");
-      var all = SHOP.members || [], hasStats = all.length && "orders" in all[0];
-      if (!hasStats) return '<div class="card"><h2>ลูกค้า</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version)
-        + ' ยังไม่ส่งข้อมูลยอดซื้อรายคน · วาง Code.gs รุ่น ' + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
-      var seg = SEG.filter(function (s) {
-        return s[0] === custSeg;
-      })[0] || SEG[0], t = custQ.toLowerCase();
-      var list = all.filter(seg[1]).filter(function (m) {
-        return !t || [m.name, m.email, m.company, m.org, m.occ, m.pos, m.province, m.phone, m.line,
-          m.id].join(" ").toLowerCase().indexOf(t) >= 0;
-      });
-      list.sort(custSort === "spent" ? function (a, b) {
-        return b.spent - a.spent;
-      } : custSort === "last" ? function (a, b) {
-        return String(b.last) < String(a.last) ? -1 : 1;
-      } : custSort === "order" ? function (a, b) {
-        return String(b.lastOrder) < String(a.lastOrder) ? -1 : 1;
-      } : function (a, b) {
-        return String(b.created) < String(a.created) ? -1 : 1;
-      });
-      var buyers = all.filter(function (m) {
-        return m.paid > 0;
-      }), spent = buyers.reduce(function (s, m) {
-        return s + m.spent;
-      }, 0);
-      var kp = [["ลูกค้าทั้งหมด", all.length], ["ซื้อแล้ว", buyers.length, all.length ? Math.round(buyers.length * 100 / all.length)
-        + "% ของสมาชิก" : ""], ["ลูกค้าประจำ", all.filter(function (m) {
-          return m.paid >= 2;
-        }).length, "ซื้อ 2 ครั้งขึ้นไป"], ["ยอดซื้อเฉลี่ยต่อคน", money(buyers.length ? Math.round(spent / buyers.length) : 0)],
-        ["ค้างชำระ", all.filter(function (m) {
-          return m.open > 0;
-        }).length, "ส่งข้อความตามได้", false], ["รอตรวจสลิป", all.filter(function (m) {
-          return m.check > 0;
-        }).length, "", all.some(function (m) {
-          return m.check > 0;
-        })], ["สมัครแล้วยังไม่ซื้อ", all.filter(function (m) {
-          return !m.orders;
-        }).length], ["มีคำถามรอตอบ", all.filter(function (m) {
-          return m.asksOpen > 0;
-        }).length, "", all.some(function (m) {
-          return m.asksOpen > 0;
-        })]];
-      var st = function (m) {
-        var s = [];
-        if (m.check) s.push('<span class="tag no">รอตรวจ ' + m.check + "</span>");
-        if (m.open) s.push('<span class="tag">ค้างชำระ ' + m.open + "</span>");
-        if (m.paid >= 2) s.push('<span class="tag ok">ประจำ</span>');
-        else if (m.paid) s.push('<span class="tag ok">ซื้อแล้ว</span>');
-        if (!m.orders) s.push('<span class="tag">ยังไม่ซื้อ</span>');
-        if (m.asksOpen) s.push('<span class="tag no">คำถาม ' + m.asksOpen + "</span>");
-        return s.join(" ");
-      };
-      var rows = list.slice(0, 300).map(function (m) {
-        return "<tr><td><b>" + esc(m.name || "-") + "</b>" + (m.company ? "<br><small>" + esc(m.company)
-          + "</small>" : "") + (m.occ || m.pos || m.org ? "<br><small>" + esc([m.occ, m.pos, m.org].filter(Boolean).join(" · "))
-            + "</small>" : "") + (m.province ? "<br><small>" + esc(m.province) + "</small>" : "") + "</td><td><small>"
-          + esc(m.email || "-") + (m.phone ? "<br>" + esc(m.phone) : "") + (m.line ? "<br>LINE " + esc(m.line) : "")
-          + (m.linked.length ? "<br>เชื่อม " + esc(m.linked.join(" ")) : "") + "</small></td><td><small>สมัคร "
-          + esc(wh(m.created)) + "<br>เข้าล่าสุด " + esc(wh(m.last) || "-") + "</small></td><td>" + m.orders
-          + (m.paid ? " (ชำระ " + m.paid + ")" : "") + (m.lastOrder ? "<br><small>ล่าสุด " + esc(wh(m.lastOrder))
-            + "</small>" : "") + "</td><td>" + money(m.spent) + "</td><td>" + m.docs + "</td><td>" + st(m)
-          + '</td><td><div class="tools" style="margin:0">' + (m.email ? '<button class="sm" type="button" data-sh="cord" data-v="'
-            + esc(m.email) + '">คำสั่งซื้อ</button><button class="sm" type="button" data-sh="cmail" data-v="'
-            + esc(m.email) + '">คัดลอกอีเมล</button>' : "") + "</div></td></tr>";
-      }).join("");
-      return '<div class="card"><h2>ลูกค้า <span class="tag">' + all.length + ' คน</span></h2><p class="hint">ข้อมูลส่วนบุคคล ใช้เพื่อดูแลคำสั่งซื้อเท่านั้น · ส่งข่าวสารได้เฉพาะคนที่ติ๊กรับข่าวสาร</p><div class="kpis">'
-        + kp.map(function (x) {
-          return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1])
-            + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>";
-        }).join("") + "</div></div>" +
-        '<div class="card"><div class="chips">' + SEG.map(function (s) {
-          var n = all.filter(s[1]).length;
-          return '<button class="sm" type="button" data-sh="cseg" data-v="' + esc(s[0]) + '" aria-pressed="'
-            + (s[0] === custSeg) + '">' + esc(s[0]) + " " + n + "</button>";
-        }).join("") + '</div><div class="grid"><label>ค้นหา ชื่อ อีเมล บริษัท จังหวัด โทรศัพท์<input type="text" id="cq" value="'
-        + esc(custQ) + '"></label><label>เรียงตาม<select id="csort"><option value="new"' + (custSort === "new"
-          ? " selected" : "") + '>สมัครล่าสุด</option><option value="spent"' + (custSort === "spent"
-            ? " selected" : "") + '>ยอดซื้อมากที่สุด</option><option value="order"' + (custSort === "order"
-              ? " selected" : "") + '>สั่งซื้อล่าสุด</option><option value="last"' + (custSort === "last"
-                ? " selected" : "") + ">เข้าระบบล่าสุด</option></select></label></div>" +
-        '<div class="tools"><button type="button" data-sh="ccsv">ส่งออกรายชื่อในตัวกรองนี้ (CSV)</button></div><div class="tbl"><table><thead><tr><th>ลูกค้า</th><th>ติดต่อ</th><th>บัญชี</th><th>คำสั่งซื้อ</th><th>ยอดซื้อ</th><th>เอกสาร</th><th>สถานะ</th><th></th></tr></thead><tbody>'
-        + (rows || '<tr><td colspan="8">ไม่มีลูกค้าในตัวกรองนี้</td></tr>') + "</tbody></table></div>"
-        + (list.length > 300 ? '<p class="hint">แสดง 300 คนแรก · ใช้ค้นหาหรือส่งออก CSV เพื่อดูทั้งหมด</p>' : "")
-        + "</div>";
-    }
-    function custCsv() {
-      var seg = SEG.filter(function (s) {
-        return s[0] === custSeg;
-      })[0] || SEG[0], t = custQ.toLowerCase(), q = function (v) {
-        v = String(v == null ? "" : v);
-        if (/^[=+\-@]/.test(v)) v = "'" + v;
-        return '"' + v.replace(/"/g, '""') + '"';
-      };
-      var list = (SHOP.members || []).filter(seg[1]).filter(function (m) {
-        return !t || [m.name, m.email, m.company, m.org, m.occ, m.pos, m.province, m.phone, m.line].join(" ").toLowerCase().indexOf(t) >= 0;
-      });
-      var head = ["รหัสสมาชิก", "ชื่อ", "อาชีพ", "ตำแหน่ง", "หน่วยงาน", "บริษัท", "อีเมล",
-        "โทรศัพท์", "LINE", "จังหวัด", "สมัครเมื่อ", "เข้าล่าสุด", "คำสั่งซื้อ", "ชำระแล้ว",
-        "ยอดซื้อ (บาท)", "ค้างชำระ", "รอตรวจ", "เอกสารที่มีสิทธิ์", "คำถามรอตอบ", "รับข่าวสาร"];
-      var lines = [head.map(q).join(",")].concat(list.map(function (m) {
-        return [m.id, m.name, m.occ || "", m.pos || "", m.org || "", m.company, m.email, m.phone, m.line,
-          m.province, m.created, m.last, m.orders, m.paid, m.spent, m.open, m.check, m.docs, m.asksOpen,
-          m.news ? "ใช่" : ""].map(q).join(",");
-      }));
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
-      a.download = "BUILD_ลูกค้า_" + custSeg + "_" + new Date().toISOString().slice(0, 10) + ".csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-    // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
-    var csSeg = "ใหม่";
+  function custTab() {
+    if (!SHOP) return needShop("ลูกค้า");
+    var all = SHOP.members || [], hasStats = all.length && "orders" in all[0];
+    if (!hasStats) return '<div class="card"><h2>ลูกค้า</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version)
+      + ' ยังไม่ส่งข้อมูลยอดซื้อรายคน · วาง Code.gs รุ่น ' + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    var seg = SEG.filter(function (s) {
+      return s[0] === custSeg;
+    })[0] || SEG[0], t = custQ.toLowerCase();
+    var list = all.filter(seg[1]).filter(function (m) {
+      return !t || [m.name, m.email, m.company, m.org, m.occ, m.pos, m.province, m.phone, m.line,
+        m.id].join(" ").toLowerCase().indexOf(t) >= 0;
+    });
+    list.sort(custSort === "spent" ? function (a, b) {
+      return b.spent - a.spent;
+    } : custSort === "last" ? function (a, b) {
+      return String(b.last) < String(a.last) ? -1 : 1;
+    } : custSort === "order" ? function (a, b) {
+      return String(b.lastOrder) < String(a.lastOrder) ? -1 : 1;
+    } : function (a, b) {
+      return String(b.created) < String(a.created) ? -1 : 1;
+    });
+    var buyers = all.filter(function (m) {
+      return m.paid > 0;
+    }), spent = buyers.reduce(function (s, m) {
+      return s + m.spent;
+    }, 0);
+    var kp = [["ลูกค้าทั้งหมด", all.length], ["ซื้อแล้ว", buyers.length, all.length ? Math.round(buyers.length * 100 / all.length)
+      + "% ของสมาชิก" : ""], ["ลูกค้าประจำ", all.filter(function (m) {
+        return m.paid >= 2;
+      }).length, "ซื้อ 2 ครั้งขึ้นไป"], ["ยอดซื้อเฉลี่ยต่อคน", money(buyers.length ? Math.round(spent / buyers.length) : 0)],
+      ["ค้างชำระ", all.filter(function (m) {
+        return m.open > 0;
+      }).length, "ส่งข้อความตามได้", false], ["รอตรวจสลิป", all.filter(function (m) {
+        return m.check > 0;
+      }).length, "", all.some(function (m) {
+        return m.check > 0;
+      })], ["สมัครแล้วยังไม่ซื้อ", all.filter(function (m) {
+        return !m.orders;
+      }).length], ["มีคำถามรอตอบ", all.filter(function (m) {
+        return m.asksOpen > 0;
+      }).length, "", all.some(function (m) {
+        return m.asksOpen > 0;
+      })]];
+    var st = function (m) {
+      var s = [];
+      if (m.check) s.push('<span class="tag no">รอตรวจ ' + m.check + "</span>");
+      if (m.open) s.push('<span class="tag">ค้างชำระ ' + m.open + "</span>");
+      if (m.paid >= 2) s.push('<span class="tag ok">ประจำ</span>');
+      else if (m.paid) s.push('<span class="tag ok">ซื้อแล้ว</span>');
+      if (!m.orders) s.push('<span class="tag">ยังไม่ซื้อ</span>');
+      if (m.asksOpen) s.push('<span class="tag no">คำถาม ' + m.asksOpen + "</span>");
+      return s.join(" ");
+    };
+    var rows = list.slice(0, 300).map(function (m) {
+      return "<tr><td><b>" + esc(m.name || "-") + "</b>" + (m.company ? "<br><small>" + esc(m.company)
+        + "</small>" : "") + (m.occ || m.pos || m.org ? "<br><small>" + esc([m.occ, m.pos, m.org].filter(Boolean).join(" · "))
+          + "</small>" : "") + (m.province ? "<br><small>" + esc(m.province) + "</small>" : "") + "</td><td><small>"
+        + esc(m.email || "-") + (m.phone ? "<br>" + esc(m.phone) : "") + (m.line ? "<br>LINE " + esc(m.line) : "")
+        + (m.linked.length ? "<br>เชื่อม " + esc(m.linked.join(" ")) : "") + "</small></td><td><small>สมัคร "
+        + esc(wh(m.created)) + "<br>เข้าล่าสุด " + esc(wh(m.last) || "-") + "</small></td><td>" + m.orders
+        + (m.paid ? " (ชำระ " + m.paid + ")" : "") + (m.lastOrder ? "<br><small>ล่าสุด " + esc(wh(m.lastOrder))
+          + "</small>" : "") + "</td><td>" + money(m.spent) + "</td><td>" + m.docs + "</td><td>" + st(m)
+        + '</td><td><div class="tools" style="margin:0">' + (m.email ? '<button class="sm" type="button" data-sh="cord" data-v="'
+          + esc(m.email) + '">คำสั่งซื้อ</button><button class="sm" type="button" data-sh="cmail" data-v="'
+          + esc(m.email) + '">คัดลอกอีเมล</button>' : "") + "</div></td></tr>";
+    }).join("");
+    return '<div class="card"><h2>ลูกค้า <span class="tag">' + all.length + ' คน</span></h2><p class="hint">ข้อมูลส่วนบุคคล ใช้เพื่อดูแลคำสั่งซื้อเท่านั้น · ส่งข่าวสารได้เฉพาะคนที่ติ๊กรับข่าวสาร</p><div class="kpis">'
+      + kp.map(function (x) {
+        return '<div class="kpi' + (x[3] ? " todo" : "") + '"><span>' + esc(x[0]) + "</span><b>" + esc(x[1])
+          + "</b>" + (x[2] ? "<small>" + esc(x[2]) + "</small>" : "") + "</div>";
+      }).join("") + "</div></div>" +
+      '<div class="card"><div class="chips">' + SEG.map(function (s) {
+        var n = all.filter(s[1]).length;
+        return '<button class="sm" type="button" data-sh="cseg" data-v="' + esc(s[0]) + '" aria-pressed="'
+          + (s[0] === custSeg) + '">' + esc(s[0]) + " " + n + "</button>";
+      }).join("") + '</div><div class="grid"><label>ค้นหา ชื่อ อีเมล บริษัท จังหวัด โทรศัพท์<input type="text" id="cq" value="'
+      + esc(custQ) + '"></label><label>เรียงตาม<select id="csort"><option value="new"' + (custSort === "new"
+        ? " selected" : "") + '>สมัครล่าสุด</option><option value="spent"' + (custSort === "spent"
+          ? " selected" : "") + '>ยอดซื้อมากที่สุด</option><option value="order"' + (custSort === "order"
+            ? " selected" : "") + '>สั่งซื้อล่าสุด</option><option value="last"' + (custSort === "last"
+              ? " selected" : "") + ">เข้าระบบล่าสุด</option></select></label></div>" +
+      '<div class="tools"><button type="button" data-sh="ccsv">ส่งออกรายชื่อในตัวกรองนี้ (CSV)</button></div><div class="tbl"><table><thead><tr><th>ลูกค้า</th><th>ติดต่อ</th><th>บัญชี</th><th>คำสั่งซื้อ</th><th>ยอดซื้อ</th><th>เอกสาร</th><th>สถานะ</th><th></th></tr></thead><tbody>'
+      + (rows || '<tr><td colspan="8">ไม่มีลูกค้าในตัวกรองนี้</td></tr>') + "</tbody></table></div>"
+      + (list.length > 300 ? '<p class="hint">แสดง 300 คนแรก · ใช้ค้นหาหรือส่งออก CSV เพื่อดูทั้งหมด</p>' : "")
+      + "</div>";
+  }
+  function custCsv() {
+    var seg = SEG.filter(function (s) {
+      return s[0] === custSeg;
+    })[0] || SEG[0], t = custQ.toLowerCase(), q = function (v) {
+      v = String(v == null ? "" : v);
+      if (/^[=+\-@]/.test(v)) v = "'" + v;
+      return '"' + v.replace(/"/g, '""') + '"';
+    };
+    var list = (SHOP.members || []).filter(seg[1]).filter(function (m) {
+      return !t || [m.name, m.email, m.company, m.org, m.occ, m.pos, m.province, m.phone, m.line].join(" ").toLowerCase().indexOf(t) >= 0;
+    });
+    var head = ["รหัสสมาชิก", "ชื่อ", "อาชีพ", "ตำแหน่ง", "หน่วยงาน", "บริษัท", "อีเมล",
+      "โทรศัพท์", "LINE", "จังหวัด", "สมัครเมื่อ", "เข้าล่าสุด", "คำสั่งซื้อ", "ชำระแล้ว",
+      "ยอดซื้อ (บาท)", "ค้างชำระ", "รอตรวจ", "เอกสารที่มีสิทธิ์", "คำถามรอตอบ", "รับข่าวสาร"];
+    var lines = [head.map(q).join(",")].concat(list.map(function (m) {
+      return [m.id, m.name, m.occ || "", m.pos || "", m.org || "", m.company, m.email, m.phone, m.line,
+        m.province, m.created, m.last, m.orders, m.paid, m.spent, m.open, m.check, m.docs, m.asksOpen,
+        m.news ? "ใช่" : ""].map(q).join(",");
+    }));
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
+    a.download = "BUILD_ลูกค้า_" + custSeg + "_" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
+  var csSeg = "ใหม่";
   function consignTab() {
     var top = "";
     if (!SHOP) top = needShop("ใบสมัครฝากขาย");
@@ -1105,11 +1105,11 @@
             + esc(c.id) + '">บันทึกสถานะ</button></div></div>';
         }).join("") : '<p class="hint" style="margin:0">ไม่มีใบสมัครในตัวกรองนี้</p>') + "</div>";
     }
-      return top + listCard("market", "สินค้าฝากขายบนเว็บ (หน้า market.html)",
-        "เพิ่ม 1 รายการต่อ 1 สินค้า · ส่งมอบแบบ file = ลูกค้าดาวน์โหลดจากหน้าสมาชิก (อัปโหลดไฟล์ชื่อตามช่อง ชื่อไฟล์ เข้าโฟลเดอร์ไดรฟ์ BUILD TH ไฟล์ฉบับมืออาชีพ) · ship = ส่งพัสดุ ใส่เลขพัสดุในแท็บ ร้าน · manual = ร้านส่งลิงก์หรือคีย์ทางอีเมล · ติ๊ก ตรวจสินค้าแล้ว + เปิดขาย แล้วบันทึกและอัปโหลด data.js");
+    return top + listCard("market", "สินค้าฝากขายบนเว็บ (หน้า market.html)",
+      "เพิ่ม 1 รายการต่อ 1 สินค้า · ส่งมอบแบบ file = ลูกค้าดาวน์โหลดจากหน้าสมาชิก (อัปโหลดไฟล์ชื่อตามช่อง ชื่อไฟล์ เข้าโฟลเดอร์ไดรฟ์ BUILD TH ไฟล์ฉบับมืออาชีพ) · ship = ส่งพัสดุ ใส่เลขพัสดุในแท็บ ร้าน · manual = ร้านส่งลิงก์หรือคีย์ทางอีเมล · ติ๊ก ตรวจสินค้าแล้ว + เปิดขาย แล้วบันทึกและอัปโหลด data.js");
   }
-    // คำขอสั่งทำ (27 ต.ค. 2026): ลูกค้าส่งจาก request.html → ร้านประเมิน เสนอราคา ตอบอีเมล และติดตามสถานะในแท็บนี้
-    var rqSeg = "ใหม่";
+  // คำขอสั่งทำ (27 ต.ค. 2026): ลูกค้าส่งจาก request.html → ร้านประเมิน เสนอราคา ตอบอีเมล และติดตามสถานะในแท็บนี้
+  var rqSeg = "ใหม่";
   // ช่องทางชำระเงิน (30 ต.ค. 2026): ดูในหน้าเดียวว่าช่องทางไหนเปิดอยู่จริง · ค่าธรรมเนียมจาก omise.co/en/pricing/thailand (อ่าน 30 ต.ค. 2026 ยังไม่รวม VAT 7%)
   var PAY_ROWS = [["promptpay", "พร้อมเพย์", "1.65%"], ["card", "บัตรเครดิต เดบิต", "3.65%"], ["googlepay",
     "Google Pay", "3.65%"], ["mobile_banking_kbank", "K PLUS", "10 บาท/รายการ"], ["mobile_banking_scb",
@@ -1136,60 +1136,60 @@
       }
     }).catch(function () {});
   }
-    function payTab() {
-      capLoad();
-      var su = (SHOP && SHOP.setup) || {}, f = su.pay || {}, hl = su.health || {}, want = Array.isArray(S.pay
-        && S.pay.methods) ? S.pay.methods : [], key = String((S.pay && S.pay.opnKey) || ""), names = capData
-        ? capData.payment_methods.map(function (m) {
-          return m.name;
-        }) : null;
-      var has = function (k) {
-        if (!names) return null;
-        if (k === "card") return names.indexOf("card") >= 0;
-        if (k === "googlepay") return (capData.tokenization_methods || []).indexOf("googlepay") >= 0;
-        if (k === "truemoney_jumpapp") return names.indexOf("truemoney_jumpapp") >= 0 || names.indexOf("truemoney") >= 0;
-        if (k === "installment") return names.some(function (n) {
-          return /^installment_/.test(n);
-        });
-        return names.indexOf(k) >= 0;
-      };
-      var live = /^pkey_(?!test_)/.test(key), mode = !key ? '<span class="tag no">ยังไม่ใส่คีย์</span>' : live
-        ? '<span class="tag ok">คีย์จริง รับเงินจริง</span>' : '<span class="tag">โหมดทดสอบ ยังไม่รับเงินจริง</span>';
-      var rows = PAY_ROWS.map(function (r) {
-        var h = has(r[0]), w = want.indexOf(r[0]) >= 0;
-        return "<tr><td>" + esc(r[1]) + "</td><td>" + (h === null ? "กำลังอ่าน…" : h ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">รอ Opn เปิด</span>')
-          + "</td><td>" + (w ? "แสดง" : "ไม่แสดง") + "</td><td>" + esc(r[2]) + "</td></tr>";
-      }).join("");
-      return '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
-        +
-        '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
-        + rows + "</tbody></table></div></div>" +
-        '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
-        "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
-        + "</td><td>ไม่มีค่าธรรมเนียม · " + (su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
-          + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
-        + " · " + (S.pay && S.pay.qrBase ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
-        + "</td></tr>" +
-        "<tr><td>จ่ายหลายสกุลเงิน</td><td>" + (capData ? esc(((capData.payment_methods.filter(function (m) {
-          return m.name === "card";
-        })[0] || {}).currencies || []).join(" ")) : "กำลังอ่าน…") + "</td><td>บัตรผ่าน Opn จ่ายได้ตามสกุลนี้ · PayPal จ่ายได้ทุกสกุลในรายการ ยกเว้น CNY · ช่องทางอื่นเป็นบาท · ร้านได้รับเป็นบาท · ใช้อัตราของ Opn บวกส่วนเผื่อ FX_MARGIN 1% และ PP_MARGIN 4% (ปรับได้ใน Script properties)</td></tr>"
-        +
-        "<tr><td>PayPal</td><td>" + (f.paypal ? (hl.paypal === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.ppSandbox
-          ? '<span class="tag">sandbox ทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
-        + "</td><td>ลูกค้าในไทย 3.90% + 11 บาท · ต่างประเทศ 4.40% + 11 บาท · แปลงสกุลเงิน 4% · ไม่รวมภาษี (paypal.com/th อ่าน 31 ต.ค. 2026) · ใบละ 99 บาท PayPal หักราว 15 บาท</td></tr>"
-        +
-        "<tr><td>Stripe</td><td>" + (f.stripe ? (hl.stripe === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.stTest
-          ? '<span class="tag">คีย์ทดสอบ</span>' : hl.stripeCharges === false ? '<span class="tag no">บัญชียังรับเงินไม่ได้</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
-        + "</td><td>บัตรในไทย 3.65% + 10 บาท · บัตรต่างประเทศ 4.75% + 10 บาท + 2% ถ้าแปลงเงิน · พร้อมเพย์ 1.65% (stripe.com อ่าน 30 ต.ค. 2026) · ตั้ง STRIPE_SECRET ใน Script properties</td></tr>"
-        +
-        "<tr><td>จ่ายที่เคาน์เตอร์ Lotus's</td><td><span class=\"tag no\">Opn ปิดแล้ว</span></td><td>Opn แจ้งว่าช่องทางนี้ไม่มีให้ใช้แล้ว (ทดสอบ 30 ต.ค. 2026)</td></tr>"
-        +
-        "<tr><td>Apple Pay</td><td><span class=\"tag no\">ยังไม่รองรับ</span></td><td>ฟอร์มของ Opn รองรับเฉพาะบัญชีสิงคโปร์ (อ่าน 30 ต.ค. 2026) · ลูกค้า iPhone จ่ายด้วยบัตรหรือแอปธนาคารได้</td></tr>"
-        +
-        "</tbody></table></div></div>";
-    }
-    // คำถามจากกล่องผู้ช่วย (30 ต.ค. 2026 · Phase 1 ข้อ 35): ดูว่าคนถามอะไร ตอบคนที่ขอ และนำคำถามซ้ำไปเพิ่มเป็นคำตอบ
-    var botSeg = "รอจัดการ";
+  function payTab() {
+    capLoad();
+    var su = (SHOP && SHOP.setup) || {}, f = su.pay || {}, hl = su.health || {}, want = Array.isArray(S.pay
+      && S.pay.methods) ? S.pay.methods : [], key = String((S.pay && S.pay.opnKey) || ""), names = capData
+      ? capData.payment_methods.map(function (m) {
+        return m.name;
+      }) : null;
+    var has = function (k) {
+      if (!names) return null;
+      if (k === "card") return names.indexOf("card") >= 0;
+      if (k === "googlepay") return (capData.tokenization_methods || []).indexOf("googlepay") >= 0;
+      if (k === "truemoney_jumpapp") return names.indexOf("truemoney_jumpapp") >= 0 || names.indexOf("truemoney") >= 0;
+      if (k === "installment") return names.some(function (n) {
+        return /^installment_/.test(n);
+      });
+      return names.indexOf(k) >= 0;
+    };
+    var live = /^pkey_(?!test_)/.test(key), mode = !key ? '<span class="tag no">ยังไม่ใส่คีย์</span>' : live
+      ? '<span class="tag ok">คีย์จริง รับเงินจริง</span>' : '<span class="tag">โหมดทดสอบ ยังไม่รับเงินจริง</span>';
+    var rows = PAY_ROWS.map(function (r) {
+      var h = has(r[0]), w = want.indexOf(r[0]) >= 0;
+      return "<tr><td>" + esc(r[1]) + "</td><td>" + (h === null ? "กำลังอ่าน…" : h ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">รอ Opn เปิด</span>')
+        + "</td><td>" + (w ? "แสดง" : "ไม่แสดง") + "</td><td>" + esc(r[2]) + "</td></tr>";
+    }).join("");
+    return '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
+      +
+      '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
+      + rows + "</tbody></table></div></div>" +
+      '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
+      "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
+      + "</td><td>ไม่มีค่าธรรมเนียม · " + (su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
+        + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
+      + " · " + (S.pay && S.pay.qrBase ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
+      + "</td></tr>" +
+      "<tr><td>จ่ายหลายสกุลเงิน</td><td>" + (capData ? esc(((capData.payment_methods.filter(function (m) {
+        return m.name === "card";
+      })[0] || {}).currencies || []).join(" ")) : "กำลังอ่าน…") + "</td><td>บัตรผ่าน Opn จ่ายได้ตามสกุลนี้ · PayPal จ่ายได้ทุกสกุลในรายการ ยกเว้น CNY · ช่องทางอื่นเป็นบาท · ร้านได้รับเป็นบาท · ใช้อัตราของ Opn บวกส่วนเผื่อ FX_MARGIN 1% และ PP_MARGIN 4% (ปรับได้ใน Script properties)</td></tr>"
+      +
+      "<tr><td>PayPal</td><td>" + (f.paypal ? (hl.paypal === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.ppSandbox
+        ? '<span class="tag">sandbox ทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
+      + "</td><td>ลูกค้าในไทย 3.90% + 11 บาท · ต่างประเทศ 4.40% + 11 บาท · แปลงสกุลเงิน 4% · ไม่รวมภาษี (paypal.com/th อ่าน 31 ต.ค. 2026) · ใบละ 99 บาท PayPal หักราว 15 บาท</td></tr>"
+      +
+      "<tr><td>Stripe</td><td>" + (f.stripe ? (hl.stripe === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.stTest
+        ? '<span class="tag">คีย์ทดสอบ</span>' : hl.stripeCharges === false ? '<span class="tag no">บัญชียังรับเงินไม่ได้</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
+      + "</td><td>บัตรในไทย 3.65% + 10 บาท · บัตรต่างประเทศ 4.75% + 10 บาท + 2% ถ้าแปลงเงิน · พร้อมเพย์ 1.65% (stripe.com อ่าน 30 ต.ค. 2026) · ตั้ง STRIPE_SECRET ใน Script properties</td></tr>"
+      +
+      "<tr><td>จ่ายที่เคาน์เตอร์ Lotus's</td><td><span class=\"tag no\">Opn ปิดแล้ว</span></td><td>Opn แจ้งว่าช่องทางนี้ไม่มีให้ใช้แล้ว (ทดสอบ 30 ต.ค. 2026)</td></tr>"
+      +
+      "<tr><td>Apple Pay</td><td><span class=\"tag no\">ยังไม่รองรับ</span></td><td>ฟอร์มของ Opn รองรับเฉพาะบัญชีสิงคโปร์ (อ่าน 30 ต.ค. 2026) · ลูกค้า iPhone จ่ายด้วยบัตรหรือแอปธนาคารได้</td></tr>"
+      +
+      "</tbody></table></div></div>";
+  }
+  // คำถามจากกล่องผู้ช่วย (30 ต.ค. 2026 · Phase 1 ข้อ 35): ดูว่าคนถามอะไร ตอบคนที่ขอ และนำคำถามซ้ำไปเพิ่มเป็นคำตอบ
+  var botSeg = "รอจัดการ";
   // ของที่รอเปิดตัว: ข้อมูลมาจากหลังบ้านหลังเข้าสู่ระบบเท่านั้น ไม่อยู่ในไฟล์เว็บ
   function soonTab() {
     if (!SHOP) return needShop("ของที่รอเปิดตัว");
@@ -1209,311 +1209,311 @@
           }).join("") + "</tbody></table></div></div>";
       }).join("");
   }
-    function botTab() {
-      if (!SHOP) return needShop("คำถามจากผู้ช่วย");
-      if (!SHOP.bot) return '<div class="card"><h2>คำถามจากผู้ช่วย</h2><p class="hint">หลังบ้านรุ่น '
-        + esc(SHOP.setup.version) + " ยังไม่เก็บคำถาม · วาง Code.gs รุ่นล่าสุดก่อน</p></div>";
-      var all = SHOP.bot, open = function (c) {
-        return c.status === "ใหม่";
-      };
-      var list = botSeg === "รอจัดการ" ? all.filter(open) : botSeg === "ไม่พบคำตอบ" ? all.filter(function (c) {
-        return c.res === "ไม่พบคำตอบ" || c.res === "ไม่ตรงคำถาม";
-      }) : all;
-      var count = {};
-      all.forEach(function (c) {
-        var k = String(c.q || "").trim().toLowerCase();
-        if (k) count[k] = (count[k] || 0) + 1;
-      });
-      var top = Object.keys(count).sort(function (a, b) {
-        return count[b] - count[a];
-      }).slice(0, 10);
-      var okN = all.filter(function (c) {
-        return c.res === "ตรงคำถาม";
-      }).length, noN = all.filter(function (c) {
-        return c.res === "ไม่ตรงคำถาม" || c.res === "ไม่พบคำตอบ";
-      }).length;
-      return '<div class="card"><h2>คำถามจากผู้ช่วย <span class="tag ' + (all.filter(open).length ? "no" : "ok")
-        + '">รอจัดการ ' + all.filter(open).length + '</span></h2><p class="hint">ขั้นตอน: อ่านคำถาม → ตอบคนที่ฝากช่องทางไว้ → ถ้าถามซ้ำ ให้เพิ่มในแท็บ ประกาศและคำตอบ → เปลี่ยนสถานะ · ระบบซ่อนอีเมลและเบอร์โทรที่คนพิมพ์ในคำถาม</p><p class="hint">ทั้งหมด '
-        + all.length + " คำถาม · ตรงคำถาม " + okN + " · ไม่ตรงหรือไม่พบ " + noN + '</p><div class="tools">'
-        +
-        ["รอจัดการ", "ไม่พบคำตอบ", "ทั้งหมด"].map(function (s) {
-          return '<button class="sm" type="button" data-sh="botseg" data-v="' + s + '" aria-pressed="'
-            + (s === botSeg) + '">' + s + "</button>";
-        }).join("") + "</div>" +
-        (list.length ? list.slice(0, 80).map(function (c) {
-          return '<div class="todo-it"><b>' + esc(c.q) + "</b> <small>" + esc(c.res) + (c.hit ? " · "
-            + esc(c.hit) : "") + " · หน้า " + esc(c.page) + " · " + esc(wh(c.at)) + "</small>" + (c.contact
-              ? "<br><b>ติดต่อกลับ: " + esc(c.contact) + "</b>" : "") +
-            '<div class="grid"><label>สถานะ<select id="bq-st-' + esc(c.id) + '">' + ["ใหม่",
-              "ตอบแล้ว", "เพิ่มในคำตอบแล้ว", "ไม่ต้องทำ"].map(function (s) {
-                return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
-              }).join("") + '</select></label><label>บันทึกของร้าน<input id="bq-nt-' + esc(c.id) + '" value="'
-            + esc(c.note) + '"></label></div><div class="tools"><button class="sm" type="button" data-sh="botsave" data-id="'
-            + esc(c.id) + '">บันทึก</button></div></div>';
-        }).join("") : '<p class="hint" style="margin:0">ไม่มีคำถามในกลุ่มนี้</p>') + "</div>" +
-        '<div class="card"><h2>คำถามที่พบบ่อย 10 อันดับ</h2>' + (top.length ? "<ol>" + top.map(function (k) {
-          return "<li>" + esc(k) + " <small>(" + count[k] + " ครั้ง)</small></li>";
-        }).join("") + "</ol>" : '<p class="hint" style="margin:0">ยังไม่มีข้อมูล</p>') + "</div>";
-    }
-    function requestTab() {
-      if (!SHOP) return needShop("คำขอสั่งทำ");
-      if (!SHOP.requests) return '<div class="card"><h2>คำขอสั่งทำ</h2><p class="hint">หลังบ้านรุ่น '
-        + esc(SHOP.setup.version) + " ยังไม่รับคำขอสั่งทำ · วาง Code.gs รุ่น " + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
-      var RS = ["ใหม่", "กำลังประเมิน", "ส่งใบเสนอราคาแล้ว", "ลูกค้าตกลง", "กำลังทำ", "ส่งมอบแล้ว",
-        "ไม่รับ", "ทั้งหมด"], all = SHOP.requests, list = all.filter(function (c) {
-          return rqSeg === "ทั้งหมด" || c.status === rqSeg;
-        });
-      var nNew = all.filter(function (c) {
-        return c.status === "ใหม่";
-      }).length;
-      return '<div class="card"><h2>คำขอสั่งทำ <span class="tag ' + (nNew ? "no" : "ok") + '">ใหม่ '
-        + nNew + '</span></h2><p class="hint">ขั้นตอน: อ่านคำขอ → ประเมินงาน (ภาษา มาตรฐานของประเทศ ต้องอ่านเล่มทางการก่อน) → ใส่ราคาที่เสนอ + ข้อความ แล้วติ๊กส่งอีเมล → ลูกค้าตกลง → ทำงาน → ส่งมอบ · ห้ามรับงานที่ต้องลงนามรับรองแทนผู้มีใบอนุญาต</p><div class="chips">'
-        +
-        RS.map(function (s) {
-          return '<button class="sm" type="button" data-sh="rqseg" data-v="' + s + '" aria-pressed="'
-            + (s === rqSeg) + '">' + s + " " + (s === "ทั้งหมด" ? all.length : all.filter(function (c) {
-              return c.status === s;
-            }).length) + "</button>";
-        }).join("") + "</div>" +
-        (list.length ? list.map(function (c) {
-          return '<div class="todo-it"><b>' + esc(c.id) + "</b> " + esc(c.kind) + (c.items ? " · " + esc(c.items) : "")
-            + " · ภาษา " + esc(c.lang1) + (c.lang2 ? " + " + esc(c.lang2) : " (1 ภาษา)") + (c.std ? " · มาตรฐาน "
-              + esc(c.std) : "") + " · จำนวน " + esc(c.qty) + (c.due ? " · ต้องการภายใน " + esc(c.due) : "")
-            +
-            "<br><small>" + esc(c.name) + (c.org ? " · " + esc(c.org) : "") + " · " + esc(c.email) + (c.contact
-              ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.updated && c.updated !== c.created
-                ? " · แก้ล่าสุด " + esc(wh(c.updated)) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap">'
-            + esc(c.desc) + "</p>" +
-            '<div class="grid"><label>สถานะ<select id="rq-st-' + esc(c.id) + '">' + RS.slice(0, 7).map(function (s) {
+  function botTab() {
+    if (!SHOP) return needShop("คำถามจากผู้ช่วย");
+    if (!SHOP.bot) return '<div class="card"><h2>คำถามจากผู้ช่วย</h2><p class="hint">หลังบ้านรุ่น '
+      + esc(SHOP.setup.version) + " ยังไม่เก็บคำถาม · วาง Code.gs รุ่นล่าสุดก่อน</p></div>";
+    var all = SHOP.bot, open = function (c) {
+      return c.status === "ใหม่";
+    };
+    var list = botSeg === "รอจัดการ" ? all.filter(open) : botSeg === "ไม่พบคำตอบ" ? all.filter(function (c) {
+      return c.res === "ไม่พบคำตอบ" || c.res === "ไม่ตรงคำถาม";
+    }) : all;
+    var count = {};
+    all.forEach(function (c) {
+      var k = String(c.q || "").trim().toLowerCase();
+      if (k) count[k] = (count[k] || 0) + 1;
+    });
+    var top = Object.keys(count).sort(function (a, b) {
+      return count[b] - count[a];
+    }).slice(0, 10);
+    var okN = all.filter(function (c) {
+      return c.res === "ตรงคำถาม";
+    }).length, noN = all.filter(function (c) {
+      return c.res === "ไม่ตรงคำถาม" || c.res === "ไม่พบคำตอบ";
+    }).length;
+    return '<div class="card"><h2>คำถามจากผู้ช่วย <span class="tag ' + (all.filter(open).length ? "no" : "ok")
+      + '">รอจัดการ ' + all.filter(open).length + '</span></h2><p class="hint">ขั้นตอน: อ่านคำถาม → ตอบคนที่ฝากช่องทางไว้ → ถ้าถามซ้ำ ให้เพิ่มในแท็บ ประกาศและคำตอบ → เปลี่ยนสถานะ · ระบบซ่อนอีเมลและเบอร์โทรที่คนพิมพ์ในคำถาม</p><p class="hint">ทั้งหมด '
+      + all.length + " คำถาม · ตรงคำถาม " + okN + " · ไม่ตรงหรือไม่พบ " + noN + '</p><div class="tools">'
+      +
+      ["รอจัดการ", "ไม่พบคำตอบ", "ทั้งหมด"].map(function (s) {
+        return '<button class="sm" type="button" data-sh="botseg" data-v="' + s + '" aria-pressed="'
+          + (s === botSeg) + '">' + s + "</button>";
+      }).join("") + "</div>" +
+      (list.length ? list.slice(0, 80).map(function (c) {
+        return '<div class="todo-it"><b>' + esc(c.q) + "</b> <small>" + esc(c.res) + (c.hit ? " · "
+          + esc(c.hit) : "") + " · หน้า " + esc(c.page) + " · " + esc(wh(c.at)) + "</small>" + (c.contact
+            ? "<br><b>ติดต่อกลับ: " + esc(c.contact) + "</b>" : "") +
+          '<div class="grid"><label>สถานะ<select id="bq-st-' + esc(c.id) + '">' + ["ใหม่",
+            "ตอบแล้ว", "เพิ่มในคำตอบแล้ว", "ไม่ต้องทำ"].map(function (s) {
               return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
-            }).join("") + '</select></label><label>ราคาที่เสนอ (บาท)<input type="text" inputmode="numeric" id="rq-q-'
-            + esc(c.id) + '" value="' + (c.quote || "") + '"></label><label class="full">ข้อความถึงลูกค้า หรือบันทึกของร้าน (ขอบเขต ระยะเวลา เงื่อนไข)<textarea id="rq-nt-'
-            + esc(c.id) + '" rows="3">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="rq-tell-'
-            + esc(c.id) + '"> ส่งอีเมลแจ้งลูกค้า</label></div><div class="tools"><button class="sm pri" type="button" data-sh="rqsave" data-id="'
-            + esc(c.id) + '">บันทึก</button><button class="sm" type="button" data-sh="cmail" data-v="'
-            + esc(c.email) + '">คัดลอกอีเมล</button></div></div>';
-        }).join("") : '<p class="hint" style="margin:0">ไม่มีคำขอในสถานะนี้</p>') + "</div>";
-    }
-    function modal(html) {
-      var d = document.createElement("div");
-      d.className = "modal";
-      d.innerHTML = '<div class="box" role="dialog" aria-modal="true">' + html + '<div class="tools"><button type="button" data-close="1">ปิด</button></div></div>';
-      d.addEventListener("click", function (ev) {
-        if (ev.target === d || ev.target.closest("[data-close]")) d.remove();
-        var b = ev.target.closest("[data-sh]");
-        if (b) {
-          d.remove();
-          shopClick(b);
-        }
+            }).join("") + '</select></label><label>บันทึกของร้าน<input id="bq-nt-' + esc(c.id) + '" value="'
+          + esc(c.note) + '"></label></div><div class="tools"><button class="sm" type="button" data-sh="botsave" data-id="'
+          + esc(c.id) + '">บันทึก</button></div></div>';
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีคำถามในกลุ่มนี้</p>') + "</div>" +
+      '<div class="card"><h2>คำถามที่พบบ่อย 10 อันดับ</h2>' + (top.length ? "<ol>" + top.map(function (k) {
+        return "<li>" + esc(k) + " <small>(" + count[k] + " ครั้ง)</small></li>";
+      }).join("") + "</ol>" : '<p class="hint" style="margin:0">ยังไม่มีข้อมูล</p>') + "</div>";
+  }
+  function requestTab() {
+    if (!SHOP) return needShop("คำขอสั่งทำ");
+    if (!SHOP.requests) return '<div class="card"><h2>คำขอสั่งทำ</h2><p class="hint">หลังบ้านรุ่น '
+      + esc(SHOP.setup.version) + " ยังไม่รับคำขอสั่งทำ · วาง Code.gs รุ่น " + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    var RS = ["ใหม่", "กำลังประเมิน", "ส่งใบเสนอราคาแล้ว", "ลูกค้าตกลง", "กำลังทำ", "ส่งมอบแล้ว",
+      "ไม่รับ", "ทั้งหมด"], all = SHOP.requests, list = all.filter(function (c) {
+        return rqSeg === "ทั้งหมด" || c.status === rqSeg;
       });
-      document.body.appendChild(d);
+    var nNew = all.filter(function (c) {
+      return c.status === "ใหม่";
+    }).length;
+    return '<div class="card"><h2>คำขอสั่งทำ <span class="tag ' + (nNew ? "no" : "ok") + '">ใหม่ '
+      + nNew + '</span></h2><p class="hint">ขั้นตอน: อ่านคำขอ → ประเมินงาน (ภาษา มาตรฐานของประเทศ ต้องอ่านเล่มทางการก่อน) → ใส่ราคาที่เสนอ + ข้อความ แล้วติ๊กส่งอีเมล → ลูกค้าตกลง → ทำงาน → ส่งมอบ · ห้ามรับงานที่ต้องลงนามรับรองแทนผู้มีใบอนุญาต</p><div class="chips">'
+      +
+      RS.map(function (s) {
+        return '<button class="sm" type="button" data-sh="rqseg" data-v="' + s + '" aria-pressed="'
+          + (s === rqSeg) + '">' + s + " " + (s === "ทั้งหมด" ? all.length : all.filter(function (c) {
+            return c.status === s;
+          }).length) + "</button>";
+      }).join("") + "</div>" +
+      (list.length ? list.map(function (c) {
+        return '<div class="todo-it"><b>' + esc(c.id) + "</b> " + esc(c.kind) + (c.items ? " · " + esc(c.items) : "")
+          + " · ภาษา " + esc(c.lang1) + (c.lang2 ? " + " + esc(c.lang2) : " (1 ภาษา)") + (c.std ? " · มาตรฐาน "
+            + esc(c.std) : "") + " · จำนวน " + esc(c.qty) + (c.due ? " · ต้องการภายใน " + esc(c.due) : "")
+          +
+          "<br><small>" + esc(c.name) + (c.org ? " · " + esc(c.org) : "") + " · " + esc(c.email) + (c.contact
+            ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.updated && c.updated !== c.created
+              ? " · แก้ล่าสุด " + esc(wh(c.updated)) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap">'
+          + esc(c.desc) + "</p>" +
+          '<div class="grid"><label>สถานะ<select id="rq-st-' + esc(c.id) + '">' + RS.slice(0, 7).map(function (s) {
+            return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
+          }).join("") + '</select></label><label>ราคาที่เสนอ (บาท)<input type="text" inputmode="numeric" id="rq-q-'
+          + esc(c.id) + '" value="' + (c.quote || "") + '"></label><label class="full">ข้อความถึงลูกค้า หรือบันทึกของร้าน (ขอบเขต ระยะเวลา เงื่อนไข)<textarea id="rq-nt-'
+          + esc(c.id) + '" rows="3">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="rq-tell-'
+          + esc(c.id) + '"> ส่งอีเมลแจ้งลูกค้า</label></div><div class="tools"><button class="sm pri" type="button" data-sh="rqsave" data-id="'
+          + esc(c.id) + '">บันทึก</button><button class="sm" type="button" data-sh="cmail" data-v="'
+          + esc(c.email) + '">คัดลอกอีเมล</button></div></div>';
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีคำขอในสถานะนี้</p>') + "</div>";
+  }
+  function modal(html) {
+    var d = document.createElement("div");
+    d.className = "modal";
+    d.innerHTML = '<div class="box" role="dialog" aria-modal="true">' + html + '<div class="tools"><button type="button" data-close="1">ปิด</button></div></div>';
+    d.addEventListener("click", function (ev) {
+      if (ev.target === d || ev.target.closest("[data-close]")) d.remove();
+      var b = ev.target.closest("[data-sh]");
+      if (b) {
+        d.remove();
+        shopClick(b);
+      }
+    });
+    document.body.appendChild(d);
+  }
+  function csv() {
+    var head = ["เลขคำสั่งซื้อ", "สร้างเมื่อ", "อีเมล", "รายการ", "ยอด (บาท)", "สถานะ", "หมายเหตุ",
+      "แนบสลิปเมื่อ", "ลูกค้าแจ้งโอน", "ยืนยันเมื่อ", "ยืนยันโดย", "เปิดไฟล์ครั้งแรก",
+      "เปิดไฟล์ (ครั้ง)", "ช่องทางชำระ", "รหัสรายการชำระ (Opn)", "ขนส่ง", "เลขพัสดุ",
+      "ลิงก์ติดตามคำสั่งซื้อ", "เลขที่ใบเสร็จ"];
+    var q = function (v) {
+      v = String(v == null ? "" : v);
+      if (/^[=+\-@]/.test(v)) v = "'" + v;
+      return '"' + v.replace(/"/g, '""') + '"';
+    };
+    var lines = [head.map(q).join(",")].concat(SHOP.orders.map(function (o) {
+      return [o.id, o.created, o.email, o.items.join(" "), o.amount, o.status, o.note, o.slipAt, o.paidAt,
+        o.okAt, o.okBy, o.dl1, o.dlN, o.method || "", o.charge || "", o.ship ? o.ship.carrier : "",
+        o.ship ? o.ship.no : "", o.trackUrl || "", o.receipt || ""].map(q).join(",");
+    }));
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
+    a.download = "BUILD_คำสั่งซื้อ_" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  function shopClick(b) {
+    var sh = b.dataset.sh, id = b.dataset.id;
+    if (sh === "load") {
+      shopLoad();
+      return;
     }
-    function csv() {
-      var head = ["เลขคำสั่งซื้อ", "สร้างเมื่อ", "อีเมล", "รายการ", "ยอด (บาท)", "สถานะ", "หมายเหตุ",
-        "แนบสลิปเมื่อ", "ลูกค้าแจ้งโอน", "ยืนยันเมื่อ", "ยืนยันโดย", "เปิดไฟล์ครั้งแรก",
-        "เปิดไฟล์ (ครั้ง)", "ช่องทางชำระ", "รหัสรายการชำระ (Opn)", "ขนส่ง", "เลขพัสดุ",
-        "ลิงก์ติดตามคำสั่งซื้อ", "เลขที่ใบเสร็จ"];
-      var q = function (v) {
-        v = String(v == null ? "" : v);
-        if (/^[=+\-@]/.test(v)) v = "'" + v;
-        return '"' + v.replace(/"/g, '""') + '"';
-      };
-      var lines = [head.map(q).join(",")].concat(SHOP.orders.map(function (o) {
-        return [o.id, o.created, o.email, o.items.join(" "), o.amount, o.status, o.note, o.slipAt, o.paidAt,
-          o.okAt, o.okBy, o.dl1, o.dlN, o.method || "", o.charge || "", o.ship ? o.ship.carrier : "",
-          o.ship ? o.ship.no : "", o.trackUrl || "", o.receipt || ""].map(q).join(",");
-      }));
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" }));
-      a.download = "BUILD_คำสั่งซื้อ_" + new Date().toISOString().slice(0, 10) + ".csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+    if (sh === "login") {
+      doLogin({ adminKey: ($("ak") || {}).value || "" });
+      return;
     }
-    function shopClick(b) {
-      var sh = b.dataset.sh, id = b.dataset.id;
-      if (sh === "load") {
-        shopLoad();
+    if (sh === "rqseg") {
+      rqSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "botseg") {
+      botSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "botsave") {
+      shopAct("adminBot", {
+        id: id,
+        status: $("bq-st-" + id).value,
+        note: $("bq-nt-" + id).value.trim()
+      }, "บันทึกคำถาม " + id);
+      return;
+    }
+    if (sh === "rqsave") {
+      var rst = $("rq-st-" + id), rnt = $("rq-nt-" + id), rtl = $("rq-tell-" + id), rqv = (($("rq-q-"
+        + id) || {}).value || "").replace(/[^\d]/g, "");
+      shopAct("adminRequest", {
+        id: id,
+        status: rst.value,
+        note: rnt.value.trim(),
+        quote: +rqv || 0,
+        tell: !!(rtl && rtl.checked)
+      }, "บันทึกคำขอ " + id + (rtl && rtl.checked ? " และส่งอีเมลแจ้งลูกค้าแล้ว" : ""));
+      return;
+    }
+    if (sh === "ghreload") {
+      siteLoad(true);
+      return;
+    }
+    if (sh === "up") {
+      upImg();
+      return;
+    }
+    if (sh === "csv") {
+      csv();
+      return;
+    }
+    if (sh === "f") {
+      shopFilter = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "cseg") {
+      custSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "ccsv") {
+      custCsv();
+      return;
+    }
+    if (sh === "cmail") {
+      copy(b.dataset.v);
+      return;
+    }
+    if (sh === "cord") {
+      shopFilter = "ทั้งหมด";
+      shopQ = b.dataset.v;
+      tab = "shop";
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (sh === "csseg") {
+      csSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "cssave") {
+      var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id);
+      shopAct("adminConsign", {
+        id: id,
+        status: cst.value,
+        note: cnt.value.trim(),
+        tell: !!(ctl && ctl.checked)
+      }, "บันทึกใบสมัคร " + id + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : ""));
+      return;
+    }
+    if (sh === "ok") {
+      if (confirm("ตรวจในแอปธนาคารแล้วว่ายอด " + money(b.dataset.amt) + " ของ " + id + " เข้าบัญชีจริง?\nกดตกลง = เปิดสิทธิ์ดาวน์โหลด และส่งอีเมลแจ้งลูกค้า")) shopAct("adminOrder",
+        { order: id, status: "ชำระแล้ว" }, "ยืนยันชำระแล้ว " + id);
+      return;
+    }
+    if (sh === "no") {
+      var why = prompt("เหตุผลที่สลิปของ " + id + " ไม่ผ่าน (ส่งถึงลูกค้า เช่น ยอดไม่ตรง ไม่พบยอดเข้า):",
+        "ยอดโอนไม่ตรงกับคำสั่งซื้อ");
+      if (why && why.trim()) shopAct("adminOrder", { order: id, status: "สลิปไม่ผ่าน", note: why.trim() },
+        "แจ้งสลิปไม่ผ่าน " + id);
+      return;
+    }
+    if (sh === "cancel") {
+      if (confirm("ยกเลิกคำสั่งซื้อ " + id + " ที่ยังไม่ชำระ?")) shopAct("adminOrder", { order: id,
+        status: "ยกเลิก", note: "ร้านยกเลิก" }, "ยกเลิกแล้ว " + id);
+      return;
+    }
+    if (sh === "back") {
+      shopAct("adminOrder", { order: id, status: "รอตรวจ" }, "ย้อนเป็นรอตรวจแล้ว " + id);
+      return;
+    }
+    // ส่งพัสดุ (สินค้าจริง เช่น สินค้าด้อม): ใส่บริษัทขนส่ง เลขพัสดุ และลิงก์ติดตามของบริษัท (ไม่บังคับ) · ระบบแสดงในหน้าติดตามและส่งอีเมลแจ้งลูกค้า
+    if (sh === "ship") {
+      var carrier = prompt("บริษัทขนส่งของ " + id + " (เช่น ไปรษณีย์ไทย, Flash Express, Kerry Express, J&T Express):",
+        "ไปรษณีย์ไทย");
+      if (!carrier || !carrier.trim()) return;
+      var no = prompt("เลขพัสดุ (ตัวอักษรอังกฤษและตัวเลข 6–40 ตัว):", "");
+      if (!no || !no.trim()) return;
+      var lk = prompt("ลิงก์ติดตามของบริษัทขนส่ง (ไม่บังคับ ต้องขึ้นต้นด้วย https://):", "") || "";
+      shopAct("adminShip", {
+        order: id,
+        carrier: carrier.trim(),
+        no: no.trim().replace(/\s+/g, ""),
+        link: lk.trim()
+      }, "บันทึกเลขพัสดุและแจ้งลูกค้าแล้ว " + id);
+      return;
+    }
+    if (sh === "trk") {
+      var u = b.dataset.url;
+      try {
+        navigator.clipboard.writeText(u).then(function () {
+          toast("คัดลอกลิงก์ติดตามแล้ว");
+        }, function () {
+          prompt("คัดลอกลิงก์นี้:", u);
+        });
+      } catch (e) {
+        prompt("คัดลอกลิงก์นี้:", u);
+      }
+      return;
+    }
+    if (sh === "ans") {
+      var t = $("ans-" + id);
+      if (!t || t.value.trim().length < 2) {
+        toast("พิมพ์คำตอบก่อน");
         return;
       }
-        if (sh === "login") {
-          doLogin({ adminKey: ($("ak") || {}).value || "" });
-          return;
-        }
-        if (sh === "rqseg") {
-          rqSeg = b.dataset.v;
-          render();
-          return;
-        }
-        if (sh === "botseg") {
-          botSeg = b.dataset.v;
-          render();
-          return;
-        }
-        if (sh === "botsave") {
-          shopAct("adminBot", {
-            id: id,
-            status: $("bq-st-" + id).value,
-            note: $("bq-nt-" + id).value.trim()
-          }, "บันทึกคำถาม " + id);
-          return;
-        }
-        if (sh === "rqsave") {
-          var rst = $("rq-st-" + id), rnt = $("rq-nt-" + id), rtl = $("rq-tell-" + id), rqv = (($("rq-q-"
-            + id) || {}).value || "").replace(/[^\d]/g, "");
-          shopAct("adminRequest", {
-            id: id,
-            status: rst.value,
-            note: rnt.value.trim(),
-            quote: +rqv || 0,
-            tell: !!(rtl && rtl.checked)
-          }, "บันทึกคำขอ " + id + (rtl && rtl.checked ? " และส่งอีเมลแจ้งลูกค้าแล้ว" : ""));
-          return;
-        }
-        if (sh === "ghreload") {
-          siteLoad(true);
-          return;
-        }
-        if (sh === "up") {
-          upImg();
-          return;
-        }
-        if (sh === "csv") {
-          csv();
-          return;
-        }
-        if (sh === "f") {
-          shopFilter = b.dataset.v;
-          render();
-          return;
-        }
-        if (sh === "cseg") {
-          custSeg = b.dataset.v;
-          render();
-          return;
-        }
-        if (sh === "ccsv") {
-          custCsv();
-          return;
-        }
-        if (sh === "cmail") {
-          copy(b.dataset.v);
-          return;
-        }
-        if (sh === "cord") {
-          shopFilter = "ทั้งหมด";
-          shopQ = b.dataset.v;
-          tab = "shop";
-          render();
-          window.scrollTo(0, 0);
-          return;
-        }
-        if (sh === "csseg") {
-          csSeg = b.dataset.v;
-          render();
-          return;
-        }
-        if (sh === "cssave") {
-          var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id);
-          shopAct("adminConsign", {
-            id: id,
-            status: cst.value,
-            note: cnt.value.trim(),
-            tell: !!(ctl && ctl.checked)
-          }, "บันทึกใบสมัคร " + id + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : ""));
-          return;
-        }
-        if (sh === "ok") {
-          if (confirm("ตรวจในแอปธนาคารแล้วว่ายอด " + money(b.dataset.amt) + " ของ " + id + " เข้าบัญชีจริง?\nกดตกลง = เปิดสิทธิ์ดาวน์โหลด และส่งอีเมลแจ้งลูกค้า")) shopAct("adminOrder",
-            { order: id, status: "ชำระแล้ว" }, "ยืนยันชำระแล้ว " + id);
-          return;
-        }
-        if (sh === "no") {
-          var why = prompt("เหตุผลที่สลิปของ " + id + " ไม่ผ่าน (ส่งถึงลูกค้า เช่น ยอดไม่ตรง ไม่พบยอดเข้า):",
-            "ยอดโอนไม่ตรงกับคำสั่งซื้อ");
-          if (why && why.trim()) shopAct("adminOrder", { order: id, status: "สลิปไม่ผ่าน", note: why.trim() },
-            "แจ้งสลิปไม่ผ่าน " + id);
-          return;
-        }
-        if (sh === "cancel") {
-          if (confirm("ยกเลิกคำสั่งซื้อ " + id + " ที่ยังไม่ชำระ?")) shopAct("adminOrder", { order: id,
-            status: "ยกเลิก", note: "ร้านยกเลิก" }, "ยกเลิกแล้ว " + id);
-          return;
-        }
-        if (sh === "back") {
-          shopAct("adminOrder", { order: id, status: "รอตรวจ" }, "ย้อนเป็นรอตรวจแล้ว " + id);
-          return;
-        }
-        // ส่งพัสดุ (สินค้าจริง เช่น สินค้าด้อม): ใส่บริษัทขนส่ง เลขพัสดุ และลิงก์ติดตามของบริษัท (ไม่บังคับ) · ระบบแสดงในหน้าติดตามและส่งอีเมลแจ้งลูกค้า
-        if (sh === "ship") {
-          var carrier = prompt("บริษัทขนส่งของ " + id + " (เช่น ไปรษณีย์ไทย, Flash Express, Kerry Express, J&T Express):",
-            "ไปรษณีย์ไทย");
-          if (!carrier || !carrier.trim()) return;
-          var no = prompt("เลขพัสดุ (ตัวอักษรอังกฤษและตัวเลข 6–40 ตัว):", "");
-          if (!no || !no.trim()) return;
-          var lk = prompt("ลิงก์ติดตามของบริษัทขนส่ง (ไม่บังคับ ต้องขึ้นต้นด้วย https://):", "") || "";
-          shopAct("adminShip", {
-            order: id,
-            carrier: carrier.trim(),
-            no: no.trim().replace(/\s+/g, ""),
-            link: lk.trim()
-          }, "บันทึกเลขพัสดุและแจ้งลูกค้าแล้ว " + id);
-          return;
-        }
-        if (sh === "trk") {
-          var u = b.dataset.url;
-          try {
-            navigator.clipboard.writeText(u).then(function () {
-              toast("คัดลอกลิงก์ติดตามแล้ว");
-            }, function () {
-              prompt("คัดลอกลิงก์นี้:", u);
-            });
-          } catch (e) {
-            prompt("คัดลอกลิงก์นี้:", u);
-          }
-            return;
-        }
-        if (sh === "ans") {
-          var t = $("ans-" + id);
-          if (!t || t.value.trim().length < 2) {
-            toast("พิมพ์คำตอบก่อน");
-            return;
-          }
-            shopAct("adminAnswer", { ask: id, answer: t.value.trim() }, "ส่งคำตอบแล้ว");
-          return;
-        }
-        if (sh === "slip") {
-          adm("adminSlip", { order: id }).then(function (r) {
-            var o = SHOP.orders.filter(function (x) {
-              return x.id === id;
-            })[0] || {};
-            modal("<h2 style=\"font-size:19px;color:var(--navy)\">สลิปของ " + esc(id) + "</h2><p class=\"hint\" style=\"margin:4px 0 0\">ยอดที่ต้องได้ <b>"
-              + money(r.amount) + "</b> · ลูกค้าแจ้งโอน " + esc((r.paidAt || "").replace("T", " "))
-              + " · แนบเมื่อ " + esc(wh(r.at)) + '</p><img src="data:' + esc(r.type) + ";base64," + r.b64
-              + '" alt="รูปสลิป"><p class="hint">ตรวจยอดในแอปธนาคารก่อนทุกครั้ง</p><div class="tools"><button class="pri" type="button" data-sh="ok" data-id="'
-              + esc(id) + '" data-amt="' + (o.amount || r.amount) + '">ยืนยันชำระแล้ว</button><button class="del" type="button" data-sh="no" data-id="'
-              + esc(id) + '">สลิปไม่ผ่าน</button></div>');
-          }).catch(function (e) {
-            toast(e.message || "เปิดสลิปไม่สำเร็จ");
-          });
-        }
+      shopAct("adminAnswer", { ask: id, answer: t.value.trim() }, "ส่งคำตอบแล้ว");
+      return;
     }
+    if (sh === "slip") {
+      adm("adminSlip", { order: id }).then(function (r) {
+        var o = SHOP.orders.filter(function (x) {
+          return x.id === id;
+        })[0] || {};
+        modal("<h2 style=\"font-size:19px;color:var(--navy)\">สลิปของ " + esc(id) + "</h2><p class=\"hint\" style=\"margin:4px 0 0\">ยอดที่ต้องได้ <b>"
+          + money(r.amount) + "</b> · ลูกค้าแจ้งโอน " + esc((r.paidAt || "").replace("T", " "))
+          + " · แนบเมื่อ " + esc(wh(r.at)) + '</p><img src="data:' + esc(r.type) + ";base64," + r.b64
+          + '" alt="รูปสลิป"><p class="hint">ตรวจยอดในแอปธนาคารก่อนทุกครั้ง</p><div class="tools"><button class="pri" type="button" data-sh="ok" data-id="'
+          + esc(id) + '" data-amt="' + (o.amount || r.amount) + '">ยืนยันชำระแล้ว</button><button class="del" type="button" data-sh="no" data-id="'
+          + esc(id) + '">สลิปไม่ผ่าน</button></div>');
+      }).catch(function (e) {
+        toast(e.message || "เปิดสลิปไม่สำเร็จ");
+      });
+    }
+  }
 
-    // ----- หลังบ้านออนไลน์ (27 ต.ค. 2026): เข้าระบบ · โหลดข้อมูลล่าสุดจากเว็บ · บันทึกขึ้นเว็บ · อัปโหลดรูป · งานวันนี้ · ทางลัดทุกระบบ -----
-    function loginCard() {
-      var gid = (S.member || {}).googleClientId;
-      return '<div class="card login"><h2>เข้าสู่ระบบหลังบ้าน</h2><p class="hint">ร้าน ลูกค้า ฝากขาย และเนื้อหาเว็บอยู่ในหน้านี้ · เปิดได้ทุกเครื่อง · ข้อมูลร้านมาจากหลังบ้านหลังเข้าระบบเท่านั้น</p>'
-        +
-        (gid && live() ? '<div id="g-btn" style="min-height:44px"></div><p class="hint" style="margin:6px 0 0">ใช้บัญชี Google ของอีเมลร้าน (อีเมลใน ADMIN_EMAILS หรือบัญชีเจ้าของหลังบ้าน)</p><div class="or">หรือ</div>' : "")
-        +
-        '<label>รหัสหลังบ้าน (ADMIN_KEY)<input type="password" id="ak" autocomplete="current-password" spellcheck="false"></label><div class="tools"><button type="button" class="pri" data-sh="login"'
-        + (loginBusy ? " disabled" : "") + ">" + (loginBusy ? "กำลังเข้า…" : "เข้าสู่ระบบ") + "</button></div>"
-        +
-        (loginErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0" role="alert">' + esc(loginErr)
-          + "</p>" : "") +
-        '<p class="hint" style="margin:12px 0 0">ปิดแท็บ = ออกจากระบบ · ไม่ได้ใช้ 6 ชั่วโมง ต้องเข้าใหม่ · ใส่รหัสผิด 10 ครั้ง ระบบพัก 15 นาที · อย่าเข้าหลังบ้านจากเครื่องสาธารณะ</p></div>';
-    }
-    var gReady = false;
+  // ----- หลังบ้านออนไลน์ (27 ต.ค. 2026): เข้าระบบ · โหลดข้อมูลล่าสุดจากเว็บ · บันทึกขึ้นเว็บ · อัปโหลดรูป · งานวันนี้ · ทางลัดทุกระบบ -----
+  function loginCard() {
+    var gid = (S.member || {}).googleClientId;
+    return '<div class="card login"><h2>เข้าสู่ระบบหลังบ้าน</h2><p class="hint">ร้าน ลูกค้า ฝากขาย และเนื้อหาเว็บอยู่ในหน้านี้ · เปิดได้ทุกเครื่อง · ข้อมูลร้านมาจากหลังบ้านหลังเข้าระบบเท่านั้น</p>'
+      +
+      (gid && live() ? '<div id="g-btn" style="min-height:44px"></div><p class="hint" style="margin:6px 0 0">ใช้บัญชี Google ของอีเมลร้าน (อีเมลใน ADMIN_EMAILS หรือบัญชีเจ้าของหลังบ้าน)</p><div class="or">หรือ</div>' : "")
+      +
+      '<label>รหัสหลังบ้าน (ADMIN_KEY)<input type="password" id="ak" autocomplete="current-password" spellcheck="false"></label><div class="tools"><button type="button" class="pri" data-sh="login"'
+      + (loginBusy ? " disabled" : "") + ">" + (loginBusy ? "กำลังเข้า…" : "เข้าสู่ระบบ") + "</button></div>"
+      +
+      (loginErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0" role="alert">' + esc(loginErr)
+        + "</p>" : "") +
+      '<p class="hint" style="margin:12px 0 0">ปิดแท็บ = ออกจากระบบ · ไม่ได้ใช้ 6 ชั่วโมง ต้องเข้าใหม่ · ใส่รหัสผิด 10 ครั้ง ระบบพัก 15 นาที · อย่าเข้าหลังบ้านจากเครื่องสาธารณะ</p></div>';
+  }
+  var gReady = false;
   function gDraw() {
     var el = $("g-btn"), gid = (S.member || {}).googleClientId;
     if (!el || !gid) return;
@@ -1536,241 +1536,241 @@
         };
         document.head.appendChild(sc);
       }
-        return;
+      return;
     }
-      google.accounts.id.renderButton(el, {
-        theme: "outline",
-        size: "large",
-        width: Math.min(360, el.clientWidth || 320),
-        text: "signin_with",
-        locale: "th",
-        shape: "rectangular"
+    google.accounts.id.renderButton(el, {
+      theme: "outline",
+      size: "large",
+      width: Math.min(360, el.clientWidth || 320),
+      text: "signin_with",
+      locale: "th",
+      shape: "rectangular"
+    });
+  }
+  function doLogin(cred) {
+    if (loginBusy || !BB()) return;
+    var key = String(cred.adminKey || "").trim();
+    if (!cred.credential && !key) {
+      loginErr = "ใส่รหัสหลังบ้าน หรือเข้าด้วย Google";
+      render();
+      return;
+    }
+    loginBusy = true;
+    loginErr = "";
+    render();
+    BB().callAdmin("adminLogin", cred.credential ? { credential: cred.credential } : {}, key)
+      .then(function (r) {
+        loginBusy = false;
+        tokSet(r.adminToken, r.who);
+        GH.on = r.github ? null : false;
+        tab = "ov";
+        render();
+        siteLoad(false);
+      })
+      .catch(function (e) {
+        loginBusy = false;
+        loginErr = e.message || "เข้าสู่ระบบไม่สำเร็จ";
+        render();
       });
   }
-    function doLogin(cred) {
-      if (loginBusy || !BB()) return;
-      var key = String(cred.adminKey || "").trim();
-      if (!cred.credential && !key) {
-        loginErr = "ใส่รหัสหลังบ้าน หรือเข้าด้วย Google";
+  // ข้อมูลเว็บล่าสุดจาก GitHub (data.js บนเว็บอาจค้างในแคชของเบราว์เซอร์ราว 10 นาที จึงไม่แก้บนข้อมูลเก่า)
+  function siteLoad(force) {
+    if (!BB() || (!tokGet() && !BB().demo)) return;
+    adm("adminSiteGet", {}).then(function (r) {
+      if (r.off) {
+        GH.on = false;
         render();
+        if (force) toast("ยังไม่ได้ใส่ GITHUB_TOKEN จึงโหลดจากเว็บไม่ได้");
         return;
       }
-        loginBusy = true;
-      loginErr = "";
-      render();
-      BB().callAdmin("adminLogin", cred.credential ? { credential: cred.credential } : {}, key)
-        .then(function (r) {
-          loginBusy = false;
-          tokSet(r.adminToken, r.who);
-          GH.on = r.github ? null : false;
-          tab = "ov";
-          render();
-          siteLoad(false);
-        })
-        .catch(function (e) {
-          loginBusy = false;
-          loginErr = e.message || "เข้าสู่ระบบไม่สำเร็จ";
-          render();
-        });
-    }
-    // ข้อมูลเว็บล่าสุดจาก GitHub (data.js บนเว็บอาจค้างในแคชของเบราว์เซอร์ราว 10 นาที จึงไม่แก้บนข้อมูลเก่า)
-    function siteLoad(force) {
-      if (!BB() || (!tokGet() && !BB().demo)) return;
-      adm("adminSiteGet", {}).then(function (r) {
-        if (r.off) {
-          GH.on = false;
-          render();
-          if (force) toast("ยังไม่ได้ใส่ GITHUB_TOKEN จึงโหลดจากเว็บไม่ได้");
-          return;
-        }
-          var o = JSON.parse(String(r.text || "").replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/,
-            "").replace(/;\s*$/, "")), fresh = JSON.stringify(o);
-        GH.sha = r.sha;
-        GH.on = true;
-        GH.err = "";
-        if (fresh !== ORIG) {
-          var useFresh = !dirty || confirm("ข้อมูลเว็บบน GitHub ใหม่กว่าข้อมูลที่หน้านี้โหลด\n\nตกลง = ใช้ข้อมูลล่าสุดบนเว็บ (ร่างที่แก้ในเครื่องนี้เก็บสำรองไว้)\nยกเลิก = ใช้ร่างในเครื่องนี้ต่อ และเมื่อบันทึกจะทับข้อมูลบนเว็บ");
-          if (useFresh) {
-            if (dirty) {
-              try {
-                localStorage.setItem(KEY + "_old", localStorage.getItem(KEY) || "");
-              } catch (e) {}
-            }
-              window.SITE = o;
-            ORIG = fresh;
-            BASE = hashOf(ORIG);
-            S = JSON.parse(fresh);
-            shape();
-            dirty = false;
+      var o = JSON.parse(String(r.text || "").replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/,
+        "").replace(/;\s*$/, "")), fresh = JSON.stringify(o);
+      GH.sha = r.sha;
+      GH.on = true;
+      GH.err = "";
+      if (fresh !== ORIG) {
+        var useFresh = !dirty || confirm("ข้อมูลเว็บบน GitHub ใหม่กว่าข้อมูลที่หน้านี้โหลด\n\nตกลง = ใช้ข้อมูลล่าสุดบนเว็บ (ร่างที่แก้ในเครื่องนี้เก็บสำรองไว้)\nยกเลิก = ใช้ร่างในเครื่องนี้ต่อ และเมื่อบันทึกจะทับข้อมูลบนเว็บ");
+        if (useFresh) {
+          if (dirty) {
+            try {
+              localStorage.setItem(KEY + "_old", localStorage.getItem(KEY) || "");
+            } catch (e) {}
           }
-            else {
-              window.SITE = o;
-              ORIG = fresh;
-              BASE = hashOf(ORIG);
-            }
+          window.SITE = o;
+          ORIG = fresh;
+          BASE = hashOf(ORIG);
+          S = JSON.parse(fresh);
+          shape();
+          dirty = false;
         }
-          render();
-        if (force) toast("โหลดข้อมูลล่าสุดจากเว็บแล้ว");
-      }).catch(function (e) {
-        GH.on = false;
-        GH.err = e.message || "";
-        render();
-        bar("โหลดข้อมูลเว็บจาก GitHub ไม่ได้: " + (e.message || "") + " · ใช้ปุ่มดาวน์โหลด data.js ได้",
-          true);
-      });
-    }
-    function bar(msg, err) {
-      var b = $("pubbar");
-      if (!b) {
-        b = document.createElement("div");
-        b.id = "pubbar";
-        b.setAttribute("role", "status");
-        document.querySelector(".stick").appendChild(b);
+        else {
+          window.SITE = o;
+          ORIG = fresh;
+          BASE = hashOf(ORIG);
+        }
       }
-        b.className = "pubbar" + (err ? " err" : "");
-      b.innerHTML = esc(msg) + (err && /โหลดใหม่/.test(msg) ? ' <button type="button" class="sm" data-gh="reload">โหลดใหม่</button>' : "")
-        + ' <button type="button" class="sm" data-gh="x" aria-label="ปิดข้อความ">✕</button>';
-    }
-    document.addEventListener("click", function (ev) {
-      var g = ev.target.closest("[data-gh]");
-      if (!g) return;
-      if (g.dataset.gh === "reload") siteLoad(true);
-      var b = $("pubbar");
-      if (b) b.remove();
+      render();
+      if (force) toast("โหลดข้อมูลล่าสุดจากเว็บแล้ว");
+    }).catch(function (e) {
+      GH.on = false;
+      GH.err = e.message || "";
+      render();
+      bar("โหลดข้อมูลเว็บจาก GitHub ไม่ได้: " + (e.message || "") + " · ใช้ปุ่มดาวน์โหลด data.js ได้",
+        true);
     });
+  }
+  function bar(msg, err) {
+    var b = $("pubbar");
+    if (!b) {
+      b = document.createElement("div");
+      b.id = "pubbar";
+      b.setAttribute("role", "status");
+      document.querySelector(".stick").appendChild(b);
+    }
+    b.className = "pubbar" + (err ? " err" : "");
+    b.innerHTML = esc(msg) + (err && /โหลดใหม่/.test(msg) ? ' <button type="button" class="sm" data-gh="reload">โหลดใหม่</button>' : "")
+      + ' <button type="button" class="sm" data-gh="x" aria-label="ปิดข้อความ">✕</button>';
+  }
+  document.addEventListener("click", function (ev) {
+    var g = ev.target.closest("[data-gh]");
+    if (!g) return;
+    if (g.dataset.gh === "reload") siteLoad(true);
+    var b = $("pubbar");
+    if (b) b.remove();
+  });
   function upCard(hint) {
     if (GH.on !== true) return "";
     return '<div class="card"><h2>อัปโหลดรูปขึ้นเว็บ</h2><p class="hint">' + esc(hint) + ' · JPG PNG WEBP ไม่เกิน 2 MB · ชื่อไฟล์เดิมจะถูกแทนที่ (GitHub เก็บรุ่นเก่าไว้ในประวัติ)</p><div class="grid"><label>เลือกรูป<input type="file" id="up-f" accept="image/jpeg,image/png,image/webp"></label><label>บันทึกเป็น (โฟลเดอร์/ชื่อไฟล์ ตัวอังกฤษเล็ก ตัวเลข - _)<input type="text" id="up-p" placeholder="img/up/e01-cover.jpg" spellcheck="false"></label></div><div class="tools"><button type="button" class="pri" data-sh="up">อัปโหลด</button><span class="hint" id="up-r" style="margin:0;align-self:center"></span></div></div>';
   }
-    function upImg() {
-      var f = ($("up-f") || {}).files, p = (($("up-p") || {}).value || "").trim().toLowerCase();
-      if (!f || !f[0]) {
-        toast("เลือกรูปก่อน");
-        return;
-      }
-        var ext = f[0].type === "image/png" ? "png" : f[0].type === "image/webp" ? "webp" : "jpg";
-      if (!p) {
-        var nm = f[0].name.toLowerCase().replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g,
-          "").slice(0, 40);
-        p = "img/up/" + (nm || "img-" + Date.now()) + "." + ext;
-      }
-        if (f[0].size > 2 * 1024 * 1024) {
-          toast("รูปใหญ่เกิน 2 MB ย่อรูปก่อน");
-          return;
-        }
-        var rd = new FileReader();
-      rd.onload = function () {
-        $("up-r").textContent = "กำลังอัปโหลด…";
-        adm("adminUpload", { path: p, data: String(rd.result) }).then(function (r) {
-          $("up-r").innerHTML = "ขึ้นเว็บแล้ว · ใส่ในช่องรูปว่า <code>" + esc(r.path) + "</code>";
-          toast("อัปโหลดแล้ว");
-        }).catch(function (e) {
-          $("up-r").textContent = e.message || "อัปโหลดไม่สำเร็จ";
-        });
-      };
-      rd.readAsDataURL(f[0]);
+  function upImg() {
+    var f = ($("up-f") || {}).files, p = (($("up-p") || {}).value || "").trim().toLowerCase();
+    if (!f || !f[0]) {
+      toast("เลือกรูปก่อน");
+      return;
     }
-    function todayCard() {
-      if (!SHOP) return BB() && (BB().demo || tokGet()) ? '<div class="card"><h2>ต้องทำวันนี้</h2><p class="hint" style="margin:0">'
-        + (shopErr ? '<span style="color:var(--bad)">' + esc(shopErr) + "</span>" : "กำลังโหลดข้อมูลร้าน…")
-        + "</p></div>" : "";
-      var k = SHOP.kpi, csNew = (SHOP.consigns || []).filter(function (c) {
-        return c.status === "ใหม่";
-      }).length, ship = SHOP.orders.filter(function (o) {
-        return o.status === "ชำระแล้ว" && o.shipTo && !o.ship;
-      }).length;
-      var it = [["shop", "สลิปรอตรวจ", k.check, true], ["shop", "คำถามรอตอบ", k.asksOpen, true], ["shop",
-        "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req",
-          "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) {
-            return c.status === "ใหม่";
-          }).length, true], ["shop", "รอลูกค้าชำระ", k.wait, false], ["cust", "สมาชิกใหม่ 30 วัน", k.members30,
-            false]];
-      return '<div class="card"><h2>ต้องทำวันนี้</h2><div class="kpis">' + it.map(function (x) {
-        return '<button type="button" class="kpi' + (x[2] && x[3] ? " todo" : "") + '" data-go="' + x[0]
-          + '" style="text-align:left;display:block;min-height:0;font:inherit;cursor:pointer"><span>'
-          + esc(x[1]) + "</span><b>" + x[2] + "</b></button>";
-      }).join("") +
-        '</div><p class="hint" style="margin:8px 0 0">ยอดขายเดือนนี้ ' + money(k.revenueMonth) + " · ทั้งหมด "
-        + money(k.revenue) + " · สมาชิก " + k.members + " คน · ข้อมูลเมื่อ " + esc(wh(SHOP._at)) + ' · ตรวจสลิป: '
-        + (SHOP.setup.slipAuto ? "อัตโนมัติ" : "ร้านตรวจเอง") + ' <button type="button" class="sm" data-sh="load">โหลดใหม่</button></p></div>';
+    var ext = f[0].type === "image/png" ? "png" : f[0].type === "image/webp" ? "webp" : "jpg";
+    if (!p) {
+      var nm = f[0].name.toLowerCase().replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g,
+        "").slice(0, 40);
+      p = "img/up/" + (nm || "img-" + Date.now()) + "." + ext;
     }
-    function linksCard() {
-      var L = (SHOP && SHOP.setup && SHOP.setup.links) || {}, site = (S.site || {}).url || "";
-      var items = [[site, "เว็บไซต์", "หน้าร้านที่ลูกค้าเห็น"], [L.sheet, "ชีตข้อมูลร้าน",
-        "คำสั่งซื้อ สมาชิก ทะเบียนสิทธิ์"], [L.files, "ไฟล์ฉบับมืออาชีพ",
-          "โฟลเดอร์ไดรฟ์ที่ระบบส่งให้ผู้ซื้อ"], [L.slips, "สลิปลูกค้า", "โฟลเดอร์ไดรฟ์"],
-        [L.script, "โค้ดหลังบ้าน", "Apps Script · Script properties · Deploy"], [L.repo || "https://github.com/srangbuild/srang-build",
-          "ที่เก็บเว็บ (GitHub)", "ไฟล์เว็บ และประวัติการแก้ทุกครั้ง"],
-        ["https://dashboard.omise.co/", "Opn Payments", "บัตร พร้อมเพย์ ยอดเงินเข้า"], ["https://easyslip.com/",
-          "EasySlip", "ตรวจสลิปอัตโนมัติ และโควตา"], ["https://analytics.google.com/",
-            "Google Analytics", "สถิติคนเข้าเว็บ"], ["https://search.google.com/search-console",
-              "Search Console", "การค้นหาใน Google"],
-        ["https://manager.line.biz/", "LINE Official Account", "ข้อความและผู้ติดตาม"], ["https://studio.youtube.com/",
-          "YouTube Studio", "คลิปและสถิติ"], ["https://www.tiktok.com/tiktokstudio", "TikTok Studio",
-            "คลิปและสถิติ"], ["https://business.facebook.com/", "Meta Business Suite",
-              "Facebook และ Instagram"]];
-      return '<div class="card"><h2>ทางลัดทุกระบบ</h2><p class="hint">ระบบหลังร้านทั้งหมดในที่เดียว · ชีตและไดรฟ์เปิดได้เฉพาะบัญชี Google ของร้าน'
-        + (SHOP ? "" : " · ลิงก์ชีต ไดรฟ์ และโค้ดหลังบ้าน แสดงหลังโหลดข้อมูลร้าน") + '</p><div class="links">'
-        +
-        items.map(function (x) {
-          var u = /^https:\/\//.test(x[0] || "") ? x[0] : "";
-          return "<a" + (u ? ' href="' + esc(u) + '" target="_blank" rel="noopener"' : ' class="off" aria-disabled="true"')
-            + "><b>" + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></a>";
-        }).join("") + "</div></div>";
+    if (f[0].size > 2 * 1024 * 1024) {
+      toast("รูปใหญ่เกิน 2 MB ย่อรูปก่อน");
+      return;
     }
+    var rd = new FileReader();
+    rd.onload = function () {
+      $("up-r").textContent = "กำลังอัปโหลด…";
+      adm("adminUpload", { path: p, data: String(rd.result) }).then(function (r) {
+        $("up-r").innerHTML = "ขึ้นเว็บแล้ว · ใส่ในช่องรูปว่า <code>" + esc(r.path) + "</code>";
+        toast("อัปโหลดแล้ว");
+      }).catch(function (e) {
+        $("up-r").textContent = e.message || "อัปโหลดไม่สำเร็จ";
+      });
+    };
+    rd.readAsDataURL(f[0]);
+  }
+  function todayCard() {
+    if (!SHOP) return BB() && (BB().demo || tokGet()) ? '<div class="card"><h2>ต้องทำวันนี้</h2><p class="hint" style="margin:0">'
+      + (shopErr ? '<span style="color:var(--bad)">' + esc(shopErr) + "</span>" : "กำลังโหลดข้อมูลร้าน…")
+      + "</p></div>" : "";
+    var k = SHOP.kpi, csNew = (SHOP.consigns || []).filter(function (c) {
+      return c.status === "ใหม่";
+    }).length, ship = SHOP.orders.filter(function (o) {
+      return o.status === "ชำระแล้ว" && o.shipTo && !o.ship;
+    }).length;
+    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["shop", "คำถามรอตอบ", k.asksOpen, true], ["shop",
+      "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req",
+        "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) {
+          return c.status === "ใหม่";
+        }).length, true], ["shop", "รอลูกค้าชำระ", k.wait, false], ["cust", "สมาชิกใหม่ 30 วัน", k.members30,
+          false]];
+    return '<div class="card"><h2>ต้องทำวันนี้</h2><div class="kpis">' + it.map(function (x) {
+      return '<button type="button" class="kpi' + (x[2] && x[3] ? " todo" : "") + '" data-go="' + x[0]
+        + '" style="text-align:left;display:block;min-height:0;font:inherit;cursor:pointer"><span>'
+        + esc(x[1]) + "</span><b>" + x[2] + "</b></button>";
+    }).join("") +
+      '</div><p class="hint" style="margin:8px 0 0">ยอดขายเดือนนี้ ' + money(k.revenueMonth) + " · ทั้งหมด "
+      + money(k.revenue) + " · สมาชิก " + k.members + " คน · ข้อมูลเมื่อ " + esc(wh(SHOP._at)) + ' · ตรวจสลิป: '
+      + (SHOP.setup.slipAuto ? "อัตโนมัติ" : "ร้านตรวจเอง") + ' <button type="button" class="sm" data-sh="load">โหลดใหม่</button></p></div>';
+  }
+  function linksCard() {
+    var L = (SHOP && SHOP.setup && SHOP.setup.links) || {}, site = (S.site || {}).url || "";
+    var items = [[site, "เว็บไซต์", "หน้าร้านที่ลูกค้าเห็น"], [L.sheet, "ชีตข้อมูลร้าน",
+      "คำสั่งซื้อ สมาชิก ทะเบียนสิทธิ์"], [L.files, "ไฟล์ฉบับมืออาชีพ",
+        "โฟลเดอร์ไดรฟ์ที่ระบบส่งให้ผู้ซื้อ"], [L.slips, "สลิปลูกค้า", "โฟลเดอร์ไดรฟ์"],
+      [L.script, "โค้ดหลังบ้าน", "Apps Script · Script properties · Deploy"], [L.repo || "https://github.com/srangbuild/srang-build",
+        "ที่เก็บเว็บ (GitHub)", "ไฟล์เว็บ และประวัติการแก้ทุกครั้ง"],
+      ["https://dashboard.omise.co/", "Opn Payments", "บัตร พร้อมเพย์ ยอดเงินเข้า"], ["https://easyslip.com/",
+        "EasySlip", "ตรวจสลิปอัตโนมัติ และโควตา"], ["https://analytics.google.com/",
+          "Google Analytics", "สถิติคนเข้าเว็บ"], ["https://search.google.com/search-console",
+            "Search Console", "การค้นหาใน Google"],
+      ["https://manager.line.biz/", "LINE Official Account", "ข้อความและผู้ติดตาม"], ["https://studio.youtube.com/",
+        "YouTube Studio", "คลิปและสถิติ"], ["https://www.tiktok.com/tiktokstudio", "TikTok Studio",
+          "คลิปและสถิติ"], ["https://business.facebook.com/", "Meta Business Suite",
+            "Facebook และ Instagram"]];
+    return '<div class="card"><h2>ทางลัดทุกระบบ</h2><p class="hint">ระบบหลังร้านทั้งหมดในที่เดียว · ชีตและไดรฟ์เปิดได้เฉพาะบัญชี Google ของร้าน'
+      + (SHOP ? "" : " · ลิงก์ชีต ไดรฟ์ และโค้ดหลังบ้าน แสดงหลังโหลดข้อมูลร้าน") + '</p><div class="links">'
+      +
+      items.map(function (x) {
+        var u = /^https:\/\//.test(x[0] || "") ? x[0] : "";
+        return "<a" + (u ? ' href="' + esc(u) + '" target="_blank" rel="noopener"' : ' class="off" aria-disabled="true"')
+          + "><b>" + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></a>";
+      }).join("") + "</div></div>";
+  }
 
-    // ----- แท็บ -----
-    var TABS = [
-      ["ov", "ภาพรวม", overview],
-      ["shop", "ร้าน (คำสั่งซื้อ)", shopTab],
-      ["cust", "ลูกค้า", custTab],
-      ["cons", "ฝากขาย", consignTab],
-      ["req", "สั่งทำ", requestTab],
-      ["pay", "ช่องทางชำระเงิน", payTab],
-      ["bot", "ผู้ช่วย", botTab],
-      ["soon", "รอเปิดตัว", soonTab],
-      ["brand", "แบรนด์และลิงก์", function () {
-        return objCard("links", "ลิงก์ช่องทาง", "เว้นว่าง = ปุ่มบนเว็บขึ้นว่า “เร็ว ๆ นี้”") + objCard("brand",
-          "แบรนด์") + objCard("site", "เว็บและสถิติ") + objCard("announce", "แถบประกาศ",
-            "ใช้ตอนเปิดขาย เปิดรับงาน หรือปล่อยอัลบั้ม") + upCard("ปกตอน รูปสินค้า หรือรูปประกอบหน้าเว็บ · แล้วนำที่อยู่ไปใส่ในช่องรูปของรายการนั้น");
-      }],
-      ["ep", "ตอน", function () {
-        return listCard("episodes", "ตอนทั้งหมด",
-          "ปล่อยคลิปแล้วนำลิงก์มาใส่ที่นี่ ตอนที่ยังไม่มีลิงก์จะแสดงวันปล่อยแทน");
-      }],
-      ["free", "ของแจก", function () {
-        return listCard("freebies", "เช็กลิสต์แจกฟรี",
-          "เนื้อหาต้องมาจากบทของตอนนั้น · 1 ชุด = 1 แผ่น A4 (หน้า free.html พิมพ์หรือบันทึกเป็น PDF ได้) · คำสั่ง LINE ต้องตรงกับที่ตั้งไว้ในข้อความตอบกลับอัตโนมัติ");
-      }],
-      ["prod", "ของแนะนำ", function () {
-        return '<div class="card"><h2>ข้อความเปิดเผยแอฟฟิลิเอต</h2><p class="hint">แสดงเหนือรายการของแนะนำและท้ายเว็บเสมอ</p><label class="full">ข้อความ<textarea data-p="disclosure">'
-          + esc(S.disclosure) + "</textarea></label></div>" + listCard("products",
-            "ของที่ใช้ในคลิป (ลิงก์แอฟฟิลิเอต)",
-            "รายการที่ยังไม่ใส่ลิงก์จะไม่แสดงบนเว็บ · แนะนำเฉพาะของที่ใช้จริงหรือพูดถึงในคลิป · ใช้ร้านเดียวต่อหนึ่งหน้า");
-      }],
-      ["biz", "บริการ ร้าน เพลง", function () {
-        return listCard("shop", "สินค้าของช่อง",
-          "ใส่ลิงก์หน้าขายเมื่อพร้อม ป้ายจะเปลี่ยนเป็นเปิดขายเอง") + listCard("services", "บริการ")
-          + listCard("music", "เพลง") + listCard("faq", "คำถามที่พบบ่อย");
-      }],
-      ["sheet", "ใบตรวจงาน", sheetTab],
-      ["mem", "สมาชิกและชำระเงิน", function () {
-        return objCard("member", "ระบบสมาชิก",
-          "สมัครฟรีด้วยอีเมล · ข้อมูลสมาชิกอยู่ในไฟล์ชีตของบัญชี Google ร้าน ไม่อยู่ในเว็บนี้") + objCard("pay",
-            "รับชำระเงินด้วยการโอนและแนบสลิป",
-            "ลูกค้าโอนตามยอด แนบรูปสลิปในหน้าสมาชิก ร้านตรวจยอดเข้าบัญชีจริงแล้วเปลี่ยนสถานะในไฟล์ชีต · ข้อมูลในช่องนี้แสดงต่อสาธารณะ ใส่เฉพาะที่ลูกค้าต้องใช้โอน")
-          + '<div class="card"><h2>ขั้นตอนของร้าน</h2><ul class="chk"><li><span>1</span><span>ติดตั้งหลังบ้านตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md<small>ทำครั้งเดียว ใช้บัญชี Google ของร้าน</small></span></li><li><span>2</span><span>มีอีเมล “มีสลิปรอตรวจ” → เปิดแอปธนาคารดูว่ายอดเข้าจริง<small>อย่าเชื่อรูปสลิปอย่างเดียว</small></span></li><li><span>3</span><span>เปลี่ยนสถานะในแผ่น orders เป็น ชำระแล้ว<small>ลูกค้าได้อีเมลและดาวน์โหลดได้ทันที</small></span></li></ul></div>'
-          + upCard("รูปคิวอาร์รับเงิน: บันทึกเป็น pay/qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่อง รูปคิวอาร์รับเงิน ด้านบน");
-      }],
-      ["ann", "ประกาศและคำตอบ", function () {
-        return listCard("notices", "แถบประกาศบนเว็บ",
-          "ข้อความแสดงบนทุกหน้า เช่น โปรโมชัน วันหยุด ระบบปิดปรับปรุง · ถ้าเว้นวันที่ จะแสดงจนกว่าจะลบ · ลบหรือแก้แล้วกดบันทึกขึ้นเว็บ")
-          + listCard("botfaq", "คำตอบของผู้ช่วย",
-            "ผู้ช่วยตอบจากรายการนี้ และจากคำถามในหน้าความรู้ · เพิ่มคำที่คนมักพิมพ์ เพื่อให้ระบบหาเจอ");
-      }],
-      ["kit", "ชุดโพสต์", kitTab],
-      ["lnk", "ลิงก์และติดตามผล", linksTab]
-    ];
+  // ----- แท็บ -----
+  var TABS = [
+    ["ov", "ภาพรวม", overview],
+    ["shop", "ร้าน (คำสั่งซื้อ)", shopTab],
+    ["cust", "ลูกค้า", custTab],
+    ["cons", "ฝากขาย", consignTab],
+    ["req", "สั่งทำ", requestTab],
+    ["pay", "ช่องทางชำระเงิน", payTab],
+    ["bot", "ผู้ช่วย", botTab],
+    ["soon", "รอเปิดตัว", soonTab],
+    ["brand", "แบรนด์และลิงก์", function () {
+      return objCard("links", "ลิงก์ช่องทาง", "เว้นว่าง = ปุ่มบนเว็บขึ้นว่า “เร็ว ๆ นี้”") + objCard("brand",
+        "แบรนด์") + objCard("site", "เว็บและสถิติ") + objCard("announce", "แถบประกาศ",
+          "ใช้ตอนเปิดขาย เปิดรับงาน หรือปล่อยอัลบั้ม") + upCard("ปกตอน รูปสินค้า หรือรูปประกอบหน้าเว็บ · แล้วนำที่อยู่ไปใส่ในช่องรูปของรายการนั้น");
+    }],
+    ["ep", "ตอน", function () {
+      return listCard("episodes", "ตอนทั้งหมด",
+        "ปล่อยคลิปแล้วนำลิงก์มาใส่ที่นี่ ตอนที่ยังไม่มีลิงก์จะแสดงวันปล่อยแทน");
+    }],
+    ["free", "ของแจก", function () {
+      return listCard("freebies", "เช็กลิสต์แจกฟรี",
+        "เนื้อหาต้องมาจากบทของตอนนั้น · 1 ชุด = 1 แผ่น A4 (หน้า free.html พิมพ์หรือบันทึกเป็น PDF ได้) · คำสั่ง LINE ต้องตรงกับที่ตั้งไว้ในข้อความตอบกลับอัตโนมัติ");
+    }],
+    ["prod", "ของแนะนำ", function () {
+      return '<div class="card"><h2>ข้อความเปิดเผยแอฟฟิลิเอต</h2><p class="hint">แสดงเหนือรายการของแนะนำและท้ายเว็บเสมอ</p><label class="full">ข้อความ<textarea data-p="disclosure">'
+        + esc(S.disclosure) + "</textarea></label></div>" + listCard("products",
+          "ของที่ใช้ในคลิป (ลิงก์แอฟฟิลิเอต)",
+          "รายการที่ยังไม่ใส่ลิงก์จะไม่แสดงบนเว็บ · แนะนำเฉพาะของที่ใช้จริงหรือพูดถึงในคลิป · ใช้ร้านเดียวต่อหนึ่งหน้า");
+    }],
+    ["biz", "บริการ ร้าน เพลง", function () {
+      return listCard("shop", "สินค้าของช่อง",
+        "ใส่ลิงก์หน้าขายเมื่อพร้อม ป้ายจะเปลี่ยนเป็นเปิดขายเอง") + listCard("services", "บริการ")
+        + listCard("music", "เพลง") + listCard("faq", "คำถามที่พบบ่อย");
+    }],
+    ["sheet", "ใบตรวจงาน", sheetTab],
+    ["mem", "สมาชิกและชำระเงิน", function () {
+      return objCard("member", "ระบบสมาชิก",
+        "สมัครฟรีด้วยอีเมล · ข้อมูลสมาชิกอยู่ในไฟล์ชีตของบัญชี Google ร้าน ไม่อยู่ในเว็บนี้") + objCard("pay",
+          "รับชำระเงินด้วยการโอนและแนบสลิป",
+          "ลูกค้าโอนตามยอด แนบรูปสลิปในหน้าสมาชิก ร้านตรวจยอดเข้าบัญชีจริงแล้วเปลี่ยนสถานะในไฟล์ชีต · ข้อมูลในช่องนี้แสดงต่อสาธารณะ ใส่เฉพาะที่ลูกค้าต้องใช้โอน")
+        + '<div class="card"><h2>ขั้นตอนของร้าน</h2><ul class="chk"><li><span>1</span><span>ติดตั้งหลังบ้านตามไฟล์ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md<small>ทำครั้งเดียว ใช้บัญชี Google ของร้าน</small></span></li><li><span>2</span><span>มีอีเมล “มีสลิปรอตรวจ” → เปิดแอปธนาคารดูว่ายอดเข้าจริง<small>อย่าเชื่อรูปสลิปอย่างเดียว</small></span></li><li><span>3</span><span>เปลี่ยนสถานะในแผ่น orders เป็น ชำระแล้ว<small>ลูกค้าได้อีเมลและดาวน์โหลดได้ทันที</small></span></li></ul></div>'
+        + upCard("รูปคิวอาร์รับเงิน: บันทึกเป็น pay/qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่อง รูปคิวอาร์รับเงิน ด้านบน");
+    }],
+    ["ann", "ประกาศและคำตอบ", function () {
+      return listCard("notices", "แถบประกาศบนเว็บ",
+        "ข้อความแสดงบนทุกหน้า เช่น โปรโมชัน วันหยุด ระบบปิดปรับปรุง · ถ้าเว้นวันที่ จะแสดงจนกว่าจะลบ · ลบหรือแก้แล้วกดบันทึกขึ้นเว็บ")
+        + listCard("botfaq", "คำตอบของผู้ช่วย",
+          "ผู้ช่วยตอบจากรายการนี้ และจากคำถามในหน้าความรู้ · เพิ่มคำที่คนมักพิมพ์ เพื่อให้ระบบหาเจอ");
+    }],
+    ["kit", "ชุดโพสต์", kitTab],
+    ["lnk", "ลิงก์และติดตามผล", linksTab]
+  ];
   var tab = "ov";
   // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
   var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop",
@@ -1787,46 +1787,46 @@
       }).length : 0;
     return n ? "<i>" + n + "</i>" : "";
   }
-    function render() {
-      var g = gated(), on1 = !!tokGet();
-      $("tabs").parentNode.hidden = g;
-      ["b-prev", "b-imp", "b-reset", "b-save", "state"].forEach(function (id) {
-        $(id).hidden = g;
-      });
-      $("b-pub").hidden = g || GH.on !== true;
-      $("b-out").hidden = !on1;
-      $("who").hidden = !on1;
-      $("who").textContent = on1 ? tokWho() : "";
-      $("b-save").className = GH.on === true ? "dark" : "pri";
-      if (g) {
-        $("main").innerHTML = loginCard();
-        gDraw();
-        var k0 = $("ak");
-        if (k0 && !loginBusy) k0.focus();
-        return;
-      }
-        $("tabs").innerHTML = TABS.map(function (t) {
-          return (GROUPS[t[0]] ? '<span class="grp" role="presentation">' + GROUPS[t[0]] + "</span>" : "")
-            + '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab)
-            + '">' + t[1] + badge(t[0]) + "</button>";
-        }).join("");
-      $("main").innerHTML = TABS.filter(function (t) {
-        return t[0] === tab;
-      })[0][2]();
-      drawUtm();
-      touch();
-      if (SHOPTABS.indexOf(tab) >= 0 && !SHOP && !shopBusy && !shopErr && BB() && (BB().demo || tokGet())) shopLoad();
-      var on = $("tabs").querySelector("[aria-selected=true]");
-      if (on && on.scrollIntoView) on.scrollIntoView({ block: "nearest", inline: "center" });
-    }
-    $("tabs").addEventListener("click", function (ev) {
-      var b = ev.target.closest("[data-tab]");
-      if (b) {
-        tab = b.dataset.tab;
-        render();
-        window.scrollTo(0, 0);
-      }
+  function render() {
+    var g = gated(), on1 = !!tokGet();
+    $("tabs").parentNode.hidden = g;
+    ["b-prev", "b-imp", "b-reset", "b-save", "state"].forEach(function (id) {
+      $(id).hidden = g;
     });
+    $("b-pub").hidden = g || GH.on !== true;
+    $("b-out").hidden = !on1;
+    $("who").hidden = !on1;
+    $("who").textContent = on1 ? tokWho() : "";
+    $("b-save").className = GH.on === true ? "dark" : "pri";
+    if (g) {
+      $("main").innerHTML = loginCard();
+      gDraw();
+      var k0 = $("ak");
+      if (k0 && !loginBusy) k0.focus();
+      return;
+    }
+    $("tabs").innerHTML = TABS.map(function (t) {
+      return (GROUPS[t[0]] ? '<span class="grp" role="presentation">' + GROUPS[t[0]] + "</span>" : "")
+        + '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (t[0] === tab)
+        + '">' + t[1] + badge(t[0]) + "</button>";
+    }).join("");
+    $("main").innerHTML = TABS.filter(function (t) {
+      return t[0] === tab;
+    })[0][2]();
+    drawUtm();
+    touch();
+    if (SHOPTABS.indexOf(tab) >= 0 && !SHOP && !shopBusy && !shopErr && BB() && (BB().demo || tokGet())) shopLoad();
+    var on = $("tabs").querySelector("[aria-selected=true]");
+    if (on && on.scrollIntoView) on.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+  $("tabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-tab]");
+    if (b) {
+      tab = b.dataset.tab;
+      render();
+      window.scrollTo(0, 0);
+    }
+  });
 
   // ----- การแก้ไข -----
   $("main").addEventListener("input", function (ev) {
@@ -1835,33 +1835,33 @@
       drawUtm();
       return;
     }
-      if (el.id === "cq") {
-        custQ = el.value;
-        clearTimeout(window.__cq);
-        window.__cq = setTimeout(function () {
-          render();
-          var s = $("cq");
-          if (s) {
-            s.focus();
-            s.setSelectionRange(s.value.length, s.value.length);
-          }
-        }, 350);
-        return;
-      }
-      if (el.id === "shq") {
-        shopQ = el.value;
-        clearTimeout(window.__shq);
-        window.__shq = setTimeout(function () {
-          render();
-          var s = $("shq");
-          if (s) {
-            s.focus();
-            s.setSelectionRange(s.value.length, s.value.length);
-          }
-        }, 350);
-        return;
-      }
-      if (el.id === "ak") return;
+    if (el.id === "cq") {
+      custQ = el.value;
+      clearTimeout(window.__cq);
+      window.__cq = setTimeout(function () {
+        render();
+        var s = $("cq");
+        if (s) {
+          s.focus();
+          s.setSelectionRange(s.value.length, s.value.length);
+        }
+      }, 350);
+      return;
+    }
+    if (el.id === "shq") {
+      shopQ = el.value;
+      clearTimeout(window.__shq);
+      window.__shq = setTimeout(function () {
+        render();
+        var s = $("shq");
+        if (s) {
+          s.focus();
+          s.setSelectionRange(s.value.length, s.value.length);
+        }
+      }, 350);
+      return;
+    }
+    if (el.id === "ak") return;
     if (!p) return;
     var v = el.dataset.t === "bool" ? el.checked : el.dataset.t === "lines" ? el.value.split("\n").map(function (x) {
       return x.trim();
@@ -1881,17 +1881,17 @@
       render();
       return;
     }
-      if (el.id === "kit-ep") {
-        kitEp = el.value;
-        render();
-      } else if (el.id === "kit-ver") {
-        kitVer = el.value;
-        render();
-      }
-      else if (el.dataset.re) {
-        var o = $("kit-out");
-        if (o) o.innerHTML = kit();
-      }
+    if (el.id === "kit-ep") {
+      kitEp = el.value;
+      render();
+    } else if (el.id === "kit-ver") {
+      kitVer = el.value;
+      render();
+    }
+    else if (el.dataset.re) {
+      var o = $("kit-out");
+      if (o) o.innerHTML = kit();
+    }
   });
   $("main").addEventListener("toggle", function (ev) {
     var d = ev.target;
@@ -1905,51 +1905,51 @@
     });
     else toast("เลือกข้อความแล้วกด Ctrl+C");
   }
-    $("main").addEventListener("click", function (ev) {
-      var go = ev.target.closest("[data-go]");
-      if (go) {
-        tab = go.dataset.go;
-        render();
-        window.scrollTo(0, 0);
-        return;
-      }
-        var sb = ev.target.closest("[data-sh]");
-      if (sb) {
-        shopClick(sb);
-        return;
-      }
-        var b = ev.target.closest("[data-act]");
-      if (!b) return;
-      var act = b.dataset.act, key = b.dataset.list, i = +b.dataset.i, A = key ? S[key] : null;
-      if (act === "copy") {
-        copy(b.closest(".kit").querySelector("textarea").value);
-        return;
-      }
-        if (act === "copyutm") {
-          var v = $("u-out").value;
-          if (v) copy(v);
-          else toast("ใส่ลิงก์ปลายทางก่อน");
-          return;
-        }
-        if (act === "add") {
-          A.push(LIST[key].blank());
-          openAt[key] = A.length - 1;
-        }
-        else if (act === "del") {
-          if (!confirm("ลบ “" + LIST[key].label(A[i]) + "” ?")) return;
-          A.splice(i, 1);
-          openAt[key] = -1;
-        }
-        else if (act === "up" && i > 0) {
-          A.splice(i - 1, 0, A.splice(i, 1)[0]);
-          openAt[key] = i - 1;
-        }
-        else if (act === "down" && i < A.length - 1) {
-          A.splice(i + 1, 0, A.splice(i, 1)[0]);
-          openAt[key] = i + 1;
-        }
-        render();
-    });
+  $("main").addEventListener("click", function (ev) {
+    var go = ev.target.closest("[data-go]");
+    if (go) {
+      tab = go.dataset.go;
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    var sb = ev.target.closest("[data-sh]");
+    if (sb) {
+      shopClick(sb);
+      return;
+    }
+    var b = ev.target.closest("[data-act]");
+    if (!b) return;
+    var act = b.dataset.act, key = b.dataset.list, i = +b.dataset.i, A = key ? S[key] : null;
+    if (act === "copy") {
+      copy(b.closest(".kit").querySelector("textarea").value);
+      return;
+    }
+    if (act === "copyutm") {
+      var v = $("u-out").value;
+      if (v) copy(v);
+      else toast("ใส่ลิงก์ปลายทางก่อน");
+      return;
+    }
+    if (act === "add") {
+      A.push(LIST[key].blank());
+      openAt[key] = A.length - 1;
+    }
+    else if (act === "del") {
+      if (!confirm("ลบ “" + LIST[key].label(A[i]) + "” ?")) return;
+      A.splice(i, 1);
+      openAt[key] = -1;
+    }
+    else if (act === "up" && i > 0) {
+      A.splice(i - 1, 0, A.splice(i, 1)[0]);
+      openAt[key] = i - 1;
+    }
+    else if (act === "down" && i < A.length - 1) {
+      A.splice(i + 1, 0, A.splice(i, 1)[0]);
+      openAt[key] = i + 1;
+    }
+    render();
+  });
 
   // ----- บันทึก นำเข้า ดูตัวอย่าง -----
   // never drop a part of the data: sections or fields that exist in the loaded data.js but not in the edited copy are put back before saving
@@ -1960,36 +1960,36 @@
       else if (dst[k] && typeof dst[k] === "object" && !Array.isArray(dst[k])) keepAll(dst[k], src[k]);
     });
   }
-    function fileText() {
-      keepAll(S, window.SITE || {});
-      S.version = new Date().toISOString().slice(0, 10);
-      return "window.SITE = " + JSON.stringify(S, null, 2) + ";\n";
-    }
-    function saved() {
-      ORIG = JSON.stringify(S);
-      BASE = hashOf(ORIG);
-      touch();
-    }
-    $("b-save").addEventListener("click", function () {
-      var text = fileText();
-      if (window.showSaveFilePicker) {
-        window.showSaveFilePicker({
-          suggestedName: "data.js",
-          types: [{ description: "data.js", accept: { "text/javascript": [".js"] } }]
-        }).then(function (h) {
-          return h.createWritable().then(function (w) {
-            return w.write(text).then(function () {
-              return w.close();
-            });
+  function fileText() {
+    keepAll(S, window.SITE || {});
+    S.version = new Date().toISOString().slice(0, 10);
+    return "window.SITE = " + JSON.stringify(S, null, 2) + ";\n";
+  }
+  function saved() {
+    ORIG = JSON.stringify(S);
+    BASE = hashOf(ORIG);
+    touch();
+  }
+  $("b-save").addEventListener("click", function () {
+    var text = fileText();
+    if (window.showSaveFilePicker) {
+      window.showSaveFilePicker({
+        suggestedName: "data.js",
+        types: [{ description: "data.js", accept: { "text/javascript": [".js"] } }]
+      }).then(function (h) {
+        return h.createWritable().then(function (w) {
+          return w.write(text).then(function () {
+            return w.close();
           });
-        }).then(function () {
-          saved();
-          toast("บันทึกแล้ว อย่าลืมอัปโหลดขึ้นโฮสต์");
-        }).catch(function (e) {
-          if (e && e.name !== "AbortError") dl(text);
         });
-      } else dl(text);
-    });
+      }).then(function () {
+        saved();
+        toast("บันทึกแล้ว อย่าลืมอัปโหลดขึ้นโฮสต์");
+      }).catch(function (e) {
+        if (e && e.name !== "AbortError") dl(text);
+      });
+    } else dl(text);
+  });
   function dl(text) {
     var a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" }));
@@ -2000,10 +2000,10 @@
     saved();
     toast("ดาวน์โหลด data.js แล้ว นำไปวางทับไฟล์เดิมในโฟลเดอร์ เว็บ");
   }
-    $("b-prev").addEventListener("click", function () {
-      touch();
-      window.open("index.html?preview=1", "_blank");
-    });
+  $("b-prev").addEventListener("click", function () {
+    touch();
+    window.open("index.html?preview=1", "_blank");
+  });
   $("b-imp").addEventListener("click", function () {
     $("file").click();
   });
@@ -2053,7 +2053,7 @@
       siteLoad(true);
       return;
     }
-      if (!dirty && !confirm("ข้อมูลตรงกับบนเว็บแล้ว บันทึกซ้ำหรือไม่?")) return;
+    if (!dirty && !confirm("ข้อมูลตรงกับบนเว็บแล้ว บันทึกซ้ำหรือไม่?")) return;
     btn.disabled = true;
     btn.textContent = "กำลังบันทึก…";
     adm("adminSiteSave", { text: fileText(), sha: GH.sha }).then(function (r) {
