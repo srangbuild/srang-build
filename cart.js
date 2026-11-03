@@ -239,25 +239,18 @@
   }
   /* ฉบับที่ต้องซื้อ: ภาษาไทยและอังกฤษอยู่ในทุกฉบับ · ภาษาอื่นหรือมาตรฐานต่างประเทศต้องใช้ฉบับประเทศ 1 ประเทศ
      กฎหมายของประเทศที่ตั้งงานเป็นข้อมูลสาธารณะ ใส่ให้ทุกฉบับ จึงไม่ทำให้ราคาเปลี่ยน */
+  // คำตอบ Q48 (สภา 3 พ.ย. 2026, ใช้คู่กับหลังบ้านรุ่น 2026-11-03k): ภาษาใดก็ได้ 1–2 ภาษาที่ราคาปกติ · × 1.5 เฉพาะเมื่อยึดมาตรฐานของต่างประเทศ
   function skuOf(x, c) {
-    var L = [c.l1].concat(c.n === 2 ? [c.l2] : []).map(bl), S = c.std, U = [], miss = [];
-    if (S && S !== "TH" && S !== "INT") U.push(S);
-    L.forEach(function (l) {
-      if (l === "th" || l === "en") return;
-      if (U.some(function (k) {
-        return R.langsOf(k).indexOf(l) >= 0;
-      })) return;
-      var k = [c.site].concat(R.list(l)).filter(function (k2) {
-        return k2 && B.CTRY[k2] && R.langsOf(k2).indexOf(l) >= 0;
-      })[0];
-      if (k) U.push(k);
-      else miss.push(l);
-    });
-    if (miss.length) return { err: "ภาษานี้ยังไม่เปิดขายเป็นฉบับประเทศ เลือกภาษาอื่น หรือใช้ไทยหรืออังกฤษ" };
-    if (U.length > 1) return { err: "เอกสาร 1 ใบใช้ข้อมูลต่างประเทศได้ 1 ประเทศ: ให้มาตรฐานตรงกับประเทศของภาษา หรือใช้ไทยหรืออังกฤษเป็นอีกภาษา" };
-    if (U.length) return B.docOn() && B.find(x.id + "." + U[0]) ? { id: x.id + "." + U[0], cc: U[0] } : { err: "ฉบับประเทศนี้ยังไม่เปิดขาย" };
-    var vs = B.langsOf(x), one = c.n === 1 ? (L[0] === "en" ? "EN" : "TH") : "";
+    var L = [c.l1].concat(c.n === 2 ? [c.l2] : []).map(bl), S = c.std;
+    if (S && S !== "TH" && S !== "INT") return B.docOn() && B.find(x.id + "." + S) ? { id: x.id + "." + S, cc: S }
+      : { err: "ฉบับประเทศนี้ยังไม่เปิดขาย เลือกมาตรฐานไทย หรือตามข้อกำหนดโครงการ" };
+    var vs = B.langsOf(x), one = c.n === 1 && (L[0] === "en" || L[0] === "th") ? (L[0] === "en" ? "EN" : "TH") : "";
     return { id: x.id + (one && vs.indexOf(one) > 0 ? "." + one : "") };
+  }
+  function machine(v) {
+    return [v.l1, v.n === 2 ? v.l2 : ""].some(function (l) {
+      return l && bl(l) !== "th" && bl(l) !== "en";
+    });
   }
   function cfgLine(root) { // บรรทัดสรุปในตะกร้า
     var c = cfgAll()[root];
@@ -370,9 +363,11 @@
       $("cfOw").hidden = known;
       var w = cur(), k = skuOf(x, w), up = !!(cf.querySelector("input[name=cfu]:checked") || {}).value && cf.querySelector("input[name=cfu]:checked").value === "1";
       $("cfErr").textContent = k.err || "";
-      $("cfSum").innerHTML = k.err ? "" : "<b>ฉบับที่จะใส่ตะกร้า:</b> " + esc(B.code(x)) + " · " + esc(B.LANGS[B.varOf(k.id)] || "") + "<br>"
+      $("cfSum").innerHTML = k.err ? "" : "<b>ฉบับที่จะใส่ตะกร้า:</b> " + esc(B.code(x)) + " · " + esc(k.cc ? B.LANGS[B.varOf(k.id)] || "" : "ฉบับปกติ · ไฟล์ PDF "
+          + (B.LANGS[B.varOf(k.id)] || "") + " · เอกสารอัจฉริยะเลือกภาษาได้") + "<br>"
         + esc(cfgTx(w)) + '<br><b class="cf-p">' + esc(B.baht(B.cart.price(k.id + (up && !k.cc ? "+U" : "")))) + "</b>" + (k.cc
-          ? " <small>ราคาปกติ × 1.5 เพราะใช้ภาษาหรือมาตรฐานของ" + esc(ccN(k.cc)) + " · ข้อความแปลด้วยเครื่อง มีคำเตือนบนเอกสาร</small>" : "")
+          ? " <small>ราคาปกติ × 1.5 เพราะยึดมาตรฐานของ" + esc(ccN(k.cc)) + "</small>" : "") + (machine(w)
+            ? "<small>ภาษาที่ไม่ใช่ไทยหรืออังกฤษแปลด้วยเครื่อง มีคำเตือนบนเอกสาร</small>" : "")
         + "<small>ปรับค่าเหล่านี้ได้อีกครั้งที่หน้าเอกสารอัจฉริยะ</small>";
       var pl = $("cfPl");
       if (pl) pl.hidden = !!k.cc;
