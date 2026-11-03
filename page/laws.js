@@ -25,7 +25,7 @@
     "almeezan.qa", "u.ae", "impo.com.uy", "joradp.dz", "conseildetat.dz", "idaraty.tn", "ibst.vn",
     "sbma.com", "opamss.org.sv", "bund.de", "gesetze-im-internet.de", "economie-ivoirienne.ci",
     "investindrc.cd", "sgg-mali.ml", "pravo.by", "etalonline.by", "lex.uz", "mc.uz", "egov.tj",
-    "portali-huquqi.tj", "anp.ne", "hauqe.tg", "zan.kz"];
+    "portali-huquqi.tj", "anp.ne", "hauqe.tg", "zan.kz", "bauministerkonferenz.de"];
   var BODY = ["din.de", "dibt.de", "oib.or.at", "iccsafe.org", "pec.org.pk", "psqca.com.pk",
     "sgpstandard.cz", "aipalync.org", "bsigroup.com", "iso.org", "pkn.pl", "piib.org.pl",
     "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org",
@@ -33,7 +33,7 @@
     "iiee.org.ph",
     "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org", "circe.hn", "occ.cd",
     "anor.cm",
-    "abnorm.bf"];
+    "abnorm.bf", "hbrc.edu.eg"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
     "worldbank.org"];
   function hostOf(url) {
@@ -59,11 +59,12 @@
     ["other", "แหล่งอื่น ควรยืนยันกับหน่วยงาน"]];
 
   function sourcesOf(x, cc) {
-    var seen = {}, list = [x.sourceUrl, x.sourceUrl2].concat((REFS[cc] && REFS[cc].src) || []).filter(function (u) {
-      if (!/^https?:\/\//.test(u || "") || seen[u]) return false;
-      seen[u] = 1;
-      return true;
-    });
+    var seen = {}, list = [x.sourceUrl, x.sourceUrl2].concat(x.more || [], (REFS[cc] && REFS[cc].src)
+      || []).filter(function (u) {
+        if (!/^https?:\/\//.test(u || "") || seen[u]) return false;
+        seen[u] = 1;
+        return true;
+      });
     return list.sort(function (a, b) {
       return kindOf(a) - kindOf(b);
     });
