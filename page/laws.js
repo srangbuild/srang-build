@@ -31,10 +31,9 @@
     "sgpstandard.cz", "aipalync.org", "bsigroup.com", "iso.org", "pkn.pl", "piib.org.pl",
     "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org",
     "singaporestandardseshop.sg", "standardsforhighways.co.uk", "bcsa.org.uk", "theiet.org",
-    "iiee.org.ph",
-    "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org", "circe.hn", "occ.cd",
-    "anor.cm",
-    "abnorm.bf", "hbrc.edu.eg", "coe.or.th", "act.or.th", "eit.or.th"];
+    "iiee.org.ph", "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org",
+    "circe.hn", "occ.cd", "anor.cm", "abnorm.bf", "hbrc.edu.eg", "coe.or.th", "act.or.th",
+    "eit.or.th", "engc.org.uk", "arb.org.uk"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
     "worldbank.org"];
   function hostOf(url) {
