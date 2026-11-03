@@ -38,7 +38,7 @@
         document.head.appendChild(sc);
       });
   }
-    var hasSheets = Array.isArray(S.sheets) && S.sheets.length > 0, memOn = !S.member || S.member.on !== false;
+  var hasSheets = Array.isArray(S.sheets) && S.sheets.length > 0, memOn = !S.member || S.member.on !== false;
   var gear = (S.products || []).some(function (p) {
     return p.on !== false && /^https?:\/\//i.test(p.url || "");
   });
@@ -76,16 +76,16 @@
     return p + pv + (h ? "#" + h : "");
   }
 
-    var box = document.getElementById("hdr");
+  var box = document.getElementById("hdr");
   if (!box) return;
   box.className = "bh";
   function flag(cc) {
     return RG && RG.svg ? RG.svg(cc) : "";
   } /* flags are in region.js */
-    function lab(t, e) {
-      return lang === "th" ? t : e;
-    }
-    var navHtml = "";
+  function lab(t, e) {
+    return lang === "th" ? t : e;
+  }
+  var navHtml = "";
   menu.forEach(function (m, i) {
     if (m.i) {
       var on = m.i[0] === here && !m.i[1];
@@ -93,9 +93,9 @@
         + lab(m.t, m.e) + "</a>";
       return;
     }
-      var cur = m.sub.some(function (x) {
-        return x[0] === here;
-      }) || (i === 1 && shopPages.indexOf(here) >= 0);
+    var cur = m.sub.some(function (x) {
+      return x[0] === here;
+    }) || (i === 1 && shopPages.indexOf(here) >= 0);
     navHtml += '<div class="bh-grp"><button class="bh-top' + (cur ? " on" : "") + '" type="button" aria-expanded="false" data-noi18n="1">'
       + lab(m.t, m.e) + '</button><div class="bh-sub">' + m.sub.map(function (x) {
         var c = x[0] === here && !x[1];
@@ -174,17 +174,17 @@
     btn.textContent = o ? "✕" : "☰";
     btn.setAttribute("aria-label", o ? lab("ปิดเมนู", "Close menu") : lab("เปิดเมนู", "Open menu"));
   }
-    function closeGroups(except) {
-      [].forEach.call(box.querySelectorAll(".bh-grp.open"), function (g) {
-        if (g !== except) {
-          g.classList.remove("open");
-          g.querySelector(".bh-top").setAttribute("aria-expanded", "false");
-        }
-      });
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!box.classList.contains("open"));
+  function closeGroups(except) {
+    [].forEach.call(box.querySelectorAll(".bh-grp.open"), function (g) {
+      if (g !== except) {
+        g.classList.remove("open");
+        g.querySelector(".bh-top").setAttribute("aria-expanded", "false");
+      }
     });
+  }
+  btn.addEventListener("click", function () {
+    setOpen(!box.classList.contains("open"));
+  });
   box.addEventListener("click", function (ev) {
     var top = ev.target.closest(".bh-top");
     if (top && window.matchMedia("(min-width:1081px)").matches) {
@@ -194,7 +194,7 @@
       top.setAttribute("aria-expanded", String(o));
       return;
     }
-      var lb = ev.target.closest("#bh-lang"), lm = box.querySelector("#bh-lmenu");
+    var lb = ev.target.closest("#bh-lang"), lm = box.querySelector("#bh-lmenu");
     if (lb) {
       var lo = lm.hidden;
       lm.hidden = !lo;
@@ -202,7 +202,7 @@
       if (lo) lqOpen();
       return;
     }
-      var lc = ev.target.closest("#bh-lmenu [data-l]");
+    var lc = ev.target.closest("#bh-lmenu [data-l]");
     if (lc) {
       var nl = lc.getAttribute("data-l"), nv = lc.getAttribute("data-v") || "";
       if (nl !== lang || (nv && nv !== enV)) {
@@ -213,12 +213,12 @@
       } else {
         lm.hidden = true;
       }
-        return;
+      return;
     }
-      if (ev.target.closest(".bh-nav a")) {
-        setOpen(false);
-        closeGroups();
-      }
+    if (ev.target.closest(".bh-nav a")) {
+      setOpen(false);
+      closeGroups();
+    }
   });
   box.addEventListener("change", function (ev) {
     if (ev.target.id === "bh-region" && RG) {
@@ -230,7 +230,7 @@
   function lqNorm(s) {
     return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
-    var lqKeys = false;
+  var lqKeys = false;
   function lqFilter(v) {
     var w = lqNorm(v).trim(), m = box.querySelector("#bh-lmenu"), n = 0;
     [].forEach.call(m.querySelectorAll("[data-code]"), function (b) {
@@ -240,27 +240,27 @@
     });
     m.querySelector(".bh-lnone").hidden = n > 0;
   }
-    function lqOpen() {
-      var m = box.querySelector("#bh-lmenu"), q = m.querySelector("#bh-lq");
-      if (!lqKeys && RG && RG.keysOfLang) {
-        lqKeys = true;
-        [].forEach.call(m.querySelectorAll("[data-code]"), function (b) {
-          b.setAttribute("data-k", lqNorm(b.textContent + " " + RG.keysOfLang(b.getAttribute("data-code"),
-            lang)));
-        });
-      }
-        q.value = "";
-      lqFilter("");
-      var c = m.querySelector("[aria-current]");
-      if (c) {
-        var g = m.querySelector(".bh-lgrid");
-        m.scrollTop = Math.max(0, c.offsetTop - g.offsetTop - 60);
-      }
-        if (!window.matchMedia("(pointer:coarse)").matches) q.focus();
+  function lqOpen() {
+    var m = box.querySelector("#bh-lmenu"), q = m.querySelector("#bh-lq");
+    if (!lqKeys && RG && RG.keysOfLang) {
+      lqKeys = true;
+      [].forEach.call(m.querySelectorAll("[data-code]"), function (b) {
+        b.setAttribute("data-k", lqNorm(b.textContent + " " + RG.keysOfLang(b.getAttribute("data-code"),
+          lang)));
+      });
     }
-    box.addEventListener("input", function (ev) {
-      if (ev.target.id === "bh-lq") lqFilter(ev.target.value);
-    });
+    q.value = "";
+    lqFilter("");
+    var c = m.querySelector("[aria-current]");
+    if (c) {
+      var g = m.querySelector(".bh-lgrid");
+      m.scrollTop = Math.max(0, c.offsetTop - g.offsetTop - 60);
+    }
+    if (!window.matchMedia("(pointer:coarse)").matches) q.focus();
+  }
+  box.addEventListener("input", function (ev) {
+    if (ev.target.id === "bh-lq") lqFilter(ev.target.value);
+  });
   box.addEventListener("keydown", function (ev) {
     if (ev.target.id === "bh-lq" && ev.key === "Enter") {
       ev.preventDefault();
@@ -275,10 +275,10 @@
       box.querySelector("#bh-lang").setAttribute("aria-expanded", "false");
     }
   }
-    document.addEventListener("click", function (ev) {
-      if (!ev.target.closest(".bh-grp")) closeGroups();
-      if (!ev.target.closest(".bh-lwrap") && !ev.target.closest(".pk-pop")) closeLang();
-    });
+  document.addEventListener("click", function (ev) {
+    if (!ev.target.closest(".bh-grp")) closeGroups();
+    if (!ev.target.closest(".bh-lwrap") && !ev.target.closest(".pk-pop")) closeLang();
+  });
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape") {
       setOpen(false);

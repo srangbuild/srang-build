@@ -9,9 +9,9 @@
   function norm(s) {
     return String(s).replace(/\s+/g, " ").trim();
   }
-    Object.keys(D).forEach(function (k) {
-      map[norm(k)] = D[k];
-    });
+  Object.keys(D).forEach(function (k) {
+    map[norm(k)] = D[k];
+  });
   /* product names and texts already have English in data.js */
   [["sheets", "title", "titleEn"], ["sheets", "sum", "sumEn"], ["bundles", "title", "titleEn"], ["bundles",
     "text", "textEn"], ["bundles", "who", "whoEn"]].forEach(function (r) {
@@ -59,24 +59,24 @@
       var m = TPL[i].re.exec(t);
       if (m) return { m: m, en: TPL[i].en };
     }
-      return null;
+    return null;
   }
-    function tplFill(s, m) {
-      return s.replace(/ZV(\d)Z/g, function (x, k) {
-        var v = m[+k];
-        if (v == null) return x;
-        var y = THAI.test(v) ? tr1(v) : null;
-        return y === null ? v : y;
+  function tplFill(s, m) {
+    return s.replace(/ZV(\d)Z/g, function (x, k) {
+      var v = m[+k];
+      if (v == null) return x;
+      var y = THAI.test(v) ? tr1(v) : null;
+      return y === null ? v : y;
+    });
+  }
+  function one(s) {
+    return String(s).replace(/(^|[^\d.,])1 (sheets|items|pages|hours|times|methods|columns|key points|hold points|documents|more sheets|more tries|days)\b/g,
+      function (x, a, w) {
+        return a + "1 " + w.replace(/ies\b/, "y").replace(/s\b/, "");
       });
-    }
-    function one(s) {
-      return String(s).replace(/(^|[^\d.,])1 (sheets|items|pages|hours|times|methods|columns|key points|hold points|documents|more sheets|more tries|days)\b/g,
-        function (x, a, w) {
-          return a + "1 " + w.replace(/ies\b/, "y").replace(/s\b/, "");
-        });
-    } /* "1 sheets" reads wrong */
-    /* Languages other than Thai and English (1 Nov 2026): Thai -> English -> core word list. */
-    var LANG = "en", CORE = {}, NOTE = "";
+  } /* "1 sheets" reads wrong */
+  /* Languages other than Thai and English (1 Nov 2026): Thai -> English -> core word list. */
+  var LANG = "en", CORE = {}, NOTE = "";
   try {
     LANG = localStorage.getItem("build_lang") || "en";
   } catch (e) {}
@@ -130,7 +130,7 @@
       doNav();
     }).catch(function () {});
   }
-    var BRAND = /^(BUILD|BUILD TH|TH|สร้าง \| BUILD TH|นายห้าง AI)$/; /* 2 Nov 2026: brand words are never translated */
+  var BRAND = /^(BUILD|BUILD TH|TH|สร้าง \| BUILD TH|นายห้าง AI)$/; /* 2 Nov 2026: brand words are never translated */
   /* 2 Nov 2026: text with no entry in the dictionaries (knowledge pages, new text, text with a number in it) is sent to the back end once, translated from Thai, checked, and kept in this browser */
   var EXTRA = {}, extraKey = "build_trx2_" + LANG, NEED = {}, needTimer = 0;
   try {
@@ -151,9 +151,9 @@
     NEED[t] = 1;
     if (!needTimer) needTimer = setTimeout(fetchExtra, 900);
   }
-    /* 2 Nov 2026: a Thai standard code alone has one fixed form in every language. A date alone uses the date format of the language, and a Buddhist year becomes a Common Era year. */
-    var CODE_ONLY = /^(มยผ\.|มอก\.|วสท\.)\s*([0-9A-Za-z][0-9A-Za-z.\-\/ ]*)$/, CODE_EN = { "มยผ.": "DPT",
-      "มอก.": "TIS", "วสท.": "EIT" };
+  /* 2 Nov 2026: a Thai standard code alone has one fixed form in every language. A date alone uses the date format of the language, and a Buddhist year becomes a Common Era year. */
+  var CODE_ONLY = /^(มยผ\.|มอก\.|วสท\.)\s*([0-9A-Za-z][0-9A-Za-z.\-\/ ]*)$/, CODE_EN = { "มยผ.": "DPT",
+    "มอก.": "TIS", "วสท.": "EIT" };
   var TH_M = {
     "ม.ค.": 0,
     "ก.พ.": 1,
@@ -195,8 +195,8 @@
       return null;
     }
   }
-    /* A label beside the brand name ("Cart — BUILD TH") is translated alone. A brand name inside a sentence stays in the sentence: the back end writes it in Latin letters and the translator keeps it. */
-    var BRAND_IN = /(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)/, BRAND_SEP = /(^|[—–·:|]\s*)(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)(\s*[—–·:|]|\s*$)/;
+  /* A label beside the brand name ("Cart — BUILD TH") is translated alone. A brand name inside a sentence stays in the sentence: the back end writes it in Latin letters and the translator keeps it. */
+  var BRAND_IN = /(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)/, BRAND_SEP = /(^|[—–·:|]\s*)(สร้าง\s*\|\s*BUILD TH|นายห้าง AI)(\s*[—–·:|]|\s*$)/;
   function tr(raw) { /* English: the result, and text already in English, take the spelling and terms of the chosen country */
     var v = tr0(raw);
     if (LANG !== "en" || !window.EnVar) return v;
@@ -206,24 +206,24 @@
     var c = window.EnVar.conv(t, EV);
     return c === t ? null : c;
   }
-    function tr0(raw) {
-      var t = norm(raw);
-      if (!t || BRAND.test(t)) return null;
-      if (BRAND_SEP.test(t)) {
-        var changed = false, out = t.split(BRAND_IN).map(function (p, i) {
-          if (i % 2) return p.indexOf("BUILD TH") >= 0 ? "BUILD TH" : p;
-          var m = /^([\s—–·:|,.()\-]*)([\s\S]*?)([\s—–·:|,.()\-]*)$/.exec(p);
-          if (!m || !m[2]) return p;
-          var v = tr1(m[2]);
-          if (v === null) return p;
-          changed = true;
-          return m[1] + v + m[3];
-        }).join("");
-        return changed ? out : null;
-      }
-        return tr1(t);
+  function tr0(raw) {
+    var t = norm(raw);
+    if (!t || BRAND.test(t)) return null;
+    if (BRAND_SEP.test(t)) {
+      var changed = false, out = t.split(BRAND_IN).map(function (p, i) {
+        if (i % 2) return p.indexOf("BUILD TH") >= 0 ? "BUILD TH" : p;
+        var m = /^([\s—–·:|,.()\-]*)([\s\S]*?)([\s—–·:|,.()\-]*)$/.exec(p);
+        if (!m || !m[2]) return p;
+        var v = tr1(m[2]);
+        if (v === null) return p;
+        changed = true;
+        return m[1] + v + m[3];
+      }).join("");
+      return changed ? out : null;
     }
-    var ID_ONE = /\b(?:BT|Q|CS|RQ|RC)-?\d[\d-]*\b/; /* a number of an order, question or receipt inside a sentence: one translation for all numbers */
+    return tr1(t);
+  }
+  var ID_ONE = /\b(?:BT|Q|CS|RQ|RC)-?\d[\d-]*\b/; /* a number of an order, question or receipt inside a sentence: one translation for all numbers */
   function tr1(raw) {
     var t = norm(raw);
     if (!t) return null;
@@ -236,7 +236,7 @@
         return ids[+k - 1] == null ? x : ids[+k - 1];
       });
     }
-      var cm = CODE_ONLY.exec(t);
+    var cm = CODE_ONLY.exec(t);
     if (cm) return CODE_EN[cm[1]] + " " + cm[2];
     var dm = dateOnly(t);
     if (dm) return dm;
@@ -251,7 +251,7 @@
       need(t);
       return null;
     }
-      if (!THAI.test(t)) return null;
+    if (!THAI.test(t)) return null;
     var en = map[t] ? norm(map[t]) : "", c = en ? (FIX[en] || FULL[en] || CORE[en]) : "";
     if (c && c !== t) return c;
     if (hit) { /* the translated sentence must keep each ZV mark, or a value would be lost */
@@ -260,27 +260,27 @@
         return tc.indexOf(z) >= 0;
       })) return tplFill(tc, hit.m);
     }
-      var ex = EXTRA[t];
+    var ex = EXTRA[t];
     if (ex && ex !== t) return ex;
     need(t);
     if (hit) return one(tplFill(hit.en, hit.m));
     var e1 = trEn(raw);
     return e1 === null ? null : one(e1); /* English only until the translation arrives */
   }
-    function trEn(raw) {
-      var t = norm(raw);
-      if (!t || !THAI.test(t)) return null;
-      if (map[t]) return map[t];
-      if (t.length > 260) return null;
-      var r = t;
-      for (var i = 0; i < phrases.length && THAI.test(r); i++) {
-        if (r.indexOf(phrases[i]) >= 0) r = r.split(phrases[i]).join(" " + map[phrases[i]] + " ");
-      } /* 2 Nov 2026: a space around each replaced phrase, so two phrases do not run together ("peopleare") */
-        for (var j = 0; j < RULES.length && THAI.test(r); j++) r = r.replace(RULES[j][0], RULES[j][1]);
-      r = r.replace(/\s+/g, " ").replace(/\s+([,.;:!?%)\]])/g, "$1").replace(/([(\[])\s+/g, "$1").trim();
-      return THAI.test(r) ? null : r;
-    }
-    var SKIP = /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|CODE)$/, SRC = new WeakMap(), ATTR = new WeakMap();
+  function trEn(raw) {
+    var t = norm(raw);
+    if (!t || !THAI.test(t)) return null;
+    if (map[t]) return map[t];
+    if (t.length > 260) return null;
+    var r = t;
+    for (var i = 0; i < phrases.length && THAI.test(r); i++) {
+      if (r.indexOf(phrases[i]) >= 0) r = r.split(phrases[i]).join(" " + map[phrases[i]] + " ");
+    } /* 2 Nov 2026: a space around each replaced phrase, so two phrases do not run together ("peopleare") */
+    for (var j = 0; j < RULES.length && THAI.test(r); j++) r = r.replace(RULES[j][0], RULES[j][1]);
+    r = r.replace(/\s+/g, " ").replace(/\s+([,.;:!?%)\]])/g, "$1").replace(/([(\[])\s+/g, "$1").trim();
+    return THAI.test(r) ? null : r;
+  }
+  var SKIP = /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|CODE)$/, SRC = new WeakMap(), ATTR = new WeakMap();
   function doText(n) {
     var e = n.parentElement;
     if (!e || SKIP.test(e.tagName)) return;
@@ -290,7 +290,7 @@
       e.setAttribute("data-src", ot);
       if (!e.hasAttribute("value")) e.setAttribute("value", ot);
     }
-      if (e.closest("[data-noi18n]")) return;
+    if (e.closest("[data-noi18n]")) return;
     /* a price is its own text part: the text before and after it are translated by themselves */
     var tk = /⁨[^⁩]*⁩/.exec(n.nodeValue);
     if (tk) {
@@ -300,88 +300,88 @@
       if (aft.nodeValue) doText(aft);
       return;
     }
-      var rec = SRC.get(n), cur = n.nodeValue, base = rec && rec.out === cur ? rec.src : cur;
+    var rec = SRC.get(n), cur = n.nodeValue, base = rec && rec.out === cur ? rec.src : cur;
     var v = tr(base);
     if (v === null) return;
     var nv = (/^\s/.test(base) ? " " : "") + v + (/\s$/.test(base) ? " " : "");
     SRC.set(n, { src: base, out: nv });
     if (nv !== cur) n.nodeValue = nv;
   }
-    function doAttrs(el) {
-      if (el.closest("[data-noi18n]")) return;
-      var m = ATTR.get(el);
-      if (!m) {
-        m = {};
-        ATTR.set(el, m);
-      }
-        ["placeholder", "aria-label", "title", "alt", "label"].forEach(function (a) {
-          if (!el.hasAttribute(a)) return;
-          var cur = el.getAttribute(a), rec = m[a], base = rec && rec.out === cur ? rec.src : cur, v = tr(base);
-          if (v !== null) {
-            m[a] = { src: base, out: v };
-            if (v !== cur) el.setAttribute(a, v);
-          }
-        });
-      if (el.tagName === "INPUT" && /^(submit|button)$/.test(el.type) && el.value) {
-        var w = tr(el.value);
-        if (w !== null) el.value = w;
-      }
+  function doAttrs(el) {
+    if (el.closest("[data-noi18n]")) return;
+    var m = ATTR.get(el);
+    if (!m) {
+      m = {};
+      ATTR.set(el, m);
     }
-    function walk(root) {
-      if (root.nodeType === 3) {
-        doText(root);
-        return;
+    ["placeholder", "aria-label", "title", "alt", "label"].forEach(function (a) {
+      if (!el.hasAttribute(a)) return;
+      var cur = el.getAttribute(a), rec = m[a], base = rec && rec.out === cur ? rec.src : cur, v = tr(base);
+      if (v !== null) {
+        m[a] = { src: base, out: v };
+        if (v !== cur) el.setAttribute(a, v);
       }
-        if (root.nodeType !== 1) return;
-      doAttrs(root);
-      root.querySelectorAll("[placeholder],[aria-label],[title],[alt],[label],input[type=submit],input[type=button]").forEach(doAttrs);
-      var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n, list = [];
-      while ((n = w.nextNode())) list.push(n);
-      list.forEach(doText);
+    });
+    if (el.tagName === "INPUT" && /^(submit|button)$/.test(el.type) && el.value) {
+      var w = tr(el.value);
+      if (w !== null) el.value = w;
     }
-    var TITLE0 = document.title;
+  }
+  function walk(root) {
+    if (root.nodeType === 3) {
+      doText(root);
+      return;
+    }
+    if (root.nodeType !== 1) return;
+    doAttrs(root);
+    root.querySelectorAll("[placeholder],[aria-label],[title],[alt],[label],input[type=submit],input[type=button]").forEach(doAttrs);
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n, list = [];
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach(doText);
+  }
+  var TITLE0 = document.title;
   function again() {
     walk(document.body);
     var tv = tr(TITLE0);
     if (tv !== null) document.title = tv;
   }
-    document.documentElement.lang = LOC;
+  document.documentElement.lang = LOC;
   if (LANG === "ar" || LANG === "ur" || LANG === "he") {
     document.documentElement.dir = "rtl";
     var rs = document.createElement("style");
     rs.textContent = ".skip:not(:focus){left:auto!important;right:-9999px!important}";
     document.head.appendChild(rs);
   }
-    function doNav() { /* the menu is drawn in English by nav.js and marked data-noi18n */
-      if (LANG === "en") return;
-      var w = document.createTreeWalker(document.querySelector(".bh") || document.body, NodeFilter.SHOW_TEXT),
-        n, list = [];
-      while ((n = w.nextNode())) {
-        var p = n.parentElement;
-        if (p && !p.closest("#bh-lmenu") && !p.closest(".bh-logo") && !BRAND.test(norm(n.nodeValue))
-          && (FIX[norm(n.nodeValue)] || FULL[norm(n.nodeValue)] || CORE[norm(n.nodeValue)])) list.push(n);
-      }
-        list.forEach(function (x) {
-          x.nodeValue = FIX[norm(x.nodeValue)] || FULL[norm(x.nodeValue)] || CORE[norm(x.nodeValue)];
-        });
+  function doNav() { /* the menu is drawn in English by nav.js and marked data-noi18n */
+    if (LANG === "en") return;
+    var w = document.createTreeWalker(document.querySelector(".bh") || document.body, NodeFilter.SHOW_TEXT),
+      n, list = [];
+    while ((n = w.nextNode())) {
+      var p = n.parentElement;
+      if (p && !p.closest("#bh-lmenu") && !p.closest(".bh-logo") && !BRAND.test(norm(n.nodeValue))
+        && (FIX[norm(n.nodeValue)] || FULL[norm(n.nodeValue)] || CORE[norm(n.nodeValue)])) list.push(n);
     }
-    function callExtra(items) { /* pages without app.js (privacy, terms, checklists) use the same back end */
-      var api = S.member && S.member.api, B = window.BUILD;
-      if (api) return fetch(api, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "i18nExtra", lang: LANG, items: items }),
-        redirect: "follow"
-      }).then(function (r) {
-        return r.json();
-      });
-      if (B && B.call) return B.call("i18nExtra", { lang: LANG, items: items });
-      return Promise.reject(new Error("no back end"));
-    }
-    window.I18N_TR = function (s) {
-      var v = tr(s);
-      return v === null ? s : v;
-    }; /* for text that is not on the page, such as the print window */
+    list.forEach(function (x) {
+      x.nodeValue = FIX[norm(x.nodeValue)] || FULL[norm(x.nodeValue)] || CORE[norm(x.nodeValue)];
+    });
+  }
+  function callExtra(items) { /* pages without app.js (privacy, terms, checklists) use the same back end */
+    var api = S.member && S.member.api, B = window.BUILD;
+    if (api) return fetch(api, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "i18nExtra", lang: LANG, items: items }),
+      redirect: "follow"
+    }).then(function (r) {
+      return r.json();
+    });
+    if (B && B.call) return B.call("i18nExtra", { lang: LANG, items: items });
+    return Promise.reject(new Error("no back end"));
+  }
+  window.I18N_TR = function (s) {
+    var v = tr(s);
+    return v === null ? s : v;
+  }; /* for text that is not on the page, such as the print window */
   window.I18N_WAIT = function () {
     return Object.keys(NEED).length;
   }; /* how many texts wait for the translator (test page only) */
@@ -409,7 +409,7 @@
           EXTRA[k] = j.map[k];
           n++;
         }
-          if (NEED[k]) delete NEED[k];
+        if (NEED[k]) delete NEED[k];
       }); /* the prepared list wins over an older copy in this browser, so a correction reaches returning visitors */
       try {
         localStorage.setItem(extraKey, JSON.stringify(EXTRA));
@@ -420,61 +420,61 @@
       TRXP = false;
     });
   }
-    function fetchExtra() {
-      needTimer = 0;
-      if (TRXP) {
-        needTimer = setTimeout(fetchExtra, 300);
+  function fetchExtra() {
+    needTimer = 0;
+    if (TRXP) {
+      needTimer = setTimeout(fetchExtra, 300);
+      return;
+    }
+    var list = Object.keys(NEED);
+    if (!list.length) return;
+    var batches = [];
+    while (list.length) batches.push(list.splice(0, 60));
+    batches = batches.slice(0, 5);
+    (function next() {
+      var items = batches.shift();
+      if (!items) {
+        if (Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 900);
         return;
       }
-        var list = Object.keys(NEED);
-      if (!list.length) return;
-      var batches = [];
-      while (list.length) batches.push(list.splice(0, 60));
-      batches = batches.slice(0, 5);
-      (function next() {
-        var items = batches.shift();
-        if (!items) {
-          if (Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 900);
-          return;
-        }
-          callExtra(items).then(function (j) {
-            var okj = !!(j && j.ok), busy = !okj || !!j.busy;
-            items.forEach(function (k) {
-              delete NEED[k];
-              var v = okj && j.map && j.map[k];
-              if (v) EXTRA[k] = v;
-              else if (!busy) EXTRA[k] = "";
-            }); /* an empty entry means: the checks did not pass, do not ask again in this browser. A busy or failed back end marks nothing, so the next page asks again. */
-            try {
-              localStorage.setItem(extraKey, JSON.stringify(EXTRA));
-            } catch (e) {}
-              again();
-            next();
-          }).catch(function () {
-            items.forEach(function (k) {
-              delete NEED[k];
-            });
-          });
-      })();
-    }
-    /* 2 Nov 2026: message boxes use the language of the page */
-    ["alert", "confirm", "prompt"].forEach(function (k) {
-      var f = window[k];
-      if (typeof f !== "function") return;
-      window[k] = function (m, d) {
-        var t = String(m == null ? "" : m), v = t.split("\n").map(function (x) {
-          var y = tr(x);
-          return y === null ? x : y;
-        }).join("\n");
-        return k === "prompt" ? f.call(window, v, d) : f.call(window, v);
-      };
-    });
+      callExtra(items).then(function (j) {
+        var okj = !!(j && j.ok), busy = !okj || !!j.busy;
+        items.forEach(function (k) {
+          delete NEED[k];
+          var v = okj && j.map && j.map[k];
+          if (v) EXTRA[k] = v;
+          else if (!busy) EXTRA[k] = "";
+        }); /* an empty entry means: the checks did not pass, do not ask again in this browser. A busy or failed back end marks nothing, so the next page asks again. */
+        try {
+          localStorage.setItem(extraKey, JSON.stringify(EXTRA));
+        } catch (e) {}
+          again();
+        next();
+      }).catch(function () {
+        items.forEach(function (k) {
+          delete NEED[k];
+        });
+      });
+    })();
+  }
+  /* 2 Nov 2026: message boxes use the language of the page */
+  ["alert", "confirm", "prompt"].forEach(function (k) {
+    var f = window[k];
+    if (typeof f !== "function") return;
+    window[k] = function (m, d) {
+      var t = String(m == null ? "" : m), v = t.split("\n").map(function (x) {
+        var y = tr(x);
+        return y === null ? x : y;
+      }).join("\n");
+      return k === "prompt" ? f.call(window, v, d) : f.call(window, v);
+    };
+  });
   function start() {
     if (LANG !== "en") {
       var es = document.getElementById("en-summary");
       if (es) es.hidden = true;
     } /* the English summary of privacy and terms: for English readers only */
-      doNav();
+    doNav();
     window.addEventListener("load", doNav);
     fetchFull();
     fetchTrx();
@@ -486,8 +486,8 @@
       var mn = document.getElementById("main");
       mn.parentNode.insertBefore(nb, mn);
     }
-      var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย ข้อความแปลด้วยเครื่องจากภาษาไทย ให้ยึดภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop()
-        || "") ? "ข้อความภาษาไทยคือฉบับที่มีผลผูกพัน ข้อความในภาษานี้แปลเพื่อให้อ่านเข้าใจ" : "";
+    var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย ข้อความแปลด้วยเครื่องจากภาษาไทย ให้ยึดภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop()
+      || "") ? "ข้อความภาษาไทยคือฉบับที่มีผลผูกพัน ข้อความในภาษานี้แปลเพื่อให้อ่านเข้าใจ" : "";
     if (hint && document.getElementById("main")) {
       var d = document.createElement("div");
       d.style.cssText = "background:#E4EAF1;color:#0F2A44;padding:10px 16px;font-size:15px";
@@ -495,56 +495,56 @@
       var m = document.getElementById("main");
       m.parentNode.insertBefore(d, m);
     }
-      if (document.body.classList.contains("k-body") && document.getElementById("main")) { /* knowledge pages explain Thai law: a card gives the law of the country of the reader */
-        var ls = document.createElement("script");
-        ls.src = "doc-law.js";
-        ls.onload = function () {
-          var cc = (window.LANG_CC || {})[LANG], rec = (window.LAWDB || []).filter(function (x) {
-            return (window.CC_OF || {})[x.country] === cc;
-          })[0];
-          if (!rec || cc === "TH") return;
-          var dn = "";
-          try {
-            dn = new Intl.DisplayNames([LANG], { type: "region", style: "short" }).of(cc);
-          } catch (e) {
-            dn = rec.country;
-          }
-            var card = document.createElement("div");
-          card.style.cssText = "background:#F6F4EF;color:#0F2A44;padding:10px 16px;font-size:15px;border-bottom:1px solid #DDE3EA;overflow-wrap:anywhere";
-          var b1 = document.createElement("b");
-          b1.setAttribute("data-noi18n", "1");
-          b1.textContent = dn + ": ";
-          card.appendChild(b1);
-          var s1 = document.createElement("span");
-          s1.textContent = "กฎหมายหลักของประเทศคุณ";
-          card.appendChild(s1);
-          card.appendChild(document.createTextNode(" "));
-          var s2 = document.createElement("span");
-          s2.setAttribute("data-noi18n", "1");
-          s2.textContent = rec.lawNameLocal || rec.lawName;
-          card.appendChild(s2);
-          card.appendChild(document.createTextNode(" · "));
-          var a1 = document.createElement("a");
-          a1.href = "doc.html";
-          a1.textContent = "เปิดฟอร์มตามมาตรฐานของประเทศคุณ";
-          card.appendChild(a1);
-          var mm = document.getElementById("main");
-          mm.parentNode.insertBefore(card, mm);
-        };
-        document.head.appendChild(ls);
-      }
-      again();
+    if (document.body.classList.contains("k-body") && document.getElementById("main")) { /* knowledge pages explain Thai law: a card gives the law of the country of the reader */
+      var ls = document.createElement("script");
+      ls.src = "doc-law.js";
+      ls.onload = function () {
+        var cc = (window.LANG_CC || {})[LANG], rec = (window.LAWDB || []).filter(function (x) {
+          return (window.CC_OF || {})[x.country] === cc;
+        })[0];
+        if (!rec || cc === "TH") return;
+        var dn = "";
+        try {
+          dn = new Intl.DisplayNames([LANG], { type: "region", style: "short" }).of(cc);
+        } catch (e) {
+          dn = rec.country;
+        }
+        var card = document.createElement("div");
+        card.style.cssText = "background:#F6F4EF;color:#0F2A44;padding:10px 16px;font-size:15px;border-bottom:1px solid #DDE3EA;overflow-wrap:anywhere";
+        var b1 = document.createElement("b");
+        b1.setAttribute("data-noi18n", "1");
+        b1.textContent = dn + ": ";
+        card.appendChild(b1);
+        var s1 = document.createElement("span");
+        s1.textContent = "กฎหมายหลักของประเทศคุณ";
+        card.appendChild(s1);
+        card.appendChild(document.createTextNode(" "));
+        var s2 = document.createElement("span");
+        s2.setAttribute("data-noi18n", "1");
+        s2.textContent = rec.lawNameLocal || rec.lawName;
+        card.appendChild(s2);
+        card.appendChild(document.createTextNode(" · "));
+        var a1 = document.createElement("a");
+        a1.href = "doc.html";
+        a1.textContent = "เปิดฟอร์มตามมาตรฐานของประเทศคุณ";
+        card.appendChild(a1);
+        var mm = document.getElementById("main");
+        mm.parentNode.insertBefore(card, mm);
+      };
+      document.head.appendChild(ls);
+    }
+    again();
     new MutationObserver(function (list) {
       list.forEach(function (m) {
         if (m.type === "characterData") {
           doText(m.target);
           return;
         }
-          if (m.type === "attributes") {
-            doAttrs(m.target);
-            return;
-          }
-          m.addedNodes.forEach(walk);
+        if (m.type === "attributes") {
+          doAttrs(m.target);
+          return;
+        }
+        m.addedNodes.forEach(walk);
       });
     }).observe(document.body, {
       subtree: true,
@@ -554,6 +554,6 @@
       attributeFilter: ["placeholder", "aria-label", "title", "alt", "label"]
     });
   }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 })();
