@@ -82,8 +82,26 @@
     kakaopay: WALLET_FX,
     touch_n_go: WALLET_FX
   };
-  function feeHtml(k) {
+  // คำตอบ Q49 (สภา 3 พ.ย. 2026): ค่าธรรมเนียมที่ซ้ำกันตั้งแต่ 2 ช่องทางในกลุ่ม แสดงครั้งเดียวที่หัวกลุ่ม · ช่องทางที่ต่างกันยังแสดงบรรทัดของตัวเอง
+  function topFee(list) {
+    var n = {}, top = "", best = 1;
+    (list || []).forEach(function (k) {
+      var f = FEE[k] || NONE;
+      n[f] = (n[f] || 0) + 1;
+      if (n[f] > best) {
+        best = n[f];
+        top = f;
+      }
+    });
+    return top;
+  }
+  function groupNote(list) {
+    var t = topFee(list);
+    return t ? '<small class="pfee pfeeg' + (t === NONE ? " none" : "") + '" style="display:block;margin:0 0 6px">' + esc(t) + "</small>" : "";
+  }
+  function feeHtml(k, list) {
     var f = FEE[k] || NONE;
+    if (list && topFee(list) === f) return "";
     return '<small class="pfee' + (f === NONE ? " none" : "") + '">' + esc(f) + "</small>";
   }
   // อัตราดอกเบี้ยต่อเดือนแบบลูกค้าจ่าย: สัญญา Opn ไทย ฉบับ 30 ก.ย. 2025 ตาราง Schedule II · จำนวนเดือนและขั้นต่ำต่อเดือน: docs.omise.co/installment-payment (อ่าน 31 ต.ค. 2026)
@@ -664,6 +682,7 @@
   B.pay = {
     groupBox: groupBox,
     feeHtml: feeHtml,
+    groupNote: groupNote,
     instTable: instTable,
     CUR: CUR,
     curs: curs,

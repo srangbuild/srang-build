@@ -284,7 +284,7 @@
         l1: l1d,
         l2: l1d === "th" ? "en-GB" : "th",
         site: def,
-        std: def,
+        std: lccOf(l1d) || def, // คำตอบ Q47 (3 พ.ย. 2026): มาตรฐานเริ่มต้นยึดประเทศของภาษาที่ 1 ลูกค้าเปลี่ยนได้
         city: ""
       }, langs = R ? R.docLangs() : [["th", "ไทย"], ["en-GB", "English (UK)"]], ccs = Object.keys(window.CC_OF ? (function () {
         var m = {};
@@ -351,10 +351,10 @@
         if (h) h.why.push(why);
         else opt.push({ cc: cc, why: [why] });
       };
-      add(v.site, "ประเทศที่ตั้งงาน");
       add(lccOf(v.l1), two ? "ประเทศของภาษาที่ 1" : "ประเทศของภาษา");
       if (two) add(lccOf(v.l2), "ประเทศของภาษาที่ 2");
-      if (!picked) stdPick = v.site;
+      add(v.site, "ประเทศที่ตั้งงาน");
+      if (!picked) stdPick = lccOf(v.l1) || v.site; // ยึดภาษาที่ 1 จนกว่าลูกค้าจะเลือกเอง
       var known = opt.some(function (p) {
         return p.cc === stdPick;
       }) || stdPick === "INT", ids = idsOf(x);
