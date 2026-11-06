@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
-Sitemap: https://srangbuild.github.io/srang-build/sitemap.xml
+Sitemap: https://srangbuild.com/sitemap.xml
