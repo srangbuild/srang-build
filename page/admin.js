@@ -1182,6 +1182,10 @@
         ? '<span class="tag">คีย์ทดสอบ</span>' : hl.stripeCharges === false ? '<span class="tag no">บัญชียังรับเงินไม่ได้</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
       + "</td><td>บัตรในไทย 3.65% + 10 บาท · บัตรต่างประเทศ 4.75% + 10 บาท + 2% ถ้าแปลงเงิน · พร้อมเพย์ 1.65% (stripe.com อ่าน 30 ต.ค. 2026) · ตั้ง STRIPE_SECRET ใน Script properties</td></tr>"
       +
+      "<tr><td>Lemon Squeezy</td><td>" + (f.lemon ? (hl.lemon === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : hl.lemonVariant === false
+        ? '<span class="tag no">ไม่พบสินค้า ตรวจ LEMON_VARIANT_ID</span>' : f.lsTest ? '<span class="tag">โหมดทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
+      + "</td><td>5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ " + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้ง LEMON_API_KEY LEMON_STORE_ID LEMON_VARIANT_ID ใน Script properties · LEMON_TEST=1 ตอนทดสอบ · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที</td></tr>"
+      +
       "<tr><td>จ่ายที่เคาน์เตอร์ Lotus's</td><td><span class=\"tag no\">Opn ปิดแล้ว</span></td><td>Opn แจ้งว่าช่องทางนี้ไม่มีให้ใช้แล้ว (ทดสอบ 30 ต.ค. 2026)</td></tr>"
       +
       "<tr><td>Apple Pay</td><td><span class=\"tag no\">ยังไม่รองรับ</span></td><td>ฟอร์มของ Opn รองรับเฉพาะบัญชีสิงคโปร์ (อ่าน 30 ต.ค. 2026) · ลูกค้า iPhone จ่ายด้วยบัตรหรือแอปธนาคารได้</td></tr>"
