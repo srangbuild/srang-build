@@ -20,6 +20,9 @@
     stripe: ["Stripe: บัตร และพร้อมเพย์",
       "Visa Mastercard ไทยและต่างประเทศ · พร้อมเพย์เฉพาะจ่ายเป็นบาท · ไปจ่ายที่หน้าของ Stripe",
       "intl"],
+    lemon: ["Lemon Squeezy: บัตร PayPal Apple Pay Google Pay",
+      "ราคาเป็นดอลลาร์สหรัฐ หน้าชำระแสดงเป็นเงินของคุณ · ภาษีของประเทศคุณรวมให้ที่หน้าชำระ · ไปจ่ายที่หน้าของ Lemon Squeezy",
+      "intl"],
     installment: ["ผ่อนชำระผ่านบัตรเครดิต",
       "ยอดตั้งแต่ 2,000 บาท · เลือกธนาคารและจำนวนเดือนในหน้าถัดไป", "intl"],
     mobile_banking_kbank: ["K PLUS", "กสิกรไทย · เปิดแอปจ่ายทันที", "bank"],
@@ -74,6 +77,7 @@
     card: FX_NOTE,
     googlepay: FX_NOTE,
     stripe: FX_NOTE,
+    lemon: "ไม่มีค่าธรรมเนียมจากร้าน · ราคาคิดเป็นดอลลาร์สหรัฐ · ภาษีมูลค่าเพิ่มของประเทศคุณ (ถ้ามี) แสดงที่หน้าชำระ",
     paypal: "ไม่มีค่าธรรมเนียมจากร้าน · ถ้าบัญชีของคุณเป็นสกุลอื่น PayPal แปลงเงินตามอัตราของ PayPal",
     installment: "มีดอกเบี้ย ลูกค้าเป็นผู้จ่าย ดูอัตราด้านล่าง",
     alipay: WALLET_FX,
@@ -236,7 +240,7 @@
     var p = me && me.pay, want = Array.isArray(P.currencies) && P.currencies.length ? P.currencies : Object.keys(CUR);
     return want.filter(function (c) {
       return CUR[c] && (c === "THB" || (p && p.opn && (B.demo || (capCur && capCur.indexOf(c) >= 0)))
-        || (p && p.paypal && c !== "CNY") || (p && p.stripe));
+        || (p && p.paypal && c !== "CNY") || (p && p.stripe) || (p && p.lemon && c === "USD"));
     });
   }
   function cur(me) {
@@ -323,17 +327,17 @@
       ? P.methods : Object.keys(LABEL);
     if (me && me.pay && me.pay.paypal) ppId = me.pay.paypal;
     return want.filter(function (k) {
-      return LABEL[k] && on.indexOf(k) >= 0 && (k === "paypal" || k === "stripe" || !capNames || capNames.indexOf(k) >= 0)
-        && (amount === undefined || amount >= (MIN_FOR[k] || 0)) && (curNow === "THB" || (k === "card"
+      return LABEL[k] && on.indexOf(k) >= 0 && (k === "paypal" || k === "stripe" || k === "lemon" || !capNames || capNames.indexOf(k) >= 0)
+        && (amount === undefined || amount >= (k === "lemon" ? (+(me && me.pay && me.pay.lemonMin) || 0) : (MIN_FOR[k] || 0))) && (curNow === "THB" || (k === "card"
           && (B.demo || (capCur && capCur.indexOf(curNow) >= 0))) || (k === "paypal" && curNow !== "CNY")
-          || k === "stripe" || (LOCAL[payCc] && LOCAL[payCc].indexOf(k) >= 0)); /* a wallet of the payer's country charges in baht, and the provider converts */
+          || k === "stripe" || k === "lemon" || (LOCAL[payCc] && LOCAL[payCc].indexOf(k) >= 0)); /* a wallet of the payer's country charges in baht, and the provider converts */
     });
   }
   // โหมดทดสอบของ Opn กับหลังบ้านรุ่นเก่า (ไม่มี guard): ซ่อนการชำระออนไลน์ เพราะบัตรทดสอบที่เผยแพร่ "ชำระผ่าน" ได้โดยไม่มีเงินจริง
   function online(me) {
     var p = me && me.pay, opnOk = !!(p && p.opn && (B.demo || /^pkey_/.test(String(P.opnKey || "")))
       && !(p.test && !p.guard && !B.demo));
-    return !!(p && (opnOk || p.paypal || p.stripe) && methods(me).length);
+    return !!(p && (opnOk || p.paypal || p.stripe || p.lemon) && methods(me).length);
   }
   function minOnline(me) {
     return +(me && me.minOnline) || 20;
@@ -371,6 +375,7 @@
     var pc = method === "card" || method === "paypal" || method === "stripe" ? curNow : "THB";
     if (method === "paypal") return paypal(order, ui, pc);
     if (method === "stripe") return stripe(order, ui, pc);
+    if (method === "lemon") return lemon(order, ui);
     if (B.demo) { // โหมดทดลอง: ตัวจำลองของ Opn ตอบแทน (บัตร = ผ่านทันที · พร้อมเพย์ = คิวอาร์ทดลอง · ช่องทางอื่น = ไปหน้ายืนยันแล้วกลับมา)
       var n = method === "card" || method === "googlepay" ? "tokn_test_emuok" : "src_test_emu" + String(method).replace(/_/g,
         "");
@@ -529,6 +534,22 @@
         sessionStorage.setItem("build_pay_from", ui.back || "");
       } catch (e) {}
         location.href = r.url;
+      return r;
+    }, function (e) {
+      if (ui.lock) ui.lock(false);
+      if (ui.msg) ui.msg(e.message, true);
+    });
+  }
+  // Lemon Squeezy Checkout (6 พ.ย. 2026): ราคาเป็นดอลลาร์สหรัฐ ลูกค้าจ่ายที่หน้าของ Lemon Squeezy (บัตร PayPal Apple Pay Google Pay) แล้วกลับมาที่หน้าเดิม หลังบ้านตรวจผลกับ Lemon Squeezy เอง
+  function lemon(order, ui) {
+    if (ui.lock) ui.lock(true);
+    return B.call("lsStart", { order: order.id, ret: ui.back || "" }).then(function (r) {
+      if (ui.lock) ui.lock(false);
+      try {
+        sessionStorage.setItem("build_pay_wait", order.id);
+        sessionStorage.setItem("build_pay_from", ui.back || "");
+      } catch (e) {}
+      location.href = r.url;
       return r;
     }, function (e) {
       if (ui.lock) ui.lock(false);
