@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-10-31b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-06b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   var KEY = "build_site_draft";
   var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";
@@ -926,6 +926,8 @@
       "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ " + ((S.pay.methods || []).length) + " ช่องทาง",
       "เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริง · ขอเปิดช่องทางเพิ่มที่ support@omise.co");
     add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
+    if (su.mailLeft !== undefined) add(su.mailLeft < 0 ? "wa" : su.mailLeft <= 30 ? "no" : "ok", "โควตาอีเมลวันนี้" + (su.mailLeft < 0 ? "" : " เหลือ " + su.mailLeft + " จาก " + (su.mailMax || 100) + " ผู้รับ"),
+      "บัญชี Gmail ทั่วไปส่งได้ 100 ผู้รับต่อวัน รีเซ็ตทุกวัน · เหลือ 30 ระบบส่งเตือนร้าน 1 ครั้ง · เหลือ 5 งดอีเมลแจ้งร้าน ลูกค้ายังได้ครบ · ยอดขายราว 20 ใบต่อวันคือจุดที่ต้องขยาย ดูแผนขยายระบบ (3_แผนและเอกสาร\\1_แผนธุรกิจ)");
     var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("")
       + "</ul></div>";
     return conn + kpis + todo + sales + orders + mem + stock + setup;
@@ -1184,7 +1186,7 @@
       +
       "<tr><td>Lemon Squeezy</td><td>" + (f.lemon ? (hl.lemon === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : hl.lemonVariant === false
         ? '<span class="tag no">ไม่พบสินค้า ตรวจ LEMON_VARIANT_ID</span>' : f.lsTest ? '<span class="tag">โหมดทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
-      + "</td><td>5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ " + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้ง LEMON_API_KEY LEMON_STORE_ID LEMON_VARIANT_ID ใน Script properties · LEMON_TEST=1 ตอนทดสอบ · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที</td></tr>"
+      + "</td><td>" + (hl.lemonStore ? "ร้าน " + esc(hl.lemonStore) + " · สินค้า " + esc(hl.lemonProduct || "") + (hl.lemonTest ? " (โหมดทดสอบ)" : "") + " · " : "") + "5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ " + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้งแค่ LEMON_API_KEY ใน Script properties ระบบหาร้าน สินค้า และโหมดทดสอบเอง (ตั้ง LEMON_STORE_ID LEMON_VARIANT_ID LEMON_TEST เองได้ถ้าต้องการบังคับ) · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที · LS_MIN_THB ยอดต่ำสุด</td></tr>"
       +
       "<tr><td>จ่ายที่เคาน์เตอร์ Lotus's</td><td><span class=\"tag no\">Opn ปิดแล้ว</span></td><td>Opn แจ้งว่าช่องทางนี้ไม่มีให้ใช้แล้ว (ทดสอบ 30 ต.ค. 2026)</td></tr>"
       +
