@@ -8,7 +8,7 @@ window.SITE = {
     "schedule": "ลงคลิปใหม่ทุกวันอังคาร 18:00"
   },
   "site": {
-    "url": "https://srangbuild.github.io/srang-build/",
+    "url": "https://srangbuild.com/",
     "ga4": ""
   },
   "links": {
@@ -888,6 +888,7 @@ window.SITE = {
       "card",
       "googlepay",
       "paypal",
+      "lemon",
       "installment",
       "mobile_banking_kbank",
       "mobile_banking_scb",
