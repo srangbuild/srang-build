@@ -722,6 +722,20 @@
         r.checked + " · " + r.confidence, true) : "") + (x.sources && x.sources.length ? row("More sources",
           x.sources.join(" · "), true) : "") + "</div>";
   }
+  function evOf(name) { // หน้าทางการของมาตรฐานชื่อนี้ จากทุกประเทศที่เลือก (ชื่อตรงกัน หรือชื่อหนึ่งขึ้นต้นด้วยอีกชื่อ)
+    var R = window.DOCREFS && window.DOCREFS.cc, hit = "";
+    if (!R || !name) return "";
+    (D.ctry || []).forEach(function (c) {
+      var ev = R[c.cc] && R[c.cc].ev;
+      if (!ev || hit) return;
+      if (ev[name]) hit = ev[name];
+      else Object.keys(ev).some(function (k) {
+        if (k.indexOf(name) === 0 || name.indexOf(k) === 0) { hit = ev[k]; return true; }
+        return false;
+      });
+    });
+    return /^https?:\/\//.test(hit) ? hit : "";
+  }
   function annexes() { // ภาคผนวก ก มาตรฐานอ้างอิงและลำดับการใช้เกณฑ์ · ภาคผนวก ข กรอบกฎหมายของประเทศที่เลือก (อยู่ท้ายเอกสาร ตามคำสั่งผู้ใช้ 2 พ.ย. 2026)
     var d = D, L = d.lab, cs = langs();
     var codeRow = function (c) {
@@ -752,7 +766,10 @@
           + "</span>";
       }).join("") + "</p>";
     var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (d.picked && d.picked.length
-      ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(esc).join(" · ") + "</div>" : "")
+      ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(function (n) { // 7 พ.ย. 2026 คำสั่งเจ้าของ: มาตรฐานที่ใช้ในเอกสารต้องมีแหล่งอ้างอิงที่ตามไปดูได้ · ลิงก์หน้าทางการจาก doc-refs.js (evidence) เมื่อมี
+        var u = evOf(n);
+        return esc(n) + (u ? ' <span class="rf2" data-noi18n="1">' + esc(u) + "</span>" : "");
+      }).join(" · ") + "</div>" : "")
       + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName)
         + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
     var site = $("site") ? $("site").value : "", inC = (d.ctry || []).some(function (c) {

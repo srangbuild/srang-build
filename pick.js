@@ -45,6 +45,7 @@
     var v = String(o.getAttribute("data-lc") || o.value || ""), a = [o.textContent, v, o.getAttribute("data-src")];
     if (type === "country" && /^[A-Z]{2}$/.test(v)) {
       a.push(nameIn("th", "region", v), nameIn("en", "region", v));
+      if (RG && RG.regionName) a.push(RG.regionName(v, "th"), RG.regionName(v, "en")); // 7 Nov 2026: official spellings of the register
       if (RG && RG.langsOf) RG.langsOf(v).forEach(function (l) {
         a.push(nameIn(l, "region", v));
       });

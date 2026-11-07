@@ -717,11 +717,11 @@ window.SITE = {
   "faq": [
     {
       "q": "ใครเป็นคนทำช่องนี้",
-      "a": "ช่อง สร้าง | BUILD TH เขียนบทและตรวจข้อเท็จจริงโดยคนทุกตอน ตัวเลขทุกตัวมีแหล่งอ้างอิง ส่วนภาพและเพลงสร้างด้วย AI"
+      "a": "ทีมงาน สร้าง | BUILD TH ทำทุกขั้นตอน ตั้งแต่ค้นข้อมูล เขียนบท ตรวจข้อเท็จจริง จนถึงผลิตภาพ เสียง และเพลง ตัวเลขทุกตัวมีแหล่งอ้างอิง"
     },
     {
       "q": "ภาพในคลิปเป็นของจริงไหม",
-      "a": "ภาพและเพลงสร้างด้วย AI เพื่ออธิบายหลักการ ภาพที่ดูสมจริงเป็นภาพจำลอง ไม่ใช่โครงการจริง"
+      "a": "ภาพในคลิปทำขึ้นเพื่ออธิบายหลักการ ภาพที่ดูสมจริงเป็นภาพจำลอง ไม่ใช่โครงการจริง"
     },
     {
       "q": "ใช้ข้อมูลในคลิปตัดสินใจเรื่องบ้านได้เลยไหม",
@@ -4004,8 +4004,8 @@ window.SITE = {
       "q": "มีภาษาอื่นไหม",
       "qEn": "Do you have other languages",
       "k": "ภาษาอื่น ภาษาอังกฤษ ภาษาจีน ภาษาญี่ปุ่น english ญี่ปุ่น เยอรมัน แปลเป็น มาตรฐานต่างประเทศ",
-      "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษแปลด้วยเครื่อง และมีคำเตือนบนเอกสาร",
-      "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are machine translated, and the document carries a warning.",
+      "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษเป็นฉบับแปลของระบบ และมีหมายเหตุบนเอกสาร",
+      "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are translated by our system, and the document carries a note.",
       "href": "request.html"
     },
     {
@@ -4091,6 +4091,6 @@ window.SITE = {
       "href": "member.html#ask"
     }
   ],
-  "termsDate": "30 ต.ค. 2026",
+  "termsDate": "7 พ.ย. 2026",
   "privacyDate": "30 ต.ค. 2026"
 };

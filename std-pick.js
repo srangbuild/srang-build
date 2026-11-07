@@ -23,9 +23,18 @@
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
       });
     }
+  function regName(cc, lg) { // 7 พ.ย. 2026: ชื่อประเทศไทยและอังกฤษใช้ทะเบียนเดียวกับหน้ากฎหมาย (region.js จาก 00_โซน.json) ไม่ใช้ชื่อย่อของเบราว์เซอร์ เช่น สหรัฐฯ
+    var R = window.REGION, b = String(lg || "").slice(0, 2);
+    if (R && R.regionName && (b === "th" || b === "en")) {
+      var n = R.regionName(cc, b);
+      if (n && n !== cc) return n;
+    }
+    return "";
+  }
   function label(cc) {
     if (cc === "INT") return "ข้อกำหนดโครงการ";
-    var n = "";
+    var n = regName(cc, lang);
+    if (n) return n;
     try {
       n = DN ? DN.of(cc) : "";
     } catch (e) {}
@@ -33,8 +42,10 @@
     return REC[cc] ? (lang === "th" ? REC[cc].countryTh : REC[cc].country) : cc;
   }
   function labelIn(cc, lg) {
+    var n = regName(cc, lg);
+    if (n) return n;
     try {
-      var n = new Intl.DisplayNames([lg], { type: "region", style: "short" }).of(cc);
+      n = new Intl.DisplayNames([lg], { type: "region", style: "short" }).of(cc);
       if (n && n !== cc) return n;
     } catch (e) {} return REC[cc] ? REC[cc].country : cc;
   }
@@ -256,7 +267,7 @@
             + t[0] + '">' + t[1] + "</button>";
         }).join("") + '</div><div class="sx-p" role="tabpanel">' + (S.tab === "std" ? panelStd() : S.tab === "law"
           ? panelLaw() : panelSys()) + '</div></li><li class="sx-s"><span class="sx-no">3</span><a class="b pri" href="'
-        + esc(goHref()) + '">เปิดฟอร์มตามตัวเลือกนี้</a></li></ol><p class="note sx-foot">ข้อมูลนี้ระบบ AI รวบรวมจากแหล่งที่ระบุ ไม่ใช่คำรับรองของผู้มีใบอนุญาต ก่อนใช้งานจริงให้ตรวจกับเอกสารทางการของประเทศนั้น</p>';
+        + esc(goHref()) + '">เปิดฟอร์มตามตัวเลือกนี้</a></li></ol><p class="note sx-foot">ทีม BUILD TH รวบรวมข้อมูลนี้จากแหล่งที่ระบุ ไม่ใช่คำรับรองของผู้มีใบอนุญาต ก่อนใช้งานจริงให้ตรวจกับเอกสารทางการของประเทศนั้น</p>';
       trEn(el);
     }
     el.addEventListener("change", function (ev) {

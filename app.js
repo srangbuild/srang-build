@@ -420,6 +420,11 @@
   }
   var MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.",
     "พ.ย.", "ธ.ค."];
+  function gmt(d) { // 7 พ.ย. 2026 คำสั่งเจ้าของ: เวลาทุกจุดบอกเขตเวลาของเครื่องผู้ชมเป็น GMT+X (คิดตามวันที่นั้น จึงรวมเวลาออมแสง)
+    d = d instanceof Date ? d : new Date(d || Date.now());
+    var m = isNaN(d) ? 0 : -d.getTimezoneOffset(), a = Math.abs(m), r = a % 60;
+    return "GMT" + (m ? (m < 0 ? "-" : "+") + Math.floor(a / 60) + (r ? ":" + ("0" + r).slice(-2) : "") : "");
+  }
   function when(iso) {
     var d = new Date(iso);
     if (!iso || isNaN(d)) return "";
@@ -433,11 +438,40 @@
           minute: "2-digit",
           hour12: false,
           numberingSystem: "latn"
-        }).format(d) + "⁩";
+        }).format(d) + " (" + gmt(d) + ")⁩";
       } catch (e) {}
     } // 2 พ.ย. 2026: รูปแบบวันที่ของภาษานั้น · อักขระ U+2068 U+2069 บอก i18n.js ว่าไม่ต้องแปล
     return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2)
-      + ":" + ("0" + d.getMinutes()).slice(-2);
+      + ":" + ("0" + d.getMinutes()).slice(-2) + " (" + gmt(d) + ")";
+  }
+  var DAY = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+  function weekly(dow, hhmm, off) { // 7 พ.ย. 2026 กฎข้อ 33: เวลาฉายประจำสัปดาห์ของต้นทาง (dow 0 = อาทิตย์ · off = นาทีตะวันออกของ UTC ค่าเริ่มต้นเวลาไทย 420) → รอบถัดไปเป็น Date ของเครื่องผู้ชม
+    var m = /^(\d{1,2}):(\d{2})$/.exec(hhmm || "");
+    if (!m || !(dow >= 0 && dow <= 6)) return null;
+    var o = off == null ? 420 : +off, now = Date.now(), s = new Date(now + o * 60000);
+    var d = new Date(Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate() + ((dow - s.getUTCDay() + 7) % 7), +m[1], +m[2]) - o * 60000);
+    if (d.getTime() < now - 3600000) d = new Date(d.getTime() + 7 * 86400000);
+    return d;
+  }
+  function whenWeekly(d) { // "อังคาร 18:00 (GMT+7)" ตามเขตเวลาและภาษาของผู้ชม · ภาษาอื่นครอบด้วย U+2068 U+2069 ให้ i18n.js ปล่อยไว้
+    if (!d || isNaN(d)) return "";
+    var t = "";
+    if (siteLang !== "th") {
+      try {
+        t = new Intl.DateTimeFormat(LOC, { weekday: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23", numberingSystem: "latn" }).format(d);
+      } catch (e) {}
+    }
+    if (!t) t = DAY[d.getDay()] + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    t += " (" + gmt(d) + ")";
+    return siteLang !== "th" ? "⁨" + t + "⁩" : t;
+  }
+  function schedText(s) { // ข้อความตารางลงคลิปใน data.js เขียนเป็นเวลาไทย เช่น ลงคลิปใหม่ทุกวันอังคาร 18:00 → ส่วนหน้า + วันเวลาของผู้ชม + ส่วนท้าย
+    var m = /^(.*?)(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์)\s*(\d{1,2}:\d{2})\s*(?:น\.)?(.*)$/.exec(s || "");
+    if (!m) return null;
+    var d = weekly(DAY.indexOf(m[2] === "พฤหัส" ? "พฤหัสบดี" : m[2]), m[3]);
+    if (!d) return null;
+    var t = whenWeekly(d);
+    return { pre: m[1], when: t, post: m[4], date: d, text: m[1] + (siteLang === "th" ? "" : " ") + t + m[4] };
   }
   function rand(n) {
     var a = new Uint8Array(n || 16);
@@ -627,6 +661,10 @@
     shrink: shrink,
     saveFile: saveFile,
     when: when,
+    gmt: gmt,
+    weekly: weekly,
+    whenWeekly: whenWeekly,
+    schedText: schedText,
     rand: rand,
     cart: cart,
     preview: /[?&]preview=1/.test(location.search) ? "?preview=1" : ""
