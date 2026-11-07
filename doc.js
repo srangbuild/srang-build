@@ -484,18 +484,29 @@
       return c !== "TH";
     })) h += '<p class="warn">' + M(L.cnote) + "</p>";
     if (d.machine) h += '<p class="warn">' + M(L.mt) + "</p>";
+    if (d.rgs && d.rgs.length && L.rgn) h += '<p class="warn">' + M(L.rgn) + " " + esc(d.rgs.join(", ")) + "</p>"; // C19
+    if (d.nWeak && L.weakN) h += '<p class="warn">' + M(L.weakN) + "</p>"; // C19
     return h;
   }
+  function c19o(o, L) { // C19: ป้ายค่าภูมิภาค และค่าที่ต่ำกว่าที่ตั้งงาน ในตัวเลือก
+    return (o.rg && L.rgv ? '<span class="rf2 rgv">' + One(L.rgv) + " " + esc(o.rg) + "</span>" : "")
+      + (o.weak && L.weakO ? '<span class="rf2 wk">' + One(L.weakO) + "</span>" : "");
+  }
+  function c19x(r, L) { // C19: ป้ายค่าภูมิภาค และคำเตือนค่าต่ำกว่าที่ตั้งงาน พร้อมค่าของที่ตั้งงาน (คำตอบ Q41)
+    return (r.rg && L.rgv ? '<div class="rf rgv">' + One(L.rgv) + " " + esc(r.rg) + "</div>" : "")
+      + (r.weak && L.weak ? '<div class="weak">' + One(L.weak) + " " + esc(r.weak.cc) + " · " + Bi(r.weak.cr, true)
+        + (r.weak.ref ? '<span class="rf2">' + esc(r.weak.ref) + "</span>" : "") + "</div>" : "");
+  }
   function crCell(r, n) {
-    var L = D.lab;
+    var L = D.lab, ex = c19x(r, L);
     if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) {
-      return '<label class="pick' + (o.tag ? " ptag" : "") + '" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk'
+      return '<label class="pick' + (o.tag ? " ptag" : "") + (o.weak ? " pweak" : "") + '" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk'
         + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">'
         + esc(o.tag || o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">'
-          + esc(o.ref) + "</span>" : "") + "</span></label>";
-    }).join("") + "</div>";
+          + esc(o.ref) + "</span>" : "") + c19o(o, L) + "</span></label>";
+    }).join("") + "</div>" + ex;
     return Bi(r.cr, true) + (r.jref ? '<div class="rf">' + One(L.also) + " " + esc(r.jref) + "</div>" : "")
-      + (r.ref ? '<div class="rf">' + One(L.ref) + " " + One(r.ref) + "</div>" : "");
+      + (r.ref ? '<div class="rf">' + One(L.ref) + " " + One(r.ref) + "</div>" : "") + ex;
   }
   function thw(c) {
     var s = (c || []).join(" ");
@@ -687,7 +698,9 @@
         return r.t === t[0];
       });
       return it.length ? '<div><b><span data-en="' + esc(t[1]) + '">' + esc(t[1]) + "</span>:</b> " + it.map(function (r) {
-        return esc(r.n) + (r.l ? " (" + esc(r.l) + ")" : "") + (r.b ? " · " + esc(r.b) : "") + (r.o ? "" : " *");
+        return esc(r.n) + (r.l ? " (" + esc(r.l) + ")" : "") + (r.b ? " · " + esc(r.b) : "")
+          + (r.s === "draft" ? ' [<span data-en="draft, not yet in force">draft, not yet in force</span>]' : r.s ? ' [<span data-en="passed, not yet in force">passed, not yet in force</span>]' : "") // 7 Nov 2026
+          + (r.o ? "" : " *");
       }).join("; ") + "</div>" : "";
     }).join("") + '<div><b><span data-en="Official links">Official links</span>:</b> ' + esc(site + "/laws.html#" + cc)
       + ' · * <span data-en="confirm with the authority">confirm with the authority</span></div></div>';
@@ -886,7 +899,7 @@
       lang2: base(pick2),
       std: v("c1"),
       std2: v("c2"),
-      stdName: v("stdName"),
+      site: $("site") ? $("site").value : "",
       stds: window.StdPick && $("stdBox") ? window.StdPick.selected($("stdBox")) : []
     })
       .then(function (r) {

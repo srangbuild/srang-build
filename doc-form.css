@@ -131,3 +131,8 @@
 .fm label.pick .rf2 { font-size: 6.8pt; color: #3F4A58; }
 .fm .pick.ptag { flex-wrap: wrap; }
 .fm .pick.ptag .ptx { flex: 1 1 100%; }
+/* C19 (6 Nov 2026): regional default label, and a chosen value lower than the site country (B&W: left bar + bold label) */
+.fm .rgv { color: #5B4B00; }
+.fm .weak { margin-top: 1mm; padding: .8mm 1.6mm; border-left: 2pt solid #C24A08; background: #FFF1E8; color: #7A2E05; font-size: 7.2pt; }
+.fm label.pick.pweak .ctag { border-color: #C24A08; color: #C24A08; }
+.fm .rf2.wk { color: #7A2E05; font-weight: 700; }
