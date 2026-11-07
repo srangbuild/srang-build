@@ -94,12 +94,34 @@
     $("l1txt").textContent = two ? "ภาษาที่ 1 (ข้อความหลัก)" : "ภาษาของเอกสาร";
   }
   var touched = { c1: false, c2: false };
-  function follow() { // ภาษาไหนยึดประเทศนั้น จนกว่าลูกค้าจะเปลี่ยนเอง
+  function ccOfLang(l) { // 7 พ.ย. 2026: ประเทศเริ่มต้นของภาษา ตามลำดับในทะเบียนโซน (สเปน → สเปน ไม่ใช่สหรัฐฯ) · อังกฤษตามรูปแบบที่เลือก (en-US / en-GB)
+    var b0 = base(l);
+    if (b0 === "en") return LANG_CC[l] || "";
+    var z = window.REGION && window.REGION.list ? window.REGION.list(b0) || [] : [];
+    return z[0] || LANG_CC[b0] || LANG_CC[l] || "";
+  }
+  function ownedCc(sheet) { // ประเทศมาตรฐานที่สิทธิ์ของสมาชิกครอบคลุม: ไทยและข้อกำหนดโครงการเสมอ + ฉบับประเทศที่ซื้อ · null = ยังไม่รู้สิทธิ์ (ยังไม่เข้าสู่ระบบ หรือยังไม่ซื้อใบนี้)
+    var vs = typeof OWN === "object" && OWN ? OWN[sheet] : null;
+    if (!vs) return null;
+    var o = { TH: 1, INT: 1 };
+    vs.forEach(function (v) {
+      if (REC[v]) o[v] = 1;
+    });
+    return o;
+  }
+  var followNote = "";
+  function follow() { // ภาษาไหนยึดประเทศนั้น จนกว่าลูกค้าจะเปลี่ยนเอง · 7 พ.ย. 2026: สมาชิกที่ซื้อใบนี้แล้วแต่ไม่มีฉบับประเทศนั้น ใช้มาตรฐานไทยตามฉบับที่ซื้อ และบอกให้รู้ (ไม่ตกไปฉบับฟรีเงียบๆ)
     var l1 = $("lang1").value, l2 = nLang() === 2 ? $("lang2").value : "", withTh = base(l1) === "th"
       || base(l2) === "th", ofL = function (l) {
-        return !l || (base(l) === "en" && withTh) ? "" : LANG_CC[l] || "";
-      }, a = ofL(l1), b = ofL(l2); /* English with Thai is the Thai edition: it stays on Thai standards */
-    if (!touched.c1) $("c1").value = a || b || "INT";
+        return !l || (base(l) === "en" && withTh) ? "" : ccOfLang(l);
+      }, a = ofL(l1), b = ofL(l2), al = ownedCc($("sheet").value), want = a || b || "INT"; /* English with Thai is the Thai edition: it stays on Thai standards */
+    followNote = "";
+    if (al && want !== "INT" && !al[want]) {
+      followNote = "ใช้มาตรฐานไทยตามฉบับที่คุณซื้อ · ค่ามาตรฐานของ" + ccName(want) + "ต้องซื้อฉบับประเทศนั้นเพิ่ม";
+      want = "TH";
+      b = "";
+    }
+    if (!touched.c1) $("c1").value = want;
     if (!touched.c2) $("c2").value = a && b && a !== b ? b : "";
     drawCc();
   }
@@ -113,12 +135,12 @@
     if (cc === "TH") return "ไทย: ค่าเต็มตามฉบับไทย";
     var D0 = window.DOCCOV || {}, id = $("sheet").value, t = (D0.numeric || {})[id] || 0, n = ((D0.cc
       || {})[cc] || {})[id] || 0;
-    return ccName(cc) + ": มีค่าที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อของใบนี้" + (n < t ? " · ข้อที่เหลือกรอกตามข้อกำหนดโครงการ" : "");
+    return ccName(cc) + ": มีค่าที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อของใบนี้" + (n < t ? " · ข้อที่เหลือใช้ค่าของประเทศอ้างอิงในกลุ่มมาตรฐานเดียวกันถ้ามี (เอกสารพิมพ์ป้ายบอก) ไม่เช่นนั้นเว้นให้กรอกตามข้อกำหนดโครงการ" : ""); // 7 พ.ย. 2026: บอกให้ตรงกับที่เอกสารทำจริง (ค่าประเทศอ้างอิง C19)
   }
   var pickFirst = null;
   function drawCc() {
     var a = $("c1").value, b = $("c2").value, r = REC[a];
-    $("ccInfo").textContent = [covLine(a), b && b !== a ? covLine(b) : ""].filter(Boolean).join(" · ");
+    $("ccInfo").textContent = [covLine(a), b && b !== a ? covLine(b) : "", followNote].filter(Boolean).join(" · ");
     var li = $("lawInfo");
     li.textContent = "";
     if (r) { /* ชื่อกฎหมายเป็นชื่อทางการ ไม่แปล · คำกำกับแยกส่วนเพื่อแปลตามภาษาของหน้า */
@@ -314,6 +336,7 @@
       if (OWN[o.value]) o.textContent = "✓ " + o.textContent;
     });
     drawRight();
+    if (!touched.c1) follow(); // 7 พ.ย. 2026: สิทธิ์มาถึงแล้ว เลือกประเทศเริ่มต้นใหม่ตามสิทธิ์ที่ซื้อ
   }).catch(function () {});
   function say(t, bad) {
     var m = $("msg");
@@ -448,7 +471,7 @@
   }
   function head(kind, plan) {
     var d = D, L = d.lab, cs = langs(), tt = d.title || [], brand = /^T-/.test(d.id) ? L.brandT : L.brandF;
-    return '<header class="hd' + (plan ? " kp" : "") + '"><div class="lg"><img src="img/logo.png" alt=""><div><b>สร้าง | BUILD TH</b>'
+    return '<header class="hd' + (plan ? " kp" : "") + '"><div class="lg"><img src="img/logo.png" alt="BUILD TH"><div><b>สร้าง | BUILD TH</b>'
       + brand.map(function (x, i) {
         return "<span" + at(cs[i] || "en") + ">" + esc(x) + "</span>";
       }).join("") + '</div></div><div class="ti"><small>' + kind + "</small><h1" + at(cs[0]) + ">"
@@ -813,7 +836,7 @@
       h += '<div class="dn"><span><b>' + esc(d.outside ? "ภาษาหรือมาตรฐานนี้ไม่อยู่ในฉบับที่คุณซื้อ จึงแสดงฉบับฟรี" : "นี่คือฉบับฟรี: ข้อหลัก 1 ภาษา")
         + "</b>" + (d.freeOne ? " · ฉบับฟรีแสดงเฉพาะภาษาที่ 1" : "") + " · ซื้อใบนี้เพื่อใช้ครบทุกข้อ และ 2 ภาษา</span>"
         + '<a class="b pri sm" href="' + esc(href) + '">' + esc(want && want !== "TH" ? "ซื้อฉบับ"
-          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a></div>";
+          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a>" + (d.outside ? ' <button class="b line sm" type="button" id="useTH">ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว</button>' : "") + "</div>"; // 7 พ.ย. 2026: ทางกลับหนึ่งคลิก ไม่ต้องหาช่องประเทศเอง
     }
     if (cm.diff || (cm.none && (d.ccs || []).length > 1)) h += '<div class="pbar"><b>ค่าที่ต่างกัน:</b> '
       + d.ccs.map(function (c) {
@@ -1065,6 +1088,16 @@
       ev.preventDefault();
       ev.target.blur();
     }
+  });
+  $("docNote").addEventListener("click", function (ev) { // 7 พ.ย. 2026: ปุ่ม "ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว" สร้างเอกสารใหม่ด้วยมาตรฐานไทยทันที
+    if (!ev.target.closest("#useTH")) return;
+    touched.c1 = true;
+    touched.c2 = true;
+    $("c1").value = "TH";
+    $("c2").value = "";
+    drawCc();
+    if ($("f-doc").requestSubmit) $("f-doc").requestSubmit();
+    else $("f-doc").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
   });
   $("docNote").addEventListener("click", function (ev) {
     var all = ev.target.closest("[data-all]");
