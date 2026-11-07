@@ -26,16 +26,43 @@
     "almeezan.qa", "u.ae", "impo.com.uy", "joradp.dz", "conseildetat.dz", "idaraty.tn", "ibst.vn",
     "sbma.com", "opamss.org.sv", "bund.de", "gesetze-im-internet.de", "economie-ivoirienne.ci",
     "investindrc.cd", "sgg-mali.ml", "pravo.by", "etalonline.by", "lex.uz", "mc.uz", "egov.tj",
-    "portali-huquqi.tj", "anp.ne", "hauqe.tg", "zan.kz", "bauministerkonferenz.de"];
+    "portali-huquqi.tj", "anp.ne", "hauqe.tg", "zan.kz", "bauministerkonferenz.de",
+    /* 7 Nov 2026: state hosts of the related laws (legislatures, official legal portals, ministries, agencies, cities, state utilities) */
+    "public.lu", "nat.tn", "adilet.kz", "adlia.tj", "kifs.tj", "apambiente.pt", "arse.tg", "arsel-cm.org",
+    "assembleenationale.bf", "assemblee-nationale.bj", "assemblee-nationale.mg", "av.se", "bahrain.bh", "bcn.cl",
+    "parliament.ug", "bygningsreglementet.dk", "cadastre.bg", "cdep.ro", "cea.lk", "civieleveiligheid.be", "muniguate.com",
+    "government.bg", "dibk.no", "nama.om", "dnsk.bg", "dublincity.ie", "parliament.bg", "fgov.be", "egyptera.org",
+    "nemc.or.tz", "klri.re.kr", "elsakerhetsverket.se", "environnement.mg", "belgium.be", "belgie.be", "finlex.fi", "anm.bj",
+    "e-qanun.az", "hellenicparliament.gr", "hsa.ie", "igssgt.org", "iplo.nl", "parliament.iq", "parliament.gh", "iss.sm",
+    "igsu.ro", "km.qa", "kremlin.ru", "ktimatologio.gr", "lands.rw", "ewa.bh", "just.ro", "nea.org.np", "ontario.ca",
+    "pelastustoimi.fi", "lawreform.ie", "rura.rw", "sag.cl", "sdcc.ie", "sec.cl", "sik.dk", "skgeodesy.sk", "suip.cz",
+    "suva.ch", "tukes.fi", "tukes.edilex.fi", "tyosuojelu.fi", "urbanisme.irisnet.be", "ute.com.uy", "vbpl.vn", "leg.br",
+    "dna.sr", "coursupreme.org.gn", "legiliban.ul.edu.lb", "tanzlii.org", "paot.org.mx",
+    "anare.ci", "oep.org.bo", "derk.ba", "hjc.iq", "legislation.tn", "narodnaskupstinars.net", "primature.sn",
+    "silgeneve.ch", "sinit.hn", "zh.ch"];
   var BODY = ["din.de", "dibt.de", "oib.or.at", "iccsafe.org", "pec.org.pk", "psqca.com.pk",
     "sgpstandard.cz", "aipalync.org", "bsigroup.com", "iso.org", "pkn.pl", "piib.org.pl",
     "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org",
     "singaporestandardseshop.sg", "standardsforhighways.co.uk", "bcsa.org.uk", "theiet.org",
     "iiee.org.ph", "nhbc.co.uk", "nhbc-standards.co.uk", "mcscertified.com", "wbdg.org",
     "circe.hn", "occ.cd", "anor.cm", "abnorm.bf", "hbrc.edu.eg", "coe.or.th", "act.or.th",
-    "eit.or.th", "engc.org.uk", "arb.org.uk", "ncees.org", "ncarb.org"];
+    "eit.or.th", "engc.org.uk", "arb.org.uk", "ncees.org", "ncarb.org",
+    /* 7 Nov 2026: standards bodies and professional chambers named by the related laws */
+    "aaca.org.au", "abnt.org.br", "aea.org.ar", "afnor.org", "aicte-india.org", "architect.be", "arhitekti-hka.hr",
+    "arkitekt.se", "asn.sn", "asro.ro", "austrian-standards.at", "awn.it", "bak.de", "bds-bg.org", "bingk.de", "bnm.mg",
+    "bperb.net", "bsvonline.ch", "zt.at", "cae.org.ec", "cfia.or.cr", "cich.hn", "cicm.org.mx", "cip.org.pe", "ckait.cz",
+    "cnoa.dz", "cnoa.ma", "codia.org.do", "colegiodearquitectoscdmx.org", "confea.org.br", "cpau.org", "cpic.org.ar",
+    "cys.org.cy", "dewanarsitek.id", "ds.dk", "eea.org.eg", "elot.gr", "engineeringnz.org", "engineerscanada.ca",
+    "engineersireland.ie", "engineersrwanda.rw", "eos.org.eg", "etek.org.cy", "gostinfo.ru", "hzn.hr", "ianor.dz",
+    "ibnorca.org", "icontec.org", "iebbd.org", "igqpi.cv", "imo.org.tr", "ingkomora.rs", "inn.cl", "innorpi.tn", "ipq.pt",
+    "iram.org.ar", "iss.rs", "jea.org.jo", "kebs.org", "kiip.bg", "mek.hu", "mmk.hu", "mszt.hu", "nbn.be", "ksm.kz",
+    "nopriz.ru", "nostroy.ru", "nrcs.org.za", "nsai.ie", "oar.archi", "oea.org.lb", "oit.org.tn", "ordemdosarquitectos.org",
+    "ordemdosengenheiros.pt", "ordeng.org.mz", "ose.org.om", "pcatp.org.pk", "cap.org.pe", "riai.ie", "rif.no", "rur.ro",
+    "sabs.co.za", "safa.fi", "safeelectric.ie", "saudieng.sa", "sfs.fi", "sii.org.il", "sis.se", "sksi.sk", "slsi.lk",
+    "snv.ch", "ssb.sr", "standard.md", "standard.no", "standards.org.au", "sverigesingenjorer.se", "tmmob.org.tr",
+    "tse.org.tr", "uni.com", "arquitectos.org.cv", "bem.org.my", "ethiostandards.org", "onigc.cm", "standard.tj"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
-    "worldbank.org"];
+    "worldbank.org", "ecolex.org", "eregulations.org", "chm-cbd.net"];
   function hostOf(url) {
     try {
       return new URL(url).hostname.replace(/^www\./, "");
@@ -127,6 +154,7 @@
       + (r.u2 ? '<a class="note" href="' + esc(r.u2) + '" target="_blank" rel="noopener nofollow" data-noi18n="1">'
         + esc(hostOf(r.u2)) + "</a>" : "")
       + '</div><span class="lw-b ' + k[0] + '">' + esc(k[1]) + "</span>"
+      + (r.s ? '<span class="lw-b draft">' + (r.s === "draft" ? "ร่าง ยังไม่ประกาศใช้" : "ผ่านแล้ว รอบังคับใช้") + "</span>" : "") // 7 Nov 2026: owner rule, a draft law shows as a draft
       + (r.o ? "" : '<span class="lw-b other">ยังต้องยืนยันกับหน่วยงาน</span>') + "</li>";
   }
   function relHtml(cc) {

@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-06b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-06c"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   var KEY = "build_site_draft";
   var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";

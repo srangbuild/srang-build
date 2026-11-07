@@ -22,6 +22,7 @@
 .lw-b.body { background: #E5EEF9; color: #1F4C86; }
 .lw-b.intl { background: #EFEAF8; color: #4B3A82; }
 .lw-b.other { background: #F1F3F6; color: #475466; }
+.lw-b.draft { background: #FFF1DB; color: #8A4B00; border: 1px solid #F0C98C; }
 .lw-meta { margin: 10px 14px 12px; }
 .lw-std { margin: 0 14px 14px; }
 .lw-std summary { cursor: pointer; font-weight: 600; min-height: 36px; }
