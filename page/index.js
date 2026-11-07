@@ -38,7 +38,9 @@
   document.title = (B.name || "สร้าง | BUILD TH") + " — " + (B.tagline || "");
   $("about-hero").textContent = B.about || "";
   $("eyebrow").textContent = "รายการประจำ · " + (B.show || "");
-  $("schedule").textContent = "รายการประจำ “" + (B.show || "") + "” " + (B.schedule || "") + " เลือกแพลตฟอร์มที่คุณใช้อยู่";
+  var SCH = window.BUILD && window.BUILD.schedText ? window.BUILD.schedText(B.schedule || "") : null; // 7 พ.ย. 2026 กฎข้อ 33: วันและเวลาฉายแสดงตามเขตเวลาของผู้ชม พร้อม (GMT+X)
+  $("schedule").textContent = "รายการประจำ “" + (B.show || "") + "” " + (SCH ? SCH.text : (B.schedule || "")) + " · "; // ส่วนท้ายเป็นข้อความของตัวเอง เพื่อให้ตัวแปลหาคำแปลเจอ
+  $("schedule").appendChild(document.createElement("span")).textContent = "เลือกแพลตฟอร์มที่คุณใช้อยู่";
   $("ep-title").textContent = (B.show || "ตอนทั้งหมด");
   $("foot-name").textContent = B.name || "";
   $("yr").textContent = new Date().getFullYear();
@@ -81,7 +83,7 @@
   }).slice(0, 2);
   var shown = outEps.concat(nextEps);
   $("facts").innerHTML = (outEps.length ? "<li><b>" + outEps.length + "</b>ตอนที่ปล่อยแล้ว</li>" : (nextEps.length
-    ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>อังคาร 18:00</b>ตอนใหม่ทุกสัปดาห์</li><li><b>"
+    ? "<li><b>" + fmt(nextEps[0].date, true) + "</b>ตอนแรก</li>" : "")) + "<li><b>" + (SCH ? SCH.when : "อังคาร 18:00") + "</b>ตอนใหม่ทุกสัปดาห์</li><li><b>"
     + ((S.sheets || []).filter(function (x) {
       return x.free && x.hidden !== true;
     }).length || 29) + "</b>ใบตรวจงานฟรี</li>";

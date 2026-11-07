@@ -39,7 +39,7 @@
     "suva.ch", "tukes.fi", "tukes.edilex.fi", "tyosuojelu.fi", "urbanisme.irisnet.be", "ute.com.uy", "vbpl.vn", "leg.br",
     "dna.sr", "coursupreme.org.gn", "legiliban.ul.edu.lb", "tanzlii.org", "paot.org.mx",
     "anare.ci", "oep.org.bo", "derk.ba", "hjc.iq", "legislation.tn", "narodnaskupstinars.net", "primature.sn",
-    "silgeneve.ch", "sinit.hn", "zh.ch"];
+    "silgeneve.ch", "sinit.hn", "zh.ch", "bnee.ne"];
   var BODY = ["din.de", "dibt.de", "oib.or.at", "iccsafe.org", "pec.org.pk", "psqca.com.pk",
     "sgpstandard.cz", "aipalync.org", "bsigroup.com", "iso.org", "pkn.pl", "piib.org.pl",
     "bis.org.in", "jisc.go.jp", "ansi.org", "astm.org", "nfpa.org", "aci-int.org",
@@ -60,7 +60,7 @@
     "ordemdosengenheiros.pt", "ordeng.org.mz", "ose.org.om", "pcatp.org.pk", "cap.org.pe", "riai.ie", "rif.no", "rur.ro",
     "sabs.co.za", "safa.fi", "safeelectric.ie", "saudieng.sa", "sfs.fi", "sii.org.il", "sis.se", "sksi.sk", "slsi.lk",
     "snv.ch", "ssb.sr", "standard.md", "standard.no", "standards.org.au", "sverigesingenjorer.se", "tmmob.org.tr",
-    "tse.org.tr", "uni.com", "arquitectos.org.cv", "bem.org.my", "ethiostandards.org", "onigc.cm", "standard.tj"];
+    "tse.org.tr", "uni.com", "arquitectos.org.cv", "bem.org.my", "ethiostandards.org", "onigc.cm", "standard.tj", "codinorm.ci"];
   var INTL = ["fao.org", "unep.org", "unhabitat.org", "un.org", "iom.int", "ilo.org", "who.int",
     "worldbank.org", "ecolex.org", "eregulations.org", "chm-cbd.net"];
   function hostOf(url) {

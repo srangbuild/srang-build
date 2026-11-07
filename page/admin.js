@@ -86,7 +86,7 @@
   // ----- แบบฟอร์ม -----
   var OBJ = {
     brand: [["name", "ชื่อช่อง"], ["show", "ชื่อรายการ"], ["tagline", "สโลแกน"], ["schedule",
-      "ตารางลงคลิป"], ["about", "แนะนำช่อง 1–2 บรรทัด", "long"]],
+      "ตารางลงคลิป (เวลาไทย · หน้าเว็บแปลงเป็นเวลาของผู้ชมเอง)"], ["about", "แนะนำช่อง 1–2 บรรทัด", "long"]],
     links: [["tiktok", "TikTok", "url"], ["youtube", "YouTube", "url"], ["facebook", "Facebook",
       "url"], ["instagram", "Instagram", "url"], ["x", "X", "url"], ["threads", "Threads", "url"], ["spotify",
         "Spotify (เพลงของช่อง)", "url"], ["line",
@@ -500,7 +500,7 @@
 
   // ----- ชุดโพสต์ -----
   var kitEp = (S.episodes[0] || {}).id, kitVer = "voice";
-  var AI = "ภาพและเพลงสร้างด้วย AI · บทและข้อเท็จจริงเขียนและตรวจโดยคน";
+  var AI = "ภาพและเพลงเป็นภาพจำลองเพื่ออธิบายหลักการ ไม่ใช่โครงการจริง · บทและข้อเท็จจริงเขียนและตรวจโดยคน"; // 7 พ.ย. 2026 กฎข้อ 32: ไม่เขียนว่าทำโดย AI ในข้อความสาธารณะ · ป้ายเนื้อหาสังเคราะห์กดที่แพลตฟอร์มตอนอัปโหลดตามเดิม
   function utm(src, med, camp) {
     var u = (S.site.url || "").replace(/\/+$/, "");
     return ok(u) ? u + "/?utm_source=" + src + "&utm_medium=" + med + "&utm_campaign=" + camp : "";
@@ -519,7 +519,7 @@
     })[0];
     var camp = e.id + (song ? "s" : ""), cap = song ? "เวอร์ชันเพลงของตอน #" + e.no + " " + e.title
       + " · เพลง “" + (e.songTitle || "") + "” เนื้อร้องมาจากบทของตอน" : (P.caption || e.title);
-    var tags = (P.tags || "") + (song ? " #เพลงAI" : ""), q = P.question || "";
+    var tags = (P.tags || "") + (song ? " #เวอร์ชันเพลง" : ""), q = P.question || "";
     var lineKw = f && f.keyword && (L.lineId || ok(L.line)) ? "อยากได้เช็กลิสต์ของตอนนี้ พิมพ์คำว่า “"
       + f.keyword + "” ใน LINE" + (L.lineId ? " " + L.lineId : "") : "";
     var out = [], add = function (t, v, tip) {

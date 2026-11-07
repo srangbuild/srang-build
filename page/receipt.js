@@ -49,7 +49,7 @@
     var d = new Date(iso);
     if (isNaN(d)) return esc(iso);
     return d.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric",
-      timeZone: "Asia/Bangkok" });
+      timeZone: "Asia/Bangkok" }) + " (GMT+7)"; // 7 พ.ย. 2026: ใบเสร็จเป็นเอกสารของร้านในไทย วันที่ตามเวลาไทย จึงบอกเขตเวลาให้ชัด
   }
   function fail(t) {
     $("out").innerHTML = '<p class="msg bad">' + esc(t) + '</p>';
