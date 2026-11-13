@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-06c"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-13a"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   var KEY = "build_site_draft";
   var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";
@@ -928,6 +928,8 @@
     add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
     if (su.mailLeft !== undefined) add(su.mailLeft < 0 ? "wa" : su.mailLeft <= 30 ? "no" : "ok", "โควตาอีเมลวันนี้" + (su.mailLeft < 0 ? "" : " เหลือ " + su.mailLeft + " จาก " + (su.mailMax || 100) + " ผู้รับ"),
       "บัญชี Gmail ทั่วไปส่งได้ 100 ผู้รับต่อวัน รีเซ็ตทุกวัน · เหลือ 30 ระบบส่งเตือนร้าน 1 ครั้ง · เหลือ 5 งดอีเมลแจ้งร้าน ลูกค้ายังได้ครบ · ยอดขายราว 20 ใบต่อวันคือจุดที่ต้องขยาย ดูแผนขยายระบบ (3_แผนและเอกสาร\\1_แผนธุรกิจ)");
+    if (su.dataFiles) add(su.dataFiles.err ? "wa" : su.dataFiles.doc && su.dataFiles.std ? "ok" : "no", "ไฟล์ข้อมูลเอกสารที่หลังบ้านใช้อยู่", su.dataFiles.err ? "อ่านโฟลเดอร์ไดรฟ์ไม่ได้: " + esc(su.dataFiles.err) : "เนื้อหาใบ: " + esc(su.dataFiles.doc || "ไม่พบไฟล์ BUILD_smartdoc") + " · ค่ามาตรฐาน: " + esc(su.dataFiles.std || "ไม่พบไฟล์ BUILD_smartstd") + " · หลังบ้านใช้ไฟล์ที่ชื่อเรียงท้ายสุด (วันที่ใหม่สุด) · ลากไฟล์ใหม่ขึ้นไดรฟ์แล้วรอ 5 นาที ชื่อตรงนี้จะเปลี่ยนเอง");
+    if (su.pay && su.pay.repeatOff) add(su.pay.promoOn ? "ok" : "wa", "โค้ดส่วนลด" + (su.pay.promoOn ? " เปิดใช้อยู่" : " ยังไม่ได้ตั้ง (ไม่บังคับ)"), "ตั้งที่ Apps Script → Project Settings → Script properties → เพิ่ม PROMO_CODES เป็นข้อความ JSON เช่น {\"BUILD10\":{\"off\":10,\"until\":\"2026-12-31\",\"min\":0}} · off = ลดกี่เปอร์เซ็นต์ (1–90) · until = วันสุดท้ายที่ใช้ได้ · min = ยอดขั้นต่ำ (บาท) · บันทึกแล้วใช้ได้ทันที ไม่ต้อง Deploy · ลูกค้าพิมพ์โค้ดในหน้าชำระเงิน · ผู้ซื้อเดิมของใบเดียวกันได้ลด " + su.pay.repeatOff + "% อัตโนมัติอยู่แล้ว");
     var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("")
       + "</ul></div>";
     return conn + kpis + todo + sales + orders + mem + stock + setup;

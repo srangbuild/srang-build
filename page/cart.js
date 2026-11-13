@@ -54,7 +54,15 @@
         cls: "bad"
       };
     }
-    var info = { amt: B.cart.price(id) };
+    var info = { amt: B.cart.price(id) }, rOff = +(me && me.pay && me.pay.repeatOff) || 0;
+    if (rOff && !B.isBundle(x) && !(x && x.hidden) && Object.keys(R).some(function (k) {
+      return k !== base && B.rootOf(k) === B.rootOf(base);
+    })) { // 13 พ.ย. 2026 (Q08 ก): ผู้ซื้อเดิมของใบเดียวกัน ซื้อฉบับภาษาหรือมาตรฐานอื่น ลด 30% · ใช้เมื่อหลังบ้านรุ่นที่คิดส่วนลดนี้ส่ง pay.repeatOff มา ยอดจึงตรงกันเสมอ
+      var off = Math.round(info.amt * rOff / 100);
+      info.amt = Math.max(1, info.amt - off);
+      info.note = "คุณมีฉบับอื่นของใบนี้แล้ว ลด " + rOff + "% (ประหยัด " + B.baht(off) + ")";
+      info.cls = "sv";
+    }
     if (B.isBundle(x)) {
       var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) {
         return R[k + sfx];

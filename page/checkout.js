@@ -118,7 +118,14 @@
       };
       return { amt: 0, block: true };
     }
-    return { amt: B.cart.price(id) };
+    var a0 = B.cart.price(id), rOff = +(me && me.pay && me.pay.repeatOff) || 0, R0 = rights(), b0 = B.baseOf(id);
+    if (rOff && !B.isBundle(x) && !(x && x.hidden) && Object.keys(R0).some(function (k) {
+      return k !== b0 && B.rootOf(k) === B.rootOf(b0);
+    })) { // 13 พ.ย. 2026 (Q08 ก): ผู้ซื้อเดิมของใบเดียวกัน ลด 30% กติกาเดียวกับหลังบ้าน
+      var off0 = Math.round(a0 * rOff / 100);
+      return { amt: Math.max(1, a0 - off0), off: off0, pct: rOff };
+    }
+    return { amt: a0 };
   }
 
   // ---------- ตัวติดตาม 5 ขั้น ----------
@@ -151,7 +158,7 @@
   function summary(ids, total, withOwn) {
     return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) {
       var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) };
-      return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "")
+      return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "") + (a.off ? " · ผู้ซื้อเดิม ลด " + a.pct + "%" : "")
         + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt))
         + "</b></li>";
     }).join("") + "</ul>" +
@@ -228,11 +235,30 @@
       +
       (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html")
         + '">แก้ไขในตะกร้า</a> ก่อนสั่งซื้อ</p>' : "") +
+      (me.pay && me.pay.promoOn ? '<div class="promo"><label for="promo">โค้ดส่วนลด (ถ้ามี)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="promo" name="promo" autocomplete="off" maxlength="24" style="flex:1;min-width:150px;text-transform:uppercase"><button class="b line" type="button" id="promoGo">ใช้โค้ด</button></div><p class="hint" id="promoHint" aria-live="polite"></p></div>' : "") +
       '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ "
       + B.thb(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>'
       +
       "</form>" + summary(ids, total, true) + "</div>";
     taxHint();
+    if ($("promoGo")) $("promoGo").addEventListener("click", function () { // 13 พ.ย. 2026: โค้ดส่วนลด · หลังบ้านตรวจและคิดยอดจริงตอนสร้างคำสั่งซื้อ
+      var code = $("promo").value.trim().toUpperCase(), h = $("promoHint");
+      if (!code) {
+        h.textContent = "พิมพ์โค้ดก่อน";
+        h.className = "hint bad";
+        return;
+      }
+      h.textContent = "กำลังตรวจโค้ด…";
+      h.className = "hint";
+      B.call("promoCheck", { code: code }).then(function (r) {
+        var pr = r.promo, cut = total >= pr.min ? Math.min(total - 1, Math.round(total * pr.off / 100)) : 0;
+        h.textContent = cut > 0 ? "ใช้โค้ด " + pr.code + " ได้ ลด " + pr.off + "% · ยอดชำระใหม่ " + B.thb(total - cut) : "โค้ดนี้ใช้ได้เมื่อยอดซื้อตั้งแต่ " + B.thb(pr.min);
+        h.className = "hint " + (cut > 0 ? "ok" : "bad");
+      }).catch(function (e) {
+        h.textContent = (e && e.message) || "ตรวจโค้ดไม่ได้ ลองใหม่";
+        h.className = "hint bad";
+      });
+    });
   }
   // ช่องทางชำระออนไลน์ จัดเป็นกลุ่ม: แนะนำ · สากล · แอปธนาคาร · กระเป๋าเงิน (รุ่น 26 ต.ค. 2026)
   function methodGroups(ms) {
@@ -421,7 +447,8 @@
       var reuse = (me.orders || []).filter(function (o) {
         return (o.status === ST.wait || o.status === ST.reject) && sameItems(o.items, ids);
       })[0];
-      return reuse ? { order: reuse, reused: true } : B.call("order", { items: ids });
+      var code = $("promo") ? $("promo").value.trim().toUpperCase() : ""; // มีโค้ดส่วนลด = สร้างคำสั่งซื้อใหม่เสมอ เพื่อให้หลังบ้านคิดยอดด้วยโค้ด
+      return reuse && !code ? { order: reuse, reused: true } : B.call("order", code ? { items: ids, code: code } : { items: ids });
     }).then(function (r) {
       var o = r.order;
       B.cart.clear();
