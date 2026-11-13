@@ -202,9 +202,37 @@
     a.hidden = !g;
     if (g) a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(g.replace(" ",
       ""));
+    geoCountry();
+  }
+  /* 14 Nov 2026 (คำสั่งเจ้าของ): แผนที่เปิดตามประเทศที่ตั้งงานที่เลือก · ไม่มีพิกัด = เปิดแผนที่ของประเทศนั้น (พร้อมชื่อพื้นที่ตรวจถ้ากรอก) ให้ผู้ใช้ปักหมุดเอง */
+  function geoCountry() {
+    var c = $("geoCountry"), sv = $("site");
+    if (!c || !sv) return;
+    var o = sv.options[sv.selectedIndex], cc = sv.value, en = "", area;
+    try {
+      en = new Intl.DisplayNames(["en"], { type: "region" }).of(cc) || "";
+    } catch (e) {}
+    if (!en || en === cc) en = (o ? o.textContent : "") || cc;
+    area = String(($("f-doc").elements.location || {}).value || "").trim();
+    c.hidden = !!geoVal() || !cc;
+    c.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([area, en].filter(Boolean).join(", "));
   }
   if ($("geoBtn")) {
     $("geo").addEventListener("input", geoDraw);
+    if ($("f-doc").elements.location) $("f-doc").elements.location.addEventListener("input", geoCountry);
+    if ($("site")) $("site").addEventListener("change", function () {
+      touched.site = true;
+      geoCountry();
+    });
+    // ประเทศที่ตั้งงานตามประเทศที่ 1 จนกว่าผู้ใช้จะเลือกเอง: กฎหมายในภาคผนวก ข (รวมผังเมืองและที่ดิน) และแผนที่จึงตรงกับประเทศที่เลือก
+    $("c1").addEventListener("change", function () {
+      var sv = $("site"), v = $("c1").value;
+      if (!sv || touched.site || !v) return;
+      if ([].some.call(sv.options, function (o) {
+        return o.value === v;
+      })) sv.value = v;
+      geoCountry();
+    });
     $("geoBtn").addEventListener("click", function () {
       if (!navigator.geolocation) {
         say("เครื่องนี้ไม่รองรับการระบุตำแหน่ง พิมพ์พิกัดเองได้", true);
@@ -506,7 +534,6 @@
     if ((d.ccs || []).some(function (c) {
       return c !== "TH";
     })) h += '<p class="warn">' + M(L.cnote) + "</p>";
-    if (d.machine) h += '<p class="warn">' + M(L.mt) + "</p>";
     if (d.rgs && d.rgs.length && L.rgn) h += '<p class="warn">' + M(L.rgn) + " " + esc(d.rgs.join(", ")) + "</p>"; // C19
     if (d.nWeak && L.weakN) h += '<p class="warn">' + M(L.weakN) + "</p>"; // C19
     return h;
@@ -822,8 +849,7 @@
       + q2(docCode(d) + (d.revDate ? " · " + L.issue[0] + " " + d.revDate : "")) + "; " + f + " } @bottom-center { content: "
       + q2("สร้าง | BUILD TH" + (d.owned && d.licensee ? " · Licensed to " + d.licensee + (d.licNo
         ? " · " + d.licNo : "") : "")) + "; " + f + " } @bottom-right { content: " + q2(L.page[0]
-          + " ") + ' counter(page) " / " counter(pages); ' + f + " }" + (d.machine ? " @top-right { content: "
-            + q2(L.draft[0]) + '; font: 7pt "Segoe UI", Arial, sans-serif; color: #C24A08; }' : "")
+          + " ") + ' counter(page) " / " counter(pages); ' + f + " }"
       + " } }";
   }
   function noteBar(d) { // ข้อความบนจอเหนือเอกสาร ไม่พิมพ์ · แปลตามภาษาของเว็บ
@@ -945,13 +971,18 @@
       .then(function (r) {
         say("");
         render(enDoc(r.doc, /^en-/.test(pick1) ? pick1 : pick2), {
-          project: v("project"),
+          project: [v("project"), f.elements.detail ? v("detail") : ""].filter(Boolean).join(" · "),
           contractor: v("contractor"),
           location: [v("location"), geoVal()].filter(Boolean).join(" · ")
         });
+        if (jobPending) {
+          if (D && jobPending.id === D.id) jobApply(jobPending);
+          jobPending = null;
+        }
       })
       .catch(function (e) {
         say(e.message || "สร้างเอกสารไม่สำเร็จ ลองใหม่อีกครั้ง", true);
+        jobPending = null;
       })
       .then(function () {
         busy = false;
@@ -1046,6 +1077,142 @@
   $("editBtn").addEventListener("click", function () {
     setEdit(!editing);
   });
+  /* 14 Nov 2026 (คำสั่งเจ้าของ): บันทึกข้อมูลที่กรอกแยกตามงาน · เก็บในเบราว์เซอร์ของเครื่องนี้ (localStorage) ไม่ส่งขึ้นเซิร์ฟเวอร์
+     เก็บ: ค่าในฟอร์มด้านบน + ข้อความในช่องกรอก + ช่องติ๊ก + ค่าที่เลือก ของเอกสารที่สร้างแล้ว · เปิดงาน = ตั้งฟอร์ม สร้างเอกสารใหม่ แล้วเติมข้อมูลกลับตามลำดับช่อง */
+  var JOBK = "build_doc_jobs", jobPending = null, JOBF = ["sheet", "lang1", "lang2", "c1", "c2", "stdName", "project", "detail",
+    "contractor", "location"];
+  function jobsGet() {
+    try {
+      var j = JSON.parse(localStorage.getItem(JOBK) || "{}");
+      return j && typeof j === "object" ? j : {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function jobsList() {
+    var s = $("jobPick");
+    if (!s) return;
+    var j = jobsGet(), keep = s.value;
+    s.innerHTML = '<option value="">งานใหม่</option>' + Object.keys(j).sort(function (a, b) {
+      return (j[b].at || 0) - (j[a].at || 0);
+    }).map(function (k) {
+      return '<option value="' + esc(k) + '">' + esc(k) + "</option>";
+    }).join("");
+    if (keep && j[keep]) s.value = keep;
+  }
+  function jobSnap() {
+    var box = $("sheetOut"), idx = function (sel, test) {
+      var out = [];
+      [].forEach.call(box.querySelectorAll(sel), function (e, i) {
+        if (test(e)) out.push(i);
+      });
+      return out;
+    }, on = function (e) {
+      return e.classList.contains("on");
+    }, t = [].map.call(box.querySelectorAll(".w,.iv,.bl"), function (e) {
+      return e.textContent;
+    });
+    return {
+      id: D.id, n: t.length, t: t, bx: idx("td.bx", on), tk: idx(".tick", on), pk: idx(".pick input", function (e) {
+        return e.checked;
+      })
+    };
+  }
+  function jobApply(s) {
+    var box = $("sheetOut"), each = function (sel, fn) {
+      [].forEach.call(box.querySelectorAll(sel), fn);
+    };
+    each(".w,.iv,.bl", function (e, i) {
+      if (s.t && typeof s.t[i] === "string" && s.t[i] !== "") e.textContent = s.t[i];
+    });
+    each("td.bx", function (e, i) {
+      e.classList.toggle("on", (s.bx || []).indexOf(i) >= 0);
+    });
+    each(".tick", function (e, i) {
+      e.classList.toggle("on", (s.tk || []).indexOf(i) >= 0);
+    });
+    each(".pick input", function (e, i) {
+      if ((s.pk || []).indexOf(i) >= 0) setPick(e.closest(".opts2"), e);
+    });
+    drawPicks();
+    say(s.n === box.querySelectorAll(".w,.iv,.bl").length ? "เปิดงานที่บันทึกไว้แล้ว" : "เอกสารฉบับนี้มีจำนวนช่องต่างจากตอนบันทึก ตรวจข้อมูลที่กรอกอีกครั้ง",
+      s.n !== box.querySelectorAll(".w,.iv,.bl").length);
+  }
+  if ($("jobSave")) $("jobSave").addEventListener("click", function () {
+    if (!D) return;
+    var f = $("f-doc"), form = {}, j = jobsGet(), btn = $("jobSave");
+    JOBF.forEach(function (n) {
+      if (f.elements[n]) form[n] = f.elements[n].value;
+    });
+    form.nlang = nLang();
+    form.site = $("site") ? $("site").value : "";
+    form.geo = $("geo") ? $("geo").value : "";
+    var name = (String(form.project || "").trim() || "งานไม่มีชื่อ") + " · " + D.id;
+    if (!j[name] && Object.keys(j).length >= 60) {
+      window.alert("บันทึกได้ไม่เกิน 60 งานในเครื่องนี้ ลบงานเก่าก่อน");
+      return;
+    }
+    j[name] = { at: Date.now(), form: form, doc: jobSnap() };
+    try {
+      localStorage.setItem(JOBK, JSON.stringify(j));
+    } catch (e) {
+      window.alert("พื้นที่เก็บของเบราว์เซอร์เต็ม ลบงานเก่าก่อน");
+      return;
+    }
+    jobsList();
+    $("jobPick").value = name;
+    btn.textContent = "บันทึกแล้ว";
+    setTimeout(function () {
+      btn.textContent = "บันทึกงานนี้";
+    }, 2000);
+  });
+  if ($("jobLoad")) $("jobLoad").addEventListener("click", function () {
+    var job = jobsGet()[$("jobPick").value], f = $("f-doc");
+    if (!job) {
+      say("เลือกงานที่บันทึกไว้ก่อน", true);
+      return;
+    }
+    var fm = job.form || {}, set = function (el, val) {
+      if (!el || val == null || val === "") return;
+      el.value = val;
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    set(f.elements.sheet, fm.sheet);
+    setN(fm.nlang === 2 ? 2 : 1);
+    var r = document.querySelector("input[name=nlang]:checked");
+    if (r) r.dispatchEvent(new Event("change", { bubbles: true }));
+    set(f.elements.lang1, fm.lang1);
+    if (fm.nlang === 2) set(f.elements.lang2, fm.lang2);
+    touched.c1 = true;
+    touched.c2 = true;
+    touched.site = true;
+    set(f.elements.c1, fm.c1);
+    set(f.elements.c2, fm.c2);
+    if ($("site") && fm.site) $("site").value = fm.site;
+    ["stdName", "project", "detail", "contractor", "location"].forEach(function (n) {
+      if (f.elements[n]) f.elements[n].value = fm[n] || "";
+    });
+    if ($("geo")) $("geo").value = fm.geo || "";
+    geoDraw();
+    jobPending = job.doc || null;
+    f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+  });
+  if ($("jobDel")) $("jobDel").addEventListener("click", function () {
+    var k = $("jobPick").value, j = jobsGet();
+    if (!k || !j[k]) {
+      say("เลือกงานที่บันทึกไว้ก่อน", true);
+      return;
+    }
+    if (!window.confirm("ลบงาน " + k + " ออกจากเครื่องนี้ ลบแล้วกู้คืนไม่ได้")) return;
+    delete j[k];
+    try {
+      localStorage.setItem(JOBK, JSON.stringify(j));
+    } catch (e) {}
+    jobsList();
+    say("ลบงานแล้ว");
+  });
+  jobsList();
+  geoCountry();
   $("sheetOut").addEventListener("click", function (ev) {
     var t = ev.target, x = t.closest(".rm");
     if (x) {

@@ -181,7 +181,8 @@
         + "</div>";
       var rows = d.s.map(function (n, i) {
         var t = d.t ? trow(d, i) : null, c = countOf(d, i);
-        var box = many && c > 0;
+        var box = false; // 14 พ.ย. 2026 (คำสั่งเจ้าของ): ไม่มีช่องติ๊กให้เลือกมาตรฐาน ระบบใช้มาตรฐานของใบนั้นทั้งหมด
+        if (many && c === 0) return ""; // แสดงเฉพาะมาตรฐานที่ใช้ในเอกสารที่จะออก
         return (box ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"' + (S.off[n]
           ? "" : " checked") + ">" : '<div class="sx-i">') + '<span class="sx-t"><b data-noi18n="1">'
           + esc(t ? t.code : n) + "</b>" + (t && t.name ? "<small>" + esc(t.name) + (t.by ? " · "
@@ -199,11 +200,11 @@
             return esc(tk) + " " + p.by[k];
           }).join(" · ") + "</small>" : "") + "</li>";
       }).join("");
-      return '<p class="sx-lead">' + (many ? "เรื่องนี้มีมาตรฐานหลายตัว เลือกตัวที่ต้องการ ระบบแสดงผลและใช้ในฟอร์มตามที่เลือก" : "มาตรฐานที่ใช้กับใบนี้")
+      return '<p class="sx-lead">' + (many ? "เรื่องนี้มีมาตรฐานหลายตัว ระบบใช้ทุกตัวที่เกี่ยวกับใบนี้ · ข้อที่มาตรฐานให้ค่าต่างกัน เอกสารพิมพ์ทุกค่าเป็นช่องติ๊กให้เลือกในฟอร์ม" : "มาตรฐานที่ใช้กับใบนี้")
         + '</p><div class="sx-list">' + rows + "</div>" +
         (many ? '<p class="sx-tools"><button type="button" class="sx-l" data-sxall="1">เลือกทั้งหมด</button></p>' : "")
         +
-        '<div class="sx-sum"><div class="sx-m"><b>' + (d.t ? "ใช้เกณฑ์ตามมาตรฐานที่เลือก " : "มีค่าที่ตรวจแล้ว ")
+        '<div class="sx-sum"><div class="sx-m"><b>' + (d.t ? "ใช้เกณฑ์ตามมาตรฐานของใบนี้ " : "มีค่าที่ตรวจแล้ว ")
         + cv.have + " ข้อ จาก " + n + ' ข้อ</b><span class="sx-bar" aria-hidden="true"><i style="width:'
         + pct + '%"></i></span></div>' + (stage ? '<ul class="sx-st">' + stage + "</ul>" : "") + (cv.have < n
           ? '<p class="note" style="margin:6px 0 0">ข้อที่เหลือเว้นช่องให้กรอกตามข้อกำหนดโครงการ</p>' : "")
@@ -343,15 +344,16 @@
     el.hidden = !d;
     if (!d) return;
     var want = o.picked && o.picked.length ? o.picked : null, many = usable(d).length > 1;
-    el.innerHTML = '<fieldset class="sx-mini"><legend>' + (many ? "มาตรฐานที่ใช้ในเอกสารนี้ (เลือกได้)" : "มาตรฐานของใบนี้")
+    el.innerHTML = '<fieldset class="sx-mini"><legend>' + "มาตรฐานที่ใช้ในเอกสารนี้"
       + "</legend>" + d.s.map(function (n, i) {
         var t = d.t ? trow(d, i) : null, c = countOf(d, i);
-        return many && c > 0 ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"'
+        if (many && c === 0) return ""; // 14 พ.ย. 2026 (คำสั่งเจ้าของ): ไม่มีช่องติ๊ก ระบบใช้ทุกมาตรฐานของใบ และแสดงเฉพาะตัวที่ใช้ในเอกสารที่จะออก
+        return false ? '<label class="sx-i"><input type="checkbox" data-sx="' + esc(n) + '"'
           + (!want || want.indexOf(n) >= 0 ? " checked" : "") + '><span class="sx-t"><b data-noi18n="1">'
           + esc(t ? t.code : n) + "</b></span>" + (c ? "<em>" + c + " <span>ข้อ</span></em>" : "")
           + "</label>" : '<div class="sx-i"><span class="sx-t"><b data-noi18n="1">' + esc(t ? t.code : n)
           + "</b></span>" + (c ? "<em>" + c + " <span>ข้อ</span></em>" : "") + "</div>";
-      }).join("") + (many ? '<p class="note" style="margin:4px 0 0">ข้อที่ไม่มีค่าจากมาตรฐานที่เลือก เว้นช่องให้กรอกตามข้อกำหนดโครงการ</p>' : "")
+      }).join("") + '<p class="note" style="margin:4px 0 0">ระบบใช้มาตรฐานเหล่านี้ให้อัตโนมัติ · ข้อที่ไม่มีค่าจากมาตรฐาน เว้นช่องให้กรอกตามข้อกำหนดโครงการ</p>'
       + "</fieldset>";
   }
   // names that are on, or an empty list when all are on (the back end then uses everything)

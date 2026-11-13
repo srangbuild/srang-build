@@ -111,7 +111,7 @@
 .ln .tt small.bad { color:var(--bad); font-weight:600; }
 .ln .ctl { display:flex; gap:8px 12px; flex-wrap:wrap; align-items:center; }
 .ln select { font:inherit; font-size:14.5px; padding:7px 10px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); max-width:100%; }
-.ln .rm { background:none; border:0; color:var(--bad); font:inherit; font-size:14px; cursor:pointer; text-decoration:underline; padding:4px 2px; }
+.ln .rm { background:none; border:0; color:var(--bad); font:inherit; font-size:14px; cursor:pointer; text-decoration:underline; padding:12px 8px; min-height:44px; }
 .sumc { padding:18px; display:grid; gap:12px; }
 .sumc h2 { font-size:20px; margin:0; }
 .sumc dl { margin:0; display:grid; grid-template-columns:1fr auto; gap:6px 10px; font-size:15.5px; }
