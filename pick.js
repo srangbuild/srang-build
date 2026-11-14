@@ -129,6 +129,7 @@
       fl.innerHTML = o ? flagOf(type, o) : "";
       btn.disabled = sel.disabled;
       var lt = labelText(sel);
+      if (lt && window.I18N_TR) lt = window.I18N_TR(lt); /* 14 Nov 2026: the label is read before the page is translated, so translate it here */
       if (lt) btn.setAttribute("aria-label", lt + ": " + cap.textContent);
       else btn.removeAttribute("aria-label");
     }

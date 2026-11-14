@@ -131,11 +131,12 @@
   }
   function covLine(cc) {
     if (!cc) return "";
-    if (cc === "INT") return "ข้อกำหนดโครงการ: ช่องเกณฑ์เว้นให้กรอกเอง ค่าไทยพิมพ์เป็นข้อมูลอ้างอิง";
-    if (cc === "TH") return "ไทย: ค่าเต็มตามฉบับไทย";
+    var T = window.I18N_TR || function (x) { return x; }; // 14 พ.ย. 2026: ข้อความนี้ประกอบจากหลายส่วน ระบบแปลหน้าเว็บจับไม่ได้ จึงแปลทีละส่วนที่นี่
+    if (cc === "INT") return T("ข้อกำหนดโครงการ: ช่องเกณฑ์เว้นให้กรอกเองตามข้อกำหนดของโครงการ");
+    if (cc === "TH") return T("ไทย: ค่าเต็มตามฉบับไทย");
     var D0 = window.DOCCOV || {}, id = $("sheet").value, t = (D0.numeric || {})[id] || 0, n = ((D0.cc
       || {})[cc] || {})[id] || 0;
-    return ccName(cc) + ": มีค่าที่ตรวจแหล่งแล้ว " + n + " จาก " + t + " ข้อของใบนี้" + (n < t ? " · ข้อที่เหลือใช้ค่าของประเทศอ้างอิงในกลุ่มมาตรฐานเดียวกันถ้ามี (เอกสารพิมพ์ป้ายบอก) ไม่เช่นนั้นเว้นให้กรอกตามข้อกำหนดโครงการ" : ""); // 7 พ.ย. 2026: บอกให้ตรงกับที่เอกสารทำจริง (ค่าประเทศอ้างอิง C19)
+    return ccName(cc) + ": " + T("มีค่าจากแหล่งรัฐฉบับปัจจุบัน") + " " + n + " / " + t + " " + T("ข้อของใบนี้") + (n < t ? " · " + T("ข้อที่เหลือเว้นให้กรอกตามข้อกำหนดของโครงการ") : ""); // 14 พ.ย. 2026: ตรงกับกฎใหม่ (พิมพ์เฉพาะค่าจากรัฐ ฉบับปัจจุบัน)
   }
   var pickFirst = null;
   function drawCc() {
@@ -603,8 +604,8 @@
   function freeRefs() {
     var d = D, L = d.lab, th = langs()[0] === "th", list = d.frefs || [], cc0 = (d.ccs || [])[0];
     if (cc0 && cc0 !== "TH" && cc0 !== "INT") { // ฉบับฟรีอ้างอิงมาตรฐานของประเทศที่เลือก
-      var sd0 = window.StdPick ? window.StdPick.data(cc0, d.id) : null, nm = d.picked && d.picked.length
-        ? d.picked : sd0 ? sd0.s : (REC[cc0] && REC[cc0].codeName ? [REC[cc0].codeName] : []);
+      var sd0 = window.StdPick ? window.StdPick.data(cc0, d.id) : null, nm = d.used ? d.used : d.picked && d.picked.length
+        ? d.picked : sd0 ? sd0.s : (REC[cc0] && REC[cc0].codeName ? [REC[cc0].codeName] : []); // 14 พ.ย. 2026: d.used = เฉพาะมาตรฐานที่ใช้จริงในใบนี้
       return nm.length ? " · " + One(L.refsShort) + ": " + nm.slice(0, 4).map(esc).join(" · ") + " ("
         + One(L.refsFull) + ")" : "";
     }
@@ -815,12 +816,14 @@
           + " · 2 " + esc(L.ordB[i + 1]) + " · 3 " + esc(L.ordC[i + 1]) + " · " + esc(L.ordN[i + 1])
           + "</span>";
       }).join("") + "</p>";
-    var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (d.picked && d.picked.length
-      ? '<div class="stdc"><h4>' + M(L.stdUsed) + "</h4>" + d.picked.map(function (n) { // 7 พ.ย. 2026 คำสั่งเจ้าของ: มาตรฐานที่ใช้ในเอกสารต้องมีแหล่งอ้างอิงที่ตามไปดูได้ · ลิงก์หน้าทางการจาก doc-refs.js (evidence) เมื่อมี
+    // 14 พ.ย. 2026 คำสั่งเจ้าของ: มาตรฐานที่ขึ้นในเอกสารต้องเป็นตัวที่ใช้จริงในใบที่ออก · d.used = ชื่อเอกสารของค่าที่พิมพ์ในแถวจริง (หลังบ้านรุ่น 14c ขึ้นไป) · หลังบ้านรุ่นเก่าไม่มี d.used จึงใช้แบบเดิม
+    var usedL = d.used || (d.picked && d.picked.length ? d.picked : null);
+    var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (usedL && usedL.length
+      ? '<div class="refs" style="margin:0;border:0"><b>' + M(L.stdUsed) + "</b><ul>" + usedL.map(function (n) { // 7 พ.ย. 2026 คำสั่งเจ้าของ: มาตรฐานที่ใช้ในเอกสารต้องมีแหล่งอ้างอิงที่ตามไปดูได้ · ลิงก์หน้าทางการจาก doc-refs.js (evidence) เมื่อมี
         var u = evOf(n);
-        return esc(n) + (u ? ' <span class="rf2" data-noi18n="1">' + esc(u) + "</span>" : "");
-      }).join(" · ") + "</div>" : "")
-      + thRefs + (d.ctry || []).map(codeRow).join("") + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName)
+        return '<li data-noi18n="1">' + esc(n) + (u ? ' <span class="rf2">' + esc(u) + "</span>" : "") + "</li>";
+      }).join("") + "</ul></div>" : "")
+      + thRefs + (d.used ? "" : (d.ctry || []).map(codeRow).join("")) + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName)
         + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
     var site = $("site") ? $("site").value : "", inC = (d.ctry || []).some(function (c) {
       return c.cc === site;
