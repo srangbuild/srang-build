@@ -169,6 +169,20 @@
       }).join("") + "</ul></div>" : "";
     }).join("");
   }
+  /* 14 Nov 2026: the standards system of the country by kind of work (doc-code.js, built from the research files). Names only, no values. */
+  var CODE = (window.DOCCODE || { cc: {} }).cc, WORK = [["building", "อาคารและโครงสร้างทั่วไป"], ["concrete", "งานคอนกรีต"],
+    ["steel", "งานเหล็ก"], ["electrical", "งานไฟฟ้า"], ["plumbing", "งานประปาและสุขาภิบาล"], ["fire", "การป้องกันอัคคีภัย"],
+    ["safety", "ความปลอดภัยในการทำงาน"]];
+  function codeHtml(cc) {
+    var c = CODE[cc], rows = "";
+    if (!c || !c.code) return "";
+    WORK.forEach(function (w) {
+      rows += row(w[1], c.code[w[0]]);
+    });
+    return rows ? '<h3 class="lw-h">ระบบมาตรฐานตามประเภทงาน</h3><dl class="lw-dl">' + rows
+      + '</dl><p class="note lw-meta">รวบรวมจากหน้าของรัฐและหน่วยงานมาตรฐาน ตรวจล่าสุด <span data-noi18n="1">'
+      + esc(c.date || "") + "</span> · ใช้ฉบับที่มีผลบังคับล่าสุดเสมอ</p>" : "";
+  }
   function body(x, cc) {
     var src = sourcesOf(x, cc), std = standardsOf(cc), ev = (REFS[cc] && REFS[cc].ev) || {};
     return '<dl class="lw-dl">' + row("กฎหมายหลัก", x.lawName) + row("ชื่อในภาษาของประเทศ", x.lawNameLocal)
@@ -177,7 +191,7 @@
         x.note)
       + "</dl>" + '<h3 class="lw-h">แหล่งอ้างอิง</h3>' + srcHtml(src) + '<p class="note lw-meta">ตรวจล่าสุด <span data-noi18n="1">'
       + esc(x.checked || "") + "</span> · " + (x.confidence === "official" ? "อ่านจากหน้าเว็บทางการ" : "ยังต้องยืนยันกับหน่วยงาน")
-      + "</p>" + relHtml(cc)
+      + "</p>" + codeHtml(cc) + relHtml(cc)
       + (std.length ? '<details class="lw-std"><summary>มาตรฐานที่ใบตรวจอ้างถึง <span data-noi18n="1">('
         + std.length + ")</span></summary><ul>"
         + std.map(function (n) {
