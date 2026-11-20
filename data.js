@@ -4127,5 +4127,6 @@ window.SITE = {
       "hidden": true,
       "of": "F-05"
     }
-  ]
+  ],
+  "scope": "3ed"
 };
