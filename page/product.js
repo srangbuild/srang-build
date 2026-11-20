@@ -122,8 +122,8 @@
     return '<fieldset class="opts"' + (dis ? " disabled" : "") + '><legend>ภาษาบนใบ</legend>' + lv.map(function (v) {
       return '<label class="opt"><input type="radio" name="lang" value="' + v + '"' + (v === c ? " checked" : "")
         + "><span><b>" + tx[v][0] + "</b><small>" + tx[v][1] + "</small></span><em>ราคาเท่ากัน</em></label>";
-    }).join("") +
-      '<p class="note" style="margin:8px 2px 0">ต้องการภาษาหรือมาตรฐานของประเทศอื่น: เลือก <a href="#editions">ฉบับประเทศ</a> ด้านล่าง</p></fieldset>';
+    }).join("") + (B.docOn() && Object.keys(B.CTRY).length // 21 Nov 2026: the hint points to a box that exists only when country editions are on sale
+      ? '<p class="note" style="margin:8px 2px 0">ต้องการภาษาหรือมาตรฐานของประเทศอื่น: เลือก <a href="#editions">ฉบับประเทศ</a> ด้านล่าง</p>' : "") + "</fieldset>";
   }
   // ฉบับประเทศ (2 พ.ย. 2026): ภาษาของประเทศนั้น ไทย อังกฤษ + ค่ามาตรฐานและกฎหมายของประเทศนั้นเทียบกับค่าไทย · แจ้งจำนวนข้อที่มีค่าตรวจแหล่งแล้วก่อนซื้อ
   function ccLabel(k) {
@@ -146,7 +146,7 @@
     };
   }
   function ctryBox() {
-    if (mk || !B.docOn() || !sell) return "";
+    if (mk || !B.docOn() || !sell || !Object.keys(B.CTRY).length) return ""; // 21 Nov 2026: no country editions on sale (launch scope 3ed) = no box
     var ks = Object.keys(B.CTRY).sort(function (a, b) {
       return ccLabel(a).localeCompare(ccLabel(b), uiLang());
     }), want = String(new URLSearchParams(location.search).get("cc") || "").toUpperCase(), cov = function (k) {
@@ -215,7 +215,7 @@
         + '">' + (inAcc ? "ไปหน้าสมาชิก" : "สมัครสมาชิกฟรี") + "</a>" + (!bundle && src.ok === true
           && src.free ? '<a class="b line" data-noi18n="1" lang="th" href="' + esc(src.free) + '" download>ฉบับฟรี ไทย</a><a class="b line" data-noi18n="1" lang="en" href="'
           + esc(B.freeEN(src)) + '" download>Free: English</a><a class="b line" href="' + L("doc.html")
-          + (L("doc.html").indexOf("?") < 0 ? "?" : "&") + "item=" + encodeURIComponent(src.id) + '">ฉบับฟรี ภาษาอื่น</a>' : "")
+          + (L("doc.html").indexOf("?") < 0 ? "?" : "&") + "item=" + encodeURIComponent(src.id) + '" data-full="1">ฉบับฟรี ภาษาอื่น</a>' : "")
         + "</div>";
     }
     var inC = B.cart.has(x.id), cov = !inC && B.cart.covered(x.id);
@@ -230,7 +230,7 @@
         + esc(src.nFree) + " จุดสำคัญ · " + esc(+src.freePages || 1) + " หน้า · 1 ภาษา): " + '<a data-noi18n="1" lang="th" href="'
         + esc(src.free) + '" download>ไทย</a> · <a data-noi18n="1" lang="en" href="' + esc(B.freeEN(src))
         + '" download>English</a> · <a href="' + L("doc.html") + (L("doc.html").indexOf("?") < 0 ? "?" : "&")
-        + "item=" + encodeURIComponent(src.id) + '">ภาษาอื่น</a></p>' : "");
+        + "item=" + encodeURIComponent(src.id) + '" data-full="1">ภาษาอื่น</a></p>' : "");
   }
   function trust() {
     var h = +P.hours || 24;

@@ -1,9 +1,20 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-13a"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
-  var KEY = "build_site_draft";
+  var NEED_API = "2026-11-21b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
+  var KEY = "build_admin_work";
+  try {
+    if (!localStorage.getItem(KEY)) {
+      var w0 = JSON.parse(localStorage.getItem("build_site_draft") || "null");
+      if (w0 && !w0.pv && w0.base && w0.data && String((w0.data.member || {}).api || "").indexOf("/EMULATOR/") < 0) {
+        localStorage.setItem(KEY, JSON.stringify(w0));
+        localStorage.removeItem("build_site_draft");
+      }
+    }
+  } catch (e) {}
   var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";
+  var SAVED = ORIG, DR = null; // SAVED = last saved state (the server draft, or data.js) · DR = draft, restore copy, maintenance (adminDraft)
   // draft safety (18 Oct 2026): an old draft once replaced the whole data.js (links, tribute, schedule were lost).
   // A draft is used only when it was made on the same data.js that is loaded now; any other draft is kept aside, not used.
   function hashOf(s) {
@@ -71,13 +82,17 @@
       e.classList.remove("show");
     }, 2200);
   }
+  function pending() {
+    var d = DR && DR.draft;
+    return !!(d && (!d.pubAt || d.at > d.pubAt));
+  }
   function touch() {
-    dirty = JSON.stringify(S) !== ORIG;
+    dirty = JSON.stringify(S) !== SAVED;
     try {
       if (dirty) localStorage.setItem(KEY, JSON.stringify({ base: BASE, at: Date.now(), data: S }));
       else localStorage.removeItem(KEY);
     } catch (e) {} var st = $("state");
-    st.textContent = dirty ? "มีการแก้ที่ยังไม่บันทึก" : (GH && GH.on === true ? "ตรงกับบนเว็บ" : "ตรงกับไฟล์");
+    st.textContent = dirty ? "มีการแก้ที่ยังไม่บันทึก" : (GH && GH.on === true ? (pending() ? "ร่างยังไม่เผยแพร่" : "ตรงกับบนเว็บ") : "ตรงกับไฟล์");
     st.classList.toggle("dirty", dirty);
   }
   var PL = [["tiktok", "TikTok"], ["youtube", "YouTube"], ["facebook", "Facebook"], ["instagram",
@@ -493,9 +508,9 @@
           && (S.pay.acc || S.pay.qr)) ? "ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl
           ? "พร้อมขาย" : "ยังไม่เปิดขายใบใด") : "ใบที่เปิดขายได้ต้องตรวจรายการแล้วเท่านั้น");
     }
-    return todayCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">'
+    return todayCard() + siteCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">'
       + rows.join("") + "</ul></div>" +
-      '<div class="card"><h2>วิธีใช้ 4 ขั้น</h2><ul class="chk"><li><span>1</span><span>แก้ข้อมูลในแท็บด้านบน<small>ระบบจำร่างไว้ในเครื่องนี้ให้เอง ปิดหน้าแล้วเปิดใหม่ยังอยู่</small></span></li><li><span>2</span><span>กด “ดูตัวอย่าง” ตรวจหน้าเว็บด้วยข้อมูลร่าง</span></li><li><span>3</span><span>กด “บันทึกขึ้นเว็บ”<small>ใช้ได้ทุกที่ทุกเครื่อง เมื่อใส่ GITHUB_TOKEN ใน Script properties แล้ว (ข้อ D15) · ถ้ายังไม่ใส่ ปุ่มนี้ไม่แสดง ให้กด “ดาวน์โหลด data.js” นำไปวางทับในโฟลเดอร์ เว็บ แล้วอัปโหลดขึ้นโฮสต์</small></span></li><li><span>4</span><span>รอราว 1–2 นาที แล้วเปิดเว็บดู<small>ลิงก์ที่แปะไว้ตามช่องทางไม่ต้องแก้ เพราะชี้มาที่เว็บนี้ · ประวัติการแก้ทุกครั้งอยู่ใน GitHub ย้อนกลับได้</small></span></li></ul></div>';
+      '<div class="card"><h2>วิธีใช้ 4 ขั้น</h2><ul class="chk"><li><span>1</span><span>แก้ข้อมูลในแท็บด้านบน<small>ระบบจำร่างไว้ในเครื่องนี้ให้เอง ปิดหน้าแล้วเปิดใหม่ยังอยู่</small></span></li><li><span>2</span><span>กด “บันทึกร่าง” แล้ว “ดูตัวอย่าง”<small>ร่างอยู่บนหลังบ้าน ลูกค้ายังไม่เห็น · แท็บตัวอย่างมีแถบสีเขียว “โหมดพรีวิว” · ทดลองซื้อ X-05 ในแท็บนั้นได้</small></span></li><li><span>3</span><span>กด “เผยแพร่”<small>ยืนยัน 2 ครั้ง · ฉบับเดิมถูกเก็บไว้ กด “ย้อนกลับ” ได้ทันทีถ้าพบปัญหา · ต้องใส่ GITHUB_TOKEN ใน Script properties (ข้อ D15) · ถ้ายังไม่ใส่ ให้กด “ดาวน์โหลด data.js” แล้วอัปโหลดเอง</small></span></li><li><span>4</span><span>รอราว 1–2 นาที แล้วเปิดเว็บดู<small>ปิดปรับปรุงได้ที่การ์ด “ร่าง · เผยแพร่ · ปิดปรับปรุง” ด้านบน · ประวัติการแก้ทุกครั้งอยู่ใน GitHub</small></span></li></ul></div>';
   }
 
   // ----- ชุดโพสต์ -----
@@ -1606,6 +1621,7 @@
           }
           window.SITE = o;
           ORIG = fresh;
+          SAVED = fresh;
           BASE = hashOf(ORIG);
           S = JSON.parse(fresh);
           shape();
@@ -1614,9 +1630,11 @@
         else {
           window.SITE = o;
           ORIG = fresh;
+          SAVED = fresh;
           BASE = hashOf(ORIG);
         }
       }
+      draftLoad();
       render();
       if (force) toast("โหลดข้อมูลล่าสุดจากเว็บแล้ว");
     }).catch(function (e) {
@@ -1626,6 +1644,56 @@
       bar("โหลดข้อมูลเว็บจาก GitHub ไม่ได้: " + (e.message || "") + " · ใช้ปุ่มดาวน์โหลด data.js ได้",
         true);
     });
+  }
+  // 21 Nov 2026 (R3): the server draft · a draft saved after the last publish is loaded to keep editing (only when it was made on the data.js that is live now)
+  function draftLoad() {
+    adm("adminDraft", { text: 1 }).then(function (r) {
+      DR = r;
+      var txt = r.text;
+      delete DR.text;
+      if (pending() && txt && !dirty) {
+        if (r.draft.base === GH.sha) {
+          S = JSON.parse(String(txt).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/, ""));
+          shape();
+          SAVED = JSON.stringify(S);
+          bar("เปิดร่างที่ยังไม่เผยแพร่ (บันทึก " + wh(r.draft.at) + " โดย " + (r.draft.who || "") + ") มาแก้ต่อ · ลูกค้ายังเห็นฉบับบนเว็บ", false);
+        }
+        else bar("ร่างบนหลังบ้านแก้จาก data.js รุ่นก่อน จึงไม่เปิดมาแก้ และเผยแพร่ไม่ได้ · แก้ในหน้านี้แล้วกด บันทึกร่าง ใหม่", true);
+      }
+      render();
+    }).catch(function (e) {
+      DR = { err: e.message || "" };
+      render();
+    });
+  }
+  function siteCard() {
+    if (!DR) return "";
+    if (DR.err) return '<div class="card"><h2>ร่าง · เผยแพร่ · ปิดปรับปรุง</h2><p class="hint" style="color:var(--bad)">' + esc(DR.err)
+      + " · ต้องใช้หลังบ้านรุ่น " + NEED_API + "</p></div>";
+    var d = DR.draft, p = DR.prev, m = DR.maint || {}, li = function (cls, t, x) {
+      return '<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : "!") + "</span><span>" + t + "<small>" + x + "</small></span></li>";
+    };
+    return '<div class="card"><h2>ร่าง · เผยแพร่ · ปิดปรับปรุง</h2><p class="hint">บันทึกร่าง = ลูกค้ายังไม่เห็น · ดูตัวอย่าง = เปิดเว็บด้วยร่างในแท็บใหม่ (หลังบ้านตรวจสิทธิ์ก่อนส่งร่าง) · เผยแพร่ = ขึ้นเว็บจริง และเก็บฉบับเดิมไว้ย้อนกลับ</p><ul class="chk">'
+      + li(pending() ? "wa" : "ok", "ร่าง", d ? "บันทึก " + esc(wh(d.at)) + " โดย " + esc(d.who || "") + (pending() ? " · ยังไม่เผยแพร่" : " · เผยแพร่แล้ว " + esc(wh(d.pubAt))) : "ยังไม่มีร่าง")
+      + li(p ? "ok" : "wa", "ฉบับย้อนกลับ", p ? (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่") + " เก็บ " + esc(wh(p.at)) + " โดย " + esc(p.who || "") : "ยังไม่มี (มีหลังเผยแพร่ครั้งแรก)")
+      + li(m.on ? "wa" : "ok", "ปิดปรับปรุง", m.on ? "ปิดอยู่ · ลูกค้าเห็นป้าย กลับมา " + esc(m.back) + " · สั่งซื้อและชำระเงินไม่ได้ · ลูกค้าเดิมยังเข้าระบบและดาวน์โหลดได้" : "เว็บเปิดตามปกติ")
+      + '</ul><div class="grid"><label>เวลาที่เว็บกลับมา (แสดงบนป้าย)<input type="text" id="mt-back" value="' + esc(m.back || "") + '" placeholder="29 พ.ย. 09:00 น."></label><label>ข้อความเพิ่ม (ไม่บังคับ)<input type="text" id="mt-msg" value="' + esc(m.msg || "") + '"></label></div><div class="tools">'
+      + '<button type="button" class="del" data-st="mt-on">ปิดปรับปรุงตอนนี้</button><button type="button" class="pri" data-st="mt-off">เปิดเว็บตามปกติ</button></div></div>';
+  }
+  function stClick(act) {
+    if (act === "mt-on" || act === "mt-off") {
+      var on = act === "mt-on", back = (($("mt-back") || {}).value || "").trim();
+      if (on && !back) return toast("ใส่เวลาที่เว็บจะกลับมาก่อน");
+      if (on && !confirm("ปิดปรับปรุงตอนนี้?\n\nลูกค้าเห็นป้าย กลับมา " + back + "\nสั่งซื้อและชำระเงินไม่ได้จนกว่าจะกด เปิดเว็บตามปกติ\nลูกค้าเดิมยังเข้าระบบ ดูคำสั่งซื้อ และดาวน์โหลดได้ · ข้อมูลไม่หาย")) return;
+      adm("adminMaint", { on: on, back: back, msg: (($("mt-msg") || {}).value || "").trim() }).then(function (r) {
+        DR = DR || {};
+        DR.maint = r.maint;
+        render();
+        toast(on ? "ปิดปรับปรุงแล้ว" : "เปิดเว็บตามปกติแล้ว");
+      }).catch(function (e) {
+        bar(e.message || "ทำรายการไม่สำเร็จ", true);
+      });
+    }
   }
   function bar(msg, err) {
     var b = $("pubbar");
@@ -1802,6 +1870,8 @@
       $(id).hidden = g;
     });
     $("b-pub").hidden = g || GH.on !== true;
+    $("b-go").hidden = g || GH.on !== true;
+    $("b-back").hidden = g || GH.on !== true || !(DR && DR.prev);
     $("b-out").hidden = !on1;
     $("who").hidden = !on1;
     $("who").textContent = on1 ? tokWho() : "";
@@ -1921,6 +1991,11 @@
       window.scrollTo(0, 0);
       return;
     }
+    var stb = ev.target.closest("[data-st]");
+    if (stb) {
+      stClick(stb.dataset.st);
+      return;
+    }
     var sb = ev.target.closest("[data-sh]");
     if (sb) {
       shopClick(sb);
@@ -2008,8 +2083,13 @@
     saved();
     toast("ดาวน์โหลด data.js แล้ว นำไปวางทับไฟล์เดิมในโฟลเดอร์ เว็บ");
   }
+  // 21 Nov 2026 (R3): the preview tab gets a copy of this tab's admin pass (sessionStorage) and asks the back end for the saved draft
   $("b-prev").addEventListener("click", function () {
     touch();
+    try {
+      sessionStorage.removeItem("build_pv_site");
+    } catch (e) {}
+    if (dirty && tokGet()) toast("ตัวอย่างแสดงร่างที่บันทึกแล้ว · กด บันทึกร่าง ก่อนเพื่อดูสิ่งที่เพิ่งแก้");
     window.open("index.html?preview=1", "_blank");
   });
   $("b-imp").addEventListener("click", function () {
@@ -2037,9 +2117,8 @@
     this.value = "";
   });
   $("b-reset").addEventListener("click", function () {
-    if (!dirty || confirm("ทิ้งทุกอย่างที่แก้ แล้วกลับไปใช้ค่าจากไฟล์ data.js ?")) {
-      S = JSON.parse(JSON.stringify(window.SITE || {}));
-      ORIG = JSON.stringify(S);
+    if (!dirty || confirm("ทิ้งทุกอย่างที่แก้ แล้วกลับไปใช้ฉบับที่บันทึกล่าสุด (ร่าง หรือ data.js) ?")) {
+      S = JSON.parse(SAVED);
       shape();
       try {
         localStorage.removeItem(KEY);
@@ -2052,7 +2131,11 @@
       ev.returnValue = "";
     }
   });
-  // บันทึกขึ้นเว็บ: หลังบ้านตรวจ data.js แล้วเขียนลง GitHub · ถ้ามีคนแก้จากที่อื่นหลังโหลด ระบบไม่ทับ ให้โหลดใหม่ก่อน
+  // 21 Nov 2026 (R3): save = the draft on the back end (customers do not see it) · publish = live, the old live copy is kept for one-step restore
+  function busy(btn, on, label) {
+    btn.disabled = on;
+    btn.textContent = label;
+  }
   $("b-pub").addEventListener("click", function () {
     var btn = this;
     if (btn.disabled) return;
@@ -2061,24 +2144,58 @@
       siteLoad(true);
       return;
     }
-    if (!dirty && !confirm("ข้อมูลตรงกับบนเว็บแล้ว บันทึกซ้ำหรือไม่?")) return;
-    btn.disabled = true;
-    btn.textContent = "กำลังบันทึก…";
-    adm("adminSiteSave", { text: fileText(), sha: GH.sha }).then(function (r) {
+    if (!dirty && !confirm("ไม่มีการแก้ใหม่ บันทึกร่างซ้ำหรือไม่?")) return;
+    busy(btn, true, "กำลังบันทึก…");
+    adm("adminDraftSave", { text: fileText(), sha: GH.sha }).then(function (r) {
+      SAVED = JSON.stringify(S);
+      DR = DR || {};
+      DR.draft = { at: r.at, who: tokWho(), base: r.base, size: r.size, pubAt: "" };
+      busy(btn, false, "บันทึกร่าง");
+      touch();
+      render();
+      bar("บันทึกร่างแล้ว " + new Date().toLocaleTimeString("th-TH") + " · ลูกค้ายังเห็นฉบับเดิม · กด ดูตัวอย่าง หรือ เผยแพร่", false);
+    }).catch(function (e) {
+      busy(btn, false, "บันทึกร่าง");
+      bar(e.message || "บันทึกไม่สำเร็จ", true);
+    });
+  });
+  $("b-go").addEventListener("click", function () {
+    var btn = this, d = DR && DR.draft;
+    if (btn.disabled) return;
+    if (dirty) return toast("มีการแก้ที่ยังไม่บันทึก · กด บันทึกร่าง ก่อนเผยแพร่");
+    if (!d) return toast("ยังไม่มีร่าง · กด บันทึกร่าง ก่อน");
+    if (!pending() && !confirm("ร่างนี้เผยแพร่ไปแล้ว เผยแพร่ซ้ำหรือไม่?")) return;
+    if (!confirm("เผยแพร่ร่างขึ้นเว็บจริง?\n\nร่างบันทึก " + wh(d.at) + " โดย " + (d.who || "") + "\nลูกค้าเห็นภายในราว 1–2 นาที\nฉบับที่อยู่บนเว็บตอนนี้ถูกเก็บไว้ กด ย้อนกลับ ได้")) return;
+    if (!confirm("ยืนยันอีกครั้ง: เผยแพร่ตอนนี้")) return;
+    busy(btn, true, "กำลังเผยแพร่…");
+    adm("adminPublish", { confirm: "PUBLISH" }).then(function (r) {
       GH.sha = r.sha;
-      GH.at = r.at;
       window.SITE = JSON.parse(JSON.stringify(S));
-      saved();
-      btn.disabled = false;
-      btn.textContent = "บันทึกขึ้นเว็บ";
-      bar("ขึ้นเว็บแล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที",
-        false);
-    })
-      .catch(function (e) {
-        btn.disabled = false;
-        btn.textContent = "บันทึกขึ้นเว็บ";
-        bar(e.message || "บันทึกไม่สำเร็จ", true);
-      });
+      ORIG = JSON.stringify(window.SITE);
+      SAVED = ORIG;
+      BASE = hashOf(ORIG);
+      busy(btn, false, "เผยแพร่");
+      bar("เผยแพร่แล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที · ถ้าพบปัญหา กด ย้อนกลับ", false);
+      draftLoad();
+    }).catch(function (e) {
+      busy(btn, false, "เผยแพร่");
+      bar(e.message || "เผยแพร่ไม่สำเร็จ", true);
+    });
+  });
+  $("b-back").addEventListener("click", function () {
+    var btn = this, p = DR && DR.prev;
+    if (btn.disabled || !p) return;
+    if (dirty) return toast("มีการแก้ที่ยังไม่บันทึก · บันทึกร่างหรือทิ้งที่แก้ก่อน");
+    if (!confirm("ย้อนกลับ data.js บนเว็บเป็น" + (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่") + " (เก็บ " + wh(p.at) + ")?\n\nลูกค้าเห็นภายในราว 1–2 นาที\nกด ย้อนกลับ อีกครั้งจะกลับมาฉบับปัจจุบัน · ร่างไม่หาย")) return;
+    busy(btn, true, "กำลังย้อนกลับ…");
+    adm("adminRestore", { confirm: "RESTORE" }).then(function () {
+      busy(btn, false, "ย้อนกลับ");
+      bar("ย้อนกลับแล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที", false);
+      siteLoad(true);
+    }).catch(function (e) {
+      busy(btn, false, "ย้อนกลับ");
+      bar(e.message || "ย้อนกลับไม่สำเร็จ", true);
+    });
   });
   $("b-out").addEventListener("click", function () {
     if (dirty && !confirm("ยังมีการแก้ที่ยังไม่บันทึกขึ้นเว็บ (ร่างยังเก็บในเครื่องนี้) ออกจากระบบหรือไม่?")) return;

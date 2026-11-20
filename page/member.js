@@ -983,7 +983,7 @@
       + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>')
       + "</section>" +
       '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="TH">ไฟล์รวมฉบับฟรี ภาษาไทย</button><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="EN">ไฟล์รวมฉบับฟรี ภาษาอังกฤษ</button><a class="b line sm" href="doc.html'
-      + q + '">ฉบับฟรีภาษาอื่น</a><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
+      + q + '" data-full="1">ฉบับฟรีภาษาอื่น</a><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
   }
   function paneOrders() {
     var list = me.orders || [];

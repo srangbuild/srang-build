@@ -98,7 +98,7 @@
           ? '<span class="fl3"><a class="b line sm" data-noi18n="1" lang="th" href="' + esc(x.free)
           + '" download>ไทย</a><a class="b line sm" data-noi18n="1" lang="en" href="' + esc(B.freeEN(x))
           + '" download>English</a><a class="b line sm" href="doc.html' + (q ? q + "&" : "?") + "item="
-          + encodeURIComponent(x.id) + '">ภาษาอื่น</a></span>' : '<span class="pill gray">กำลังตรวจรายการ</span>')
+          + encodeURIComponent(x.id) + '" data-full="1">ภาษาอื่น</a></span>' : '<span class="pill gray">กำลังตรวจรายการ</span>')
         + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H "
         + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ "
           + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>"

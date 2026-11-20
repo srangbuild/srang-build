@@ -12,6 +12,9 @@
   // รายการเดียวกับหลังบ้าน (Code.gs ตัวแปร RQ_KINDS และ RQ_LANGS)
   var KINDS = ["ใบตรวจงานภาษาอื่น", "เกณฑ์ตามมาตรฐานของประเทศอื่น", "ใบตรวจงานตามแบบของโครงการ",
     "Method statement", "เช็กลิสต์เอกสารขออนุญาต", "แบบฟอร์มอื่น"];
+  // 21 Nov 2026 launch scope 3ed: no other-language sheets, no other-country standard (the back end refuses them too)
+  var S3 = !!(window.REGION.scope3 && window.REGION.scope3()), KIND0 = S3 ? "ใบตรวจงานตามแบบของโครงการ" : "ใบตรวจงานภาษาอื่น";
+  if (S3) KINDS = KINDS.slice(2);
   var RQ = window.REGION.request(), LANGS = RQ.langs, SAMPLE = RQ.sample, LCODE = RQ.code;
   $("kind").innerHTML = '<option value="">เลือกประเภทงาน</option>' + KINDS.map(function (k) {
     return "<option>" + esc(k) + "</option>";
@@ -38,6 +41,10 @@
   }
   (function () {
     var R = window.REGION, sp = $("stdPick"), oth = sp.querySelector('[value="other"]');
+    if (S3 && oth) {
+      oth.parentNode.removeChild(oth);
+      return;
+    }
     if (!B.CTRY || !R) return;
     Object.keys(B.CTRY).forEach(function (k) {
       var o = document.createElement("option");
@@ -58,7 +65,7 @@
   var P = new URLSearchParams(location.search);
   if (P.get("item")) {
     $("items").value = String(P.get("item")).replace(/[^\w .,+-]/g, "").slice(0, 300);
-    $("kind").value = "ใบตรวจงานภาษาอื่น";
+    $("kind").value = KIND0;
   }
   if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
   function nLang() {
