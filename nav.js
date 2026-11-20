@@ -29,6 +29,8 @@
     })) lang = lg;
   } catch (e) {}
     var RG = window.REGION, enV = RG ? RG.ev() : "US"; /* 3 Nov 2026: each language has its countries (region.js). The country sets the standards, currency and date format. */
+  /* 21 Nov 2026 launch scope 3ed: class s3 on <html> hides [data-full] text and shows [data-s3] text (nav.css) */
+  if (RG && RG.scope3 && RG.scope3()) document.documentElement.classList.add("s3");
   if (lang !== "th" && !/[?&]shot=1/.test(location.search)) {
     (lang === "en" ? ["en-var.js", "i18n-en.js", "i18n.js"] : ["i18n-en.js", "i18n-core.js",
       "i18n-fix.js", "i18n.js"]).forEach(function (f) {

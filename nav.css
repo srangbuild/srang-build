@@ -116,4 +116,5 @@
   .pk-btn { border:0;padding:0;min-height:0 }
   .pk-arr { display:none }
 }
-
+/* 21 Nov 2026 launch scope 3ed (data.js scope): text for the full shop or for the 3-edition shop */
+.s3 [data-full]{display:none!important}html:not(.s3) [data-s3]{display:none!important}

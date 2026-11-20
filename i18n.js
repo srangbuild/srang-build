@@ -5,6 +5,13 @@
 (function () {
   "use strict";
   var D = window.I18N_EN || {}, RULES = window.I18N_RULES || [], S = window.SITE || {}, map = {};
+  try { /* 21 Nov 2026: ?preview=1 uses the draft data like app.js and nav.js · an emulator address means no live back end */
+    if (/[?&]preview=1/.test(location.search)) {
+      var dr0 = localStorage.getItem("build_site_draft");
+      if (dr0) { dr0 = JSON.parse(dr0); S = dr0.data || dr0; }
+    }
+  } catch (e) {}
+  if (S.member && /\/EMULATOR\//.test(S.member.api || "")) S = Object.assign({}, S, { member: Object.assign({}, S.member, { api: "" }) });
   var THAI = /[฀-฾เ-๿]/; /* not the baht sign U+0E3F */
   function norm(s) {
     return String(s).replace(/\s+/g, " ").trim();

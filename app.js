@@ -85,6 +85,7 @@
     NGN:44.4
   }, siteLang = "th", FX = FX0; // FX0 = อัตราสำรองวันที่สร้างไฟล์ · ใช้เมื่ออ่านอัตราล่าสุดไม่ได้
   try {
+    if (window.REGION && window.REGION.scope3) window.REGION.scope3(); // 21 Nov 2026: launch scope 3ed resets a stored language that is not Thai or English
     siteLang = localStorage.getItem("build_lang") || "th";
     var fxs = JSON.parse(localStorage.getItem("build_fx") || "null");
     if (fxs && fxs.rates && fxs.rates.USD > 0) FX = fxs.rates;
@@ -328,11 +329,20 @@
         return j;
       });
   }
+  // 21 Nov 2026 (R3): mode.js sets SITE_MODE · admin preview sends its pass (the back end checks it) · maintenance stops new orders and payments here too (the back end also refuses them)
+  var MAINT_BLOCK = { order: 1, payStart: 1, ppStart: 1, ppCapture: 1, stStart: 1, lsStart: 1, slip: 1,
+    promoCheck: 1, request: 1, consign: 1 };
   function call(action, data) {
-    var body = { action: action, token: token.get(), ui: siteLang };
+    var body = { action: action, token: token.get(), ui: siteLang }, SM = window.SITE_MODE || {};
     Object.keys(data || {}).forEach(function (k) {
       body[k] = data[k];
     });
+    if (SM.preview && SM.tok) {
+      body.preview = 1;
+      body.adminToken = SM.tok;
+    }
+    else if (SM.maint && SM.maint.on && MAINT_BLOCK[action]) return Promise.reject(new Error("เว็บปิดปรับปรุงชั่วคราว ยังสั่งซื้อและชำระเงินไม่ได้"
+      + (SM.maint.back ? " · กลับมา " + SM.maint.back : "") + " · คำสั่งซื้อ ใบเสร็จ และเอกสารที่ซื้อแล้วยังเปิดได้ตามปกติ"));
     if (API) return post(API, body);
     return ensureEmu().then(function () {
       return post(EMU_API, body);

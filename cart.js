@@ -271,7 +271,9 @@
     });
   }
   function cfgDraw(x, o) {
-    var old = cfgAll()[x.id], u0 = uiL(), def = window.StdPick ? window.StdPick.defaultCc() : "TH", l1d = u0 === "th"
+    // 21 Nov 2026 launch scope 3ed: standard = Thailand or project specification, construction site = Thailand, languages Thai and English only
+    var S3 = !!(R && R.scope3 && R.scope3());
+    var old = cfgAll()[x.id], u0 = uiL(), def = S3 ? "TH" : window.StdPick ? window.StdPick.defaultCc() : "TH", l1d = u0 === "th"
       ? "th" : u0 === "en" ? "en-" + (window.EnVar ? window.EnVar.cur() : "GB") : u0, c = old || {
         n: 2,
         l1: l1d,
@@ -286,7 +288,7 @@
         });
         return m;
       })() : B.CTRY).filter(function (k) {
-        return k && k !== "INT";
+        return k && k !== "INT" && (!S3 || k === "TH");
       }).sort(function (a, b) {
         return ccN(a).localeCompare(ccN(b), u0);
       }), hasU = !B.isMarket(x) && +x.priceU > 0;
@@ -348,6 +350,10 @@
       if (two) add(lccOf(v.l2), "ประเทศของภาษาที่ 2");
       add(v.site, "ประเทศที่ตั้งงาน");
       if (!picked) stdPick = lccOf(v.l1) || v.site; // ยึดภาษาที่ 1 จนกว่าลูกค้าจะเลือกเอง
+      if (S3) { // launch scope 3ed: only the Thai standard and the project specification
+        opt = [{ cc: "TH", why: ["มาตรฐานไทย"] }];
+        if (stdPick !== "TH" && stdPick !== "INT") stdPick = "TH";
+      }
       var known = opt.some(function (p) {
         return p.cc === stdPick;
       }) || stdPick === "INT", ids = idsOf(x);
@@ -355,8 +361,8 @@
         return '<label class="cf-o"><input type="radio" name="cfs" value="' + p.cc + '"' + (p.cc === stdPick ? " checked" : "") + "><span><b>"
           + esc(p.why.join(" และ ")) + ': <span data-noi18n="1">' + esc(ccN(p.cc)) + "</span></b><small>" + stdHtml(p.cc, ids) + "</small><small>"
           + esc(covTx(p.cc, ids)) + "</small></span></label>";
-      }).join("") + '<label class="cf-o"><input type="radio" name="cfs" value="other"' + (known ? "" : " checked")
-        + "><span><b>ประเทศอื่น</b><small>เลือกประเทศจากรายการด้านล่าง</small></span></label>"
+      }).join("") + (S3 ? "" : '<label class="cf-o"><input type="radio" name="cfs" value="other"' + (known ? "" : " checked")
+        + "><span><b>ประเทศอื่น</b><small>เลือกประเทศจากรายการด้านล่าง</small></span></label>")
         + '<label class="cf-o"><input type="radio" name="cfs" value="INT"' + (stdPick === "INT" ? " checked" : "")
         + "><span><b>ตามข้อกำหนดโครงการ</b><small>ช่องเกณฑ์เว้นให้กรอกค่าเอง</small></span></label>";
       if (!known) $("cfOther").value = stdPick;

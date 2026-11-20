@@ -184,6 +184,9 @@
   }
   function of(l) { var v = get("build_region_" + l); return v && lst(l).indexOf(v) >= 0 ? v : infer(l); }
   function ev() { return US[of("en")] ? "US" : "GB"; }
+  /* 21 Nov 2026 launch scope: data.js scope "3ed" = Thai, English and bilingual editions only. No country editions, no other site or document languages. Nothing is deleted: remove the key to open everything again. */
+  function s3() { var S = window.SITE || {}; try { if (/[?&]preview=1/.test(location.search)) { var d = localStorage.getItem("build_site_draft"); if (d) { d = JSON.parse(d); S = d.data || d; } } } catch (e) {} var on = !!(S && S.scope === "3ed"); if (on) { var g = get("build_lang"); if (g && g !== "th" && g !== "en") { try { localStorage.removeItem("build_lang"); } catch (e) {} } } return on; }
+  function k3(k) { return !s3() || k === "en" || k === "th"; }
   window.REGION = {
     of: of, ev: ev,
     list: function (l, form) { var L = lst(l); return l === "en" && form ? L.filter(function (c) { return !!US[c] === (form === "US"); }) : L.slice(); },
@@ -195,18 +198,18 @@
     svg: function (c) { return '<svg class="bh-fl" viewBox="0 0 30 20" width="24" height="16" aria-hidden="true">' + (FLAGS[c] || FLAGS.INT) + "</svg>"; },
     ccOfLang: function (code) { if (code === "en-US") return "US"; if (code === "en-GB") return "GB"; return lst(String(code).slice(0, 2))[0] || "INT"; },
     ccOfCur: ccOfCur, langsOf: langsOf, langName: langName, ownName: own, regionName: regionName, keysOfLang: keysOfLang,
-    all: function () { return Object.keys(CN); },
+    all: function () { return Object.keys(CN); }, scope3: s3,
     searchWord: function (l) { return (LN[l] || LN.en)[2]; },
     /* the lists that pages use */
-    menu: function () { var o = []; codes().forEach(function (k) { if (k === "en") { o.push(["en", "US", "EN", "English (US)"], ["en", "GB", "EN", "English (UK)"]); } else { o.push([k, "", LN[k][3], LN[k][0]]); } }); return o; },
-    docLangs: function () { var o = [["en-US", "English (US)"], ["en-GB", "English (UK)"]]; codes().forEach(function (k) { if (k !== "en") o.push([k, LN[k][0]]); }); return o; },
+    menu: function () { var o = []; codes().filter(k3).forEach(function (k) { if (k === "en") { o.push(["en", "US", "EN", "English (US)"], ["en", "GB", "EN", "English (UK)"]); } else { o.push([k, "", LN[k][3], LN[k][0]]); } }); return o; },
+    docLangs: function () { var o = [["en-US", "English (US)"], ["en-GB", "English (UK)"]]; codes().filter(k3).forEach(function (k) { if (k !== "en") o.push([k, LN[k][0]]); }); return o; },
     langCur: function () { var o = {}; codes().forEach(function (k) { o[k] = LN[k][4]; }); return o; },
     langCc: function () { var o = {}; codes().forEach(function (k) { o[k] = k === "en" ? "" : lst(k)[0]; }); return o; },
-    sale: function () { var o = {}; Object.keys(SALE).forEach(function (k) { o[k] = SALE[k].slice(); }); return o; },
+    sale: function () { var o = {}; if (s3()) return o; Object.keys(SALE).forEach(function (k) { o[k] = SALE[k].slice(); }); return o; },
     request: function () {
       var r = { langs: ["อังกฤษ (สหรัฐอเมริกา)", "อังกฤษ (สหราชอาณาจักร)"], sample: { "อังกฤษ (สหรัฐอเมริกา)": LN.en[5], "อังกฤษ (สหราชอาณาจักร)": LN.en[5], "อื่น ๆ": "(ภาษาที่ระบุในรายละเอียด)" }, code: { "อังกฤษ (สหรัฐอเมริกา)": "en-US", "อังกฤษ (สหราชอาณาจักร)": "en-GB" } };
-      codes().forEach(function (k) { if (k !== "en") { r.langs.push(LN[k][1]); r.sample[LN[k][1]] = LN[k][5]; r.code[LN[k][1]] = k; } });
-      r.langs.push("อื่น ๆ"); return r;
+      codes().filter(k3).forEach(function (k) { if (k !== "en") { r.langs.push(LN[k][1]); r.sample[LN[k][1]] = LN[k][5]; r.code[LN[k][1]] = k; } });
+      if (!s3()) r.langs.push("อื่น ๆ"); return r;
     }
   };
 })();

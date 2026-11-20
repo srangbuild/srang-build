@@ -7,8 +7,9 @@
   "use strict";
   var REFS = window.DOCREFS || { cc: {} }, LAW = window.LAWDB || [], CC_OF = window.CC_OF || {},
     LANG_CC = window.LANG_CC || {}, REC = {};
+  var S3 = !!(window.REGION && window.REGION.scope3 && window.REGION.scope3()); // 21 Nov 2026 launch scope 3ed: Thailand only
   LAW.forEach(function (x) {
-    if (CC_OF[x.country]) REC[CC_OF[x.country]] = x;
+    if (CC_OF[x.country] && (!S3 || CC_OF[x.country] === "TH")) REC[CC_OF[x.country]] = x;
   });
   var lang = "th";
   try {
@@ -50,6 +51,7 @@
     } catch (e) {} return REC[cc] ? REC[cc].country : cc;
   }
   function defaultCc() {
+    if (S3) return "TH";
     return LANG_CC[lang] || "TH";
   }
   function data(cc, sheet) {

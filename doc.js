@@ -12,8 +12,10 @@
   var LANG_CC = window.LANG_CC || {};
   var CODE = window.CC_OF || {};
   var LAW = window.LAWDB || [], REC = {};
+  // 21 Nov 2026 launch scope 3ed: only the Thai law record, so every standard, compare and site list holds Thailand (+ project specification) and ?c1= / ?site= of another country is ignored
+  var S3 = !!(window.REGION && window.REGION.scope3 && window.REGION.scope3());
   LAW.forEach(function (x) {
-    if (CODE[x.country]) REC[CODE[x.country]] = x;
+    if (CODE[x.country] && (!S3 || CODE[x.country] === "TH")) REC[CODE[x.country]] = x;
   });
   function opts(list, sel) {
     var R = window.REGION;
@@ -71,7 +73,7 @@
     var SP = window.StdPick, list = LAW.map(function (x) {
       return [CODE[x.country], SP ? SP.label(CODE[x.country]) : x.countryTh + " · " + x.country];
     }).filter(function (x) {
-      return x[0];
+      return x[0] && (!S3 || x[0] === "TH");
     }).sort(function (a, b) {
       return zr(a[0]) - zr(b[0]) || a[1].localeCompare(b[1], siteLang);
     });
@@ -119,6 +121,10 @@
     if (al && want !== "INT" && !al[want]) {
       followNote = "ใช้มาตรฐานไทยตามฉบับที่คุณซื้อ · ค่ามาตรฐานของ" + ccName(want) + "ต้องซื้อฉบับประเทศนั้นเพิ่ม";
       want = "TH";
+      b = "";
+    }
+    if (S3) { // launch scope 3ed: English uses the Thai reference values too
+      if (want !== "INT") want = "TH";
       b = "";
     }
     if (!touched.c1) $("c1").value = want;
