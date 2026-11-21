@@ -184,8 +184,8 @@
   }
   function of(l) { var v = get("build_region_" + l); return v && lst(l).indexOf(v) >= 0 ? v : infer(l); }
   function ev() { return US[of("en")] ? "US" : "GB"; }
-  /* 21 Nov 2026 launch scope: data.js scope "3ed" = Thai, English and bilingual editions only. No country editions, no other site or document languages. Nothing is deleted: remove the key to open everything again. */
-  function s3() { var S = window.SITE || {}; try { if (/[?&]preview=1/.test(location.search)) { var d = localStorage.getItem("build_site_draft"); if (d) { d = JSON.parse(d); S = d.data || d; } } } catch (e) {} var on = !!(S && S.scope === "3ed"); if (on) { var g = get("build_lang"); if (g && g !== "th" && g !== "en") { try { localStorage.removeItem("build_lang"); } catch (e) {} } } return on; }
+  /* 21 Nov 2026 launch scope: data.js scope "3ed" = Thai, English and bilingual editions only. No country editions and no other document languages. The site menu keeps every language (owner order 21 Nov 2026). Nothing is deleted: remove the key to open everything again. */
+  function s3() { var S = window.SITE || {}; try { if (/[?&]preview=1/.test(location.search)) { var d = localStorage.getItem("build_site_draft"); if (d) { d = JSON.parse(d); S = d.data || d; } } } catch (e) {} return !!(S && S.scope === "3ed"); }
   function k3(k) { return !s3() || k === "en" || k === "th"; }
   window.REGION = {
     of: of, ev: ev,
@@ -201,7 +201,7 @@
     all: function () { return Object.keys(CN); }, scope3: s3,
     searchWord: function (l) { return (LN[l] || LN.en)[2]; },
     /* the lists that pages use */
-    menu: function () { var o = []; codes().filter(k3).forEach(function (k) { if (k === "en") { o.push(["en", "US", "EN", "English (US)"], ["en", "GB", "EN", "English (UK)"]); } else { o.push([k, "", LN[k][3], LN[k][0]]); } }); return o; },
+    menu: function () { var o = []; codes().forEach(function (k) { if (k === "en") { o.push(["en", "US", "EN", "English (US)"], ["en", "GB", "EN", "English (UK)"]); } else { o.push([k, "", LN[k][3], LN[k][0]]); } }); return o; },
     docLangs: function () { var o = [["en-US", "English (US)"], ["en-GB", "English (UK)"]]; codes().filter(k3).forEach(function (k) { if (k !== "en") o.push([k, LN[k][0]]); }); return o; },
     langCur: function () { var o = {}; codes().forEach(function (k) { o[k] = LN[k][4]; }); return o; },
     langCc: function () { var o = {}; codes().forEach(function (k) { o[k] = k === "en" ? "" : lst(k)[0]; }); return o; },

@@ -40,7 +40,7 @@
     +
     ".cf-r{display:flex;flex-wrap:wrap;gap:4px 20px}.cf-r label{display:flex;align-items:center;gap:8px;min-height:44px;font-size:16px;cursor:pointer}.cf-r input{width:20px;height:20px}.cf-f{display:grid;gap:4px;font-size:14px;color:#5A6573}.cf-f[hidden]{display:none}.cf-f select,.cf-f input{width:100%;min-height:44px;font-size:16px;border:1.5px solid #C9D1DB;border-radius:8px;padding:6px 10px;background:#fff;color:#16202B;box-sizing:border-box}"
     +
-    ".cf-o{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:8px 10px;border-radius:8px;border:1px solid #E7EBF0;cursor:pointer}.cf-o:has(input:checked){border-color:#FF6B1A;background:#FFF6F0}.cf-o input{margin-top:3px;width:20px;height:20px}.cf-o b{color:#0F2A44;font-size:15.5px}.cf-o small{display:block;color:#5A6573;font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}.cf-o small:empty{display:none}"
+    ".cf-o{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:8px 10px;border-radius:8px;border:1px solid #E7EBF0;cursor:pointer}.cf-o:has(input:checked){border-color:#FF6B1A;background:#FFF6F0}.cf-o input{margin-top:3px;width:20px;height:20px}.cf-o b{color:#0F2A44;font-size:15.5px}.cf-o small{display:block;color:#5A6573;font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}.cf-o small:empty{display:none}.cf-pr{float:right;margin-left:10px;white-space:nowrap}[dir=rtl] .cf-pr{float:left;margin:0 10px 0 0}"
     +
     ".cf-nt{margin:0;color:#5A6573;font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}.cf-sum{background:#F6F4EF;border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.6;overflow-wrap:anywhere}.cf-sum:empty{display:none}.cf-sum small{display:block;color:#5A6573}.cf-p{font:700 22px/1.4 \"Kanit\",sans-serif;color:#0F2A44}.cf-err{margin:0;color:#B3261E;font-weight:600}.cf-err:empty{display:none}"
     +
@@ -137,6 +137,7 @@
      ระบบเลือกฉบับที่ต้องซื้อตามสิทธิ์เดิม: อังกฤษ-ไทย · .EN · .TH · ฉบับประเทศ (ราคา × 1.5 บอกก่อนใส่ตะกร้า)
      ค่าที่เลือกเก็บในเครื่องนี้ (build_cart_cfg) หน้าเอกสารอัจฉริยะอ่านไปตั้งค่าให้ */
   var R = window.REGION, CFK = "build_cart_cfg";
+  var S3 = !!(R && R.scope3 && R.scope3()); // รอบเปิดตัว 3ed (data.js scope): ขาย 3 ฉบับ คือ อังกฤษ + ไทย · ไทย · อังกฤษ
   function cfgAll() {
     try {
       var o = JSON.parse(localStorage.getItem(CFK) || "{}");
@@ -252,28 +253,140 @@
       return l && bl(l) !== "th" && bl(l) !== "en";
     });
   }
-  function cfgLine(root) { // บรรทัดสรุปในตะกร้า
+  function cfgLine(root) { // บรรทัดสรุปในตะกร้า · รอบเปิดตัว 3ed: ไม่มี เพราะชื่อฉบับ (อังกฤษ + ไทย · ไทย · อังกฤษ) บอกครบแล้ว
     var c = cfgAll()[root];
-    if (!c || !R) return "";
+    if (!c || !R || S3) return "";
     var ln = function (l) {
       return R.langName(l, uiL());
     };
     return "ภาษา: " + ln(c.l1) + (c.n === 2 ? " + " + ln(c.l2) : "") + " · มาตรฐาน: " + ccN(c.std) + " · ที่ตั้งงาน: " + ccN(c.site)
       + (c.city ? " (" + c.city + ")" : "");
   }
+  /* ---------- หน้าต่างตั้งค่า: ส่วนที่ใช้ร่วมกัน ---------- */
   var cf = null;
   function cfgOpen(id, o) {
     o = o || {};
     var x = B.find(id);
     if (!x) return;
+    if (S3) {
+      cfgAsk3(x, o);
+      return;
+    }
     deps().then(function () {
-      cfgDraw(x, o);
+      cfgDrawFull(x, o);
     });
   }
-  function cfgDraw(x, o) {
-    // 21 Nov 2026 launch scope 3ed: standard = Thailand or project specification, construction site = Thailand, languages Thai and English only
-    var S3 = !!(R && R.scope3 && R.scope3());
-    var old = cfgAll()[x.id], u0 = uiL(), def = S3 ? "TH" : window.StdPick ? window.StdPick.defaultCc() : "TH", l1d = u0 === "th"
+  function cfgShow(html) { // วาดหน้าต่าง · คืนตัวหาช่องในหน้าต่าง
+    if (!cf) {
+      cf = document.createElement("div");
+      cf.className = "cf-wrap";
+      document.body.appendChild(cf);
+    }
+    cf.innerHTML = html;
+    cf.onchange = null; // ตัวฟังของหน้าต่างรอบก่อน
+    cf.onclick = function (ev) {
+      if (ev.target.closest && ev.target.closest("[data-cf-x]")) cfClose();
+    };
+    document.body.classList.add("cf-on");
+    return function (i) {
+      return cf.querySelector("#" + i);
+    };
+  }
+  function cfgHead(title, x) {
+    return '<div class="cf-bg" data-cf-x="1"></div><div class="cf-box" role="dialog" aria-modal="true" aria-labelledby="cfH"><div class="bc-hd"><h2 id="cfH">'
+      + title + '</h2><button type="button" data-cf-x="1" aria-label="ปิด">✕</button></div><form class="cf-bd" id="cfF" novalidate><p class="cf-it" data-noi18n="1"><b>'
+      + esc(B.code(x) + " " + x.title) + "</b></p>";
+  }
+  function cfgFoot(o) {
+    return '<p class="cf-err" id="cfErr" role="alert"></p><div class="cf-ft"><button type="submit" class="bc-go">'
+      + (o.now ? "ใส่ตะกร้าและชำระเงิน" : "ใส่ตะกร้า") + '</button><button type="button" class="bc-vw" data-cf-x="1">ยกเลิก</button></div></form></div>';
+  }
+  /* ใส่ตะกร้า เก็บค่าที่เลือกให้หน้าเอกสารอัจฉริยะ แล้วปิดหน้าต่าง · คืนข้อความผิดพลาด หรือ "" เมื่อสำเร็จ */
+  function cfgCommit(x, o, id, upd, c, note) {
+    var err = B.cart.add(id, upd);
+    if (err) return err;
+    cfgPut(x.id, c);
+    cfClose();
+    draw();
+    say("ใส่ " + B.code(x) + " ลงตะกร้าแล้ว · " + note);
+    if (o.now) location.href = L("checkout.html");
+    if (typeof o.done === "function") o.done(id);
+    return "";
+  }
+  /* ---------- รอบเปิดตัว 3ed: ถามเฉพาะสิ่งที่กำหนดสินค้าและราคา (คำสั่งเจ้าของ 21 พ.ย. 2026) ----------
+     ถาม 2 ข้อ: ฉบับภาษา และแบบสิทธิ์ · ข้อที่มีตัวเลือกเดียวไม่ถาม · ไม่มีอะไรให้เลือก = ใส่ตะกร้าทันที
+     มาตรฐานอ้างอิงและที่ตั้งงานไม่มีผลต่อราคา ลูกค้าตั้งที่หน้าเอกสารอัจฉริยะตอนใช้งาน */
+  var ADDED3 = "กดปุ่มตะกร้าเพื่อชำระเงิน"; // ข้อความยืนยันหลังใส่ตะกร้า · ประโยคเดียวกับปุ่มใส่ตะกร้าของสินค้าอื่น จึงมีคำแปลครบทุกภาษาแล้ว
+  function edOf(c) { // ค่าที่เก็บไว้ → ฉบับ ("" = อังกฤษ + ไทย)
+    return !c || c.n === 2 ? "" : bl(c.l1) === "th" ? "TH" : "EN";
+  }
+  function edCfg(v, old) { // ฉบับ → ค่าที่หน้าเอกสารอัจฉริยะอ่าน (รูปเดียวกับหน้าต่างเต็ม)
+    var en = "en-" + (window.EnVar ? window.EnVar.cur() : "GB"), th1 = uiL() === "th";
+    return {
+      n: v ? 1 : 2,
+      l1: v === "TH" ? "th" : v === "EN" ? en : th1 ? "th" : en,
+      l2: v ? "" : th1 ? en : "th",
+      site: "TH",
+      std: old && old.std === "INT" ? "INT" : "TH",
+      city: (old && old.city) || ""
+    };
+  }
+  function edPut(root, v) { // หน้าที่ใส่ตะกร้าเองโดยไม่เปิดหน้าต่าง (หน้าสินค้า หน้าตะกร้า) เรียกเพื่อให้ค่าตรงกับฉบับที่เลือก
+    cfgPut(root, edCfg(v, cfgAll()[root]));
+  }
+  function skuId(x, v, upd) {
+    return x.id + (v ? "." + v : "") + (upd ? "+U" : "");
+  }
+  function cfgAsk3(x, o) {
+    var eds = B.langsOf(x), hasU = !B.isMarket(x) && +x.priceU > 0, line = B.cart.line(x.id), old = cfgAll()[x.id];
+    var ed0 = line ? B.varOf(line) : edOf(old);
+    if (eds.indexOf(ed0) < 0) ed0 = "";
+    if (eds.length < 2 && !hasU) { // ไม่มีอะไรให้เลือก
+      var e0 = cfgCommit(x, o, skuId(x, ed0, false), false, edCfg(ed0, old), ADDED3);
+      if (e0) say(e0);
+      return;
+    }
+    cfgDraw3(x, o, eds, hasU, ed0, old);
+  }
+  function cfgDraw3(x, o, eds, hasU, ed0, old) {
+    var card = function (name, val, on, head, sub, price) {
+      return '<label class="cf-o"><input type="radio" name="' + name + '" value="' + val + '"' + (on ? " checked" : "") + "><span><b>" + esc(head)
+        + (price ? ' <span class="cf-pr">' + esc(price) + "</span>" : "") + "</b><small>" + esc(sub) + "</small></span></label>";
+    };
+    var n = 0, step = function (t) {
+      n++;
+      return "<legend>" + (eds.length > 1 && hasU ? n + ". " : "") + t + "</legend>";
+    };
+    var $ = cfgShow(cfgHead("เลือกฉบับก่อนใส่ตะกร้า", x) + (eds.length > 1 ? "<fieldset>" + step("ภาษาบนใบ") + eds.map(function (v) {
+      return card("cfe", v, v === ed0, B.LANGS[v], v ? "" : "บรรทัดอังกฤษและบรรทัดไทยอยู่ในใบเดียวกัน");
+    }).join("") + '<p class="cf-nt">ทุกฉบับราคาเท่ากัน</p></fieldset>' : "") + (hasU ? "<fieldset>" + step("แบบสิทธิ์")
+      + card("cfu", "0", !o.upd, "ซื้อฉบับนี้ เก็บได้ตลอด", "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
+        B.baht(B.cart.price(skuId(x, ed0, false))))
+      + card("cfu", "1", !!o.upd, "รับฉบับใหม่ตลอด", "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
+        B.baht(B.cart.price(skuId(x, ed0, true)))) + "</fieldset>" : "")
+      + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>' + cfgFoot(o));
+    var pick = function () {
+      var e = cf.querySelector("input[name=cfe]:checked"), u = cf.querySelector("input[name=cfu]:checked");
+      return { ed: e ? e.value : ed0, upd: !!u && u.value === "1" };
+    };
+    var sum = function () {
+      var p = pick();
+      $("cfSum").innerHTML = '<b class="cf-p">' + esc(B.baht(B.cart.price(skuId(x, p.ed, p.upd)))) + "</b><small>ได้ไฟล์ PDF และใช้หน้าเอกสารอัจฉริยะได้ · มาตรฐานอ้างอิงและที่ตั้งงานตั้งได้ที่หน้าเอกสารอัจฉริยะ ไม่มีผลต่อราคา</small>";
+    };
+    cf.onchange = sum;
+    $("cfF").onsubmit = function (ev) {
+      ev.preventDefault();
+      var p = pick();
+      var err = cfgCommit(x, o, skuId(x, p.ed, false), p.upd, edCfg(p.ed, old), ADDED3);
+      if (err) $("cfErr").textContent = err; // สำเร็จ = หน้าต่างปิดไปแล้ว
+    };
+    sum();
+    var f0 = cf.querySelector("input:checked");
+    if (f0) f0.focus();
+  }
+  /* ---------- ระบบเต็ม (ปิดสวิตช์ 3ed): ภาษา 1–2 ภาษา ประเทศที่ตั้งงาน และมาตรฐานของประเทศ ---------- */
+  function cfgDrawFull(x, o) {
+    var old = cfgAll()[x.id], u0 = uiL(), def = window.StdPick ? window.StdPick.defaultCc() : "TH", l1d = u0 === "th"
       ? "th" : u0 === "en" ? "en-" + (window.EnVar ? window.EnVar.cur() : "GB") : u0, c = old || {
         n: 2,
         l1: l1d,
@@ -288,7 +401,7 @@
         });
         return m;
       })() : B.CTRY).filter(function (k) {
-        return k && k !== "INT" && (!S3 || k === "TH");
+        return k && k !== "INT";
       }).sort(function (a, b) {
         return ccN(a).localeCompare(ccN(b), u0);
       }), hasU = !B.isMarket(x) && +x.priceU > 0;
@@ -301,13 +414,7 @@
         return '<option value="' + k + '"' + (k === sel ? " selected" : "") + ">" + esc(ccN(k)) + "</option>";
       }).join("");
     };
-    if (!cf) {
-      cf = document.createElement("div");
-      cf.className = "cf-wrap";
-      document.body.appendChild(cf);
-    }
-    cf.innerHTML = '<div class="cf-bg" data-cf-x="1"></div><div class="cf-box" role="dialog" aria-modal="true" aria-labelledby="cfH"><div class="bc-hd"><h2 id="cfH">ตั้งค่าเอกสารก่อนใส่ตะกร้า</h2><button type="button" data-cf-x="1" aria-label="ปิด">✕</button></div><form class="cf-bd" id="cfF" novalidate><p class="cf-it" data-noi18n="1"><b>'
-      + esc(B.code(x) + " " + x.title) + '</b></p><fieldset><legend>1. ภาษาบนเอกสาร</legend><div class="cf-r"><label><input type="radio" name="cfn" value="1"'
+    var $ = cfgShow(cfgHead("ตั้งค่าเอกสารก่อนใส่ตะกร้า", x) + '<fieldset><legend>1. ภาษาบนเอกสาร</legend><div class="cf-r"><label><input type="radio" name="cfn" value="1"'
       + (c.n === 1 ? " checked" : "") + '> 1 ภาษา</label><label><input type="radio" name="cfn" value="2"' + (c.n === 2 ? " checked" : "")
       + '> 2 ภาษา</label></div><label class="cf-f"><span id="cfL1t">ภาษาที่ 1 (ข้อความหลัก มีช่องกรอก)</span><select id="lang1">' + lo(c.l1)
       + '</select></label><label class="cf-f" id="cfL2w"><span>ภาษาที่ 2 (บรรทัดรอง)</span><select id="lang2">' + lo(c.l2)
@@ -316,11 +423,8 @@
       + esc(c.city || "") + '"></label><p class="cf-nt" id="cfLaw"></p></fieldset><fieldset><legend>3. ยึดมาตรฐานของประเทศใด</legend><div id="cfStd"></div><label class="cf-f" id="cfOw" hidden><span>ประเทศอื่น</span><select id="cfOther" data-country-name="1">'
       + co(c.std) + '</select></label></fieldset>' + (hasU ? '<fieldset id="cfPl"><legend>4. แบบสิทธิ์</legend><div class="cf-r"><label><input type="radio" name="cfu" value="0"'
         + (o.upd ? "" : " checked") + '> ซื้อฉบับนี้ เก็บได้ตลอด</label><label><input type="radio" name="cfu" value="1"' + (o.upd ? " checked" : "")
-        + "> รับฉบับใหม่ตลอด</label></div></fieldset>" : "") + '<div class="cf-sum" id="cfSum" aria-live="polite"></div><p class="cf-err" id="cfErr" role="alert"></p><div class="cf-ft"><button type="submit" class="bc-go">'
-      + (o.now ? "ใส่ตะกร้าและชำระเงิน" : "ใส่ตะกร้า") + '</button><button type="button" class="bc-vw" data-cf-x="1">ยกเลิก</button></div></form></div>';
-    var $ = function (i) {
-      return cf.querySelector("#" + i);
-    }, stdPick = c.std, picked = !!old;
+        + "> รับฉบับใหม่ตลอด</label></div></fieldset>" : "") + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>' + cfgFoot(o));
+    var stdPick = c.std, picked = !!old;
     function cur() {
       var n = +((cf.querySelector("input[name=cfn]:checked") || {}).value || 2), s = $("cfStd").querySelector("input[name=cfs]:checked"),
         site = $("cfSite").value, k = s ? s.value : stdPick;
@@ -350,10 +454,6 @@
       if (two) add(lccOf(v.l2), "ประเทศของภาษาที่ 2");
       add(v.site, "ประเทศที่ตั้งงาน");
       if (!picked) stdPick = lccOf(v.l1) || v.site; // ยึดภาษาที่ 1 จนกว่าลูกค้าจะเลือกเอง
-      if (S3) { // launch scope 3ed: only the Thai standard and the project specification
-        opt = [{ cc: "TH", why: ["มาตรฐานไทย"] }];
-        if (stdPick !== "TH" && stdPick !== "INT") stdPick = "TH";
-      }
       var known = opt.some(function (p) {
         return p.cc === stdPick;
       }) || stdPick === "INT", ids = idsOf(x);
@@ -361,8 +461,8 @@
         return '<label class="cf-o"><input type="radio" name="cfs" value="' + p.cc + '"' + (p.cc === stdPick ? " checked" : "") + "><span><b>"
           + esc(p.why.join(" และ ")) + ': <span data-noi18n="1">' + esc(ccN(p.cc)) + "</span></b><small>" + stdHtml(p.cc, ids) + "</small><small>"
           + esc(covTx(p.cc, ids)) + "</small></span></label>";
-      }).join("") + (S3 ? "" : '<label class="cf-o"><input type="radio" name="cfs" value="other"' + (known ? "" : " checked")
-        + "><span><b>ประเทศอื่น</b><small>เลือกประเทศจากรายการด้านล่าง</small></span></label>")
+      }).join("") + '<label class="cf-o"><input type="radio" name="cfs" value="other"' + (known ? "" : " checked")
+        + "><span><b>ประเทศอื่น</b><small>เลือกประเทศจากรายการด้านล่าง</small></span></label>"
         + '<label class="cf-o"><input type="radio" name="cfs" value="INT"' + (stdPick === "INT" ? " checked" : "")
         + "><span><b>ตามข้อกำหนดโครงการ</b><small>ช่องเกณฑ์เว้นให้กรอกค่าเอง</small></span></label>";
       if (!known) $("cfOther").value = stdPick;
@@ -402,9 +502,6 @@
       }
       redraw();
     };
-    cf.onclick = function (ev) {
-      if (ev.target.closest && ev.target.closest("[data-cf-x]")) cfClose();
-    };
     $("cfF").onsubmit = function (ev) {
       ev.preventDefault();
       var v = cur();
@@ -417,19 +514,9 @@
         $("cfErr").textContent = k.err;
         return;
       }
-      var err = B.cart.add(k.id, up);
-      if (err) {
-        $("cfErr").textContent = err;
-        return;
-      }
-      cfgPut(x.id, v);
-      cfClose();
-      draw();
-      say("ใส่ " + B.code(x) + " ลงตะกร้าแล้ว · " + cfgTx(v));
-      if (o.now) location.href = L("checkout.html");
-      if (typeof o.done === "function") o.done(k.id);
+      var err = cfgCommit(x, o, k.id, up, v, cfgTx(v));
+      if (err) $("cfErr").textContent = err;
     };
-    document.body.classList.add("cf-on");
     redraw();
     var f0 = cf.querySelector("input[name=cfn]:checked");
     if (f0) f0.focus();
@@ -442,7 +529,7 @@
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape" && cf && cf.innerHTML) cfClose();
   });
-  B.cfg = { open: cfgOpen, line: cfgLine, all: cfgAll, put: cfgPut };
+  B.cfg = { open: cfgOpen, line: cfgLine, all: cfgAll, put: cfgPut, edition: edPut, simple: S3 };
   fab.addEventListener("click", function () {
     open(true);
   });

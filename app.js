@@ -85,7 +85,6 @@
     NGN:44.4
   }, siteLang = "th", FX = FX0; // FX0 = อัตราสำรองวันที่สร้างไฟล์ · ใช้เมื่ออ่านอัตราล่าสุดไม่ได้
   try {
-    if (window.REGION && window.REGION.scope3) window.REGION.scope3(); // 21 Nov 2026: launch scope 3ed resets a stored language that is not Thai or English
     siteLang = localStorage.getItem("build_lang") || "th";
     var fxs = JSON.parse(localStorage.getItem("build_fx") || "null");
     if (fxs && fxs.rates && fxs.rates.USD > 0) FX = fxs.rates;
