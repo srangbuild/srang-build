@@ -435,7 +435,7 @@
       || "ฉันยินยอมให้เก็บข้อมูลที่กรอกเพื่อดูแลบัญชีสมาชิก") + ' <a href="privacy.html' + q + '" target="_blank" rel="noopener">อ่านนโยบาย</a></span></label>';
     var reg = '<form class="f" id="f-reg" novalidate><label>ชื่อที่ใช้เรียก<input type="text" name="name" maxlength="60" autocomplete="nickname" required></label><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>'
       + pwField("pass", "ตั้งรหัสผ่าน", "new-password", true) + pwField("pass2",
-        "ยืนยันรหัสผ่าน (พิมพ์ซ้ำอีกครั้ง)", "new-password", false) + '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off"></label>'
+        "ยืนยันรหัสผ่าน (พิมพ์ซ้ำอีกครั้ง)", "new-password", false) // 21 Nov 2026: ถามเฉพาะที่จำเป็นต่อการสร้างบัญชี · LINE ID โทรศัพท์ ที่อยู่ กรอกทีหลังได้ที่เมนู โปรไฟล์
       + consent + '<button class="b pri" type="submit">สมัครสมาชิกด้วยอีเมล</button><p class="note" style="margin:0">ระบบส่งรหัส 6 หลักไปที่อีเมล เพื่อยืนยันว่าเป็นอีเมลของคุณ ก่อนสร้างบัญชี</p></form>';
     var inn = '<form class="f" id="f-in" novalidate><label>อีเมล<input type="email" name="email" maxlength="120" autocomplete="email" inputmode="email" required></label>'
       + pwField("pass", "รหัสผ่าน", "current-password", false) + '<button class="b pri" type="submit">เข้าสู่ระบบ</button><p class="note" style="margin:0"><button type="button" class="linkbtn" data-mode="forgot">ลืมรหัสผ่าน หรือสมัครด้วย Google LINE Facebook TikTok แล้วอยากตั้งรหัสผ่าน</button></p></form>';
@@ -846,7 +846,7 @@
           + x.title) + "<small>" + (B.isBundle(x) ? x.items.length + " ใบ: " + esc(x.items.join(" · ")) : esc(x.nPro)
             + " ข้อ · " + esc(x.pages) + " หน้า") + "</small></span><em>" + B.baht(p) + (pu ? '<small class="pu">รับฉบับใหม่ '
               + B.baht(pu) + "</small>" : "") + "</em></label>";
-    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">สร้างคำสั่งซื้อ</button></div><p class="note">'
+    }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">ไปชำระเงิน</button></div><p class="note">ฉบับที่ได้คืออังกฤษ + ไทย เปลี่ยนเป็นฉบับภาษาเดียวได้ที่หน้าตะกร้า</p><p class="note">'
       + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ</p></form>";
   }
   /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
@@ -1841,23 +1841,27 @@
       return;
     }
     if (f.id === "f-order") {
-      var upP = planOf() === "up", ids = [].map.call(f.querySelectorAll("input[name=it]:checked"),
-        function (c) {
-          return c.value + (upP ? "+U" : "");
-        });
-      if (!ids.length) {
+      // 21 Nov 2026 (คำสั่งเจ้าของ): ทางซื้อมีทางเดียว คือ ตะกร้า แล้วหน้าชำระเงิน · แท็บนี้ใส่รายการที่เลือกลงตะกร้าแล้วพาไปหน้าชำระเงิน
+      // รายการที่อยู่ในตะกร้าแล้วคงฉบับภาษาเดิม เปลี่ยนเฉพาะแบบสิทธิ์ · รายการที่อยู่ในชุดรวมในตะกร้าแล้วข้ามไป
+      var upP = planOf() === "up", picks = [].map.call(f.querySelectorAll("input[name=it]:checked"), function (c) {
+        return c.value;
+      });
+      if (!picks.length) {
         say("เลือกอย่างน้อย 1 รายการ", true);
         return;
       }
-      want = "";
-      wantList = [];
-      run(B.call("order", { items: ids }).then(function () {
-        if (B.cart) B.cart.clear();
-        return refresh(true).then(function () {
-          go("orders");
-          say("สร้างคำสั่งซื้อแล้ว เลือกวิธีชำระด้านล่าง");
-        });
-      }));
+      var errs = picks.map(function (id) {
+        if (B.cart.has(id)) {
+          B.cart.setPlan(id, upP);
+          return "";
+        }
+        return B.cart.covered(id) ? "" : B.cart.add(id, upP);
+      }).filter(String);
+      if (errs.length) {
+        say(errs[0], true);
+        return;
+      }
+      location.href = "checkout.html" + q;
       return;
     }
     if (f.dataset.slip) {

@@ -63,9 +63,10 @@
   }
   function planTx(id) {
     var x = B.find(id);
-    return B.isMarket(x) ? "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ",
-      manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล") : (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
-        + (B.cfg && x && B.cfg.line(x.id) ? " · " + B.cfg.line(x.id) : ""); // ค่าที่ตั้งตอนใส่ตะกร้า (ภาษา มาตรฐาน ที่ตั้งงาน)
+    if (B.isMarket(x)) return "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล");
+    // ระบบเต็ม: ค่าที่ตั้งตอนใส่ตะกร้า (ภาษา มาตรฐาน ที่ตั้งงาน) · รอบเปิดตัว 3ed หรือยังไม่ได้ตั้ง: ชื่อฉบับภาษา · ฉบับประเทศบอกในชื่อรายการแล้ว
+    var cl = B.cfg && x ? B.cfg.line(x.id) : "", ed = B.isCtry(B.varOf(id)) ? "" : B.LANGS[B.varOf(id)] || "";
+    return (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด") + (cl || ed ? " · " + (cl || ed) : "");
   }
   function trackUrl(o) {
     return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k="

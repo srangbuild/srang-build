@@ -485,7 +485,9 @@
       else location.href = L("cart.html");
       return;
     }
-    if (B.cfg && !mk) { // 3 Nov 2026: ตั้งค่าภาษา มาตรฐาน และที่ตั้งงานก่อนใส่ตะกร้า
+    // 3 Nov 2026: ระบบเต็มเปิดหน้าต่างตั้งค่าภาษา มาตรฐาน และที่ตั้งงานก่อนใส่ตะกร้า
+    // 21 Nov 2026 (คำสั่งเจ้าของ): รอบเปิดตัว 3ed ลูกค้าเลือกฉบับภาษาและแบบสิทธิ์ในหน้านี้แล้ว จึงใส่ตะกร้าทันที ไม่ถามซ้ำ
+    if (B.cfg && !mk && !B.cfg.simple) {
       B.cfg.open(x.id, { now: act === "now", upd: up, done: redrawBuy });
       return;
     }
@@ -494,6 +496,7 @@
       toast(err);
       return;
     }
+    if (B.cfg && !mk) B.cfg.edition(x.id, lv0); // ให้หน้าเอกสารอัจฉริยะเปิดด้วยภาษาของฉบับที่เลือก
     if (act === "now") {
       location.href = L("checkout.html");
       return;

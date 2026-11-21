@@ -125,9 +125,14 @@
           ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.memberPrice(x.price)) + "</option>"
         + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · "
           + B.baht(B.memberPrice(x.priceU)) + "</option>" : "") + "</select></label>";
-      // 3 Nov 2026 (สภา + คำสั่งเจ้าของ): ตั้งภาษา มาตรฐาน และที่ตั้งงานได้ที่เดียว คือหน้าต่างตั้งค่า · ในตะกร้าแสดงสรุปและปุ่มแก้
-      var cl = !B.isMarket(x) && B.cfg ? B.cfg.line(x.id) : "", ctry = B.isCtry(B.varOf(id));
-      var opt = B.isMarket(x) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
+      // 3 Nov 2026 (สภา + คำสั่งเจ้าของ): ระบบเต็มตั้งภาษา มาตรฐาน และที่ตั้งงานได้ที่เดียว คือหน้าต่างตั้งค่า · ในตะกร้าแสดงสรุปและปุ่มแก้
+      // 21 Nov 2026 (คำสั่งเจ้าของ): รอบเปิดตัว 3ed เปลี่ยนฉบับภาษาได้ในแถวนี้เลย ไม่ต้องเปิดหน้าต่าง
+      var cl = !B.isMarket(x) && B.cfg ? B.cfg.line(x.id) : "", ctry = B.isCtry(B.varOf(id)), eds = B.langsOf(x);
+      var edSel = eds.length > 1 ? '<label class="ctl"><span class="note" style="margin:0">ภาษาบนใบ</span><select data-lang="' + esc(x.id)
+        + '" aria-label="ภาษาบนใบของ ' + esc(x.id) + '">' + eds.map(function (v) {
+          return '<option value="' + v + '"' + (v === B.varOf(id) ? " selected" : "") + ">" + esc(B.LANGS[v]) + "</option>";
+        }).join("") + "</select></label>" : "";
+      var opt = B.isMarket(x) || (B.cfg && B.cfg.simple) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
         + esc(cl || "ภาษา: " + B.LANGS[B.varOf(id)] + " · มาตรฐาน: ไทย") + '</small><button class="b line sm" type="button" data-cfg="' + esc(x.id)
         + '">แก้ภาษา มาตรฐาน และที่ตั้งงาน</button></div>';
       return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="'
@@ -143,7 +148,7 @@
         (s > 0 && !info.block ? '<small class="sv">ถูกกว่าซื้อแยก ' + B.baht(s) + "</small>" : "")
         + (info.note ? '<small class="' + (info.cls || "") + '">' + esc(info.note) + "</small>" : "")
         +
-        '<div class="ctl">' + sel + '<button class="rm" type="button" data-rm="' + esc(x.id)
+        '<div class="ctl">' + (B.cfg && B.cfg.simple && !B.isMarket(x) ? edSel : "") + sel + '<button class="rm" type="button" data-rm="' + esc(x.id)
         + '">เอาออก</button></div></div></article>';
     }).join("");
     var ups = upsell(ids).map(function (u) {
@@ -175,6 +180,7 @@
       say("");
     } else if (t.dataset.lang) {
       B.cart.setLang(t.dataset.lang, t.value);
+      if (B.cfg) B.cfg.edition(t.dataset.lang, t.value); // ให้หน้าเอกสารอัจฉริยะเปิดด้วยภาษาของฉบับที่เลือก
       say("เปลี่ยนภาษาบนใบของ " + t.dataset.lang + " เป็น " + B.LANGS[t.value] + " แล้ว ราคาเท่าเดิม");
     }
   });
