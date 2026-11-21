@@ -1026,7 +1026,7 @@
       + esc(m.name) + '" required></label>' + (m.email ? '<label>อีเมล<input type="email" value="'
         + esc(m.email) + '" readonly aria-readonly="true"></label>' : '<label>อีเมลสำหรับรับไฟล์และการแจ้งเตือน (ต้องใส่ก่อนสั่งซื้อ)<input type="email" name="email" maxlength="120" inputmode="email" autocomplete="email" required></label>')
       + '<label>LINE ID (ไม่บังคับ)<input type="text" name="line" maxlength="40" autocomplete="off" value="'
-      + esc(m.line) + '"></label><button class="b pri" type="submit">บันทึกข้อมูล</button></form><p class="note">รูปโปรไฟล์ เบอร์โทร ที่อยู่จัดส่ง และข้อมูลออกใบเสร็จ เปิดให้ใช้เร็ว ๆ นี้</p></section>';
+      + esc(m.line) + '"></label><button class="b pri" type="submit">บันทึกข้อมูล</button></form></section>'; // 21 Nov 2026: no "coming soon" note for customers
     var avGrid = AV.map(function (x) {
       return '<label class="avpick"><input type="radio" name="av" value="a:' + x[0] + '"' + (cur === "a:"
         + x[0] ? " checked" : "") + '><img src="img/avatar/' + x[0] + '.jpg" alt="" loading="lazy"><span>'

@@ -18,8 +18,10 @@
     manual: "ร้านส่งรายละเอียดทางอีเมล"
   };
   // แสดงเฉพาะสินค้าที่ร้านตรวจแล้ว · ปุ่มใส่ตะกร้าเฉพาะสินค้าที่เปิดขาย
+  // 21 Nov 2026 (owner order): items not on sale yet ("เร็ว ๆ นี้") show only in the admin preview
+  var ADM = !!(window.SITE_MODE && window.SITE_MODE.preview);
   var items = B.market.filter(function (x) {
-    return x.ok === true && x.hidden !== true;
+    return x.ok === true && x.hidden !== true && (ADM || B.canSell(x));
   }), kinds = [], cur = "ทั้งหมด";
   items.forEach(function (x) {
     if (x.kind && kinds.indexOf(x.kind) < 0) kinds.push(x.kind);

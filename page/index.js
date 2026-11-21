@@ -33,6 +33,15 @@
   var PLAT = [["tiktok", "TikTok", "TT"], ["youtube", "YouTube", "YT"], ["facebook", "Facebook",
     "FB"], ["instagram", "Instagram", "IG"], ["threads", "Threads", "TH"], ["x", "X", "X"]];
   var ext = ' target="_blank" rel="noopener"';
+  /* 21 Nov 2026 (owner order): items that are not open yet ("เร็ว ๆ นี้") are hidden from customers.
+     The admin preview (?preview=1 with an admin pass, mode.js) still shows them, so the shop can check them before opening. */
+  var ADM = !!(window.SITE_MODE && window.SITE_MODE.preview);
+  function showSec(id, html) { // fill a list, and hide its whole section when nothing is left to show
+    var el = $(id);
+    el.innerHTML = html;
+    var sec = el.closest("section");
+    if (sec) sec.hidden = !html;
+  }
 
   // แบรนด์
   document.title = (B.name || "สร้าง | BUILD TH") + " — " + (B.tagline || "");
@@ -104,7 +113,9 @@
     threads: "โพสต์สั้นและภาพเบื้องหลัง",
     x: "ข่าวและเกร็ดสั้น"
   };
-  $("channels").innerHTML = PLAT.map(function (p, i) {
+  $("channels").innerHTML = PLAT.filter(function (p) {
+    return ADM || ok(L[p[0]]);
+  }).map(function (p, i) {
     var u = L[p[0]], on = ok(u);
     return '<a class="card ch' + (on ? "" : " off") + (on && p === firstCh ? " main" : "") + '" href="'
       + (on ? esc(u) : "#") + '"' + (on ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>" + p[2]
@@ -181,6 +192,8 @@
   function drawEps() {
     $("eps").innerHTML = shown.filter(function (e) {
       return cur === "ทั้งหมด" || e.topic === cur;
+    }).filter(function (e) { // a past episode with no watch link would say "เร็ว ๆ นี้": hidden from customers
+      return ADM || links(e.watch, "") || future(e.date);
     }).map(function (e) {
       var w = links(e.watch, "p"), s = links(e.song, "");
       var badge = w ? '<span class="pill ok">ดูได้แล้ว</span>' : (future(e.date) ? '<span class="pill">ปล่อย '
@@ -238,14 +251,23 @@
           + '">' + esc(x.cta || "ดูรายการและราคา") + " →</a>" : (ok(L.line) ? '<a class="b line sm" href="'
             + esc(L.line) + '"' + ext + ">แจ้งเตือนเมื่อเปิดทาง LINE</a>" : ""))) + "</div>";
   }
-  $("services").innerHTML = (S.services || []).map(item).join("");
-  $("shopitems").innerHTML = (S.shop || []).map(item).join("");
-  $("musiclinks").innerHTML = (S.music || []).map(function (m) {
+  var isLive = function (x) {
+    return ok(x.url) || /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "");
+  };
+  showSec("services", (S.services || []).filter(function (x) {
+    return ADM || isLive(x);
+  }).map(item).join(""));
+  showSec("shopitems", (S.shop || []).filter(function (x) {
+    return ADM || isLive(x);
+  }).map(item).join(""));
+  showSec("musiclinks", (S.music || []).filter(function (m) {
+    return ADM || ok(m.url);
+  }).map(function (m) {
     var on = ok(m.url);
     return '<a class="card ch' + (on ? "" : " off") + '" href="' + (on ? esc(m.url) : "#") + '"' + (on
       ? ext : ' tabindex="-1" aria-disabled="true"') + "><i>♪</i><span><strong>" + esc(m.title) + "</strong><small>"
       + esc(m.text) + '</small></span><span class="arr">' + (on ? "→" : "") + "</span></a>";
-  }).join("");
+  }).join(""));
   $("faq").innerHTML = (S.faq || []).map(function (f) {
     return "<details><summary>" + esc(f.q) + "</summary><p>" + esc(f.a) + "</p></details>";
   }).join("");
