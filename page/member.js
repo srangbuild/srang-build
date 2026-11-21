@@ -53,7 +53,13 @@
       } catch (e) {
         return true;
       }
-    })() ? "ความปลอดภัย" : "ความปลอดภัยของบัญชี"]];
+    })() ? "ความปลอดภัย" : "ความปลอดภัยของบัญชี"], ["sell", "ขายของฉัน"]];
+  var sellData = null, sellBusy = false; // 21 Nov 2026: seller tab data (loaded when the tab opens) · shown only to members with a consignment application
+  function tabsShown() {
+    return TABS.filter(function (t) {
+      return t[0] !== "sell" || !!(me && me.seller);
+    });
+  }
 
   function say(t, bad) {
     var m = $("msg");
@@ -1132,7 +1138,7 @@
   function paint() {
     if (!me) return authView();
     var m = me.member, c = counts();
-    if (!TABS.some(function (t) {
+    if (!tabsShown().some(function (t) {
       return t[0] === tab;
     })) tab = "home";
     var badge = { orders: c.todo, docs: c.newer, ask: 0 };
@@ -1140,7 +1146,7 @@
       + pv(m.name) + '</h1><p class="note" style="margin:0">' + (m.email ? pv(m.email) : "ยังไม่มีอีเมล")
       + " · สมาชิกตั้งแต่ " + esc(B.when(m.created).replace(/,? \d\d:\d\d(\u2069?)$/, "$1")) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>'
       +
-      '<nav class="acct-nav" aria-label="เมนูบัญชี">' + TABS.map(function (t) {
+      '<nav class="acct-nav" aria-label="เมนูบัญชี">' + tabsShown().map(function (t) {
         return '<a href="#' + t[0] + '"' + (t[0] === tab ? ' aria-current="page"' : "") + ">" + t[1]
           + (badge[t[0]] ? '<em>' + badge[t[0]] + "</em>" : "") + "</a>";
       }).join("") + "</nav>" +
@@ -1151,7 +1157,8 @@
         shop: paneShop,
         ask: paneAsk,
         profile: paneProfile,
-        security: paneSecurity
+        security: paneSecurity,
+        sell: paneSell
       }[tab])() + "</div>";
     [].forEach.call(document.querySelectorAll("img.qr"), function (im) {
       im.addEventListener("error", function () {
@@ -1171,6 +1178,114 @@
     total();
     gDraw();
     taxHint();
+  }
+  // ---------- ขายของฉัน (21 Nov 2026): ส่วนแบ่ง ยอดขาย ยอดถอนได้ บัญชีรับเงิน และรายการถอน · ตัวเลขทั้งหมดคำนวณที่หลังบ้าน ----------
+  function money2(n) {
+    return "฿" + (+n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function sellLoad(force) {
+    if (sellBusy || (sellData && !force)) return;
+    sellBusy = true;
+    B.call("seller").then(function (r) {
+      sellBusy = false;
+      sellData = r;
+      if (tab === "sell") paint();
+    }).catch(function (e) {
+      sellBusy = false;
+      sellData = { error: (e && e.message) || "โหลดข้อมูลผู้ขายไม่สำเร็จ" };
+      if (tab === "sell") paint();
+    });
+  }
+  var SELL_CSS = ".sl-mini{list-style:none;margin:0;padding:0}.sl-mini li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed #DDE2E8}.sl-mini li span{min-width:0;overflow-wrap:anywhere}.sl-mini small{display:block;color:#5A6573}.sl-mini b{white-space:nowrap}"
+    + ".sl-kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:0}.sl-kv dt{color:#5A6573}.sl-kv dd{margin:0;text-align:right}.sl-tw{overflow-x:auto}.sl-tbl{width:100%;border-collapse:collapse;font-size:14px}.sl-tbl th,.sl-tbl td{padding:6px 8px;border-bottom:1px solid #E7EBF0;text-align:left;white-space:nowrap}";
+  function paneSell() {
+    if (!document.getElementById("sl-css")) {
+      var st0 = document.createElement("style");
+      st0.id = "sl-css";
+      st0.textContent = SELL_CSS;
+      document.head.appendChild(st0);
+    }
+    var d = sellData;
+    if (!d) {
+      sellLoad();
+      return '<section class="sec"><h2>ขายของฉัน</h2><div class="card pad"><p style="margin:0">กำลังโหลดข้อมูลผู้ขาย…</p></div></section>';
+    }
+    if (d.error) return '<section class="sec"><h2>ขายของฉัน</h2><div class="card pad"><p class="msg bad" style="margin:0">' + esc(d.error)
+      + '</p><p><button class="b line sm" type="button" data-sell="reload">ลองใหม่</button></p></div></section>';
+    if (!d.seller) return '<section class="sec"><h2>ขายของฉัน</h2><div class="card pad"><p style="margin:0">ยังไม่มีใบสมัครฝากขายในบัญชีนี้</p><p class="note"><a href="market.html'
+      + q + '#apply">ส่งใบสมัครฝากขาย</a></p></div></section>';
+    var R = d.rules || {}, b = d.balance || {}, P = d.pay;
+    var apps = d.apps.map(function (c) {
+      var st = c.share != null ? '<span class="pill ok">ตกลงแล้ว ร้าน ' + c.share + "% · คุณ " + (100 - c.share) + "%</span>"
+        : c.offer != null ? '<span class="pill">ร้านเสนอ ร้าน ' + c.offer + "% · คุณ " + (100 - c.offer) + "%</span>" : '<span class="pill gray">รอร้านเสนอส่วนแบ่ง</span>';
+      var act = c.share == null && c.offer != null && c.status !== "ไม่รับ" ? '<div class="row" style="margin-top:8px"><button class="b pri sm" type="button" data-sell="accept" data-id="'
+        + esc(c.id) + '" data-offer="' + c.offer + '">ตอบรับส่วนแบ่งนี้</button></div><form class="f" data-sellmsg="' + esc(c.id)
+        + '" style="margin-top:8px"><label>ขอต่อรอง หรือถามร้าน<textarea name="msg" rows="2" maxlength="1000" placeholder="เช่น ขอส่วนแบ่งผู้ขาย 75% เพราะ…"></textarea></label><button class="b line sm" type="submit">ส่งข้อความถึงร้าน</button></form>'
+        + '<p class="note">ตอบรับแล้ว ส่วนแบ่งล็อกตลอดอายุสินค้า ร้านและคุณเปลี่ยนไม่ได้</p>' : "";
+      return '<div class="card pad"><p style="margin:0"><b>' + pv(c.title) + "</b> · " + esc(c.id) + " · " + esc(c.kind) + '</p><p class="note" style="margin:4px 0">สถานะ: '
+        + esc(c.status) + "</p>" + (c.agreedAt ? '<p class="note" style="margin:0 0 4px">ตกลงเมื่อ <span data-noi18n="1">' + esc(B.when(c.agreedAt)) + "</span></p>" : "") + st
+        + (c.note ? '<p class="note" style="white-space:pre-wrap">ข้อความจากร้าน: ' + pv(c.note) + "</p>" : "")
+        + (c.sellerMsg ? '<p class="note" style="white-space:pre-wrap">ข้อความของคุณ: ' + pv(c.sellerMsg) + "</p>" : "") + act + "</div>";
+    }).join("");
+    var items = d.items.length ? '<ul class="sl-mini">' + d.items.map(function (x) {
+      return "<li><span>" + esc(x.id) + " " + pv(x.title) + "<small>" + (x.sale ? "วางขายอยู่" : "ยังไม่วางขาย") + "</small></span><b>" + esc(B.baht(x.price)) + "</b></li>";
+    }).join("") + "</ul>" : '<p class="note" style="margin:0">ยังไม่มีสินค้าที่วางขาย · ร้านวางขายหลังตกลงส่วนแบ่งและตรวจสินค้าแล้ว</p>';
+    var sales = d.sales.length ? '<div class="sl-tw"><table class="sl-tbl"><thead><tr><th>วันที่</th><th>คำสั่งซื้อ</th><th>สินค้า</th><th>ยอดขาย</th><th>ส่วนของคุณ</th><th>ถอนได้</th></tr></thead><tbody>'
+      + d.sales.slice(0, 50).map(function (s) {
+        return "<tr><td>" + esc(B.when(s.at)) + "</td><td>" + esc(s.order) + "</td><td>" + esc(s.item) + "</td><td>" + money2(s.gross)
+          + "</td><td>" + money2(s.amount) + "</td><td>" + (s.ready ? "พร้อม" : esc(B.when(s.availAt))) + "</td></tr>";
+      }).join("") + "</tbody></table></div>" : '<p class="note" style="margin:0">ยังไม่มียอดขาย</p>';
+    var canW = (+b.free || 0) >= (+R.min || 0) && P && !d.payouts.some(function (p) {
+      return p.status === "รอโอน";
+    });
+    var bal = '<div class="card pad"><h3 style="margin:0 0 8px">ยอดเงิน</h3><dl class="sl-kv"><dt>ถอนได้ตอนนี้</dt><dd><b class="price">' + money2(b.free)
+      + "</b></dd><dt>รอพ้นช่วงขอคืนเงิน (" + esc(R.hold) + " วัน)</dt><dd>" + money2(b.hold) + "</dd><dt>รอร้านโอน</dt><dd>" + money2(b.wait)
+      + "</dd><dt>โอนแล้วทั้งหมด</dt><dd>" + money2(b.paid) + "</dd></dl>" + ((+b.free || 0) < 0 ? '<p class="msg bad">ยอดติดลบเพราะมีคำสั่งซื้อที่คืนเงินหลังร้านโอนแล้ว ยอดขายครั้งถัดไปหักส่วนนี้ก่อน</p>' : "")
+      + '<p class="note">ถอนได้ครั้งละอย่างน้อย ' + esc(B.baht(R.min)) + (+R.wht > 0 ? " · หักภาษี ณ ที่จ่าย " + esc(R.wht) + "%" : " · ร้านยังไม่หักภาษี ณ ที่จ่าย ผู้ขายยื่นภาษีของรายได้นี้เอง")
+      + " · ร้านโอนภายใน 3 วันทำการ แล้วส่งอีเมลพร้อมเลขอ้างอิง</p>"
+      + (canW ? '<button class="b pri" type="button" data-sell="withdraw">ขอถอน ' + money2(b.free) + "</button>"
+        : '<p class="note" style="margin:0">' + (!P ? "ตั้งบัญชีรับเงินด้านล่างก่อนขอถอน" : d.payouts.some(function (p) {
+          return p.status === "รอโอน";
+        }) ? "มีรายการถอนที่รอร้านโอนอยู่ 1 รายการ" : "ยอดถอนได้ยังไม่ถึงขั้นต่ำ") + "</p>") + "</div>";
+    var banks = (R.banks || []).map(function (k) {
+      return '<option value="' + esc(k) + '"' + (P && P.bank === k ? " selected" : "") + ">" + esc(k) + "</option>"; // value stays Thai: the back end checks the bank name
+    }).join(""), pm = P ? P.method : "promptpay";
+    var payForm = '<form class="f card pad" id="f-sellpay" novalidate><h3 style="margin:0">บัญชีรับเงิน</h3>' + (P ? '<p class="note" style="margin:0">ตอนนี้: '
+      + esc(P.method === "bank" ? P.bank : "พร้อมเพย์") + " " + esc(P.acc) + " · " + pv(P.name) + "</p>" : "")
+      + '<fieldset class="chips" style="border:0;padding:0;margin:0"><legend class="note">รอบรับเงิน</legend><label class="ck"><input type="radio" name="mode" value="request"'
+      + (!P || P.mode !== "monthly" ? " checked" : "") + '><span>กดขอถอนเอง</span></label><label class="ck"><input type="radio" name="mode" value="monthly"'
+      + (P && P.mode === "monthly" ? " checked" : "") + '><span>ร้านโอนให้ทุกเดือน (วันที่ ' + esc(R.day) + ")</span></label></fieldset>"
+      + '<fieldset class="chips" style="border:0;padding:0;margin:0"><legend class="note">ช่องทาง</legend><label class="ck"><input type="radio" name="method" value="promptpay"'
+      + (pm !== "bank" ? " checked" : "") + '><span>พร้อมเพย์</span></label><label class="ck"><input type="radio" name="method" value="bank"'
+      + (pm === "bank" ? " checked" : "") + '><span>บัญชีธนาคาร</span></label></fieldset><label id="sp-bank"' + (pm === "bank" ? "" : " hidden")
+      + '>ธนาคาร<select name="bank">' + banks + '</select></label><label>เลขพร้อมเพย์หรือเลขบัญชี<input type="text" name="acc" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="'
+      + (P ? "ใส่ใหม่ทั้งหมดเมื่อต้องการเปลี่ยน" : "") + '"></label><label>ชื่อบัญชี (ตรงกับบัญชีธนาคาร)<input type="text" name="name" maxlength="80" autocomplete="name" value="'
+      + esc(P ? P.name : "") + '"></label><button class="b pri" type="submit">บันทึกบัญชีรับเงิน</button><p class="note" style="margin:0">เปลี่ยนบัญชีแล้วระบบส่งอีเมลแจ้งทุกครั้ง · หน้าเว็บแสดงเลขบัญชีเพียง 4 ตัวท้าย</p></form>';
+    var pos = d.payouts.length ? '<ul class="sl-mini">' + d.payouts.map(function (p) {
+      return "<li><span>" + esc(p.id) + " · " + esc(p.status) + "<small>" + esc(B.when(p.created)) + " · " + esc(p.method) + " " + esc(p.acc)
+        + (p.ref ? " · อ้างอิง " + esc(p.ref) : "") + (p.wht ? " · หักภาษี " + money2(p.wht) : "") + (p.note ? " · " + pv(p.note) : "") + "</small></span><b>" + money2(p.net) + "</b></li>";
+    }).join("") + "</ul>" : '<p class="note" style="margin:0">ยังไม่มีรายการถอน</p>';
+    return '<section class="sec"><h2>ขายของฉัน</h2><div style="display:grid;gap:12px">' + bal + '<h3 style="margin:8px 0 0">ใบสมัครและส่วนแบ่ง</h3>' + apps
+      + '<div class="card pad"><h3 style="margin:0 0 8px">สินค้าของฉัน</h3>' + items + '</div><div class="card pad"><h3 style="margin:0 0 8px">ยอดขาย</h3>' + sales
+      + '<p class="note">ส่วนของคุณ = ยอดขายหลังเฉลี่ยส่วนลด × (100 − ส่วนแบ่งร้าน)% · คำสั่งซื้อที่ยกเลิกหรือคืนเงินไม่นับ</p></div>' + payForm
+      + '<div class="card pad"><h3 style="margin:0 0 8px">รายการถอน</h3>' + pos + "</div></div></section>";
+  }
+  function sellAct(action, data, okText) {
+    if (sellBusy) return;
+    sellBusy = true;
+    lock(true);
+    return B.call(action, data).then(function (r) {
+      sellBusy = false;
+      lock(false);
+      sellData = r && r.view ? r.view : r && r.seller !== undefined ? r : null;
+      if (!sellData) sellLoad(true);
+      paint();
+      say(okText);
+    }).catch(function (e) {
+      sellBusy = false;
+      lock(false);
+      say((e && e.message) || "ทำรายการไม่สำเร็จ", true);
+    });
   }
   function go(t) {
     if (location.hash !== "#" + t) location.hash = t;
@@ -1228,6 +1343,7 @@
   window.addEventListener("hashchange", function () {
     if (!me) return;
     tab = readHash();
+    if (tab === "sell") sellData = null; // ตัวเลขยอดเงินโหลดใหม่ทุกครั้งที่เปิดเมนู
     say("");
     paint();
     window.scrollTo({ top: 0 });
@@ -1332,8 +1448,22 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear]");
+    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear],[data-sell]");
     if (!t) return;
+    if (t.dataset.sell) { // ขายของฉัน (21 Nov 2026)
+      var sa = t.dataset.sell;
+      if (sa === "reload") {
+        sellData = null;
+        paint();
+      } else if (sa === "accept") {
+        if (!confirm("ตอบรับส่วนแบ่ง: ร้าน " + t.dataset.offer + "% · คุณ " + (100 - +t.dataset.offer) + "%\nตอบรับแล้วล็อกตลอดอายุสินค้า เปลี่ยนไม่ได้")) return;
+        sellAct("sellerOffer", { id: t.dataset.id, accept: true, offer: +t.dataset.offer }, "ตอบรับส่วนแบ่งแล้ว · ร้านส่งอีเมลยืนยันให้");
+      } else if (sa === "withdraw") {
+        if (!confirm("ขอถอนยอดที่ถอนได้ทั้งหมดเข้าบัญชีที่ตั้งไว้?")) return;
+        sellAct("sellerWithdraw", {}, "ส่งคำขอถอนแล้ว · ร้านโอนภายใน 3 วันทำการ แล้วส่งอีเมลแจ้ง");
+      }
+      return;
+    }
     if (t.dataset.eye) {
       ev.preventDefault();
       var pi = t.parentNode.querySelector("input");
@@ -1553,6 +1683,7 @@
   $("view").addEventListener("change", function (ev) {
     var e = ev.target;
     if (e.name === "it" || e.name === "plan") total();
+    if (e.form && e.form.id === "f-sellpay" && e.name === "method") $("sp-bank").hidden = e.value !== "bank";
     if (e.form && e.form.id === "f-avatar" && e.name === "photo" && e.files && e.files[0]) {
       cropAvatar(e.files[0]).then(function (d) {
         avDraft = d;
@@ -1617,6 +1748,29 @@
     var f = ev.target, v = function (n) {
       return f.elements[n] ? f.elements[n].value : "";
     };
+    if (f.id === "f-sellpay") { // บัญชีรับเงินของผู้ขาย · หลังบ้านตรวจรูปแบบเลขอีกครั้ง
+      var meth = (f.querySelector("input[name=method]:checked") || {}).value || "promptpay", acc0 = v("acc").replace(/[\s-]/g, "");
+      if (!acc0 && sellData && sellData.pay) {
+        say("ใส่เลขพร้อมเพย์หรือเลขบัญชีอีกครั้งทุกครั้งที่บันทึก (หน้าเว็บไม่เก็บเลขเต็ม)", true);
+        return;
+      }
+      if (meth === "promptpay" ? !/^(0\d{9}|\d{13})$/.test(acc0) : !/^\d{10,15}$/.test(acc0)) {
+        say(meth === "promptpay" ? "พร้อมเพย์: เบอร์มือถือ 10 หลัก หรือเลขประจำตัว 13 หลัก" : "เลขบัญชีธนาคาร 10–15 หลัก", true);
+        return;
+      }
+      sellAct("sellerPay", { mode: (f.querySelector("input[name=mode]:checked") || {}).value || "request", method: meth, bank: v("bank"),
+        acc: acc0, name: v("name").trim() }, "บันทึกบัญชีรับเงินแล้ว");
+      return;
+    }
+    if (f.dataset.sellmsg) {
+      var sm = v("msg").trim();
+      if (sm.length < 5) {
+        say("เขียนข้อความถึงร้านอย่างน้อย 5 ตัวอักษร", true);
+        return;
+      }
+      sellAct("sellerOffer", { id: f.dataset.sellmsg, msg: sm }, "ส่งข้อความถึงร้านแล้ว · ร้านตอบทางอีเมลและในหน้านี้");
+      return;
+    }
     if (f.id === "f-reg") {
       var em1 = v("email").trim().toLowerCase();
       if (!v("name").trim()) {

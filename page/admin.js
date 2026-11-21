@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-21b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-21d"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
   var KEY = "build_admin_work";
   try {
@@ -1089,6 +1089,38 @@
   }
   // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
   var csSeg = "ใหม่";
+  // 21 Nov 2026: seller balances and withdrawals · the shop transfers by itself, then records the bank reference here
+  function payoutCard() {
+    var P = SHOP.payouts;
+    if (!P) return "";
+    var m2 = function (n) {
+      return "฿" + (+n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }, wait = P.list.filter(function (p) {
+      return p.status === "รอโอน";
+    });
+    return '<div class="card"><h2>ถอนเงินของผู้ขาย <span class="tag ' + (wait.length ? "no" : "ok") + '">รอโอน ' + wait.length + "</span></h2>"
+      + '<p class="hint">โอนเงินเองจากบัญชีร้านตามยอดโอน แล้วใส่เลขอ้างอิงจากสลิปธนาคาร ระบบส่งใบสรุปรายได้ให้ผู้ขายทางอีเมล · ยกเลิกได้เมื่อมีเหตุผล ยอดกลับเข้ายอดถอนได้</p>'
+      + (wait.length ? wait.map(function (p) {
+        return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.email) + " · ขอเมื่อ " + esc(wh(p.created)) + " · " + esc(p.src)
+          + "<br>ยอดก่อนหัก " + m2(p.gross) + " · หักภาษี " + m2(p.wht) + " · <b>ยอดโอน " + m2(p.net) + "</b><br>" + esc(p.method) + " <b>"
+          + esc(p.acc) + "</b> · " + esc(p.accName) + '<div class="grid"><label>เลขอ้างอิงการโอน<input id="po-ref-' + esc(p.id)
+          + '" maxlength="60" autocomplete="off"></label><label class="full">หมายเหตุ (ต้องใส่เมื่อยกเลิก)<input id="po-nt-' + esc(p.id)
+          + '" maxlength="500"></label></div><div class="tools"><button class="sm pri" type="button" data-sh="popaid" data-id="' + esc(p.id)
+          + '">โอนแล้ว</button><button class="sm" type="button" data-sh="pocancel" data-id="' + esc(p.id) + '">ยกเลิกรายการ</button></div></div>';
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีรายการรอโอน</p>')
+      + (P.sellers.length ? '<h3>ยอดของผู้ขาย</h3><div class="tbl"><table><thead><tr><th>ผู้ขาย</th><th>ถอนได้</th><th>รอพ้นช่วงคืนเงิน</th><th>รอโอน</th><th>โอนแล้ว</th><th>รอบ</th></tr></thead><tbody>'
+        + P.sellers.map(function (s) {
+          return "<tr><td>" + esc(s.name || s.email) + "<br><small>" + esc(s.email) + "</small></td><td>" + m2(s.balance.free) + "</td><td>"
+            + m2(s.balance.hold) + "</td><td>" + m2(s.balance.wait) + "</td><td>" + m2(s.balance.paid) + "</td><td>"
+            + (s.mode === "monthly" ? "รายเดือน" : s.mode ? "ขอเอง" : "ยังไม่ตั้งบัญชี") + "</td></tr>";
+        }).join("") + "</tbody></table></div>" : "")
+      + (P.list.length > wait.length ? '<details><summary>รายการที่ปิดแล้ว ' + (P.list.length - wait.length) + "</summary>" + P.list.filter(function (p) {
+        return p.status !== "รอโอน";
+      }).map(function (p) {
+        return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.status) + " · " + esc(p.email) + " · " + m2(p.net)
+          + (p.ref ? " · อ้างอิง " + esc(p.ref) : "") + (p.note ? " · " + esc(p.note) : "") + " · " + esc(wh(p.paidAt || p.created)) + "</div>";
+      }).join("") + "</details>" : "") + "</div>";
+  }
   function consignTab() {
     var top = "";
     if (!SHOP) top = needShop("ใบสมัครฝากขาย");
@@ -1115,14 +1147,20 @@
             + (c.contact ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.url
               ? ' · <a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer">ลิงก์ตัวอย่าง</a>' : "")
             + " · " + esc(c.own) + '</small><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.desc)
+            + "</p>" + (c.sellerMsg ? '<p class="hint" style="margin:0 0 6px;white-space:pre-wrap"><b>ข้อความจากผู้ขาย:</b> ' + esc(c.sellerMsg) + "</p>" : "")
+            + '<p style="margin:0 0 6px">' + (c.share != null ? '<span class="tag ok">ส่วนแบ่งตกลงแล้ว ร้าน ' + c.share + "% · ผู้ขาย " + (100 - c.share)
+              + "% · ล็อก" + (c.agreedAt ? " " + esc(wh(c.agreedAt)) : "") + "</span>" : c.offer != null ? '<span class="tag">เสนอแล้ว ร้าน ' + c.offer
+              + "% · รอผู้ขายตอบ</span>" : '<span class="tag no">ยังไม่เสนอส่วนแบ่ง</span>') + (c.linked ? "" : ' <small>ผู้สมัครยังไม่ได้ผูกบัญชีสมาชิก (ระบบผูกเองเมื่อเข้าสู่ระบบด้วยอีเมลนี้)</small>')
             + '</p><div class="grid"><label>สถานะ<select id="cs-st-' + esc(c.id) + '">' + CSS.slice(0,
               5).map(function (s) {
                 return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
-              }).join("") + '</select></label><label class="full">ข้อความถึงผู้สมัคร หรือบันทึกของร้าน<textarea id="cs-nt-'
+              }).join("") + "</select></label>" + (c.share == null ? '<label>เสนอส่วนแบ่งร้าน (%)<input id="cs-of-' + esc(c.id)
+                + '" type="number" min="0" max="90" step="1" inputmode="numeric" value="' + (c.offer != null ? c.offer : "")
+                + '" placeholder="เช่น 30"></label>' : "") + '<label class="full">ข้อความถึงผู้สมัคร หรือบันทึกของร้าน<textarea id="cs-nt-'
             + esc(c.id) + '" rows="2">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="cs-tell-'
             + esc(c.id) + '"> ส่งอีเมลแจ้งผู้สมัคร</label></div><div class="tools"><button class="sm pri" type="button" data-sh="cssave" data-id="'
             + esc(c.id) + '">บันทึกสถานะ</button></div></div>';
-        }).join("") : '<p class="hint" style="margin:0">ไม่มีใบสมัครในตัวกรองนี้</p>') + "</div>";
+        }).join("") : '<p class="hint" style="margin:0">ไม่มีใบสมัครในตัวกรองนี้</p>') + "</div>" + payoutCard();
     }
     return top + listCard("market", "สินค้าฝากขายบนเว็บ (หน้า market.html)",
       "เพิ่ม 1 รายการต่อ 1 สินค้า · ส่งมอบแบบ file = ลูกค้าดาวน์โหลดจากหน้าสมาชิก (อัปโหลดไฟล์ชื่อตามช่อง ชื่อไฟล์ เข้าโฟลเดอร์ไดรฟ์ BUILD TH ไฟล์ฉบับมืออาชีพ) · ship = ส่งพัสดุ ใส่เลขพัสดุในแท็บ ร้าน · manual = ร้านส่งลิงก์หรือคีย์ทางอีเมล · ติ๊ก ตรวจสินค้าแล้ว + เปิดขาย แล้วบันทึกและอัปโหลด data.js");
@@ -1437,13 +1475,31 @@
       return;
     }
     if (sh === "cssave") {
-      var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id);
-      shopAct("adminConsign", {
-        id: id,
-        status: cst.value,
-        note: cnt.value.trim(),
-        tell: !!(ctl && ctl.checked)
-      }, "บันทึกใบสมัคร " + id + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : ""));
+      var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id), cof = $("cs-of-" + id),
+        ofv = cof && cof.value.trim() !== "" ? +cof.value : null;
+      if (ofv !== null && !(ofv >= 0 && ofv <= 90 && ofv === Math.round(ofv))) {
+        toast("ส่วนแบ่งร้านต้องเป็นจำนวนเต็ม 0–90");
+        return;
+      }
+      var csd = { id: id, status: cst.value, note: cnt.value.trim(), tell: !!(ctl && ctl.checked) };
+      if (ofv !== null) csd.offer = ofv;
+      shopAct("adminConsign", csd, "บันทึกใบสมัคร " + id + (ofv !== null ? " · ข้อเสนอส่วนแบ่งส่งถึงผู้สมัครทางอีเมลเมื่อเปลี่ยนตัวเลข" : "")
+        + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : ""));
+      return;
+    }
+    if (sh === "popaid" || sh === "pocancel") {
+      var pref = $("po-ref-" + id), pnt = $("po-nt-" + id);
+      if (sh === "popaid" && pref.value.trim().length < 3) {
+        toast("ใส่เลขอ้างอิงการโอนจากสลิปธนาคาร");
+        return;
+      }
+      if (sh === "pocancel" && pnt.value.trim().length < 3) {
+        toast("ใส่เหตุผลที่ยกเลิกในช่องหมายเหตุ");
+        return;
+      }
+      if (!confirm(sh === "popaid" ? "ยืนยันว่าโอนเงินรายการ " + id + " แล้ว? ระบบส่งอีเมลแจ้งผู้ขาย" : "ยกเลิกรายการถอน " + id + "?")) return;
+      shopAct("adminPayout", { id: id, status: sh === "popaid" ? "โอนแล้ว" : "ยกเลิก", ref: pref.value.trim(), note: pnt.value.trim() },
+        sh === "popaid" ? "บันทึกโอนแล้ว " + id + " · ส่งอีเมลแจ้งผู้ขายแล้ว" : "ยกเลิกรายการ " + id + " แล้ว");
       return;
     }
     if (sh === "ok") {
