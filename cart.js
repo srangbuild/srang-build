@@ -234,8 +234,8 @@
     var r = rec(cc);
     if (!r) return "ยังไม่มีข้อมูลกฎหมายของประเทศนี้ ภาคผนวกกฎหมายจะว่างไว้ให้กรอก";
     return 'กฎหมายท้ายเอกสาร: <span data-noi18n="1"><b>' + esc(r.lawName) + "</b>" + (r.lawNameLocal ? " (" + esc(r.lawNameLocal)
-      + ")" : "") + "</span> · " + esc(r.authority || "") + ' · <a href="laws.html#' + esc(cc)
-      + '" target="_blank" rel="noopener">ดูกฎหมายทั้งหมดของประเทศนี้</a>';
+      + ")" : "") + "</span> · " + esc(r.authority || "") + (window.REGION && REGION.scope3 && REGION.scope3() ? "" : ' · <a href="laws.html#' + esc(cc)
+      + '" target="_blank" rel="noopener">ดูกฎหมายทั้งหมดของประเทศนี้</a>'); // 21 Nov 2026 (Q62): scope 3ed = no link to the admin-only laws page
   }
   /* ฉบับที่ต้องซื้อ: ภาษาไทยและอังกฤษอยู่ในทุกฉบับ · ภาษาอื่นหรือมาตรฐานต่างประเทศต้องใช้ฉบับประเทศ 1 ประเทศ
      กฎหมายของประเทศที่ตั้งงานเป็นข้อมูลสาธารณะ ใส่ให้ทุกฉบับ จึงไม่ทำให้ราคาเปลี่ยน */

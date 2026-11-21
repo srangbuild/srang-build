@@ -31,6 +31,11 @@
     var RG = window.REGION, enV = RG ? RG.ev() : "US"; /* 3 Nov 2026: each language has its countries (region.js). The country sets the standards, currency and date format. */
   /* 21 Nov 2026 launch scope 3ed: class s3 on <html> hides [data-full] text and shows [data-s3] text (nav.css) */
   if (RG && RG.scope3 && RG.scope3()) document.documentElement.classList.add("s3");
+  /* 21 Nov 2026 (owner Q62): in scope 3ed the country pages laws.html and k-std-sources.html are for admins only (mode.js checks the pass) */
+  var lawsOpen = !(RG && RG.scope3 && RG.scope3());
+  try {
+    if (!lawsOpen && sessionStorage.getItem("build_admin_tok")) lawsOpen = true;
+  } catch (e) {}
   if (lang !== "th" && !/[?&]shot=1/.test(location.search)) {
     (lang === "en" ? ["en-var.js", "i18n-en.js", "i18n.js"] : ["i18n-en.js", "i18n-core.js",
       "i18n-fix.js", "i18n.js"]).forEach(function (f) {
@@ -58,10 +63,10 @@
     {
       t: "ความรู้",
       e: "Knowledge",
-      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"], ["laws.html", "",
-        "กฎหมายและมาตรฐานรายประเทศ", "Laws and standards by country"], ["knowledge.html", "permit",
+      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"]].concat(lawsOpen ? [["laws.html", "",
+        "กฎหมายและมาตรฐานรายประเทศ", "Laws and standards by country"]] : []).concat([["knowledge.html", "permit",
           "ขออนุญาตก่อสร้างและโรงงาน", "Permits"], ["knowledge.html", "ms", "Method statement",
-            "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]]
+            "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]])
     },
     {
       t: "คลิปและเพลง",

@@ -189,7 +189,41 @@
     el.style.background = bg;
     el.innerHTML = html;
   }
+  /* 21 Nov 2026 (owner Q62): pages with <body data-admin-only="1"> (laws.html, k-std-sources.html) are for admins only
+     while data.js has scope 3ed. nav.css hides #main until body has class adm-ok, so the page stays closed if this
+     script fails. The back end checks the admin pass of this tab (adminDraft); a missing or refused pass keeps it closed.
+     The data files of these pages stay public; this hides the pages, it does not protect secrets. */
+  var GATE_T = "หน้านี้ยังไม่เปิดให้บริการ", GATE_P = "ข้อมูลกฎหมายและมาตรฐานรายประเทศอยู่ระหว่างตรวจ ตอนนี้เปิดให้ดูเฉพาะผู้ดูแลระบบ",
+    GATE_W = "กำลังตรวจสิทธิ์ผู้ดูแลระบบ", GATE_N = "สิทธิ์ผู้ดูแลระบบหมดอายุหรือไม่ถูกต้อง เข้าสู่ระบบในหน้าหลังบ้านแล้วเปิดหน้านี้อีกครั้ง";
+  function gate() {
+    var b = document.body, R = window.REGION;
+    if (!b || b.getAttribute("data-admin-only") !== "1") return;
+    if (!(R && R.scope3 && R.scope3())) {
+      b.classList.add("adm-ok");
+      return;
+    }
+    var robots = document.createElement("meta");
+    robots.name = "robots";
+    robots.content = "noindex";
+    document.head.appendChild(robots);
+    var box = document.createElement("section"), main = document.getElementById("main"), tok = ss(TK) || "";
+    box.id = "admin-gate";
+    box.className = "wrap";
+    box.setAttribute("role", "status");
+    box.style.cssText = "max-width:720px;margin:48px auto;padding:0 20px";
+    box.innerHTML = "<h1>" + esc(GATE_T) + "</h1><p>" + esc(tok ? GATE_W : GATE_P) + '</p><p><a href="knowledge.html">ความรู้ทั้งหมด</a> · <a href="sheets.html">ใบตรวจงาน</a></p>';
+    if (main && main.parentNode) main.parentNode.insertBefore(box, main);
+    else b.appendChild(box);
+    if (!tok) return;
+    adminCall("adminDraft", { adminToken: tok }).then(function () {
+      box.remove();
+      b.classList.add("adm-ok");
+    }).catch(function () {
+      box.querySelector("p").textContent = GATE_N;
+    });
+  }
   function start() {
+    gate();
     draw();
     refresh();
     checkMaint();

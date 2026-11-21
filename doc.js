@@ -759,7 +759,7 @@
           + (r.s === "draft" ? ' [<span data-en="draft, not yet in force">draft, not yet in force</span>]' : r.s ? ' [<span data-en="passed, not yet in force">passed, not yet in force</span>]' : "") // 7 Nov 2026
           + (r.o ? "" : " *");
       }).join("; ") + "</div>" : "";
-    }).join("") + '<div><b><span data-en="Official links">Official links</span>:</b> ' + esc(site + "/laws.html#" + cc)
+    }).join("") + '<div>' + (window.REGION && REGION.scope3 && REGION.scope3() ? "" /* 21 Nov 2026 (Q62): the laws page is admin-only in scope 3ed */ : '<b><span data-en="Official links">Official links</span>:</b> ' + esc(site + "/laws.html#" + cc))
       + ' · * <span data-en="confirm with the authority">confirm with the authority</span></div></div>';
   }
   function lawBlock(cc, c, tag) {
