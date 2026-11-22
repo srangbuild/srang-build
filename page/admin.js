@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-22c"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-22e"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
   var KEY = "build_admin_work";
   try {
@@ -800,7 +800,8 @@
   }
   function orderRowHtml(o) {
     var acts = o.status === "รอตรวจ" ? '<button class="sm" type="button" data-sh="slip" data-id="'
-      + esc(o.id) + '">ดูสลิป</button><button class="sm pri" type="button" data-sh="ok" data-id="'
+      + esc(o.id) + '">ดูสลิป</button>' + (SHOP && SHOP.setup && SHOP.setup.slipAuto ? '<button class="sm" type="button" data-sh="autochk" data-id="'
+      + esc(o.id) + '" title="ระบบตรวจซ้ำเองทุก 1 นาทีอยู่แล้ว ปุ่มนี้สั่งตรวจทันที">ตรวจอัตโนมัติตอนนี้</button>' : "") + '<button class="sm pri" type="button" data-sh="ok" data-id="'
       + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
       + esc(o.id) + '">สลิปไม่ผ่าน</button>'
       : o.status === "รอชำระ" ? '<button class="sm" type="button" data-sh="cancel" data-id="' + esc(o.id)
@@ -1525,8 +1526,22 @@
       return;
     }
     if (sh === "ok") {
-      if (confirm("ตรวจในแอปธนาคารแล้วว่ายอด " + money(b.dataset.amt) + " ของ " + id + " เข้าบัญชีจริง?\nกดตกลง = เปิดสิทธิ์ดาวน์โหลด และส่งอีเมลแจ้งลูกค้า")) shopAct("adminOrder",
-        { order: id, status: "ชำระแล้ว" }, "ยืนยันชำระแล้ว " + id);
+      if (!confirm("ตรวจในแอปธนาคารแล้วว่ายอด " + money(b.dataset.amt) + " ของ " + id + " เข้าบัญชีจริง?\nกดตกลง = เปิดสิทธิ์ดาวน์โหลด และส่งอีเมลแจ้งลูกค้า")) return;
+      if (shopBusy) return;
+      shopBusy = true;
+      // 22 Nov 2026: the back end refuses a slip that is the same as the slip of another paid or waiting order;
+      // the shop may still approve after it checks in the bank app that these are 2 different transfers
+      adm("adminOrder", { order: id, status: "ชำระแล้ว" }).then(function () {
+        shopBusy = false;
+        toast("ยืนยันชำระแล้ว " + id);
+        shopLoad();
+      }).catch(function (e) {
+        shopBusy = false;
+        var m = String((e && e.message) || "");
+        if (/ซ้ำกับคำสั่งซื้อ/.test(m) && confirm(m + "\n\nยืนยันว่าเป็นการโอนคนละครั้งจริง (ตรวจในแอปธนาคารแล้ว)?")) shopAct("adminOrder",
+          { order: id, status: "ชำระแล้ว", dupOk: true }, "ยืนยันชำระแล้ว " + id);
+        else toast(m || "ทำรายการไม่สำเร็จ");
+      });
       return;
     }
     if (sh === "no") {
@@ -1534,6 +1549,22 @@
         "ยอดโอนไม่ตรงกับคำสั่งซื้อ");
       if (why && why.trim()) shopAct("adminOrder", { order: id, status: "สลิปไม่ผ่าน", note: why.trim() },
         "แจ้งสลิปไม่ผ่าน " + id);
+      return;
+    }
+    if (sh === "autochk") { // 22 Nov 2026: run the EasySlip check now for one waiting order (the 1-minute timer does it anyway)
+      if (shopBusy) return;
+      shopBusy = true;
+      toast("กำลังตรวจสลิป " + id + " กับธนาคาร…");
+      adm("adminSlipCheck", { order: id }).then(function (r) {
+        shopBusy = false;
+        var x = (r.checked || [])[0] || {};
+        toast(x.state === "ok" ? "ตรวจผ่าน " + id + " เปิดสิทธิ์ดาวน์โหลดแล้ว" : x.state === "fail" ? "สลิปไม่ผ่าน " + id + ": " + (x.why || "")
+          : "ยังตรวจไม่ได้ " + id + (x.why ? ": " + x.why : "") + " · ระบบตรวจซ้ำให้เองทุก 1 นาที");
+        shopLoad();
+      }).catch(function (e) {
+        shopBusy = false;
+        toast(e.message || "ตรวจไม่สำเร็จ");
+      });
       return;
     }
     if (sh === "cancel") {

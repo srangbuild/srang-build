@@ -366,8 +366,9 @@
     var paid = o.status === ST.paid, tl = trackUrl(o);
     var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
       + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
-      : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>ร้านกำลังตรวจยอดเข้าบัญชี ภายใน '
-      + esc(P.hours || 24) + " ชั่วโมง · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
+      : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>' + (me.pay && me.pay.slipAuto
+        ? "ระบบกำลังตรวจสลิปกับธนาคารอัตโนมัติ หน้านี้อัปเดตผลให้เอง · ถ้าระบบตรวจไม่ได้ ร้านตรวจให้ภายใน " + esc(P.hours || 24) + " ชั่วโมง"
+        : "ร้านกำลังตรวจยอดเข้าบัญชี ภายใน " + esc(P.hours || 24) + " ชั่วโมง") + " · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
       : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
     $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">'
       + esc(o.id) + "</span>" + tracker(o) +
@@ -383,6 +384,27 @@
     try {
       history.replaceState(null, "", HERE + (q || "") + (q ? "&" : "?") + "done=" + encodeURIComponent(o.id));
     } catch (e) {}
+    doneWatch(o);
+  }
+  // 22 Nov 2026 (owner: show the automatic slip check in real time): while this order waits for the check, ask again every
+  // 15 s (up to 40 times, only while the tab is visible) and show the result as soon as it changes
+  var doneTimer = 0, doneTries = 0;
+  function doneWatch(o) {
+    clearTimeout(doneTimer);
+    if (o.status !== ST.check || !(me && me.pay && me.pay.slipAuto) || doneTries >= 40) return;
+    doneTimer = setTimeout(function () {
+      if (document.hidden) return doneWatch(o);
+      doneTries++;
+      refresh().then(function () {
+        var n = findOrder(o.id);
+        if (!n) return;
+        if (n.status === ST.check) return doneWatch(n);
+        doneTries = 0;
+        doneView(n.id, n.status === ST.reject ? "สลิปไม่ผ่านการตรวจ" + (n.note ? ": " + n.note : "") + " · แนบสลิปใหม่ได้ด้านล่าง" : "");
+      }).catch(function () {
+        doneWatch(o);
+      });
+    }, 15000);
   }
 
   // ---------- สร้างคำสั่งซื้อ ----------

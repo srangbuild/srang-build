@@ -761,7 +761,9 @@
       body += '<div class="ocancel" style="display:flex;justify-content:flex-end;margin:10px 0 0"><button class="b line sm" type="button" data-cancel="'
         + esc(o.id) + '" aria-label="ยกเลิกคำสั่งซื้อ ' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div>';
     } else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt))
-      + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + " · ผลจะส่งไปที่อีเมลของคุณ</p>"
+      + (me && me.pay && me.pay.slipAuto ? " · ระบบกำลังตรวจสลิปกับธนาคารอัตโนมัติ หน้านี้อัปเดตผลให้เอง · ถ้าระบบตรวจไม่ได้ ร้านตรวจให้"
+        + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") : " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : ""))
+      + " · ผลจะส่งไปที่อีเมลของคุณ</p>"
       + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
     else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">'
       + B.expand(o.items).map(function (id) {
@@ -1137,6 +1139,45 @@
       '<section class="sec"><h2>อุปกรณ์และข้อมูลของฉัน</h2><div class="card pad">' + (full() ? '<div class="rowbtn"><button class="b line sm" type="button" data-outall="1">ออกจากระบบทุกเครื่อง</button><span class="note" style="margin:0">ใช้เมื่อลืมออกจากระบบที่เครื่องอื่น หรือสงสัยว่ามีคนอื่นใช้บัญชี</span></div><div class="rowbtn"><button class="b line sm" type="button" data-export="1">ดาวน์โหลดข้อมูลของฉัน</button><span class="note" style="margin:0">ไฟล์ JSON ของข้อมูลบัญชี คำสั่งซื้อ คำถาม และประวัติดาวน์โหลด (สิทธิ์ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล)</span></div>' : "")
       + '<div class="rowbtn"><button class="b line sm danger" type="button" data-erase="1">ลบบัญชีของฉัน</button><span class="note" style="margin:0">ลบบัญชีและข้อมูลส่วนตัวทั้งหมด รวมสิทธิ์ดาวน์โหลดไฟล์ที่ซื้อไว้ · คำสั่งซื้อที่ชำระแล้วเก็บเป็นหลักฐานการขายโดยไม่มีข้อมูลติดต่อ</span></div></div></section>';
   }
+  // 22 Nov 2026 (owner: no real-time slip check visible): while an order waits for the automatic slip check, ask the back end
+  // again every 20 s (up to 30 times, only while this tab is visible) and repaint when a status changes. A failed call keeps
+  // the member signed in (refresh() would sign out on any error).
+  var slipTimer = 0, slipTries = 0;
+  function slipWaiting() {
+    return !!(me && me.pay && me.pay.slipAuto) && (me.orders || []).some(function (o) {
+      return o.status === ST.check && o.slipAt && Date.now() - new Date(o.slipAt).getTime() < 90 * 60000;
+    });
+  }
+  function slipWatch() {
+    clearTimeout(slipTimer);
+    if (!slipWaiting()) {
+      slipTries = 0;
+      return;
+    }
+    if (slipTries >= 30) return;
+    slipTimer = setTimeout(function () {
+      if (document.hidden || !me) return slipWatch();
+      slipTries++;
+      var before = (me.orders || []).map(function (o) {
+        return o.id + ":" + o.status;
+      }).join(",");
+      B.call("me").then(function (r) {
+        var after = (r.orders || []).map(function (o) {
+          return o.id + ":" + o.status;
+        }).join(",");
+        me = r;
+        if (after !== before) {
+          paint();
+          var paid = (r.orders || []).some(function (o) {
+            return o.status === ST.paid && before.indexOf(o.id + ":" + ST.check) >= 0;
+          });
+          say(paid ? "ตรวจสลิปผ่านแล้ว ดาวน์โหลดไฟล์ได้เลย" : "ตรวจสลิปเสร็จแล้ว ดูผลในคำสั่งซื้อ", !paid);
+        } else slipWatch();
+      }).catch(function () {
+        slipWatch();
+      });
+    }, 20000);
+  }
   function paint() {
     if (!me) return authView();
     var m = me.member, c = counts();
@@ -1177,6 +1218,7 @@
     });
     var cur = document.querySelector('.acct-nav a[aria-current]');
     if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "nearest", inline: "center" });
+    slipWatch();
     total();
     gDraw();
     taxHint();
