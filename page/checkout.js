@@ -328,8 +328,10 @@
         + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
         : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx
           + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
-      '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ · <button type="button" class="linkbtn" data-cancel="'
-      + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></p></div>' +
+      '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ</p>'
+      // 22 พ.ย. 2026 (คำสั่งเจ้าของ: หาปุ่มยกเลิกไม่เจอ): ปุ่มยกเลิกเป็นปุ่มเต็ม ไม่ใช่ลิงก์เล็กในข้อความ
+      + '<div style="display:flex;justify-content:flex-end;margin:6px 0 0"><button type="button" class="b line sm" data-cancel="'
+      + esc(o.id) + '" aria-label="ยกเลิกคำสั่งซื้อ ' + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></div></div>' +
       '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) {
         return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
       }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.thb(o.amount) + "</b></div></div></aside></div>";

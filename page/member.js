@@ -709,8 +709,7 @@
     return '<div class="paybox">' + (o.status === ST.reject ? '<p class="msg bad">สลิปเดิมไม่ผ่าน'
       + (o.note ? ": " + esc(o.note) : "") + " กรุณาแนบใหม่</p>" : "") + B.qrBox(o) + "<dl>" + rows
       + "</dl>" + (P.note ? '<p class="note" style="margin:0">' + esc(P.note) + "</p>" : "") +
-      '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button><button class="b line sm" type="button" data-cancel="'
-      + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div></form></div>';
+      '<form class="f" data-slip="' + esc(o.id) + '"><label>รูปสลิป (JPG หรือ PNG)<input type="file" name="slip" accept="image/jpeg,image/png" required></label><label>วันและเวลาที่โอน<input type="datetime-local" name="paidAt" required></label><div class="sum" style="margin:0"><button class="b pri" type="submit">ส่งสลิป</button></div></form></div>';
   }
   function payChooser(o) { // ชำระออนไลน์: ระบบตรวจยอดและเปิดสิทธิ์ดาวน์โหลดเองทันที
     var ms = payMethods(o.amount);
@@ -758,6 +757,9 @@
         + esc(P.hours || 24) + ' ชั่วโมง)</summary>' + payBox(o) + "</details>";
       else body = (payOnline() && payMethods().length ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : "")
         + payBox(o);
+      // 22 พ.ย. 2026 (คำสั่งเจ้าของ: หาปุ่มยกเลิกไม่เจอ): ปุ่มยกเลิกอยู่ท้ายการ์ดเสมอ ไม่ซ่อนในส่วนโอนเงินที่พับไว้
+      body += '<div class="ocancel" style="display:flex;justify-content:flex-end;margin:10px 0 0"><button class="b line sm" type="button" data-cancel="'
+        + esc(o.id) + '" aria-label="ยกเลิกคำสั่งซื้อ ' + esc(o.id) + '">ยกเลิกคำสั่งซื้อ</button></div>';
     } else if (o.status === ST.check) body = '<p class="note">ได้รับสลิปแล้วเมื่อ ' + esc(B.when(o.slipAt))
       + " · ร้านกำลังตรวจยอดเข้าบัญชี" + (P.hours ? " ภายใน " + esc(P.hours) + " ชั่วโมง" : "") + " · ผลจะส่งไปที่อีเมลของคุณ</p>"
       + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");

@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-21d"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-22a"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
   var KEY = "build_admin_work";
   try {
