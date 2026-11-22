@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-22b"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-22c"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
   var KEY = "build_admin_work";
   try {
@@ -1087,6 +1087,28 @@
     a.click();
     a.remove();
   }
+  // 22 Nov 2026 (owner order): EasySlip status card · quota and the receiving accounts registered for matchAccount · the key never reaches the page
+  function slipCard(su, hl) {
+    if (!su || !su.slipAuto) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">ปิด</span></h2><p class="hint">ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ร้านตรวจสลิปเองในแท็บ ร้าน</p></div>';
+    if (hl.slip === false) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">คีย์ใช้ไม่ได้</span></h2><p class="hint">EasySlip ตอบรหัส '
+      + esc(hl.slipCode || "-") + " · ตรวจคีย์ใน EasySlip แล้วใส่ EASYSLIP_KEY ใหม่ใน Script properties · ระหว่างนี้สลิปทุกใบส่งให้ร้านตรวจเอง</p></div>";
+    if (hl.slip !== true) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip)</h2><p class="hint">กำลังอ่านสถานะ…</p></div>';
+    var left = hl.slipLeft, low = typeof left === "number" && left < 50, acc = hl.slipAccounts;
+    var quota = (left === null || left === undefined ? "ไม่จำกัด" : esc(left) + " สลิป") + (hl.slipUsed !== undefined && hl.slipUsed !== null ? " · ใช้แล้ว " + esc(hl.slipUsed) : "")
+      + (hl.slipMax ? " จาก " + esc(hl.slipMax) : "");
+    var rows = acc === null || acc === undefined ? '<tr><td colspan="4">อ่านรายการบัญชีไม่ได้ · ดูในหน้า EasySlip</td></tr>' : !acc.length
+      ? '<tr><td colspan="4"><b>ยังไม่มีบัญชีรับเงิน</b> · สลิปทุกใบจะไม่ผ่าน (บัญชีผู้รับไม่ใช่บัญชีของร้าน) · เพิ่มบัญชีในหน้า EasySlip ให้ผูกกับสาขาของคีย์นี้</td></tr>'
+      : acc.map(function (a) {
+        return "<tr><td>" + esc(a.bank) + "</td><td data-noi18n=\"1\">" + esc(a.acc) + "</td><td data-noi18n=\"1\">" + esc(a.name) + "</td><td>" + esc(a.type)
+          + (a.extra ? " · " + esc(a.extra) : "") + "</td></tr>";
+      }).join("");
+    return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) ' + (acc && !acc.length ? '<span class="tag no">ยังไม่มีบัญชีรับเงิน</span>' : low
+      ? '<span class="tag no">โควตาใกล้หมด</span>' : '<span class="tag ok">พร้อมใช้</span>') + "</h2>"
+      + '<p class="hint">' + (hl.slipApp ? "แอป " + esc(hl.slipApp) + " · " : "") + (hl.slipBranch ? "สาขา " + esc(hl.slipBranch) + " · " : "")
+      + "โควตาเหลือ " + quota + " · ระบบตรวจสลิปที่ลูกค้าแนบทันที ผ่าน = ชำระแล้ว เปิดดาวน์โหลดเอง · ไม่ผ่าน = แจ้งเหตุผลให้ลูกค้าแนบใหม่ · โควตาหมด = อีเมลเตือนร้าน แล้วร้านตรวจเอง</p>"
+      + '<div class="tbl"><table><thead><tr><th>ธนาคาร</th><th>เลขบัญชี</th><th>ชื่อบัญชี</th><th>ประเภท</th></tr></thead><tbody>' + rows + "</tbody></table></div>"
+      + '<p class="hint">บัญชีที่ลูกค้าโอนเข้าต้องอยู่ในรายการนี้ ระบบจึงยืนยันว่าผู้รับเป็นร้าน · เพิ่มหรือแก้บัญชีที่ <a href="https://easyslip.com" target="_blank" rel="noopener">easyslip.com</a> (เข้าสู่ระบบด้วยบัญชีของร้าน)</p></div>';
+  }
   // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
   var csSeg = "ใหม่";
   // 21 Nov 2026: seller balances and withdrawals · the shop transfers by itself, then records the bank reference here
@@ -1220,7 +1242,7 @@
     return '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
       +
       '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
-      + rows + "</tbody></table></div></div>" +
+      + rows + "</tbody></table></div></div>" + slipCard(su, hl) +
       '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
       "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
       + "</td><td>ไม่มีค่าธรรมเนียม · " + (su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
