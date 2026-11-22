@@ -40,8 +40,8 @@
       return '<tr><td class="n">' + (i + 1) + '</td><td class="it">' + esc(pick(x, ie[i])) + '</td><td class="c"></td><td class="r"></td></tr>';
     }).join("");
     return '<article class="sheet"><header class="hd"><div class="lg"><img src="img/logo.png" alt=""><div><b>'
-      + esc(B.name) + '</b><span>เช็กลิสต์จากคลิป</span></div></div><div class="ti"><small>เช็กลิสต์ฟรี'
-      + (no ? " · " + esc(B.show) + " #" + esc(no) : "") + "</small><h1>" + esc(pick(f.title, f.titleEn))
+      + esc(B.name) + '</b><span>เช็กลิสต์จากคลิป</span></div></div><div class="ti"><small><span>เช็กลิสต์ฟรี</span>'
+      + (no ? " · <span>" + esc(B.show) + "</span> #" + esc(no) : "") + "</small><h1>" /* แยกคำเป็นส่วน ๆ ให้ระบบแปลใช้พจนานุกรมได้ (ไม่ต้องแปลใหม่ทุกเลขตอน) */ + esc(pick(f.title, f.titleEn))
       + "</h1>" + '</div><div class="cd"><div>ใบที่</div><div>วันที่</div></div></header>' +
       '<section class="info"><div>บ้าน / โครงการ<span></span></div><div>ผู้ตรวจ<span></span></div></section>'
       +
