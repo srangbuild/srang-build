@@ -124,22 +124,28 @@
       }
     } catch (e) {}
       if (at && ver === I18N_VER && Date.now() - at < 216e5) return; /* 22 Nov 2026: ask again after 6 hours (was 24), so new text reaches a returning visitor the same day */
+    var first = !Object.keys(FULL).length; /* a first visit has no dictionary yet: the page waits for it, so it counts in the progress bar */
+    if (first) pgAdd(PG_FULL);
     fetch(api + "?action=i18n&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) {
       return r.json();
     }).then(function (j) {
-      if (!j || !j.ok || !j.map) return;
-      try {
-        localStorage.setItem("build_i18n_" + LANG, JSON.stringify({ at: Date.now(), v: I18N_VER,
-          built: j.built, map: j.map }));
-      } catch (e) {}
+      if (j && j.ok && j.map) {
+        try {
+          localStorage.setItem("build_i18n_" + LANG, JSON.stringify({ at: Date.now(), v: I18N_VER,
+            built: j.built, map: j.map }));
+        } catch (e) {}
         FULL = j.map;
-      again();
-      doNav();
-    }).catch(function () {});
+        again();
+        doNav();
+      }
+      if (first) pgDone(PG_FULL);
+    }).catch(function () {
+      if (first) pgDone(PG_FULL);
+    });
   }
   var BRAND = /^(BUILD|BUILD TH|TH|สร้าง \| BUILD TH|นายห้าง AI)$/; /* 2 Nov 2026: brand words are never translated */
   /* 2 Nov 2026: text with no entry in the dictionaries (knowledge pages, new text, text with a number in it) is sent to the back end once, translated from Thai, checked, and kept in this browser */
-  var EXTRA = {}, extraKey = "build_trx2_" + LANG, NEED = {}, needTimer = 0;
+  var EXTRA = {}, extraKey = "build_trx2_" + LANG, NEED = {}, needTimer = 0, extraBusy = 0, TRIED = {};
   try {
     localStorage.removeItem("build_trx_" + LANG);
   } catch (e) {}
@@ -152,11 +158,92 @@
       if (raw) EXTRA = JSON.parse(raw) || {};
     } catch (e) {}
   })();
+  /* 22 Nov 2026 (owner: show that the page is working and how many percent are done while the language changes).
+     Work is counted in units: 1 per text that waits for the translator, PG_FULL for the download of the dictionary of a first visit,
+     PG_TRX for the download of the prepared list. The bar shows only when the work lasts longer than 0.3 second, and never goes back. */
+  var PG = { total: 0, done: 0, top: 0, el: null, bar: null, txt: null, wait: 0, hide: 0 }, PG_FULL = 30, PG_TRX = 15;
+  function pgBuild() {
+    var st = document.createElement("style");
+    st.textContent = "#i18n-pg{position:fixed;z-index:2147483000;top:0;left:0;right:0;pointer-events:none;font:600 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif}"
+      + "#i18n-pg i{display:block;height:3px;width:0;background:#FF6B1A;box-shadow:0 0 6px rgba(255,107,26,.6);transition:width .35s ease}"
+      + "#i18n-pg b{position:absolute;top:8px;inset-inline-end:10px;background:#0F2A44;color:#fff;border-radius:999px;padding:6px 10px;box-shadow:0 4px 14px rgba(15,42,68,.3);font-weight:600;letter-spacing:.02em}"
+      + "#i18n-pg b:before{content:'';display:inline-block;width:10px;height:10px;margin-inline-end:6px;vertical-align:-1px;border:2px solid rgba(255,255,255,.35);border-top-color:#FF6B1A;border-radius:50%;animation:i18npg .8s linear infinite}"
+      + "@keyframes i18npg{to{transform:rotate(360deg)}}"
+      + "#i18n-pg.out{opacity:0;transition:opacity .4s ease}@media (prefers-reduced-motion:reduce){#i18n-pg i,#i18n-pg.out{transition:none}#i18n-pg b:before{animation:none}}";
+    document.head.appendChild(st);
+    var el = document.createElement("div");
+    el.id = "i18n-pg";
+    el.setAttribute("data-noi18n", "1");
+    el.setAttribute("role", "progressbar");
+    el.setAttribute("aria-label", "Translating the page");
+    el.setAttribute("aria-valuemin", "0");
+    el.setAttribute("aria-valuemax", "100");
+    PG.bar = document.createElement("i");
+    PG.txt = document.createElement("b");
+    el.appendChild(PG.bar);
+    el.appendChild(PG.txt);
+    document.body.appendChild(el);
+    PG.el = el;
+  }
+  function pgDraw() {
+    var left = PG.total - PG.done;
+    if (left <= 0) { /* all done: show 100 for a moment, then go away and start the count again for the next work */
+      clearTimeout(PG.wait);
+      PG.wait = 0;
+      PG.total = PG.done = PG.top = 0;
+      if (!PG.el) return;
+      PG.bar.style.width = "100%";
+      PG.txt.textContent = String(LANG).toUpperCase() + " 100%";
+      PG.el.setAttribute("aria-valuenow", "100");
+      clearTimeout(PG.hide);
+      PG.hide = setTimeout(function () {
+        if (PG.total - PG.done > 0 || !PG.el) return; /* new work came: keep the bar */
+        PG.el.className = "out";
+        setTimeout(function () {
+          if (PG.el && PG.total - PG.done <= 0) {
+            PG.el.remove();
+            PG.el = PG.bar = PG.txt = null;
+          }
+        }, 450);
+      }, 700);
+      return;
+    }
+    if (!PG.el) {
+      if (!PG.wait) PG.wait = setTimeout(function () {
+        PG.wait = 0;
+        if (PG.total - PG.done > 0 && document.body) {
+          pgBuild();
+          pgDraw();
+        }
+      }, 300);
+      return;
+    }
+    PG.el.className = "";
+    var pc = Math.min(99, Math.max(PG.top, Math.round(PG.done * 100 / PG.total), 3));
+    PG.top = pc;
+    PG.bar.style.width = pc + "%";
+    PG.txt.textContent = String(LANG).toUpperCase() + " " + pc + "%";
+    PG.el.setAttribute("aria-valuenow", String(pc));
+  }
+  function pgAdd(n) {
+    PG.total += n;
+    pgDraw();
+  }
+  function pgDone(n) {
+    PG.done = Math.min(PG.total, PG.done + n);
+    pgDraw();
+  }
+  function needDrop(k) { /* one text leaves the waiting list (translated, refused, or the call failed) */
+    if (!NEED[k]) return;
+    delete NEED[k];
+    pgDone(1);
+  }
   function need(t) {
-    if (t.length < 2 || t.length > 1500 || Object.prototype.hasOwnProperty.call(EXTRA, t) || NEED[t]
+    if (t.length < 2 || t.length > 1500 || Object.prototype.hasOwnProperty.call(EXTRA, t) || NEED[t] || TRIED[t]
       || (PRIVATE && PII.test(t))) return;
     NEED[t] = 1;
-    if (!needTimer) needTimer = setTimeout(fetchExtra, 900);
+    pgAdd(1);
+    if (!needTimer) needTimer = setTimeout(fetchExtra, 400);
   }
   /* 2 Nov 2026: a Thai standard code alone has one fixed form in every language. A date alone uses the date format of the language, and a Buddhist year becomes a Common Era year. */
   var CODE_ONLY = /^(มยผ\.|มอก\.|วสท\.)\s*([0-9A-Za-z][0-9A-Za-z.\-\/ ]*)$/, CODE_EN = { "มยผ.": "DPT",
@@ -405,26 +492,30 @@
     } catch (e) {}
       if (at && ver === I18N_VER && Date.now() - at < 864e5) return;
     TRXP = true;
+    pgAdd(PG_TRX);
     fetch(api + "?action=trx&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) {
       return r.json();
     }).then(function (j) {
       TRXP = false;
-      if (!j || !j.ok || !j.map) return;
-      var n = 0;
-      Object.keys(j.map).forEach(function (k) {
-        if (EXTRA[k] !== j.map[k]) {
-          EXTRA[k] = j.map[k];
-          n++;
-        }
-        if (NEED[k]) delete NEED[k];
-      }); /* the prepared list wins over an older copy in this browser, so a correction reaches returning visitors */
-      try {
-        localStorage.setItem(extraKey, JSON.stringify(EXTRA));
-        localStorage.setItem(key, Date.now() + "|" + I18N_VER);
-      } catch (e) {}
+      if (j && j.ok && j.map) {
+        var n = 0;
+        Object.keys(j.map).forEach(function (k) {
+          if (EXTRA[k] !== j.map[k]) {
+            EXTRA[k] = j.map[k];
+            n++;
+          }
+          needDrop(k);
+        }); /* the prepared list wins over an older copy in this browser, so a correction reaches returning visitors */
+        try {
+          localStorage.setItem(extraKey, JSON.stringify(EXTRA));
+          localStorage.setItem(key, Date.now() + "|" + I18N_VER);
+        } catch (e) {}
         if (n) again();
+      }
+      pgDone(PG_TRX);
     }).catch(function () {
       TRXP = false;
+      pgDone(PG_TRX);
     });
   }
   function fetchExtra() {
@@ -433,36 +524,51 @@
       needTimer = setTimeout(fetchExtra, 300);
       return;
     }
+    if (extraBusy) return; /* a round is running: it starts the next round itself when texts still wait */
     var list = Object.keys(NEED);
     if (!list.length) return;
+    /* 22 Nov 2026: sets of 30 texts, 2 sets at the same time (was 60 texts, one set after the other).
+       The first translated texts reach the page sooner, and the page text comes first because the list is in page order. */
     var batches = [];
-    while (list.length) batches.push(list.splice(0, 60));
-    batches = batches.slice(0, 5);
-    (function next() {
+    while (list.length) batches.push(list.splice(0, 30));
+    batches = batches.slice(0, 10);
+    extraBusy = 2;
+    var next = function () {
       var items = batches.shift();
       if (!items) {
-        if (Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 900);
+        extraBusy--;
+        if (!extraBusy && Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 400);
         return;
       }
       callExtra(items).then(function (j) {
         var okj = !!(j && j.ok), busy = !okj || !!j.busy;
         items.forEach(function (k) {
-          delete NEED[k];
+          needDrop(k);
           var v = okj && j.map && j.map[k];
           if (v) EXTRA[k] = v;
           else if (!busy) EXTRA[k] = "";
-        }); /* an empty entry means: the checks did not pass, do not ask again in this browser. A busy or failed back end marks nothing, so the next page asks again. */
+          else TRIED[k] = 1;
+        }); /* an empty entry means: the checks did not pass, do not ask again in this browser. A busy or failed back end marks nothing in the store, so the next page asks again; TRIED stops a second question on this page view (22 Nov 2026: without it a busy back end was asked again and again). */
         try {
           localStorage.setItem(extraKey, JSON.stringify(EXTRA));
         } catch (e) {}
-          again();
+        again();
         next();
       }).catch(function () {
-        items.forEach(function (k) {
-          delete NEED[k];
+        var gone = function (k) {
+          needDrop(k);
+          TRIED[k] = 1;
+        };
+        items.forEach(gone);
+        batches.forEach(function (b) { /* the back end does not answer: stop this round, the next page asks again */
+          b.forEach(gone);
         });
+        batches = [];
+        next();
       });
-    })();
+    };
+    next();
+    next();
   }
   /* 2 Nov 2026: message boxes use the language of the page */
   ["alert", "confirm", "prompt"].forEach(function (k) {
