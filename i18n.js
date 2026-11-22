@@ -123,7 +123,7 @@
         ver = o0.v || "";
       }
     } catch (e) {}
-      if (at && ver === I18N_VER && Date.now() - at < 864e5) return;
+      if (at && ver === I18N_VER && Date.now() - at < 216e5) return; /* 22 Nov 2026: ask again after 6 hours (was 24), so new text reaches a returning visitor the same day */
     fetch(api + "?action=i18n&lang=" + encodeURIComponent(LANG), { redirect: "follow" }).then(function (r) {
       return r.json();
     }).then(function (j) {
