@@ -667,9 +667,6 @@
       docs: lib.length,
       newer: lib.filter(function (x) {
         return x.newer;
-      }).length,
-      asksOpen: (me.asks || []).filter(function (a) {
-        return !a.answer;
       }).length
     };
   }
@@ -859,23 +856,247 @@
     }).join("") + '</div><div class="sum"><span>รวม <b class="price" id="total">฿0</b></span><button class="b pri" type="submit">ไปชำระเงิน</button></div><p class="note">ฉบับที่ได้คืออังกฤษ + ไทย เปลี่ยนเป็นฉบับภาษาเดียวได้ที่หน้าตะกร้า</p><p class="note">'
       + esc(how) + " · ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อและวันที่ดาวน์โหลดพิมพ์ท้ายกระดาษ</p></form>";
   }
-  /* สอบถามร้าน: สมาชิกส่งคำถามได้ ร้านตอบจากหน้าหลังบ้าน คำตอบขึ้นที่นี่และส่งไปที่อีเมล */
-  function askBox() {
-    var list = (me.asks || []).map(function (a) {
-      return '<div class="card pad" style="margin-top:10px"><p style="margin:0;font-size:13.5px;color:#5A6573">'
-        + esc(a.id) + " · " + esc(a.topic) + " · " + esc(B.when(a.created)) + '</p><p style="margin:6px 0 0;white-space:pre-wrap">'
-        + pv(a.text) + "</p>" +
-        (a.answer ? '<div class="answer"><b style="color:#0F2A44">คำตอบจากร้าน</b>' + (a.answeredAt
-          ? ' <span style="font-size:13px;color:#5A6573">' + esc(B.when(a.answeredAt)) + "</span>" : "")
-          + '<p style="margin:4px 0 0;white-space:pre-wrap">' + pv(a.answer) + "</p></div>" : '<p class="note" style="margin:8px 0 0">รอร้านตอบ'
-          + (B.demo ? ' · <button type="button" class="linkbtn" data-qa="' + esc(a.id) + '">โหมดทดลอง: จำลองว่าร้านตอบแล้ว</button>' : "")
-          + "</p>") + "</div>";
+  /* ห้องแชตกับร้าน (22 พ.ย. 2026 คำสั่งเจ้าของ: เหมือน LINE แนบรูป ไฟล์ คลิปได้)
+     ข้อความอยู่ที่หลังบ้านแผ่น chat ที่เดียว · ไฟล์แนบเปิดผ่านหลังบ้านเท่านั้น (เจ้าของห้องหรือร้าน) · หน้านี้ดึงข้อความใหม่เองขณะเปิดเมนูนี้ */
+  var chat = null, chatBusy = false, chatTimer = 0, chatIdle = 0, chatPend = null, chatUrl = {}, chatSig = "", chatDraft = "";
+  var CHAT_MAX = { image: 8, video: 20, file: 15 }, CHAT_EXT = /\.(jpe?g|png|gif|webp|mp4|mov|webm|pdf|docx|xlsx|pptx|zip)$/i;
+  function chatKind(f) {
+    return /^image\//.test(f.type) ? "image" : /^video\//.test(f.type) ? "video" : "file";
+  }
+  function chatSize(n) {
+    return n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+  }
+  function chatTime(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? "" : ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+  function chatDay(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return "";
+    var t = new Date(), y = new Date(Date.now() - 864e5), same = function (a) {
+      return a.toDateString() === d.toDateString();
+    };
+    var w0 = String(B.when(iso)), dd = w0.replace(/,?\s*\d{1,2}:\d{2}.*$/, ""); // ตัดเวลาและเขตเวลาออก เหลือวันที่
+    if (w0.charAt(0) === "\u2068" && dd.slice(-1) !== "\u2069") dd += "\u2069";
+    return same(t) ? "วันนี้" : same(y) ? "เมื่อวาน" : esc(dd);
+  }
+  function chatText(s) { // ข้อความ: กันโค้ด แล้วทำลิงก์ http(s) ให้กดได้
+    return esc(s).replace(/https?:\/\/[^\s<>"']+/g, function (u) {
+      return '<a href="' + u + '" target="_blank" rel="noopener noreferrer nofollow">' + u + "</a>";
+    });
+  }
+  function chatFileHtml(x) {
+    var f = x.file, u = chatUrl[x.id];
+    if (f.kind === "image" && u) return '<img class="chat-img" src="' + u + '" alt="' + esc(f.name) + '" data-chatv="' + esc(x.id) + '">';
+    if (f.kind === "video" && u) return '<video class="chat-vid" src="' + u + '" controls playsinline preload="metadata"></video>';
+    return '<button type="button" class="chat-file" data-chatf="' + esc(x.id) + '"><span aria-hidden="true">'
+      + (f.kind === "image" ? "🖼️" : f.kind === "video" ? "🎬" : "📄") + "</span><b>" + pv(f.name) + "</b><small>" + pv(chatSize(f.size)) + " · <span>"
+      + (f.kind === "file" ? "กดเพื่อดาวน์โหลด" : "กดเพื่อเปิด") + "</span></small></button>";
+  }
+  function chatLog() {
+    if (!chat) return '<p class="chat-empty">กำลังโหลดข้อความ…</p>';
+    if (!chat.length) return '<p class="chat-empty">ยังไม่มีข้อความ พิมพ์ถามร้านได้เลย แนบรูปหน้างาน ไฟล์ หรือคลิปได้</p>';
+    var day = "";
+    return chat.map(function (x) {
+      var d = chatDay(x.at), head = d !== day ? '<div class="chat-day">' + d + "</div>" : "";
+      day = d;
+      var me1 = x.from === "me";
+      return head + '<div class="chat-row ' + (me1 ? "me" : "shop") + '"><div class="chat-bub">' + (me1 ? ""
+        : '<div class="chat-who">ร้าน BUILD TH</div>') + (x.file ? chatFileHtml(x) : "") + (x.text ? '<span data-noi18n="1">'
+          + chatText(x.text) + "</span>" : "") + (x.old ? '<span class="chat-old">คำถามจากระบบเดิม</span>' : "")
+        + '</div><div class="chat-meta">' + (me1 && x.read ? "อ่านแล้ว<br>" : "") + esc(chatTime(x.at)) + "</div></div>";
     }).join("");
-    return '<form class="f card pad" id="f-ask" novalidate><label>หัวข้อ<select name="topic" required><option value="">เลือกหัวข้อ</option>'
-      + (B.ASK || []).map(function (t) {
-        return "<option>" + esc(t) + "</option>";
-      }).join("") + '</select></label><label>คำถามของคุณ (10–1000 ตัวอักษร)<textarea name="text" rows="4" maxlength="1000" required></textarea></label><button class="b dark" type="submit">ส่งคำถาม</button><p class="note" style="margin:8px 0 0">ร้านตอบภายใน 2 วันทำการ คำตอบขึ้นที่หน้านี้และส่งไปที่อีเมลของคุณ · คำตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่ใช่การรับรองทางวิศวกรรมของงานคุณ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในคำถาม</p></form>'
-      + list;
+  }
+  function chatPendHtml() {
+    if (!chatPend) return "";
+    return '<div class="chat-pend">' + (chatPend.kind === "image" ? '<img src="' + chatPend.data + '" alt="">' : '<b aria-hidden="true">'
+      + (chatPend.kind === "video" ? "🎬" : "📄") + "</b>") + "<span>" + pv(chatPend.name + " · " + chatSize(chatPend.size))
+      + '</span><button type="button" class="b line sm" data-chatx="1">เอาออก</button></div>';
+  }
+  function askBox() {
+    return '<div class="chat card"><div class="chat-log" id="chatlog" role="log" aria-live="polite" aria-label="ข้อความกับร้าน">'
+      + chatLog() + "</div>" + '<div id="chatpend">' + chatPendHtml() + "</div>"
+      + '<form class="chat-bar" id="f-chat" novalidate><label class="chat-att" title="แนบรูป ไฟล์ หรือคลิป"><span aria-hidden="true">📎</span><span class="sr">แนบรูป ไฟล์ หรือคลิป</span><input type="file" name="file" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm,.pdf,.docx,.xlsx,.pptx,.zip"></label>'
+      + '<textarea name="text" rows="1" maxlength="2000" placeholder="พิมพ์ข้อความ" aria-label="ข้อความถึงร้าน">' + esc(chatDraft) + '</textarea><button class="b pri" type="submit">ส่ง</button></form></div>'
+      + '<p class="note">ร้านตอบในเวลาทำการ ภายใน 2 วันทำการ และส่งอีเมลแจ้งเมื่อตอบ · แนบได้: รูป JPG PNG GIF WEBP ไม่เกิน 8 MB · คลิป MP4 MOV WEBM ไม่เกิน 20 MB · ไฟล์ PDF DOCX XLSX PPTX ZIP ไม่เกิน 15 MB · คำตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่ใช่การรับรองทางวิศวกรรมของงานคุณ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในห้องแชต</p>';
+  }
+  function chatDraw(stick) {
+    var lg = $("chatlog");
+    if (!lg) return;
+    var atEnd = stick || lg.scrollHeight - lg.scrollTop - lg.clientHeight < 80;
+    lg.innerHTML = chatLog();
+    if (atEnd) {
+      lg.scrollTop = lg.scrollHeight;
+      [].forEach.call(lg.querySelectorAll("img.chat-img,video.chat-vid"), function (m) { // รูปโหลดเสร็จทีหลัง: เลื่อนตามให้อยู่ข้อความล่าสุด
+        m.addEventListener(m.tagName === "IMG" ? "load" : "loadedmetadata", function () {
+          lg.scrollTop = lg.scrollHeight;
+        });
+      });
+    }
+    chatAuto();
+  }
+  function chatAuto() { // เปิดรูปล่าสุด 6 รูปให้เองแบบ LINE · รูปเก่ากว่านั้นกดเปิด
+    (chat || []).filter(function (x) {
+      return x.file && x.file.kind === "image" && !chatUrl[x.id] && x.file.size <= 4194304;
+    }).slice(-6).forEach(function (x) {
+      chatOpen(x.id, true);
+    });
+  }
+  var chatGetting = {};
+  function chatOpen(id, quiet) {
+    if (chatGetting[id]) return;
+    var x = (chat || []).filter(function (y) {
+      return y.id === id;
+    })[0];
+    if (!x || !x.file) return;
+    if (chatUrl[id]) {
+      if (x.file.kind === "file") chatSave(id, x.file.name);
+      else if (x.file.kind === "image") window.open(chatUrl[id], "_blank", "noopener");
+      return;
+    }
+    chatGetting[id] = 1;
+    B.call("chatFile", { id: id }).then(function (r) {
+      delete chatGetting[id];
+      var bin = atob(r.b64), arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      chatUrl[id] = URL.createObjectURL(new Blob([arr], { type: r.type || "application/octet-stream" }));
+      if (x.file.kind === "file") chatSave(id, r.name || x.file.name);
+      chatDraw(false);
+    }).catch(function (e) {
+      delete chatGetting[id];
+      if (!quiet) say((e && e.message) || "เปิดไฟล์ไม่สำเร็จ", true);
+    });
+  }
+  function chatSave(id, name) {
+    var a = document.createElement("a");
+    a.href = chatUrl[id];
+    a.download = name || "file";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  function chatSet(r) {
+    var list = (r && r.chat) || [], sig = list.map(function (x) {
+      return x.id + (x.read ? "r" : "");
+    }).join(",");
+    var grew = !chat || list.length !== chat.length;
+    chat = list;
+    if (me) me.chatUnread = 0;
+    if (sig !== chatSig) {
+      chatSig = sig;
+      chatIdle = 0;
+      chatDraw(grew);
+    } else chatIdle++;
+  }
+  function chatLoad() {
+    if (chatBusy) return;
+    chatBusy = true;
+    B.call("chat").then(function (r) {
+      chatBusy = false;
+      chatSet(r);
+      var nav = document.querySelector('.acct-nav a[href="#ask"] em');
+      if (nav) nav.remove();
+      chatPoll();
+    }).catch(function (e) {
+      chatBusy = false;
+      if (!chat) {
+        chat = [];
+        chatDraw(true);
+      }
+      say((e && e.message) || "โหลดข้อความไม่สำเร็จ", true);
+      chatPoll();
+    });
+  }
+  function chatPoll() { // ดึงข้อความใหม่ขณะเปิดเมนูนี้: ทุก 8 วินาที ถ้าเงียบนาน ช้าลงเป็น 30 วินาที · ซ่อนหน้า = หยุด
+    clearTimeout(chatTimer);
+    if (tab !== "ask" || !me) return;
+    chatTimer = setTimeout(function () {
+      if (tab !== "ask" || !me) return;
+      if (document.hidden) return chatPoll();
+      chatLoad();
+    }, chatIdle > 15 ? 30000 : 8000);
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && tab === "ask" && me && $("chatlog")) chatLoad();
+  });
+  // เลือกไฟล์: ตรวจชนิดและขนาดก่อนส่ง · รูปใหญ่ย่อเหลือด้านยาว 2000 จุด (JPEG) ให้ส่งเร็ว · GIF ส่งตามเดิม
+  function chatPick(file) {
+    return new Promise(function (res, rej) {
+      if (!file) return rej(new Error("เลือกไฟล์ใหม่"));
+      if (!CHAT_EXT.test(file.name || "")) return rej(new Error("แนบได้เฉพาะรูป (JPG PNG GIF WEBP) คลิป (MP4 MOV WEBM) และไฟล์ PDF DOCX XLSX PPTX ZIP"));
+      var k = chatKind(file);
+      if (k === "file" && /\.(jpe?g|png|gif|webp)$/i.test(file.name)) k = "image";
+      if (k === "file" && /\.(mp4|mov|webm)$/i.test(file.name)) k = "video";
+      var fr = new FileReader();
+      fr.onerror = function () {
+        rej(new Error("อ่านไฟล์ไม่ได้"));
+      };
+      fr.onload = function () {
+        var data = String(fr.result || "");
+        if (k !== "image" || /\.gif$/i.test(file.name) || file.size <= 1572864) {
+          if (file.size > CHAT_MAX[k] * 1048576) return rej(new Error((k === "image" ? "รูป" : k === "video" ? "คลิป" : "ไฟล์") + "ใหญ่เกิน " + CHAT_MAX[k] + " MB"));
+          return res({ name: file.name, data: data, kind: k, size: file.size });
+        }
+        var im = new Image();
+        im.onerror = function () {
+          rej(new Error("ไฟล์นี้ไม่ใช่รูปภาพ"));
+        };
+        im.onload = function () {
+          var s = Math.min(1, 2000 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+          c.width = Math.round(im.width * s);
+          c.height = Math.round(im.height * s);
+          var g = c.getContext("2d");
+          g.fillStyle = "#fff";
+          g.fillRect(0, 0, c.width, c.height);
+          g.drawImage(im, 0, 0, c.width, c.height);
+          var out = c.toDataURL("image/jpeg", 0.85), n = Math.round((out.length - out.indexOf(",") - 1) * 0.75);
+          if (n > CHAT_MAX.image * 1048576) return rej(new Error("รูปใหญ่เกิน 8 MB"));
+          res({ name: String(file.name).replace(/\.[^.]+$/, "") + ".jpg", data: out, kind: "image", size: n });
+        };
+        im.src = data;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function chatSend(f) {
+    var ta = f.elements.text, text = String(ta.value || "").trim();
+    if (!text && !chatPend) {
+      ta.focus();
+      return;
+    }
+    if (text.length > 2000) return say("ข้อความยาวเกิน 2,000 ตัวอักษร", true);
+    if (chatBusy || busy) return;
+    var pend = chatPend, btn = f.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = pend ? "กำลังส่งไฟล์…" : "กำลังส่ง…";
+    chatBusy = true;
+    B.call("chatSend", { text: text, file: pend ? { name: pend.name, data: pend.data } : null }).then(function (r) {
+      chatBusy = false;
+      ta.value = "";
+      chatDraft = "";
+      ta.style.height = "";
+      chatPend = null;
+      var pe = $("chatpend");
+      if (pe) pe.innerHTML = "";
+      btn.disabled = false;
+      btn.textContent = "ส่ง";
+      say("");
+      if (pend && pend.kind !== "file") { // รูปหรือคลิปที่เพิ่งส่ง: ใช้ไฟล์ในเครื่องแสดงทันที ไม่ต้องดาวน์โหลดกลับ
+        var mine = ((r && r.chat) || []).filter(function (x) {
+          return x.from === "me" && x.file;
+        }).pop();
+        if (mine && !chatUrl[mine.id]) chatUrl[mine.id] = pend.data;
+      }
+      chatSet(r);
+      chatDraw(true);
+      chatPoll();
+      ta.focus();
+    }).catch(function (e) {
+      chatBusy = false;
+      btn.disabled = false;
+      btn.textContent = "ส่ง";
+      say((e && e.message) || "ส่งข้อความไม่สำเร็จ", true);
+    });
   }
 
   // ---------- แท็บต่าง ๆ ----------
@@ -893,16 +1114,8 @@
     });
     if (c.newer) todo.push(["docs", "มีฉบับใหม่ของเอกสารที่คุณซื้อ " + c.newer + " ใบ ดาวน์โหลดได้ฟรี",
       ""]);
-    // การแจ้งเตือน (30 ต.ค. 2026): คำตอบจากร้านที่ยังไม่ได้เปิดอ่าน · สินค้าที่ส่งแล้ว
-    var seenAsk = "";
-    try {
-      seenAsk = localStorage.getItem("build_ask_seen") || "";
-    } catch (e) {}
-      (me.asks || []).filter(function (a) {
-        return a.answer && String(a.answeredAt || "") > seenAsk;
-      }).forEach(function (a) {
-        todo.push(["ask", "ร้านตอบคำถาม " + a.id + " แล้ว กดเพื่ออ่าน", ""]);
-      });
+    // การแจ้งเตือน: ข้อความจากร้านในห้องแชตที่ยังไม่ได้อ่าน (นับที่หลังบ้าน 22 พ.ย. 2026) · สินค้าที่ส่งแล้ว
+    if (+me.chatUnread > 0) todo.push(["ask", "ร้านส่งข้อความถึงคุณ " + (+me.chatUnread) + " ข้อความ กดเพื่ออ่าน", ""]);
     (me.orders || []).filter(function (o) {
       var at = o.ship && Date.parse(String(o.ship.at || "").replace(" ", "T"));
       return o.ship && o.ship.no && (!at || Date.now() - at < 1209600000);
@@ -921,7 +1134,7 @@
     };
     return '<div class="tiles">' + tile("orders", c.todo, "คำสั่งซื้อรอชำระ", c.check ? "รอร้านตรวจ "
       + c.check : "") + tile("docs", c.docs, "เอกสารของฉัน", c.newer ? "ฉบับใหม่ " + c.newer : "")
-      + tile("ask", c.asksOpen, "คำถามรอตอบ", "") + "</div>" +
+      + tile("ask", +me.chatUnread || 0, "ข้อความใหม่จากร้าน", "") + "</div>" +
       (todo.length ? '<section class="sec"><h2>สิ่งที่ควรทำต่อ</h2><div class="card todo">' + todo.map(function (x) {
         return '<a href="#' + x[0] + '" class="' + x[2] + '">' + esc(x[1]) + "<i>›</i></a>";
       }).join("") + "</div></section>" : '<section class="sec"><div class="card pad"><p style="margin:0">ทุกอย่างเรียบร้อย ไม่มีงานค้าง</p></div></section>')
@@ -1008,12 +1221,7 @@
         + n + " รายการในตะกร้า)</a>" : "") + "</div>" + shopBox() + "</section>";
   }
   function paneAsk() {
-    try {
-      var la = (me.asks || []).map(function (a) {
-        return String(a.answeredAt || "");
-      }).sort().pop();
-      if (la) localStorage.setItem("build_ask_seen", la);
-    } catch (e) {} return '<section class="sec" id="askbox"><h2>ถามร้าน</h2>' + askBox() + "</section>";
+    return '<section class="sec" id="askbox"><h2>ห้องแชตกับร้าน</h2>' + askBox() + "</section>";
   }
   // ลิงก์ Google Maps จากพิกัดหรือลิงก์ที่บันทึกไว้ · ไม่มีหมุด = เปิดแผนที่เปล่าให้ค้นหาแล้วคัดลอกลิงก์
   function mapLink(v) {
@@ -1179,12 +1387,13 @@
     }, 20000);
   }
   function paint() {
+    document.body.classList.toggle("on-chat", !!me && tab === "ask"); // ห้องแชต: ซ่อนปุ่มลอย (ผู้ช่วย ตะกร้า) ไม่ให้บังปุ่มส่ง
     if (!me) return authView();
     var m = me.member, c = counts();
     if (!tabsShown().some(function (t) {
       return t[0] === tab;
     })) tab = "home";
-    var badge = { orders: c.todo, docs: c.newer, ask: 0 };
+    var badge = { orders: c.todo, docs: c.newer, ask: tab === "ask" ? 0 : +me.chatUnread || 0 };
     $("view").innerHTML = '<div class="acct-head card pad">' + avatarHtml(m, "lg") + '<div class="who"><h1>สวัสดี '
       + pv(m.name) + '</h1><p class="note" style="margin:0">' + (m.email ? pv(m.email) : "ยังไม่มีอีเมล")
       + " · สมาชิกตั้งแต่ " + esc(B.when(m.created).replace(/,? \d\d:\d\d(\u2069?)$/, "$1")) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>'
@@ -1222,6 +1431,12 @@
     total();
     gDraw();
     taxHint();
+    if (tab === "ask") {
+      var lg = $("chatlog");
+      if (lg) lg.scrollTop = lg.scrollHeight;
+      chatLoad();
+      chatAuto();
+    } else clearTimeout(chatTimer);
   }
   // ---------- ขายของฉัน (21 Nov 2026): ส่วนแบ่ง ยอดขาย ยอดถอนได้ บัญชีรับเงิน และรายการถอน · ตัวเลขทั้งหมดคำนวณที่หลังบ้าน ----------
   function money2(n) {
@@ -1492,7 +1707,7 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-qa],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear],[data-sell]");
+    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear],[data-sell],[data-chatf],[data-chatv],[data-chatx]");
     if (!t) return;
     if (t.dataset.sell) { // ขายของฉัน (21 Nov 2026)
       var sa = t.dataset.sell;
@@ -1567,13 +1782,15 @@
       } else if (o0) receipt(o0);
       return;
     } // ใบเสร็จรับเงินฉบับร้าน (รุ่น 2026-10-27) · คำสั่งซื้อรุ่นเก่าที่ไม่มีกุญแจ ใช้หลักฐานการชำระเงินแบบเดิม
-    if (t.dataset.qa) {
-      run(B.callAdmin("adminAnswer", {
-        ask: t.dataset.qa,
-        answer: "ตัวอย่างคำตอบในโหมดทดลอง: เมื่อต่อหลังบ้านแล้ว ร้านตอบจากหน้าหลังบ้าน แล้วคำตอบจะขึ้นที่นี่ และส่งไปที่อีเมลของคุณ"
-      }).then(function () {
-        return refresh(true);
-      }), "โหมดทดลอง: ร้านตอบแล้ว");
+    if (t.dataset.chatf || t.dataset.chatv) { // ห้องแชต: เปิดรูป คลิป หรือดาวน์โหลดไฟล์แนบ
+      if (t.dataset.chatf) t.disabled = true;
+      chatOpen(t.dataset.chatf || t.dataset.chatv, false);
+      return;
+    }
+    if (t.dataset.chatx) {
+      chatPend = null;
+      var pe0 = $("chatpend");
+      if (pe0) pe0.innerHTML = "";
       return;
     }
     if (t.dataset.fg) {
@@ -1728,6 +1945,17 @@
     var e = ev.target;
     if (e.name === "it" || e.name === "plan") total();
     if (e.form && e.form.id === "f-sellpay" && e.name === "method") $("sp-bank").hidden = e.value !== "bank";
+    if (e.form && e.form.id === "f-chat" && e.name === "file" && e.files && e.files[0]) {
+      chatPick(e.files[0]).then(function (d) {
+        chatPend = d;
+        var pe1 = $("chatpend");
+        if (pe1) pe1.innerHTML = chatPendHtml();
+        say("");
+      }).catch(function (er) {
+        say(er.message, true);
+      });
+      e.value = "";
+    }
     if (e.form && e.form.id === "f-avatar" && e.name === "photo" && e.files && e.files[0]) {
       cropAvatar(e.files[0]).then(function (d) {
         avDraft = d;
@@ -1774,6 +2002,12 @@
   });
   $("view").addEventListener("input", function (ev) {
     var e = ev.target, f = e.form;
+    if (f && f.id === "f-chat" && e.name === "text") { // ช่องพิมพ์ขยายตามข้อความ · จำร่างไว้เมื่อหน้าวาดใหม่
+      chatDraft = e.value;
+      e.style.height = "";
+      e.style.height = Math.min(160, e.scrollHeight + 2) + "px";
+      return;
+    }
     if (f && f.querySelector("input[data-pw]")) pwPaint(f);
     if (e.dataset && e.dataset.taxid) {
       var pos = e.value.length;
@@ -1782,6 +2016,14 @@
     }
     if (e.name === "zip" && f && f.id === "f-addr" && f.elements.country.value === "ไทย") e.value = e.value.replace(/\D/g,
       "").slice(0, 5);
+  });
+  $("view").addEventListener("keydown", function (ev) { // ห้องแชต: Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่ · ระหว่างพิมพ์ภาษาที่ต้องผสมคำ ไม่ส่ง
+    var e = ev.target;
+    if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && e.name === "text" && e.form && e.form.id === "f-chat"
+      && !(window.matchMedia && matchMedia("(pointer: coarse)").matches)) {
+      ev.preventDefault();
+      chatSend(e.form);
+    }
   });
   $("view").addEventListener("focusout", function (ev) {
     var e = ev.target;
@@ -1922,11 +2164,8 @@
       }), "ตั้งรหัสผ่านใหม่แล้ว");
       return;
     }
-    if (f.id === "f-ask") {
-      run(B.call("ask", { topic: v("topic"), text: v("text") }).then(function (r) {
-        me.asks = r.asks;
-        paint();
-      }), "ส่งคำถามแล้ว ร้านจะตอบภายใน 2 วันทำการ");
+    if (f.id === "f-chat") {
+      chatSend(f);
       return;
     }
     var saved = function (txt) {

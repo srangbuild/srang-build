@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var NEED_API = "2026-11-22e"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
+  var NEED_API = "2026-11-22f"; // รุ่นล่าสุดของ รายได้\หลังบ้านสมาชิก\Code.gs (แก้ทุกครั้งที่เปลี่ยน VERSION ในไฟล์นั้น)
   // 21 Nov 2026 (R3): the working copy of this device has its own key · build_site_draft now belongs to mode.js (preview) and the local test pages
   var KEY = "build_admin_work";
   try {
@@ -758,6 +758,7 @@
     adm("adminSummary", {}).then(function (r) {
       SHOP = r;
       SHOP._at = new Date().toISOString();
+      CR = r.chats || null;
       shopBusy = false;
       if (SHOPTABS.indexOf(tab) >= 0) render();
     })
@@ -843,12 +844,12 @@
     if (!SHOP) return conn;
     var k = SHOP.kpi, todoO = SHOP.orders.filter(function (o) {
       return o.status === "รอตรวจ";
-    }), todoQ = SHOP.asks.filter(function (a) {
-      return !a.answer;
+    }), todoQ = (SHOP.chats || []).filter(function (c) {
+      return c.unread;
     });
     var kp = [["ยอดขายเดือนนี้", money(k.revenueMonth)], ["30 วันล่าสุด", money(k.revenue30)], ["ยอดขายทั้งหมด",
       money(k.revenue), k.paid + " คำสั่งซื้อ · เฉลี่ย " + money(k.aov)], ["รอตรวจสลิป", k.check,
-        k.check ? "ต้องทำ" : "", k.check > 0], ["รอลูกค้าชำระ", k.wait], ["คำถามรอตอบ", k.asksOpen,
+        k.check ? "ต้องทำ" : "", k.check > 0], ["รอลูกค้าชำระ", k.wait], ["แชตรอตอบ", k.asksOpen,
           k.asksOpen ? "ต้องทำ" : "", k.asksOpen > 0], ["สมาชิก", k.members, "ใหม่ 30 วัน " + k.members30],
       ["ลูกค้าเปิดไฟล์แล้ว", k.downloaded + " / " + k.paid, "คำสั่งซื้อที่ชำระแล้ว"]];
     var kpis = '<div class="card"><div class="kpis">' + kp.map(function (x) {
@@ -857,7 +858,7 @@
     }).join("") + "</div></div>";
     var todo = '<div class="card"><h2>ต้องทำตอนนี้ <span class="tag ' + (todoO.length + todoQ.length
       ? "no" : "ok") + '">' + (todoO.length + todoQ.length) + " งาน</span></h2>" + (todoO.length + todoQ.length
-        ? "" : '<p class="hint" style="margin:0">ไม่มีสลิปรอตรวจ และไม่มีคำถามรอตอบ</p>') +
+        ? "" : '<p class="hint" style="margin:0">ไม่มีสลิปรอตรวจ และไม่มีแชตรอตอบ</p>') +
       todoO.map(function (o) {
         return '<div class="todo-it"><b>' + esc(o.id) + "</b> " + stTag(o.status) + " · " + money(o.amount)
           + " · " + esc(o.email) + "<br><small>แนบสลิป " + esc(wh(o.slipAt)) + (o.paidAt ? " · ลูกค้าแจ้งโอน "
@@ -869,11 +870,10 @@
           + esc(o.id) + '">สลิปไม่ผ่าน</button></div><small>เปิดแอปธนาคารดูว่ายอด ' + money(o.amount)
           + " เข้าจริงก่อนกดยืนยัน (รูปสลิปปลอมได้)</small></div>";
       }).join("") +
-      todoQ.map(function (a) {
-        return '<div class="todo-it"><b>' + esc(a.id) + "</b> · " + esc(a.topic) + " · " + esc(a.email)
-          + " · " + esc(wh(a.created)) + '<p style="margin:6px 0;white-space:pre-wrap">' + esc(a.text)
-          + '</p><label>คำตอบของร้าน<textarea id="ans-' + esc(a.id) + '" rows="3"></textarea></label><div class="tools"><button class="sm pri" type="button" data-sh="ans" data-id="'
-          + esc(a.id) + '">ส่งคำตอบ (ขึ้นหน้าสมาชิก + อีเมล)</button></div></div>';
+      todoQ.map(function (c) {
+        return '<div class="todo-it"><b>แชต</b> · ' + esc(c.name || c.email || c.member) + " · " + esc(c.email) + " · " + esc(wh(c.at))
+          + ' · <span class="tag no">ยังไม่อ่าน ' + c.unread + '</span><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.last)
+          + '</p><div class="tools"><button class="sm pri" type="button" data-go="chat" data-crm="' + esc(c.member) + '">เปิดห้องแชตและตอบ</button></div></div>';
       }).join("") + "</div>";
     var sales = '<div class="card"><h2>ยอดขายที่ชำระแล้ว 30 วัน</h2><p class="hint">ชี้ที่แท่งเพื่อดูยอดของวันนั้น · ตารางรายสินค้าอยู่ด้านล่าง</p>'
       + chart(SHOP.days) +
@@ -1605,15 +1605,7 @@
       }
       return;
     }
-    if (sh === "ans") {
-      var t = $("ans-" + id);
-      if (!t || t.value.trim().length < 2) {
-        toast("พิมพ์คำตอบก่อน");
-        return;
-      }
-      shopAct("adminAnswer", { ask: id, answer: t.value.trim() }, "ส่งคำตอบแล้ว");
-      return;
-    }
+
     if (sh === "slip") {
       adm("adminSlip", { order: id }).then(function (r) {
         var o = SHOP.orders.filter(function (x) {
@@ -1864,7 +1856,7 @@
     }).length, ship = SHOP.orders.filter(function (o) {
       return o.status === "ชำระแล้ว" && o.shipTo && !o.ship;
     }).length;
-    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["shop", "คำถามรอตอบ", k.asksOpen, true], ["shop",
+    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["chat", "แชตรอตอบ", k.asksOpen, true], ["shop",
       "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req",
         "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) {
           return c.status === "ใหม่";
@@ -1904,10 +1896,311 @@
       }).join("") + "</div></div>";
   }
 
+  // ----- ห้องแชตกับลูกค้า (22 พ.ย. 2026): รายชื่อห้อง (ห้องที่รอตอบอยู่บนสุด) · ข้อความ · ตอบพร้อมแนบรูป ไฟล์ หรือคลิป -----
+  // ข้อมูลอยู่ที่หลังบ้านแผ่น chat ที่เดียว · ไฟล์แนบดึงผ่านหลังบ้านด้วยรหัสหลังบ้าน (ไม่มีลิงก์สาธารณะ) · หน้านี้ดึงข้อความใหม่เองขณะเปิดแท็บนี้
+  var CR = null, crSel = "", crMsgs = null, crBusy = false, crTimer = 0, crUrl = {}, crGet = {}, crPend = null, crDraft = "", crQ = "", crSig = "";
+  var CR_MAX = { image: 8, video: 20, file: 15 };
+  function crSize(n) {
+    return n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+  }
+  function crText(s) {
+    return esc(s).replace(/https?:\/\/[^\s<>"']+/g, function (u) {
+      return '<a href="' + u + '" target="_blank" rel="noopener noreferrer nofollow">' + u + "</a>";
+    });
+  }
+  function crRoom() {
+    return (CR || []).filter(function (c) {
+      return c.member === crSel;
+    })[0] || null;
+  }
+  function crLog() {
+    if (!crSel) return '<p class="chat-empty">เลือกห้องแชตทางซ้าย</p>';
+    if (!crMsgs) return '<p class="chat-empty">กำลังโหลดข้อความ…</p>';
+    if (!crMsgs.length) return '<p class="chat-empty">ยังไม่มีข้อความ</p>';
+    var day = "";
+    return crMsgs.map(function (x) {
+      var d = String(wh(x.at)).replace(/,?\s*\d{1,2}:\d{2}.*$/, ""), head = d !== day ? '<div class="chat-day">' + esc(d) + "</div>" : "";
+      day = d;
+      var shop = x.from === "shop", f = x.file, u = crUrl[x.id], tm = new Date(x.at);
+      var fh = !f ? "" : f.kind === "image" && u ? '<img class="chat-img" src="' + u + '" alt="' + esc(f.name) + '" data-crv="' + esc(x.id) + '">'
+        : f.kind === "video" && u ? '<video class="chat-vid" src="' + u + '" controls playsinline preload="metadata"></video>'
+          : '<button type="button" class="chat-file" data-crf="' + esc(x.id) + '"><span aria-hidden="true">' + (f.kind === "image" ? "🖼️"
+            : f.kind === "video" ? "🎬" : "📄") + "</span><b>" + esc(f.name) + "</b><small>" + crSize(f.size) + "</small></button>";
+      return head + '<div class="chat-row ' + (shop ? "me" : "shop") + '"><div class="chat-bub">' + fh + (x.text ? crText(x.text) : "")
+        + (x.old ? '<span class="chat-old">คำถามจากระบบเดิม</span>' : "") + '</div><div class="chat-meta">' + (shop ? (x.read ? "ลูกค้าอ่านแล้ว<br>" : "")
+          + (x.by ? esc(x.by) + "<br>" : "") : "") + (isNaN(tm) ? "" : ("0" + tm.getHours()).slice(-2) + ":" + ("0" + tm.getMinutes()).slice(-2))
+        + "</div></div>";
+    }).join("");
+  }
+  function crPendHtml() {
+    return crPend ? '<div class="chat-pend">' + (crPend.kind === "image" ? '<img src="' + crPend.data + '" alt="">' : "<b>"
+      + (crPend.kind === "video" ? "🎬" : "📄") + "</b>") + "<span>" + esc(crPend.name) + " · " + crSize(crPend.size)
+      + '</span><button type="button" class="sm" data-crx="1">เอาออก</button></div>' : "";
+  }
+  function chatTab() {
+    if (!SHOP) return needShop("แชตกับลูกค้า");
+    if (!SHOP.chats) return '<div class="card"><h2>แชตกับลูกค้า</h2><p class="hint">หลังบ้านรุ่น ' + esc(SHOP.setup.version)
+      + " ยังไม่มีห้องแชต · วาง Code.gs รุ่น " + NEED_API + " แล้ว Deploy เป็น New version</p></div>";
+    if (!CR) CR = SHOP.chats;
+    var q = crQ.toLowerCase(), list = CR.filter(function (c) {
+      return !q || (c.name + " " + c.email + " " + c.last).toLowerCase().indexOf(q) >= 0;
+    }).sort(function (a, b) {
+      return (b.unread ? 1 : 0) - (a.unread ? 1 : 0) || (a.at < b.at ? 1 : -1);
+    }), r = crRoom();
+    return '<div class="card"><h2>แชตกับลูกค้า <span class="tag ' + (CR.filter(function (c) {
+      return c.unread;
+    }).length ? "no" : "ok") + '">รอตอบ ' + CR.filter(function (c) {
+      return c.unread;
+    }).length + ' ห้อง</span></h2><p class="hint">ลูกค้าได้อีเมลแจ้งเมื่อร้านตอบ (ไม่เกิน 1 ฉบับต่อ 10 นาที) · ไฟล์แนบเก็บในโฟลเดอร์ไดรฟ์ของร้าน ไม่มีลิงก์สาธารณะ · ตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่รับรองงานของลูกค้า</p>'
+      + '<div class="cr"><div class="cr-list"><input type="search" id="crq" placeholder="ค้นหาชื่อ อีเมล ข้อความ" value="' + esc(crQ) + '" aria-label="ค้นหาห้องแชต">'
+      + (list.length ? list.map(function (c) {
+        return '<button type="button" class="cr-it" data-crm="' + esc(c.member) + '" aria-pressed="' + (c.member === crSel) + '"><b>'
+          + esc(c.name || c.email || c.member) + (c.unread ? " <i>" + c.unread + "</i>" : "") + "</b><small>" + (c.lastFrom === "shop" ? "ร้าน: " : "")
+          + esc(c.last || "") + "</small><small>" + esc(wh(c.at)) + "</small></button>";
+      }).join("") : '<p class="hint">ยังไม่มีห้องแชต</p>') + "</div>"
+      + '<div class="chat cr-room">' + (r ? '<div class="cr-head"><b>' + esc(r.name || "-") + "</b> <small>" + esc(r.email || "") + " · " + esc(r.member)
+        + "</small></div>" : "") + '<div class="chat-log" id="crlog" role="log" aria-live="polite">' + crLog() + "</div>"
+      + (crSel ? '<div id="crpend">' + crPendHtml() + '</div><form class="chat-bar" id="f-cr" novalidate><label class="chat-att" title="แนบรูป ไฟล์ หรือคลิป"><span aria-hidden="true">📎</span><input type="file" id="crfile" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm,.pdf,.docx,.xlsx,.pptx,.zip" aria-label="แนบรูป ไฟล์ หรือคลิป"></label><textarea id="crtext" rows="1" maxlength="2000" placeholder="พิมพ์คำตอบ (Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่)">'
+        + esc(crDraft) + '</textarea><button class="pri" type="submit" id="crsend">ส่ง</button></form>' : "") + "</div></div></div>";
+  }
+  function crDraw(stick) {
+    var lg = $("crlog");
+    if (!lg) return;
+    var end = stick || lg.scrollHeight - lg.scrollTop - lg.clientHeight < 80;
+    lg.innerHTML = crLog();
+    if (end) {
+      lg.scrollTop = lg.scrollHeight;
+      [].forEach.call(lg.querySelectorAll("img.chat-img,video.chat-vid"), function (m) { // รูปโหลดเสร็จทีหลัง: เลื่อนตามให้อยู่ข้อความล่าสุด
+        m.addEventListener(m.tagName === "IMG" ? "load" : "loadedmetadata", function () {
+          lg.scrollTop = lg.scrollHeight;
+        });
+      });
+    }
+    (crMsgs || []).filter(function (x) {
+      return x.file && x.file.kind === "image" && !crUrl[x.id] && x.file.size <= 4194304;
+    }).slice(-6).forEach(function (x) {
+      crOpen(x.id, true);
+    });
+  }
+  function crSet(r) {
+    var list = (r && r.chat) || [], sig = list.map(function (x) {
+      return x.id + (x.read ? "r" : "");
+    }).join(","), grew = !crMsgs || list.length !== crMsgs.length;
+    crMsgs = list;
+    (CR || []).forEach(function (c) {
+      if (c.member === crSel) c.unread = 0;
+    });
+    if (sig !== crSig) {
+      crSig = sig;
+      crDraw(grew);
+    }
+  }
+  function crLoad() { // ห้องที่เปิดอยู่ + รายชื่อห้อง (ห้องใหม่ ข้อความใหม่)
+    if (crBusy || !SHOP) return;
+    crBusy = true;
+    var a = crSel ? adm("adminChat", { member: crSel }) : Promise.resolve(null);
+    a.then(function (r) {
+      if (r && r.member === crSel) crSet(r);
+      return adm("adminChats", {});
+    }).then(function (r) {
+      crBusy = false;
+
+      CR = r.chats || [];
+      SHOP.chats = CR;
+      SHOP.kpi.asksOpen = CR.filter(function (c) {
+        return c.unread;
+      }).length;
+      if (tab === "chat") crList(); // วาดรายชื่อห้องใหม่ทุกครั้ง (ตัวเลขยังไม่อ่านเปลี่ยนตามจริง)
+      crPoll();
+    }).catch(function (e) {
+      crBusy = false;
+      toast((e && e.message) || "โหลดแชตไม่สำเร็จ");
+      crPoll();
+    });
+  }
+  function crList() { // วาดเฉพาะรายชื่อห้อง ไม่ล้างช่องพิมพ์
+    var box = document.querySelector(".cr-list");
+    if (!box) return;
+    var keep = document.activeElement && document.activeElement.id === "crq";
+    var tmp = document.createElement("div");
+    tmp.innerHTML = chatTab();
+    var nl = tmp.querySelector(".cr-list"), h2 = tmp.querySelector("h2"), oh = document.querySelector("#main .card h2");
+    if (nl && !keep) box.innerHTML = nl.innerHTML;
+    if (h2 && oh) oh.innerHTML = h2.innerHTML;
+    var tb = document.querySelector('#tabs [data-tab="chat"]'), tt = document.querySelector('#tabs [data-tab="chat"] i');
+    if (tb) {
+      var n = SHOP.kpi.asksOpen;
+      if (tt) tt.textContent = n;
+      if (tt && !n) tt.remove();
+      if (!tt && n) tb.insertAdjacentHTML("beforeend", "<i>" + n + "</i>");
+    }
+  }
+  function crPoll() {
+    clearTimeout(crTimer);
+    if (tab !== "chat") return;
+    crTimer = setTimeout(function () {
+      if (tab !== "chat") return;
+      if (document.hidden) return crPoll();
+      crLoad();
+    }, crSel ? 8000 : 20000);
+  }
+  function crOpen(id, quiet) {
+    if (crGet[id] || !crSel) return;
+    var x = (crMsgs || []).filter(function (y) {
+      return y.id === id;
+    })[0];
+    if (!x || !x.file) return;
+    var save = function (nm) {
+      var a = document.createElement("a");
+      a.href = crUrl[id];
+      a.download = nm || "file";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+    if (crUrl[id]) {
+      if (x.file.kind === "file") save(x.file.name);
+      else if (x.file.kind === "image") window.open(crUrl[id], "_blank", "noopener");
+      return;
+    }
+    crGet[id] = 1;
+    adm("adminChatFile", { member: crSel, id: id }).then(function (r) {
+      delete crGet[id];
+      var bin = atob(r.b64), arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      crUrl[id] = URL.createObjectURL(new Blob([arr], { type: r.type || "application/octet-stream" }));
+      if (x.file.kind === "file") save(r.name || x.file.name);
+      crDraw(false);
+    }).catch(function (e) {
+      delete crGet[id];
+      if (!quiet) toast((e && e.message) || "เปิดไฟล์ไม่สำเร็จ");
+    });
+  }
+  function crPick(file) {
+    return new Promise(function (res, rej) {
+      if (!file || !/\.(jpe?g|png|gif|webp|mp4|mov|webm|pdf|docx|xlsx|pptx|zip)$/i.test(file.name || "")) return rej(new Error("แนบได้เฉพาะรูป คลิป และไฟล์ PDF DOCX XLSX PPTX ZIP"));
+      var k = /\.(jpe?g|png|gif|webp)$/i.test(file.name) ? "image" : /\.(mp4|mov|webm)$/i.test(file.name) ? "video" : "file";
+      if (file.size > CR_MAX[k] * 1048576) return rej(new Error((k === "image" ? "รูป" : k === "video" ? "คลิป" : "ไฟล์") + "ใหญ่เกิน " + CR_MAX[k] + " MB"));
+      var fr = new FileReader();
+      fr.onerror = function () {
+        rej(new Error("อ่านไฟล์ไม่ได้"));
+      };
+      fr.onload = function () {
+        res({ name: file.name, data: String(fr.result || ""), kind: k, size: file.size });
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function crSend() {
+    var ta = $("crtext"), btn = $("crsend"), text = ta ? ta.value.trim() : "";
+    if (!crSel || (!text && !crPend)) return ta && ta.focus();
+    if (crBusy) return toast("รอสักครู่ กำลังโหลดข้อความ");
+    crBusy = true;
+    btn.disabled = true;
+    btn.textContent = crPend ? "กำลังส่งไฟล์…" : "กำลังส่ง…";
+    adm("adminChatSend", { member: crSel, text: text, file: crPend ? { name: crPend.name, data: crPend.data } : null }).then(function (r) {
+      crBusy = false;
+      if (crPend && crPend.kind !== "file") { // รูปหรือคลิปที่เพิ่งส่ง: ใช้ไฟล์ในเครื่องแสดงทันที
+        var mine = ((r && r.chat) || []).filter(function (x) {
+          return x.from === "shop" && x.file;
+        }).pop();
+        if (mine && !crUrl[mine.id]) crUrl[mine.id] = crPend.data;
+      }
+      crPend = null;
+      crDraft = "";
+      ta.value = "";
+      ta.style.height = "";
+      var pe = $("crpend");
+      if (pe) pe.innerHTML = "";
+      btn.disabled = false;
+      btn.textContent = "ส่ง";
+      crSet(r);
+      crDraw(true);
+      toast("ส่งแล้ว");
+      ta.focus();
+      crPoll();
+    }).catch(function (e) {
+      crBusy = false;
+      btn.disabled = false;
+      btn.textContent = "ส่ง";
+      toast((e && e.message) || "ส่งไม่สำเร็จ");
+    });
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && tab === "chat" && SHOP) crLoad();
+  });
+  $("main").addEventListener("click", function (ev) {
+    var m = ev.target.closest("[data-crm]");
+    if (m) {
+      if (crSel !== m.dataset.crm) {
+        crSel = m.dataset.crm;
+        crMsgs = null;
+        crSig = "";
+        crPend = null;
+        crDraft = "";
+        render();
+      }
+      return;
+    }
+    var f = ev.target.closest("[data-crf],[data-crv]");
+    if (f) {
+      crOpen(f.dataset.crf || f.dataset.crv, false);
+      return;
+    }
+    if (ev.target.closest("[data-crx]")) {
+      crPend = null;
+      var pe = $("crpend");
+      if (pe) pe.innerHTML = "";
+    }
+  });
+  $("main").addEventListener("change", function (ev) {
+    if (ev.target.id !== "crfile" || !ev.target.files || !ev.target.files[0]) return;
+    crPick(ev.target.files[0]).then(function (d) {
+      crPend = d;
+      var pe = $("crpend");
+      if (pe) pe.innerHTML = crPendHtml();
+    }).catch(function (e) {
+      toast(e.message);
+    });
+    ev.target.value = "";
+  });
+  $("main").addEventListener("input", function (ev) {
+    if (ev.target.id === "crtext") {
+      crDraft = ev.target.value;
+      ev.target.style.height = "";
+      ev.target.style.height = Math.min(160, ev.target.scrollHeight + 2) + "px";
+    }
+    if (ev.target.id === "crq") {
+      crQ = ev.target.value;
+      var box = document.querySelector(".cr-list"), tmp = document.createElement("div");
+      tmp.innerHTML = chatTab();
+      var nl = tmp.querySelector(".cr-list");
+      if (!box || !nl) return;
+      [].slice.call(box.children, 1).forEach(function (n) { // เก็บช่องค้นหา (ลูกตัวแรก) ไว้ ไม่ให้เสียตำแหน่งที่พิมพ์
+        n.remove();
+      });
+      [].slice.call(nl.children, 1).forEach(function (n) {
+        box.appendChild(n);
+      });
+    }
+  });
+  $("main").addEventListener("submit", function (ev) {
+    if (ev.target.id !== "f-cr") return;
+    ev.preventDefault();
+    crSend();
+  });
+  $("main").addEventListener("keydown", function (ev) {
+    if (ev.target.id === "crtext" && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) {
+      ev.preventDefault();
+      crSend();
+    }
+  });
+
   // ----- แท็บ -----
   var TABS = [
     ["ov", "ภาพรวม", overview],
     ["shop", "ร้าน (คำสั่งซื้อ)", shopTab],
+    ["chat", "แชตกับลูกค้า", chatTab],
     ["cust", "ลูกค้า", custTab],
     ["cons", "ฝากขาย", consignTab],
     ["req", "สั่งทำ", requestTab],
@@ -1958,11 +2251,11 @@
   ];
   var tab = "ov";
   // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
-  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop",
+  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop", "chat",
     "cust", "cons", "req", "pay", "bot", "soon"];
   function badge(id) {
     if (!SHOP) return "";
-    var n = id === "shop" ? (SHOP.kpi.check || 0) + (SHOP.kpi.asksOpen || 0) : id === "cons" ? (SHOP.consigns
+    var n = id === "shop" ? SHOP.kpi.check || 0 : id === "chat" ? SHOP.kpi.asksOpen || 0 : id === "cons" ? (SHOP.consigns
       || []).filter(function (c) {
         return c.status === "ใหม่";
       }).length : id === "req" ? (SHOP.requests || []).filter(function (c) {
@@ -2005,6 +2298,10 @@
     if (SHOPTABS.indexOf(tab) >= 0 && !SHOP && !shopBusy && !shopErr && BB() && (BB().demo || tokGet())) shopLoad();
     var on = $("tabs").querySelector("[aria-selected=true]");
     if (on && on.scrollIntoView) on.scrollIntoView({ block: "nearest", inline: "center" });
+    if (tab === "chat" && SHOP) { // แชต: เลื่อนไปข้อความล่าสุด แล้วดึงข้อความใหม่
+      crDraw(true);
+      crLoad();
+    } else clearTimeout(crTimer);
   }
   $("tabs").addEventListener("click", function (ev) {
     var b = ev.target.closest("[data-tab]");
