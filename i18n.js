@@ -599,7 +599,7 @@
       var mn = document.getElementById("main");
       mn.parentNode.insertBefore(nb, mn);
     }
-    var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย ข้อความแปลด้วยเครื่องจากภาษาไทย ให้ยึดภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop()
+    var hint = document.body.classList.contains("k-body") ? "คู่มือนี้อธิบายกฎหมายไทย หากข้อความในภาษานี้ต่างจากฉบับภาษาไทย ให้ยึดฉบับภาษาไทยเป็นหลัก และยืนยันกับหน่วยงานก่อนดำเนินการ" : /^(privacy|terms)\.html$/i.test(location.pathname.split("/").pop()
       || "") ? "ข้อความภาษาไทยคือฉบับที่มีผลผูกพัน ข้อความในภาษานี้แปลเพื่อให้อ่านเข้าใจ" : "";
     if (hint && document.getElementById("main")) {
       var d = document.createElement("div");

@@ -1833,8 +1833,8 @@ window.SITE = {
         },
         {
           "code": "วสท. 1019",
-          "th": "มาตรฐานที่ มยผ. 1106-64 ข้อ 3.1.12 อ้างถึงสำหรับเข็มเจาะแบบเปียก (Claude ยังไม่ได้อ่านเล่มนี้ ผู้ตรวจยืนยันชื่อและฉบับ)",
-          "en": "EIT standard cited by DPT 1106-64 cl. 3.1.12 for wet-process bored piles (not yet read; the inspector confirms title and edition)",
+          "th": "มาตรฐานที่ มยผ. 1106-64 ข้อ 3.1.12 อ้างถึงสำหรับเข็มเจาะแบบเปียก (ผู้ตรวจงานยืนยันชื่อและฉบับล่าสุดก่อนใช้)",
+          "en": "EIT standard cited by DPT 1106-64 cl. 3.1.12 for wet-process bored piles (the inspector confirms the title and the latest edition before use)",
           "by": "วิศวกรรมสถานแห่งประเทศไทย"
         }
       ],

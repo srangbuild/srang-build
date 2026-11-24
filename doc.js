@@ -705,11 +705,12 @@
       h += "</tbody>";
     });
     h += '</table><p class="lgd"><span class="lg1">C = ' + One(L.cC) + '</span> · <span class="lg1">NC = '
-      + One(L.cNC) + '</span> · <span class="lg1">N/A = ' + One(L.cNA) + '</span> | <span class="lg1"><span class="mk H">H</span>'
+      + One(L.cNC) + '</span> · <span class="lg1">N/A = ' + One(L.cNA) + '</span><br><span class="lg1"><span class="mk H">H</span>'
       + One(L.lgH) + '</span> · <span class="lg1"><span class="mk W">W</span>' + One(L.lgW) + '</span> · <span class="lg1"><span class="mk">R</span>'
       + One(L.lgR) + '</span> · <span class="lg1"><span class="mk S">S</span>' + One(L.lgS) + "</span><br>"
-      + (two ? '<span><span class="bn">1</span>' + One(L.lgBox) + "</span> · " : "") + "<span>" + One(L.lgPlan)
-      + "</span></p>";
+      + (two ? '<span class="lg1"><span class="bn">1</span>' + One(L.lgBox) + "</span><br>" : "") + '<span class="lg1">' + One(L.lgPlan)
+      + "</span></p>"; // 24 Nov 2026 (owner): one group per line, items never split, aligned to the start
+
     // ผลการตรวจ ลายเซ็น 3 ฝ่าย วิธีใช้ หมายเหตุ
     h += '<div class="keep"><h3>' + M(L.result) + '</h3><div class="res"><span><b class="tick"></b>'
       + One(L.r1) + '</span><span><b class="tick"></b>' + esc(L.r2[0]) + ' <span class="bl"' + CEA
