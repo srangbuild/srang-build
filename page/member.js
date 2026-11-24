@@ -22,14 +22,19 @@
   var wantList = (want ? want.split(",") : (B.cart ? B.cart.get() : [])).map(function (k) {
     return k === "F-01" ? "B-PL" : k;
   }); // ลิงก์เก่า F-01 (ก่อนแยกเข็มตอกและเข็มเจาะ 23 ต.ค. 2026) = ชุดเสาเข็ม
-  var HERE = location.origin + location.pathname; // ที่อยู่กลับของ LINE และ TikTok ต้องตรงกับที่ตั้งในหน้าผู้พัฒนาของแต่ละค่าย
+  // ที่อยู่กลับของ LINE และ TikTok ต้องตรงกับที่ตั้งในหน้าผู้พัฒนาของแต่ละค่ายทุกตัวอักษร
+  // 25 พ.ย. 2026: บนเว็บจริงใช้ที่อยู่เดียวเสมอ (คนที่เปิด /member ก็ส่ง /member.html) · โดเมนเดียวกันเท่านั้น
+  // เพราะ sessionStorage แยกตามโดเมน ถ้าเปลี่ยนโดเมนตอนกลับ ระบบจะตรวจ state ไม่ได้ · เครื่องทดสอบใช้ที่อยู่ของหน้าเอง
+  var HERE = location.hostname === "srangbuild.com" ? "https://srangbuild.com/member.html"
+    : location.origin + location.pathname;
   var PROV = { google: "Google", line: "LINE", facebook: "Facebook", tiktok: "TikTok" }, PLIST = ["google",
     "line", "facebook", "tiktok"];
   var ON = {
     google: B.demo || /\.apps\.googleusercontent\.com$/.test(M.googleClientId || ""),
     line: B.demo || /^\d{8,12}$/.test(String(M.lineChannelId || "")),
     facebook: B.demo || /^\d{8,20}$/.test(String(M.facebookAppId || "")),
-    tiktok: B.demo || /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey || ""))
+    // tiktokLive: false = ซ่อนปุ่มไว้จนกว่า TikTok อนุมัติแอป (25 พ.ย. 2026 TikTok ตอบ unauthorized_client)
+    tiktok: B.demo || (M.tiktokLive !== false && /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey || "")))
   };
   // อวาตาร์สัตว์ 12 ตัวของแก๊งสัตว์ (รหัสตรงกับหลังบ้าน Code.gs ตัวแปร AVATARS)
   var AV = [["otter", "นากช่าง"], ["koon", "คูน"], ["sloth", "ลอธ"], ["somo", "ส้มโอ"], ["nim",
@@ -493,8 +498,8 @@
     }
     $("view").innerHTML = '<h1 class="pageh">ยืนยันอีเมล</h1><p class="lead" style="margin:0 0 16px">อีกขั้นเดียว บัญชีจะถูกสร้างเมื่อยืนยันอีเมลแล้ว</p>'
       +
-      '<form class="f card pad" id="f-vr" novalidate>' + demoHint + '<p style="margin:0">ส่งรหัส 6 หลักไปที่ <b>'
-      + pv(w.email) + '</b> แล้ว ใช้ได้ 15 นาที · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะหรือโปรโมชัน</p>'
+      '<form class="f card pad" id="f-vr" novalidate>' + demoHint + '<p style="margin:0">ส่งอีเมลยืนยันไปที่ <b>'
+      + pv(w.email) + '</b> แล้ว กดลิงก์ในอีเมล หรือกรอกรหัส 6 หลักด้านล่าง ใช้ได้ 15 นาที · ไม่เห็นอีเมล ดูในโฟลเดอร์จดหมายขยะหรือโปรโมชัน</p>'
       +
       '<label>รหัส 6 หลักจากอีเมล<input type="text" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required></label>'
       +
@@ -2503,7 +2508,23 @@
   if (!B.demo && anySoc()) B.ping().then(applyLogin).catch(function () {});
 
   // เริ่มหน้า: กลับจากการชำระเงิน → ตรวจผล · กลับจาก LINE หรือ TikTok → ส่งรหัสไปตรวจ · ไม่งั้นโหลดบัญชี
-  if (!payReturn()) {
+  // ลิงก์ยืนยันอีเมลตอนสมัคร (25 พ.ย. 2026): member.html#vr=<โทเคน 64 ตัว> · ลบออกจากแถบที่อยู่ก่อนส่ง เพื่อไม่ให้ค้างในประวัติหรือถูกแชร์ต่อ
+  function verifyLinkBack() {
+    var m = /^#vr=([0-9a-f]{64})$/i.exec(location.hash || "");
+    if (!m) return false;
+    try {
+      history.replaceState(null, "", HERE + (q || ""));
+    } catch (e) {}
+    authView();
+    say("กำลังยืนยันอีเมล…");
+    run(B.call("registerVerify", { link: m[1].toLowerCase() }).then(function (r) {
+      mode = "in";
+      tab = "home";
+      return signedIn(r);
+    }), "ยืนยันอีเมลแล้ว สร้างบัญชีเรียบร้อย");
+    return true;
+  }
+  if (!payReturn() && !verifyLinkBack()) {
     var back = oauthBack();
     if (back) {
       if (back.act === "link" && B.token.get()) refresh(true).then(function () {
