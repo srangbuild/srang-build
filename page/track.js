@@ -60,14 +60,13 @@
       '<p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap">' + (can ? '<a class="b pri sm" href="sheets.html">เลือกซื้อใหม่</a>' : '<a class="b pri sm" href="'
         + (paid ? "member.html#docs" : o.status === ST.check ? "member.html#orders" : "checkout.html?done="
           + encodeURIComponent(o.id)) + '">' + (paid ? "เปิดเอกสารของฉัน" : o.status === ST.check
-            ? "ดูคำสั่งซื้อของฉัน" : "ไปชำระหรือแนบสลิป") + "</a>") + (paid && o.receipt ? '<a class="b line sm" href="receipt.html?o='
-              + encodeURIComponent(oid) + "&k=" + encodeURIComponent(key) + '" target="_blank" rel="noopener">ใบเสร็จรับเงิน'
-              + (o.receipt !== "pending" ? " " + esc(o.receipt) : "") + "</a>" : "") + '<button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
+            ? "ดูคำสั่งซื้อของฉัน" : "ไปชำระหรือแนบสลิป") + "</a>") + (paid && o.receipt ? '<a class="b line sm" href="member.html#orders">ใบเสร็จรับเงิน'
+              + (o.receipt !== "pending" ? " " + esc(o.receipt) : "") + "</a>" : "") // ใบเสร็จมีข้อมูลส่วนตัว: เปิดจากหน้าสมาชิกหรืออีเมล ไม่ใช่จากลิงก์ติดตาม + '<button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
     var re = $("re");
     if (re) re.onclick = load;
   }
   function load() {
-    if (!/^BT-\d{6}-\d{3}$/.test(oid) || !/^[0-9a-f]{16}$/.test(key)) {
+    if (!/^BT-\d{6}-\d{3,6}$/.test(oid) || !/^[0-9a-f]{16}$/.test(key)) { // รูปแบบเดียวกับหลังบ้าน
       $("view").innerHTML = '<div class="card pad"><p style="margin:0">ลิงก์ติดตามไม่ครบ · เปิดลิงก์จากอีเมลของคำสั่งซื้อ หรือดูที่ <a href="member.html#orders">หน้าสมาชิก เมนู คำสั่งซื้อ</a></p></div>';
       return;
     }

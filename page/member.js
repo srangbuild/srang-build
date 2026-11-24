@@ -1919,8 +1919,8 @@
       var o0 = (me.orders || []).filter(function (o) {
         return o.id === t.dataset.rcpt;
       })[0];
-      if (o0 && o0.track) {
-        window.open("receipt.html?o=" + encodeURIComponent(o0.id) + "&k=" + encodeURIComponent(o0.track),
+      if (o0 && o0.rkey) { // กุญแจใบเสร็จ (หลังบ้าน 25c) · ไม่ใช้กุญแจลิงก์ติดตาม
+        window.open("receipt.html?o=" + encodeURIComponent(o0.id) + "&k=" + encodeURIComponent(o0.rkey),
           "_blank", "noopener");
       } else if (o0) receipt(o0);
       return;
