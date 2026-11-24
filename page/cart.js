@@ -37,41 +37,35 @@
   }
   // ยอดของบรรทัด ตามกติกาเดียวกับหลังบ้าน: มีแบบฉบับนี้แล้ว + เลือกรับฉบับใหม่ = จ่ายส่วนต่าง (อย่างน้อย 1 บาท) · มีแล้ว = ซื้อซ้ำไม่ได้
   function lineInfo(id) {
-    var x = B.find(id), R = rights(), base = B.baseOf(id), upd = B.isUpd(id), own = R[base];
-    if (!B.isBundle(x) && own) {
-      if (own === "edition" && upd) {
-        var diff = Math.max(1, B.memberPrice(x.priceU) - B.memberPrice(x.price));
-        return {
-          amt: diff,
-          note: "คุณมีแบบซื้อฉบับนี้แล้ว · อัปเกรดเป็นรับฉบับใหม่ตลอด จ่ายเฉพาะส่วนต่าง",
-          cls: "sv"
-        };
-      }
-      return {
-        amt: 0,
-        block: true,
-        note: own === "updates" ? "คุณมีใบนี้แบบรับฉบับใหม่ตลอดแล้ว เอาออกจากตะกร้าได้" : "คุณมีใบนี้แล้ว · ถ้าต้องการรับฉบับใหม่ตลอด เลือกแบบนั้นเพื่ออัปเกรด จ่ายเฉพาะส่วนต่าง",
-        cls: "bad"
-      };
-    }
-    var info = { amt: B.cart.price(id) }, rOff = +(me && me.pay && me.pay.repeatOff) || 0;
-    if (rOff && !B.isBundle(x) && !(x && x.hidden) && Object.keys(R).some(function (k) {
-      return k !== base && B.rootOf(k) === B.rootOf(base);
-    })) { // 13 พ.ย. 2026 (Q08 ก): ผู้ซื้อเดิมของใบเดียวกัน ซื้อฉบับภาษาหรือมาตรฐานอื่น ลด 30% · ใช้เมื่อหลังบ้านรุ่นที่คิดส่วนลดนี้ส่ง pay.repeatOff มา ยอดจึงตรงกันเสมอ
-      var off = Math.round(info.amt * rOff / 100);
-      info.amt = Math.max(1, info.amt - off);
-      info.note = "คุณมีฉบับอื่นของใบนี้แล้ว ลด " + rOff + "% (ประหยัด " + B.baht(off) + ")";
+    var x = B.find(id), R = rights(), rOff = +(me && me.pay && me.pay.repeatOff) || 0;
+    var la = B.cart.lineAmt(id, R, rOff); // ยอดคิดที่เดียวใน app.js กติกาเดียวกับหลังบ้าน
+    if (la.up) return {
+      amt: la.amt,
+      note: "คุณมีแบบซื้อฉบับนี้แล้ว · อัปเกรดเป็นรับฉบับใหม่ตลอด จ่ายเฉพาะส่วนต่าง",
+      cls: "sv"
+    };
+    if (la.block) return {
+      amt: 0,
+      block: true,
+      note: la.own === "updates" ? "คุณมีใบนี้แบบรับฉบับใหม่ตลอดแล้ว เอาออกจากตะกร้าได้" : "คุณมีใบนี้แล้ว · ถ้าต้องการรับฉบับใหม่ตลอด เลือกแบบนั้นเพื่ออัปเกรด จ่ายเฉพาะส่วนต่าง",
+      cls: "bad"
+    };
+    var info = { amt: la.amt };
+    if (la.off) { // มีฉบับอื่นของใบเดียวกันแล้ว: 1 ภาษา → 2 ภาษา จ่ายส่วนต่าง · กรณีอื่นลดตามส่วนลดผู้ซื้อเดิม
+      info.note = la.lang ? "คุณมีฉบับ 1 ภาษาของใบนี้แล้ว · เพิ่มเป็น 2 ภาษา จ่ายเฉพาะส่วนต่าง (ประหยัด "
+        + B.baht(la.off) + ")"
+        : "คุณมีฉบับอื่นของใบนี้แล้ว ลด " + rOff + "% (ประหยัด " + B.baht(la.off) + ")";
       info.cls = "sv";
     }
-      if (B.isBundle(x)) {
-        var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) {
-          return R[k + sfx];
-        });
-        if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว",
-          cls: "bad" };
-        if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า";
-      }
-      return info;
+    if (B.isBundle(x)) {
+      var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) {
+        return R[k + sfx];
+      });
+      if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว",
+        cls: "bad" };
+      if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า";
+    }
+    return info;
   }
   // ชุดรวมที่คุ้มกว่า: ใบเดี่ยวในตะกร้าครอบคลุมครึ่งหนึ่งของชุดขึ้นไป
   function upsell(ids) {
@@ -82,14 +76,20 @@
       return B.canSell(b) && b.id !== "B-ALL";
     }).forEach(function (b) {
       var mine = singles.filter(function (id) {
-        return b.items.indexOf(B.baseOf(id)) >= 0;
+        return b.items.indexOf(B.rootOf(id)) >= 0;
       });
       if (mine.length < 2 || mine.length * 2 < b.items.length) return;
       var upd = mine.filter(B.isUpd).length * 2 > mine.length, cost = mine.reduce(function (t, id) {
         return t + B.cart.price(id);
-      }, 0), bp = B.memberPrice(upd && +b.priceU > 0 ? b.priceU : b.price);
+      }, 0), v0 = B.varOf(mine[0]), same = mine.every(function (id) {
+        return B.varOf(id) === v0;
+      });
+      // ชุดรวมฉบับเดียวกับใบที่เลือกอยู่ · ใบที่เลือกมีหลายฉบับปนกัน = เสนอชุด 2 ภาษา
+      var bid = b.id + (same && v0 && B.find(b.id + "." + v0) ? "." + v0 : ""), bp = B.cart.price(bid
+        + (upd && +b.priceU > 0 ? "+U" : ""));
       out.push({
         b: b,
+        id: bid,
         upd: upd && +b.priceU > 0,
         extra: bp - cost,
         more: b.items.length - mine.length,
@@ -122,9 +122,9 @@
       if (!info.block) sv += s;
       var sel = B.isMarket(x) || B.isCtry(B.varOf(id)) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="'
         + esc(x.id) + '" aria-label="แบบสิทธิ์ของ ' + esc(x.id) + '"><option value="ed"' + (B.isUpd(id)
-          ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.memberPrice(x.price)) + "</option>"
+          ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.cart.price(B.baseOf(id))) + "</option>"
         + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · "
-          + B.baht(B.memberPrice(x.priceU)) + "</option>" : "") + "</select></label>";
+          + B.baht(B.cart.price(B.baseOf(id) + "+U")) + "</option>" : "") + "</select></label>";
       // 3 Nov 2026 (สภา + คำสั่งเจ้าของ): ระบบเต็มตั้งภาษา มาตรฐาน และที่ตั้งงานได้ที่เดียว คือหน้าต่างตั้งค่า · ในตะกร้าแสดงสรุปและปุ่มแก้
       // 21 Nov 2026 (คำสั่งเจ้าของ): รอบเปิดตัว 3ed เปลี่ยนฉบับภาษาได้ในแถวนี้เลย ไม่ต้องเปิดหน้าต่าง
       var cl = !B.isMarket(x) && B.cfg ? B.cfg.line(x.id) : "", ctry = B.isCtry(B.varOf(id)), eds = B.langsOf(x);
@@ -159,7 +159,7 @@
       return '<div class="upsell"><span><b>ซื้อเป็น ' + esc(u.b.id + " " + u.b.title) + "</b> ได้ครบ "
         + u.b.items.length + " ใบ " + B.baht(u.price) + " · " + (u.extra <= 0 ? "ถูกกว่าที่เลือกอยู่ "
           + B.baht(-u.extra) : "จ่ายเพิ่ม " + B.baht(u.extra) + " ได้อีก " + u.more + " ใบ") + '</span><span><button class="b line sm" type="button" data-swap="'
-        + esc(u.b.id) + '" data-upd="' + (u.upd ? 1 : 0) + '">เปลี่ยนเป็นชุดนี้</button></span></div>';
+        + esc(u.id) + '" data-upd="' + (u.upd ? 1 : 0) + '">เปลี่ยนเป็นชุดนี้</button></span></div>';
     }).join("");
     $("view").innerHTML = '<div class="cartg"><div class="lines">' + rows + ups + '<p class="note"><a href="'
       + L("sheets.html") + '">← เลือกซื้อต่อ</a></p></div>' +
@@ -185,7 +185,7 @@
     } else if (t.dataset.lang) {
       B.cart.setLang(t.dataset.lang, t.value);
       if (B.cfg) B.cfg.edition(t.dataset.lang, t.value); // ให้หน้าเอกสารอัจฉริยะเปิดด้วยภาษาของฉบับที่เลือก
-      say("เปลี่ยนภาษาบนใบของ " + t.dataset.lang + " เป็น " + B.LANGS[t.value] + " แล้ว ราคาเท่าเดิม");
+      say("เปลี่ยนภาษาบนใบของ " + t.dataset.lang + " เป็น " + B.LANGS[t.value] + " แล้ว");
     }
   });
   $("view").addEventListener("click", function (ev) {

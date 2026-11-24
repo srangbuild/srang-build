@@ -103,12 +103,27 @@
     var r = document.querySelector("input[name=plan]:checked");
     return r ? r.value : "ed";
   }
-  // ภาษาบนใบ (โปรเจกต์กำแพง 24 ต.ค. 2026): 2 ภาษา อังกฤษ + ไทย หรือ 1 ภาษา · ราคาเท่ากัน · ภาษาอื่นและมาตรฐานประเทศอื่น = สั่งทำ
+  // ภาษาบนใบ (โปรเจกต์กำแพง 24 ต.ค. 2026): 2 ภาษา อังกฤษ + ไทย หรือ 1 ภาษา · 2 ภาษาแพงกว่า (24 พ.ย. 2026 สภาราคา) · ภาษาอื่นและมาตรฐานประเทศอื่น = สั่งทำ
   function lang() {
     var r = document.querySelector("input[name=lang]:checked");
     if (r) return r.value;
     var l = B.cart.line(x.id);
-    return l ? B.varOf(l) : "";
+    return l ? B.varOf(l) : B.defEd(x); // ยังไม่เคยเลือก = 1 ภาษาตามภาษาของหน้าเว็บ
+  }
+  function pOf(up) { // ราคาตามภาษาที่เลือกอยู่
+    var v = lang();
+    return B.cart.price(x.id + (v ? "." + v : "") + (up ? "+U" : "")) || (up ? pU : pE);
+  }
+  function reprice() { // ราคาบนตัวเลือกภาษาและแบบสิทธิ์ ตามสิ่งที่เลือกอยู่
+    var up = (cur() || plan()) === "up";
+    [].forEach.call(document.querySelectorAll("em[data-edp]"), function (e) {
+      var v = e.getAttribute("data-edp");
+      e.textContent = B.baht(B.cart.price(x.id + (v ? "." + v : "") + (up ? "+U" : "")));
+    });
+    [].forEach.call(document.querySelectorAll("em[data-plp]"), function (e) {
+      e.textContent = B.baht(pOf(e.getAttribute("data-plp") === "up"));
+    });
+    mbar();
   }
   function langSel(dis) {
     if (mk) return "";
@@ -119,11 +134,16 @@
       EN: ["1 ภาษา: อังกฤษ", "ทั้งใบเป็นภาษาอังกฤษ · สำหรับโครงการและผู้ตรวจต่างประเทศ"],
       TH: ["1 ภาษา: ไทย", "ทั้งใบเป็นภาษาไทย ตัวอักษรใหญ่ขึ้น อ่านง่าย"]
     };
-    return '<fieldset class="opts"' + (dis ? " disabled" : "") + '><legend>ภาษาบนใบ</legend>' + lv.map(function (v) {
-      return '<label class="opt"><input type="radio" name="lang" value="' + v + '"' + (v === c ? " checked" : "")
-        + "><span><b>" + tx[v][0] + "</b><small>" + tx[v][1] + "</small></span><em>ราคาเท่ากัน</em></label>";
-    }).join("") + (B.docOn() && Object.keys(B.CTRY).length // 21 Nov 2026: the hint points to a box that exists only when country editions are on sale
-      ? '<p class="note" style="margin:8px 2px 0">ต้องการภาษาหรือมาตรฐานของประเทศอื่น: เลือก <a href="#editions">ฉบับประเทศ</a> ด้านล่าง</p>' : "")
+    var upN = (cur() || plan()) === "up" ? "+U" : "";
+    return '<fieldset class="opts"' + (dis ? " disabled" : "") + '><legend>ภาษาบนใบ</legend>' + lv.slice().sort(function (a,
+      b) {
+        return (a ? 0 : 1) - (b ? 0 : 1); // 1 ภาษาก่อน 2 ภาษาท้ายสุด
+      }).map(function (v) {
+        return '<label class="opt"><input type="radio" name="lang" value="' + v + '"' + (v === c ? " checked" : "")
+          + "><span><b>" + tx[v][0] + "</b><small>" + tx[v][1] + '</small></span><em data-edp="' + v
+          + '">' + B.baht(B.cart.price(x.id + (v ? "." + v : "") + upN)) + "</em></label>";
+      }).join("") + (B.docOn() && Object.keys(B.CTRY).length // 21 Nov 2026: the hint points to a box that exists only when country editions are on sale
+        ? '<p class="note" style="margin:8px 2px 0">ต้องการภาษาหรือมาตรฐานของประเทศอื่น: เลือก <a href="#editions">ฉบับประเทศ</a> ด้านล่าง</p>' : "")
       + "</fieldset>";
   }
   // ฉบับประเทศ (2 พ.ย. 2026): ภาษาของประเทศนั้น ไทย อังกฤษ + ค่ามาตรฐานและกฎหมายของประเทศนั้นเทียบกับค่าไทย · แจ้งจำนวนข้อที่มีค่าตรวจแหล่งแล้วก่อนซื้อ
@@ -171,22 +191,23 @@
   function opts() {
     if (mk) return '<p style="margin:0 0 14px"><span class="price" style="font-size:30px">' + B.baht(pE)
       + "</span></p>";
-    var c = cur() || "ed";
+    var c = cur() || plan();
     var rows = [["ed", "ซื้อฉบับนี้ เก็บได้ตลอด",
       "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
-      pE]];
+      pOf(false)]];
     if (hasU) rows.push(["up", "รับฉบับใหม่ตลอด",
       "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
-      pU]);
+      pOf(true)]);
     return langSel(false) + '<fieldset class="opts"><legend>เลือกแบบสิทธิ์</legend>' + rows.map(function (r) {
       return '<label class="opt"><input type="radio" name="plan" value="' + r[0] + '"' + (r[0] === c
-        ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + "</small></span><em>" + B.baht(r[3])
+        ? " checked" : "") + "><span><b>" + r[1] + "</b><small>" + r[2] + '</small></span><em data-plp="'
+        + r[0] + '">' + B.baht(r[3])
         + "</em></label>";
     }).join("") + "</fieldset>" + ctryBox();
   }
   var own = ""; // สิทธิ์ที่บัญชีนี้มีอยู่แล้ว: "edition" | "updates" (โหลดหลังหน้าเปิด ถ้าเข้าระบบอยู่)
   function ownBox() {
-    var diff = hasU ? Math.max(1, pU - pE) : 0, inC = B.cart.line(x.id);
+    var diff = hasU ? Math.max(1, B.cart.price(x.id + "+U") - B.cart.price(x.id)) : 0, inC = B.cart.line(x.id); // ส่วนต่างของฉบับที่มีอยู่ (รหัสหลัก = 2 ภาษา)
     var lib = '<a class="b line sm" href="' + L("member.html") + '#docs">เปิดเอกสารของฉัน</a>';
     if (mk) return '<div class="own"><span><b>คุณซื้อสินค้านี้แล้ว</b> · ' + esc(DEL[x.delivery] || DEL.manual)
       + '</span><div class="buy">' + (x.delivery === "file" ? lib : '<a class="b line sm" href="' + L("member.html")
@@ -423,7 +444,7 @@
       return;
     }
     var up = (cur() || plan()) === "up", inC = B.cart.has(x.id);
-    m.innerHTML = '<span class="price">' + B.baht(up ? pU : pE) + "<small>" + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
+    m.innerHTML = '<span class="price">' + B.baht(pOf(up)) + "<small>" + (up ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด")
       + "</small></span>" + (inC ? '<a class="b pri" href="' + L("checkout.html") + '">ไปชำระเงิน</a>' : '<button class="b pri" type="button" data-act="add">ใส่ตะกร้า</button>');
     m.classList.add("on");
     m.removeAttribute("aria-hidden");
@@ -525,6 +546,7 @@
         B.cart.setLang(x.id, ev.target.value);
         toast("เปลี่ยนภาษาในตะกร้าเป็น " + B.LANGS[ev.target.value] + " แล้ว");
       }
+      reprice();
       return;
     }
     if (ev.target.name === "plan") {
@@ -532,7 +554,7 @@
         B.cart.setPlan(x.id, ev.target.value === "up");
         toast("เปลี่ยนแบบสิทธิ์ในตะกร้าแล้ว");
       }
-      mbar();
+      reprice();
     }
   });
   window.addEventListener("build-cart", function () {

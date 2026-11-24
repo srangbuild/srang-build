@@ -848,7 +848,7 @@
       +
       '<label><input type="radio" name="plan" value="up"' + (wantU ? " checked" : "") + '><span><b>รับฉบับใหม่ตลอด</b><small>เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ฟรีทุกครั้ง และได้อีเมลแจ้ง</small></span></label></fieldset>' : "";
     return '<form class="card pad" id="f-order">' + plans + '<div class="pick">' + list.map(function (x) {
-      var p = B.memberPrice(x.price), pu = +x.priceU > 0 ? B.memberPrice(x.priceU) : 0, want = wantList.indexOf(x.id) >= 0
+      var p = B.cart.price(x.id), pu = +x.priceU > 0 ? B.cart.price(x.id + "+U") : 0, want = wantList.indexOf(x.id) >= 0
         || wantList.indexOf(x.id + "+U") >= 0;
       return '<label><input type="checkbox" name="it" value="' + esc(x.id) + '" data-price="' + p
         + '" data-priceu="' + pu + '"' + (want ? " checked" : "") + "><span>" + esc(B.code(x) + " "
@@ -1416,7 +1416,8 @@
     };
     $("view").innerHTML = '<div class="acct-head card pad">' + avatarHtml(m, "lg") + '<div class="who"><h1>สวัสดี '
       + pv(m.name) + '</h1><p class="note" style="margin:0">' + (m.email ? pv(m.email) : "ยังไม่มีอีเมล")
-      + " · สมาชิกตั้งแต่ " + esc(B.when(m.created).replace(/,? \d\d:\d\d[^\u2069]*(\u2069?)$/, "$1")) + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>'
+      + " · สมาชิกตั้งแต่ " + esc(B.when(m.created).replace(/,? \d\d:\d\d[^\u2069]*(\u2069?)$/, "$1"))
+      + '</p></div><button class="b line sm" type="button" data-out="1">ออกจากระบบ</button></div>'
       +
       '<nav class="acct-nav" aria-label="เมนูบัญชี">' + tabsShown().map(function (t) {
         return '<a href="#' + t[0] + '"' + (t[0] === tab ? ' aria-current="page"' : "") + ">" + t[1]

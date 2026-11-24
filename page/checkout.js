@@ -114,22 +114,8 @@
     return r;
   }
   function lineAmt(id) {
-    var x = B.find(id), own = rights()[B.baseOf(id)];
-    if (!B.isBundle(x) && own) {
-      if (own === "edition" && B.isUpd(id)) return {
-        amt: Math.max(1, B.memberPrice(x.priceU) - B.memberPrice(x.price)),
-        up: true
-      };
-      return { amt: 0, block: true };
-    }
-    var a0 = B.cart.price(id), rOff = +(me && me.pay && me.pay.repeatOff) || 0, R0 = rights(), b0 = B.baseOf(id);
-    if (rOff && !B.isBundle(x) && !(x && x.hidden) && Object.keys(R0).some(function (k) {
-      return k !== b0 && B.rootOf(k) === B.rootOf(b0);
-    })) { // 13 พ.ย. 2026 (Q08 ก): ผู้ซื้อเดิมของใบเดียวกัน ลด 30% กติกาเดียวกับหลังบ้าน
-      var off0 = Math.round(a0 * rOff / 100);
-      return { amt: Math.max(1, a0 - off0), off: off0, pct: rOff };
-    }
-      return { amt: a0 };
+    // ยอดคิดที่เดียวใน app.js กติกาเดียวกับหลังบ้าน (อัปเกรดจ่ายส่วนต่าง · ผู้ซื้อเดิมลด · 1 ภาษาเป็น 2 ภาษาจ่ายส่วนต่าง)
+    return B.cart.lineAmt(id, rights(), +(me && me.pay && me.pay.repeatOff) || 0);
   }
 
   // ---------- ตัวติดตาม 5 ขั้น ----------
@@ -163,7 +149,7 @@
     return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) {
       var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) };
       return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "")
-        + (a.off ? " · ผู้ซื้อเดิม ลด " + a.pct + "%" : "")
+        + (a.off ? (a.lang ? " · เพิ่มเป็น 2 ภาษา จ่ายส่วนต่าง" : " · ผู้ซื้อเดิม ลด " + a.pct + "%") : "")
         + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt))
         + "</b></li>";
     }).join("") + "</ul>" +
