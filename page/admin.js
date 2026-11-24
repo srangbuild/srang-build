@@ -1246,10 +1246,11 @@
       return "<tr><td>" + esc(r[1]) + "</td><td>" + (h === null ? "กำลังอ่าน…" : h ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">รอ Opn เปิด</span>')
         + "</td><td>" + (w ? "แสดง" : "ไม่แสดง") + "</td><td>" + esc(r[2]) + "</td></tr>";
     }).join("");
-    return wait + '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
+    var opnCard = !key ? '<div class="card"><h2>Opn Payments <span class="tag no">ปิด</span></h2><p class="hint">ซ่อนช่องทางของ Opn จากลูกค้าแล้ว (ไม่มี opnKey ในข้อมูลเว็บ) · ลูกค้าชำระด้วย Stripe Lemon Squeezy หรือโอนเงินแล้วแนบสลิป · ถ้าจะเปิด Opn ภายหลัง ใส่ opnKey และเลือกช่องทางในแท็บ สมาชิกและชำระเงิน</p></div>' : null; // 24 Nov 2026: Opn application not approved, hidden by owner
+    return wait + (opnCard !== null ? opnCard + "<div hidden>" : "") + '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
       +
       '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
-      + rows + "</tbody></table></div></div>" + slipCard(su, hl) +
+      + rows + "</tbody></table></div></div>" + (opnCard !== null ? "</div>" : "") + slipCard(su, hl) +
       '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
       "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
       + "</td><td>ไม่มีค่าธรรมเนียม · " + (!SHOP ? "สถานะการตรวจสลิปอัตโนมัติแสดงหลังโหลดข้อมูล" : su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
