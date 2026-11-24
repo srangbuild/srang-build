@@ -12,7 +12,7 @@
   .state.dirty { background:#FFE9DC; color:#9A3A05; font-weight:600; }
   .sp { flex:1; }
   button, .btn { font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--ink); padding:8px 14px; min-height:40px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:14.5px; }
-  button.pri { background:var(--orange); border-color:var(--orange); color:#fff; }
+  button.pri { background:#C24A08; border-color:#C24A08; color:#fff; }
   button.dark { background:transparent; border-color:#476787; color:#fff; }
   button.sm { min-height:32px; padding:3px 10px; font-size:13.5px; font-weight:500; }
   button.del { color:var(--bad); }
@@ -89,7 +89,7 @@
   .login .or { display:flex; align-items:center; gap:10px; color:var(--mute); font-size:13.5px; margin:14px 0 6px; } .login .or::before, .login .or::after { content:""; flex:1; border-top:1px solid var(--line); }
   .tabs .grp { align-self:center; font-size:11.5px; font-weight:700; letter-spacing:.3px; color:#8A95A3; padding:0 4px 0 14px; white-space:nowrap; }
   .tabs .grp:first-child { padding-left:4px; }
-  .tabs button i { font-style:normal; display:inline-block; min-width:19px; height:19px; margin-left:5px; padding:0 5px; border-radius:999px; background:var(--orange); color:#fff; font:700 11.5px/19px "Kanit",sans-serif; text-align:center; }
+  .tabs button i { font-style:normal; display:inline-block; min-width:19px; height:19px; margin-left:5px; padding:0 5px; border-radius:999px; background:#C24A08; color:#fff; font:700 11.5px/19px "Kanit",sans-serif; text-align:center; }
   .links { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:8px; }
   .links a { display:block; border:1px solid var(--line); border-radius:11px; padding:9px 12px; text-decoration:none; color:var(--ink); background:#FBFCFD; }
   .links a:hover { border-color:var(--navy); }

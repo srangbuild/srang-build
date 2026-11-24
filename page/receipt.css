@@ -3,7 +3,7 @@
   body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.55 "IBM Plex Sans Thai","Leelawadee UI",Tahoma,sans-serif; }
   .bar { max-width:840px; margin:0 auto; padding:14px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   .bar a, .bar button { font:inherit; font-weight:600; border-radius:10px; padding:9px 16px; border:1px solid var(--line); background:#fff; color:var(--ink); text-decoration:none; cursor:pointer; min-height:42px; }
-  .bar .pri { background:var(--orange); border-color:var(--orange); color:#fff; }
+  .bar .pri { background:#C24A08; border-color:#C24A08; color:#fff; }
   .bar small { color:var(--mute); flex-basis:100%; }
   .doc { max-width:840px; margin:0 auto 32px; background:#fff; border:1px solid var(--line); border-radius:6px; padding:34px 38px; }
   .hd { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; border-bottom:2px solid var(--navy); padding-bottom:14px; }

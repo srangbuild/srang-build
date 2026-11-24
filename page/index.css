@@ -21,7 +21,7 @@
   .nav a { text-decoration:none; font-size:14.5px; padding:8px 11px; border-radius:999px; color:#D5E1EE; white-space:nowrap; }
   .nav a:hover { background:rgba(255,255,255,.1); color:#fff; }
 
-  .announce { background:var(--orange); color:#fff; font-weight:600; font-size:15px; text-align:center; padding:8px 16px; }
+  .announce { background:#C24A08; color:#fff; font-weight:600; font-size:15px; text-align:center; padding:8px 16px; }
   .announce a { text-decoration:underline; }
 
   .hero { background-color:var(--navy); background-image:linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px), radial-gradient(900px 500px at 85% 0%, #1E4B77 0%, rgba(30,75,119,0) 70%); background-size:34px 34px, 34px 34px, auto; color:#fff; padding:46px 0 54px; overflow:hidden; }
@@ -32,8 +32,8 @@
   .hero p.sub { font-size:18px; color:#D5E1EE; margin:0 0 22px; max-width:34em; }
   .cta { display:flex; flex-wrap:wrap; gap:10px; }
   .b { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:50px; padding:10px 20px; border-radius:14px; font-weight:700; text-decoration:none; border:2px solid transparent; font-size:16.5px; cursor:pointer; font-family:inherit; }
-  .b.pri { background:var(--orange); color:#fff; box-shadow:0 6px 18px rgba(255,107,26,.35); }
-  .b.pri:hover { background:#FF7C33; }
+  .b.pri { background:#C24A08; color:#fff; box-shadow:0 6px 18px rgba(194,74,8,.35); }
+  .b.pri:hover { background:#A83F05; }
   .b.sec { border-color:rgba(255,255,255,.4); color:#fff; }
   .b.sec:hover { border-color:#fff; }
   .b.line { background:#fff; color:var(--navy); border-color:var(--line); }
@@ -102,7 +102,7 @@
   .ep .meta { font-size:13px; color:var(--mute); }
   .ep .acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; }
   .ep .acts a { font-size:13.5px; font-weight:600; text-decoration:none; padding:5px 10px; border-radius:9px; background:#EEF2F6; color:var(--navy); }
-  .ep .acts a.p { background:var(--orange); color:#fff; }
+  .ep .acts a.p { background:#C24A08; color:#fff; }
   .ep .song { font-size:13px; color:var(--mute); border-top:1px dashed var(--line); padding-top:7px; }
 
   .disc { font-size:14px; color:#6B4A1E; background:#FFF6E5; border:1px solid #F2D9A8; border-radius:12px; padding:10px 14px; margin:0 0 14px; }
