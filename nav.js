@@ -36,15 +36,15 @@
   try {
     if (!lawsOpen && sessionStorage.getItem("build_admin_tok")) lawsOpen = true;
   } catch (e) {}
-  if (lang !== "th" && !/[?&]shot=1/.test(location.search)) {
-    (lang === "en" ? ["en-var.js", "i18n-en.js", "i18n.js"] : ["i18n-en.js", "i18n-core.js",
-      "i18n-fix.js", "i18n.js"]).forEach(function (f) {
-        var sc = document.createElement("script");
-        sc.src = f;
-        sc.async = false;
-        document.head.appendChild(sc);
-      });
-  }
+    if (lang !== "th" && !/[?&]shot=1/.test(location.search)) {
+      (lang === "en" ? ["en-var.js", "i18n-en.js", "i18n.js"] : ["i18n-en.js", "i18n-core.js",
+        "i18n-fix.js", "i18n.js"]).forEach(function (f) {
+          var sc = document.createElement("script");
+          sc.src = f;
+          sc.async = false;
+          document.head.appendChild(sc);
+        });
+    }
   var hasSheets = Array.isArray(S.sheets) && S.sheets.length > 0, memOn = !S.member || S.member.on !== false;
   var gear = (S.products || []).some(function (p) {
     return p.on !== false && /^https?:\/\//i.test(p.url || "");
@@ -63,8 +63,10 @@
     {
       t: "ความรู้",
       e: "Knowledge",
-      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"]].concat(lawsOpen ? [["laws.html", "",
-        "กฎหมายและมาตรฐานรายประเทศ", "Laws and standards by country"]] : []).concat([["knowledge.html", "permit",
+      sub: [["knowledge.html", "", "แหล่งความรู้ทั้งหมด", "All guides"]].concat(lawsOpen ? [["laws.html",
+        "",
+        "กฎหมายและมาตรฐานรายประเทศ", "Laws and standards by country"]] : []).concat([["knowledge.html",
+          "permit",
           "ขออนุญาตก่อสร้างและโรงงาน", "Permits"], ["knowledge.html", "ms", "Method statement",
             "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]])
     },

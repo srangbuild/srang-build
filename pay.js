@@ -101,7 +101,8 @@
   }
   function groupNote(list) {
     var t = topFee(list);
-    return t ? '<small class="pfee pfeeg' + (t === NONE ? " none" : "") + '" style="display:block;margin:0 0 6px">' + esc(t) + "</small>" : "";
+    return t ? '<small class="pfee pfeeg' + (t === NONE ? " none" : "") + '" style="display:block;margin:0 0 6px">'
+      + esc(t) + "</small>" : "";
   }
   function feeHtml(k, list) {
     var f = FEE[k] || NONE;
@@ -327,10 +328,12 @@
       ? P.methods : Object.keys(LABEL);
     if (me && me.pay && me.pay.paypal) ppId = me.pay.paypal;
     return want.filter(function (k) {
-      return LABEL[k] && on.indexOf(k) >= 0 && (k === "paypal" || k === "stripe" || k === "lemon" || !capNames || capNames.indexOf(k) >= 0)
-        && (amount === undefined || amount >= (k === "lemon" ? (+(me && me.pay && me.pay.lemonMin) || 0) : (MIN_FOR[k] || 0))) && (curNow === "THB" || (k === "card"
-          && (B.demo || (capCur && capCur.indexOf(curNow) >= 0))) || (k === "paypal" && curNow !== "CNY")
-          || k === "stripe" || k === "lemon" || (LOCAL[payCc] && LOCAL[payCc].indexOf(k) >= 0)); /* a wallet of the payer's country charges in baht, and the provider converts */
+      return LABEL[k] && on.indexOf(k) >= 0 && (k === "paypal" || k === "stripe" || k === "lemon" || !capNames
+        || capNames.indexOf(k) >= 0)
+        && (amount === undefined || amount >= (k === "lemon" ? (+(me && me.pay && me.pay.lemonMin)
+          || 0) : (MIN_FOR[k] || 0))) && (curNow === "THB" || (k === "card"
+            && (B.demo || (capCur && capCur.indexOf(curNow) >= 0))) || (k === "paypal" && curNow !== "CNY")
+            || k === "stripe" || k === "lemon" || (LOCAL[payCc] && LOCAL[payCc].indexOf(k) >= 0)); /* a wallet of the payer's country charges in baht, and the provider converts */
     });
   }
   // โหมดทดสอบของ Opn กับหลังบ้านรุ่นเก่า (ไม่มี guard): ซ่อนการชำระออนไลน์ เพราะบัตรทดสอบที่เผยแพร่ "ชำระผ่าน" ได้โดยไม่มีเงินจริง
@@ -549,7 +552,7 @@
         sessionStorage.setItem("build_pay_wait", order.id);
         sessionStorage.setItem("build_pay_from", ui.back || "");
       } catch (e) {}
-      location.href = r.url;
+        location.href = r.url;
       return r;
     }, function (e) {
       if (ui.lock) ui.lock(false);

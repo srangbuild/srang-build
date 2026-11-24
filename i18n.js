@@ -8,10 +8,14 @@
   try { /* 21 Nov 2026: ?preview=1 uses the draft data like app.js and nav.js · an emulator address means no live back end */
     if (/[?&]preview=1/.test(location.search)) {
       var dr0 = localStorage.getItem("build_site_draft");
-      if (dr0) { dr0 = JSON.parse(dr0); S = dr0.data || dr0; }
+      if (dr0) {
+        dr0 = JSON.parse(dr0);
+        S = dr0.data || dr0;
+      }
     }
   } catch (e) {}
-  if (S.member && /\/EMULATOR\//.test(S.member.api || "")) S = Object.assign({}, S, { member: Object.assign({}, S.member, { api: "" }) });
+    if (S.member && /\/EMULATOR\//.test(S.member.api || "")) S = Object.assign({}, S, { member: Object.assign({},
+      S.member, { api: "" }) });
   var THAI = /[฀-฾เ-๿]/; /* not the baht sign U+0E3F */
   function norm(s) {
     return String(s).replace(/\s+/g, " ").trim();
@@ -134,7 +138,7 @@
           localStorage.setItem("build_i18n_" + LANG, JSON.stringify({ at: Date.now(), v: I18N_VER,
             built: j.built, map: j.map }));
         } catch (e) {}
-        FULL = j.map;
+          FULL = j.map;
         again();
         doNav();
       }
@@ -161,7 +165,16 @@
   /* 22 Nov 2026 (owner: show that the page is working and how many percent are done while the language changes).
      Work is counted in units: 1 per text that waits for the translator, PG_FULL for the download of the dictionary of a first visit,
      PG_TRX for the download of the prepared list. The bar shows only when the work lasts longer than 0.3 second, and never goes back. */
-  var PG = { total: 0, done: 0, top: 0, el: null, bar: null, txt: null, wait: 0, hide: 0 }, PG_FULL = 30, PG_TRX = 15;
+  var PG = {
+    total: 0,
+    done: 0,
+    top: 0,
+    el: null,
+    bar: null,
+    txt: null,
+    wait: 0,
+    hide: 0
+  }, PG_FULL = 30, PG_TRX = 15;
   function pgBuild() {
     var st = document.createElement("style");
     st.textContent = "#i18n-pg{position:fixed;z-index:2147483000;top:0;left:0;right:0;pointer-events:none;font:600 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif}"
@@ -239,7 +252,8 @@
     pgDone(1);
   }
   function need(t) {
-    if (t.length < 2 || t.length > 1500 || Object.prototype.hasOwnProperty.call(EXTRA, t) || NEED[t] || TRIED[t]
+    if (t.length < 2 || t.length > 1500 || Object.prototype.hasOwnProperty.call(EXTRA, t) || NEED[t]
+      || TRIED[t]
       || (PRIVATE && PII.test(t))) return;
     NEED[t] = 1;
     pgAdd(1);
@@ -510,7 +524,7 @@
           localStorage.setItem(extraKey, JSON.stringify(EXTRA));
           localStorage.setItem(key, Date.now() + "|" + I18N_VER);
         } catch (e) {}
-        if (n) again();
+          if (n) again();
       }
       pgDone(PG_TRX);
     }).catch(function () {
@@ -537,7 +551,8 @@
       var items = batches.shift();
       if (!items) {
         extraBusy--;
-        if (!extraBusy && Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra, 400);
+        if (!extraBusy && Object.keys(NEED).length && !needTimer) needTimer = setTimeout(fetchExtra,
+          400);
         return;
       }
       callExtra(items).then(function (j) {
@@ -552,7 +567,7 @@
         try {
           localStorage.setItem(extraKey, JSON.stringify(EXTRA));
         } catch (e) {}
-        again();
+          again();
         next();
       }).catch(function () {
         var gone = function (k) {

@@ -118,7 +118,7 @@
         return !l || (base(l) === "en" && withTh) ? "" : ccOfLang(l);
       }, a = ofL(l1), b = ofL(l2), al = ownedCc($("sheet").value), want = a || b || "INT"; /* English with Thai is the Thai edition: it stays on Thai standards */
     followNote = "";
-    if (al && want !== "INT" && !al[want]) {
+    if (!S3 && al && want !== "INT" && !al[want]) { // launch scope 3ed sells no country edition, so it shows no such note
       followNote = "ใช้มาตรฐานไทยตามฉบับที่คุณซื้อ · ค่ามาตรฐานของ" + ccName(want) + "ต้องซื้อฉบับประเทศนั้นเพิ่ม";
       want = "TH";
       b = "";
@@ -137,12 +137,15 @@
   }
   function covLine(cc) {
     if (!cc) return "";
-    var T = window.I18N_TR || function (x) { return x; }; // 14 พ.ย. 2026: ข้อความนี้ประกอบจากหลายส่วน ระบบแปลหน้าเว็บจับไม่ได้ จึงแปลทีละส่วนที่นี่
+    var T = window.I18N_TR || function (x) {
+      return x;
+    }; // 14 พ.ย. 2026: ข้อความนี้ประกอบจากหลายส่วน ระบบแปลหน้าเว็บจับไม่ได้ จึงแปลทีละส่วนที่นี่
     if (cc === "INT") return T("ข้อกำหนดโครงการ: ช่องเกณฑ์เว้นให้กรอกเองตามข้อกำหนดของโครงการ");
     if (cc === "TH") return T("ไทย: ค่าเต็มตามฉบับไทย");
     var D0 = window.DOCCOV || {}, id = $("sheet").value, t = (D0.numeric || {})[id] || 0, n = ((D0.cc
       || {})[cc] || {})[id] || 0;
-    return ccName(cc) + ": " + T("มีค่าจากแหล่งรัฐฉบับปัจจุบัน") + " " + n + " / " + t + " " + T("ข้อของใบนี้") + (n < t ? " · " + T("ข้อที่เหลือเว้นให้กรอกตามข้อกำหนดของโครงการ") : ""); // 14 พ.ย. 2026: ตรงกับกฎใหม่ (พิมพ์เฉพาะค่าจากรัฐ ฉบับปัจจุบัน)
+    return ccName(cc) + ": " + T("มีค่าจากแหล่งรัฐฉบับปัจจุบัน") + " " + n + " / " + t + " " + T("ข้อของใบนี้")
+      + (n < t ? " · " + T("ข้อที่เหลือเว้นให้กรอกตามข้อกำหนดของโครงการ") : ""); // 14 พ.ย. 2026: ตรงกับกฎใหม่ (พิมพ์เฉพาะค่าจากรัฐ ฉบับปัจจุบัน)
   }
   var pickFirst = null;
   function drawCc() {
@@ -182,7 +185,7 @@
       touched[t.id] = true;
       drawCc();
     }
-    else if (t.id === "sheet") drawCc();
+    else if (t.id === "sheet") follow();
   });
   $("swapPick").addEventListener("click", function () {
     var a = $("lang1").value;
@@ -219,14 +222,15 @@
     try {
       en = new Intl.DisplayNames(["en"], { type: "region" }).of(cc) || "";
     } catch (e) {}
-    if (!en || en === cc) en = (o ? o.textContent : "") || cc;
+      if (!en || en === cc) en = (o ? o.textContent : "") || cc;
     area = String(($("f-doc").elements.location || {}).value || "").trim();
     c.hidden = !!geoVal() || !cc;
     c.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([area, en].filter(Boolean).join(", "));
   }
   if ($("geoBtn")) {
     $("geo").addEventListener("input", geoDraw);
-    if ($("f-doc").elements.location) $("f-doc").elements.location.addEventListener("input", geoCountry);
+    if ($("f-doc").elements.location) $("f-doc").elements.location.addEventListener("input",
+      geoCountry);
     if ($("site")) $("site").addEventListener("change", function () {
       touched.site = true;
       geoCountry();
@@ -307,20 +311,22 @@
     try {
       cf = (JSON.parse(localStorage.getItem("build_cart_cfg") || "{}") || {})[$("sheet").value] || null;
     } catch (e) {}
-    var has = function (v) {
-      return sv && v && [].some.call(sv.options, function (o) {
-        return o.value === v;
-      });
-    };
+      var has = function (v) {
+        return sv && v && [].some.call(sv.options, function (o) {
+          return o.value === v;
+        });
+      };
     if (sv) sv.value = has(String(q.get("site") || "").toUpperCase()) ? String(q.get("site")).toUpperCase()
       : cf && has(cf.site) ? cf.site : has($("c1").value) ? $("c1").value : "TH";
     if (!cf) return;
-    if (cf.city && !$("f-doc").elements.location.value) $("f-doc").elements.location.value = String(cf.city).slice(0, 100);
+    if (cf.city && !$("f-doc").elements.location.value) $("f-doc").elements.location.value = String(cf.city).slice(0,
+      100);
     if (q.get("lang") || q.get("c1")) return;
     var cc = q.has("cc") ? String(q.get("cc") || "").toUpperCase() : null, ls = [cf.l1, cf.n === 2 ? cf.l2 : ""].filter(Boolean),
       local = ls.every(function (l) {
         return base(l) === "th" || base(l) === "en";
-      }) && (cf.std === "TH" || cf.std === "INT"), fit = cc === null || ((cc === "" || cc === "EN" || cc === "TH") ? local
+      }) && (cf.std === "TH" || cf.std === "INT"), fit = cc === null || ((cc === "" || cc === "EN"
+        || cc === "TH") ? local
         : cf.std === cc || ls.some(function (l) {
           return LANG_CC[l] === cc || (window.REGION && window.REGION.langsOf(cc).indexOf(base(l)) >= 0);
         }));
@@ -378,6 +384,7 @@
     m.hidden = !t;
     m.className = "msg " + (bad ? "bad" : "ok");
     m.textContent = t || "";
+    if (t && m.scrollIntoView) m.scrollIntoView({ block: "nearest" }); // 24 Nov 2026: the message sits above the form, so bring it into view
   }
 
   // ---------- ตัวสร้างฟอร์ม: โครงเดียวกับใบ PDF (gen_sheets.ps1) แต่ข้อความมาจากหลังบ้านตามภาษาที่เลือก ----------
@@ -541,7 +548,8 @@
     if ((d.ccs || []).some(function (c) {
       return c !== "TH";
     })) h += '<p class="warn">' + M(L.cnote) + "</p>";
-    if (d.rgs && d.rgs.length && L.rgn) h += '<p class="warn">' + M(L.rgn) + " " + esc(d.rgs.join(", ")) + "</p>"; // C19
+    if (d.rgs && d.rgs.length && L.rgn) h += '<p class="warn">' + M(L.rgn) + " " + esc(d.rgs.join(", "))
+      + "</p>"; // C19
     if (d.nWeak && L.weakN) h += '<p class="warn">' + M(L.weakN) + "</p>"; // C19
     return h;
   }
@@ -551,13 +559,15 @@
   }
   function c19x(r, L) { // C19: ป้ายค่าภูมิภาค และคำเตือนค่าต่ำกว่าที่ตั้งงาน พร้อมค่าของที่ตั้งงาน (คำตอบ Q41)
     return (r.rg && L.rgv ? '<div class="rf rgv">' + One(L.rgv) + " " + esc(r.rg) + "</div>" : "")
-      + (r.weak && L.weak ? '<div class="weak">' + One(L.weak) + " " + esc(r.weak.cc) + " · " + Bi(r.weak.cr, true)
+      + (r.weak && L.weak ? '<div class="weak">' + One(L.weak) + " " + esc(r.weak.cc) + " · " + Bi(r.weak.cr,
+        true)
         + (r.weak.ref ? '<span class="rf2">' + esc(r.weak.ref) + "</span>" : "") + "</div>" : "");
   }
   function crCell(r, n) {
     var L = D.lab, ex = c19x(r, L);
     if (r.opts) return '<div class="opts2">' + r.opts.map(function (o) {
-      return '<label class="pick' + (o.tag ? " ptag" : "") + (o.weak ? " pweak" : "") + '" data-cc="' + esc(o.cc) + '"><input type="radio" name="pk'
+      return '<label class="pick' + (o.tag ? " ptag" : "") + (o.weak ? " pweak" : "") + '" data-cc="'
+        + esc(o.cc) + '"><input type="radio" name="pk'
         + n + '" value="' + esc(o.cc) + '"><span class="tk" aria-hidden="true"></span><span class="ctag">'
         + esc(o.tag || o.cc) + '</span><span class="ptx">' + Bi(o.cr, true) + (o.ref ? '<span class="rf2">'
           + esc(o.ref) + "</span>" : "") + c19o(o, L) + "</span></label>";
@@ -610,7 +620,8 @@
   function freeRefs() {
     var d = D, L = d.lab, th = langs()[0] === "th", list = d.frefs || [], cc0 = (d.ccs || [])[0];
     if (cc0 && cc0 !== "TH" && cc0 !== "INT") { // ฉบับฟรีอ้างอิงมาตรฐานของประเทศที่เลือก
-      var sd0 = window.StdPick ? window.StdPick.data(cc0, d.id) : null, nm = d.used ? d.used : d.picked && d.picked.length
+      var sd0 = window.StdPick ? window.StdPick.data(cc0, d.id) : null, nm = d.used ? d.used : d.picked
+        && d.picked.length
         ? d.picked : sd0 ? sd0.s : (REC[cc0] && REC[cc0].codeName ? [REC[cc0].codeName] : []); // 14 พ.ย. 2026: d.used = เฉพาะมาตรฐานที่ใช้จริงในใบนี้
       return nm.length ? " · " + One(L.refsShort) + ": " + nm.slice(0, 4).map(esc).join(" · ") + " ("
         + One(L.refsFull) + ")" : "";
@@ -655,7 +666,7 @@
     h += '</tbody></table><p class="lgd">C = ' + One(L.cC) + " · NC = " + One(L.cNC) + " · " + One(L.lgFree)
       + freeRefs() + "</p>";
     var hasRec = (d.recs || []).length > 0;
-    var tail = '<p class="sh2 top">' + M(L.sh2) + "</p>" + sign([L.sIns, L.sAck]) + notesBox(L.notesF,
+    var tail = '<div class="keep"><p class="sh2 top">' + M(L.sh2) + "</p>" + sign([L.sIns, L.sAck]) + "</div>" + notesBox(L.notesF,
       hasRec ? 2 : 4) + upBox() + '<p class="fine">' + One(L.fine) + " · " + One(L.freeShare) + "</p>"
       + flagNote();
     if (hasRec) h += '<div class="pb">' + rpBar(false) + d.recs.map(recTable).join("") + tail + "</div>";
@@ -708,7 +719,8 @@
       + One(L.cNC) + '</span> · <span class="lg1">N/A = ' + One(L.cNA) + '</span><br><span class="lg1"><span class="mk H">H</span>'
       + One(L.lgH) + '</span> · <span class="lg1"><span class="mk W">W</span>' + One(L.lgW) + '</span> · <span class="lg1"><span class="mk">R</span>'
       + One(L.lgR) + '</span> · <span class="lg1"><span class="mk S">S</span>' + One(L.lgS) + "</span><br>"
-      + (two ? '<span class="lg1"><span class="bn">1</span>' + One(L.lgBox) + "</span><br>" : "") + '<span class="lg1">' + One(L.lgPlan)
+      + (two ? '<span class="lg1"><span class="bn">1</span>' + One(L.lgBox) + "</span><br>" : "") + '<span class="lg1">'
+      + One(L.lgPlan)
       + "</span></p>"; // 24 Nov 2026 (owner): one group per line, items never split, aligned to the start
 
     // ผลการตรวจ ลายเซ็น 3 ฝ่าย วิธีใช้ หมายเหตุ
@@ -746,21 +758,27 @@
         + esc(by) + ")</span>" : "") + "</li>";
   }
   function relBlock(cc) { // 3 Nov 2026: กฎหมายที่เกี่ยวข้องของประเทศที่ตั้งงาน (ผังเมือง ที่ดิน ผู้อนุญาต วิศวกร สถาปนิก อัคคีภัย ไฟฟ้า ความปลอดภัย สิ่งแวดล้อม มาตรฐาน)
-    var list = (window.LAWREL || {})[cc] || [], TOP = [["plan", "Town planning and land use"], ["land", "Land"], ["gov",
-      "Local permit authority"], ["eng", "Engineers"], ["arch", "Architects"], ["fire", "Fire safety"], ["elec", "Electrical"],
-      ["osh", "Occupational safety and health"], ["env", "Environment"], ["std", "Technical standards"]], site = window.SITE
-        && window.SITE.site && window.SITE.site.url ? String(window.SITE.site.url).replace(/\/+$/, "") : "";
+    var list = (window.LAWREL || {})[cc] || [], TOP = [["plan", "Town planning and land use"], ["land",
+      "Land"], ["gov",
+        "Local permit authority"], ["eng", "Engineers"], ["arch", "Architects"], ["fire",
+          "Fire safety"], ["elec", "Electrical"],
+      ["osh", "Occupational safety and health"], ["env", "Environment"], ["std",
+        "Technical standards"]], site = window.SITE
+      && window.SITE.site && window.SITE.site.url ? String(window.SITE.site.url).replace(/\/+$/, "") : "";
     if (!list.length) return "";
     return '<div class="lawc"><h4><span data-en="Related laws">Related laws</span></h4>' + TOP.map(function (t) {
       var it = list.filter(function (r) {
         return r.t === t[0];
       });
-      return it.length ? '<div><b><span data-en="' + esc(t[1]) + '">' + esc(t[1]) + "</span>:</b> " + it.map(function (r) {
-        return esc(r.n) + (r.l ? " (" + esc(r.l) + ")" : "") + (r.b ? " · " + esc(r.b) : "")
-          + (r.s === "draft" ? ' [<span data-en="draft, not yet in force">draft, not yet in force</span>]' : r.s ? ' [<span data-en="passed, not yet in force">passed, not yet in force</span>]' : "") // 7 Nov 2026
-          + (r.o ? "" : " *");
-      }).join("; ") + "</div>" : "";
-    }).join("") + '<div>' + (window.REGION && REGION.scope3 && REGION.scope3() ? "" /* 21 Nov 2026 (Q62): the laws page is admin-only in scope 3ed */ : '<b><span data-en="Official links">Official links</span>:</b> ' + esc(site + "/laws.html#" + cc))
+      return it.length ? '<div><b><span data-en="' + esc(t[1]) + '">' + esc(t[1]) + "</span>:</b> "
+        + it.map(function (r) {
+          return esc(r.n) + (r.l ? " (" + esc(r.l) + ")" : "") + (r.b ? " · " + esc(r.b) : "")
+            + (r.s === "draft" ? ' [<span data-en="draft, not yet in force">draft, not yet in force</span>]' : r.s
+              ? ' [<span data-en="passed, not yet in force">passed, not yet in force</span>]' : "") // 7 Nov 2026
+            + (r.o ? "" : " *");
+        }).join("; ") + "</div>" : "";
+    }).join("") + '<div>' + (window.REGION && REGION.scope3 && REGION.scope3() ? "" /* 21 Nov 2026 (Q62): the laws page is admin-only in scope 3ed */ : '<b><span data-en="Official links">Official links</span>:</b> '
+      + esc(site + "/laws.html#" + cc))
       + ' · * <span data-en="confirm with the authority">confirm with the authority</span></div></div>';
   }
   function lawBlock(cc, c, tag) {
@@ -771,9 +789,10 @@
     }, row = function (k, v, keep) {
       return v ? "<div><b>" + tx(k) + ":</b> " + (keep ? esc(v) : tx(v)) + "</div>" : "";
     }, name = window.StdPick ? window.StdPick.labelIn(cc, langs()[0]) : r ? r.country : (c ? c.en : cc); // คำบนภาคผนวกตามภาษาของเอกสาร ชื่อทางการและลิงก์คงเดิม
-    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (tag ? "<div><b>" + tx(tag) + "</b></div>" : "") + (r ? row("Law", r.lawName + (r.lawNameLocal
-      ? " (" + r.lawNameLocal + ")" : ""), true) + row("Authority", r.authority) + row("Code", r.codeName,
-        true) + row("Standards body", r.standardsBody, true) + row("Licensed persons", r.licensed) : "")
+    return '<div class="lawc"><h4>' + esc(name) + "</h4>" + (tag ? "<div><b>" + tx(tag) + "</b></div>" : "")
+      + (r ? row("Law", r.lawName + (r.lawNameLocal
+        ? " (" + r.lawNameLocal + ")" : ""), true) + row("Authority", r.authority) + row("Code", r.codeName,
+          true) + row("Standards body", r.standardsBody, true) + row("Licensed persons", r.licensed) : "")
       + row("Permit body", x.permitBody) + row("Mandatory inspections", x.mandatoryInspections) + row("Licensed persons (detail)",
         x.licensedPersons) + row("Statutory language", x.statutoryLanguage) + row("Notes", x.notes)
       + (r ? row("Source", r.sourceUrl, true) + row("Source 2", r.sourceUrl2, true) + row("Checked",
@@ -788,7 +807,10 @@
       if (!ev || hit) return;
       if (ev[name]) hit = ev[name];
       else Object.keys(ev).some(function (k) {
-        if (k.indexOf(name) === 0 || name.indexOf(k) === 0) { hit = ev[k]; return true; }
+        if (k.indexOf(name) === 0 || name.indexOf(k) === 0) {
+          hit = ev[k];
+          return true;
+        }
         return false;
       });
     });
@@ -828,18 +850,21 @@
     var h = '<section class="annex pb"><h3>' + M(L.annexA) + "</h3>" + (usedL && usedL.length
       ? '<div class="refs" style="margin:0;border:0"><b>' + M(L.stdUsed) + "</b><ul>" + usedL.map(function (n) { // 7 พ.ย. 2026 คำสั่งเจ้าของ: มาตรฐานที่ใช้ในเอกสารต้องมีแหล่งอ้างอิงที่ตามไปดูได้ · ลิงก์หน้าทางการจาก doc-refs.js (evidence) เมื่อมี
         var u = evOf(n);
-        return '<li data-noi18n="1">' + esc(n) + (u ? ' <span class="rf2">' + esc(u) + "</span>" : "") + "</li>";
+        return '<li data-noi18n="1">' + esc(n) + (u ? ' <span class="rf2">' + esc(u) + "</span>" : "")
+          + "</li>";
       }).join("") + "</ul></div>" : "")
-      + thRefs + (d.used ? "" : (d.ctry || []).map(codeRow).join("")) + (d.stdName ? '<div class="stdc"><h4>' + esc(d.stdName)
+      + thRefs + (d.used ? "" : (d.ctry || []).map(codeRow).join("")) + (d.stdName ? '<div class="stdc"><h4>'
+        + esc(d.stdName)
         + "</h4>" + M(L.user) + "</div>" : "") + ord + "</section>";
     var site = $("site") ? $("site").value : "", inC = (d.ctry || []).some(function (c) {
       return c.cc === site;
     });
-    var lawHtml = (site && !inC && REC[site] ? lawBlock(site, null, "Construction site") : "") + (d.ctry || []).filter(function (c) {
-      return c.cc !== "INT";
-    }).map(function (c) {
-      return lawBlock(c.cc, c, c.cc === site ? "Construction site" : "Country of the standard");
-    }).join("") + (site ? relBlock(site) : ""); // 3 Nov 2026: กฎหมายตามประเทศที่ตั้งงานขึ้นก่อน แล้วตามด้วยกฎหมายที่เกี่ยวข้อง
+    var lawHtml = (site && !inC && REC[site] ? lawBlock(site, null, "Construction site") : "") + (d.ctry
+      || []).filter(function (c) {
+        return c.cc !== "INT";
+      }).map(function (c) {
+        return lawBlock(c.cc, c, c.cc === site ? "Construction site" : "Country of the standard");
+      }).join("") + (site ? relBlock(site) : ""); // 3 Nov 2026: กฎหมายตามประเทศที่ตั้งงานขึ้นก่อน แล้วตามด้วยกฎหมายที่เกี่ยวข้อง
     if (lawHtml) h += '<section class="annex"><h3>' + M(L.annexB) + "</h3>" + lawHtml + '<div class="ord2">'
       + M(L.lnote) + "</div></section>";
     return h;
@@ -872,7 +897,8 @@
       h += '<div class="dn"><span><b>' + esc(d.outside ? "ภาษาหรือมาตรฐานนี้ไม่อยู่ในฉบับที่คุณซื้อ จึงแสดงฉบับฟรี" : "นี่คือฉบับฟรี: ข้อหลัก 1 ภาษา")
         + "</b>" + (d.freeOne ? " · ฉบับฟรีแสดงเฉพาะภาษาที่ 1" : "") + " · ซื้อใบนี้เพื่อใช้ครบทุกข้อ และ 2 ภาษา</span>"
         + '<a class="b pri sm" href="' + esc(href) + '">' + esc(want && want !== "TH" ? "ซื้อฉบับ"
-          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a>" + (d.outside ? ' <button class="b line sm" type="button" id="useTH">ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว</button>' : "") + "</div>"; // 7 พ.ย. 2026: ทางกลับหนึ่งคลิก ไม่ต้องหาช่องประเทศเอง
+          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a>" + (d.outside ? ' <button class="b line sm" type="button" id="useTH">ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว</button>' : "")
+        + "</div>"; // 7 พ.ย. 2026: ทางกลับหนึ่งคลิก ไม่ต้องหาช่องประเทศเอง
     }
     if (cm.diff || (cm.none && (d.ccs || []).length > 1)) h += '<div class="pbar"><b>ค่าที่ต่างกัน:</b> '
       + d.ccs.map(function (c) {
@@ -967,7 +993,7 @@
     var b = f.querySelector("button[type=submit]"), old = b.textContent;
     b.disabled = true;
     b.textContent = "กำลังสร้างเอกสาร…";
-    say("ครั้งแรกของภาษานั้นอาจใช้เวลาประมาณ 1 นาที เพราะระบบแปลและตรวจทุกช่อง");
+    say("ครั้งแรกของภาษานั้นอาจใช้เวลาประมาณ 1 นาที เพราะระบบเตรียมและตรวจทุกช่อง");
     B.call("docBuild", {
       token: tok,
       sheet: v("sheet"),
@@ -1089,7 +1115,8 @@
   });
   /* 14 Nov 2026 (คำสั่งเจ้าของ): บันทึกข้อมูลที่กรอกแยกตามงาน · เก็บในเบราว์เซอร์ของเครื่องนี้ (localStorage) ไม่ส่งขึ้นเซิร์ฟเวอร์
      เก็บ: ค่าในฟอร์มด้านบน + ข้อความในช่องกรอก + ช่องติ๊ก + ค่าที่เลือก ของเอกสารที่สร้างแล้ว · เปิดงาน = ตั้งฟอร์ม สร้างเอกสารใหม่ แล้วเติมข้อมูลกลับตามลำดับช่อง */
-  var JOBK = "build_doc_jobs", jobPending = null, JOBF = ["sheet", "lang1", "lang2", "c1", "c2", "stdName", "project", "detail",
+  var JOBK = "build_doc_jobs", jobPending = null, JOBF = ["sheet", "lang1", "lang2", "c1", "c2",
+    "stdName", "project", "detail",
     "contractor", "location"];
   function jobsGet() {
     try {
@@ -1123,7 +1150,12 @@
       return e.textContent;
     });
     return {
-      id: D.id, n: t.length, t: t, bx: idx("td.bx", on), tk: idx(".tick", on), pk: idx(".pick input", function (e) {
+      id: D.id,
+      n: t.length,
+      t: t,
+      bx: idx("td.bx", on),
+      tk: idx(".tick", on),
+      pk: idx(".pick input", function (e) {
         return e.checked;
       })
     };
@@ -1157,11 +1189,15 @@
     form.nlang = nLang();
     form.site = $("site") ? $("site").value : "";
     form.geo = $("geo") ? $("geo").value : "";
-    var name = (String(form.project || "").trim() || "งานไม่มีชื่อ") + " · " + D.id;
+    var name = (String(form.project || "").trim() || String(form.detail || "").trim() || String(form.location || "").trim() || "งานไม่มีชื่อ")
+      + " · " + D.id;
     if (!j[name] && Object.keys(j).length >= 60) {
       window.alert("บันทึกได้ไม่เกิน 60 งานในเครื่องนี้ ลบงานเก่าก่อน");
       return;
     }
+    // 24 Nov 2026: a job of the same name that this visit did not open or save is not replaced without a question
+    if (j[name] && !jobMine[name] && !window.confirm("มีงานชื่อ " + name + " อยู่แล้ว บันทึกทับหรือไม่")) return;
+    jobMine[name] = 1;
     j[name] = { at: Date.now(), form: form, doc: jobSnap() };
     try {
       localStorage.setItem(JOBK, JSON.stringify(j));
@@ -1176,12 +1212,14 @@
       btn.textContent = "บันทึกงานนี้";
     }, 2000);
   });
+  var jobMine = {}; // names of the jobs this visit opened or saved
   if ($("jobLoad")) $("jobLoad").addEventListener("click", function () {
     var job = jobsGet()[$("jobPick").value], f = $("f-doc");
     if (!job) {
       say("เลือกงานที่บันทึกไว้ก่อน", true);
       return;
     }
+    jobMine[$("jobPick").value] = 1;
     var fm = job.form || {}, set = function (el, val) {
       if (!el || val == null || val === "") return;
       el.value = val;
@@ -1218,7 +1256,7 @@
     try {
       localStorage.setItem(JOBK, JSON.stringify(j));
     } catch (e) {}
-    jobsList();
+      jobsList();
     say("ลบงานแล้ว");
   });
   jobsList();

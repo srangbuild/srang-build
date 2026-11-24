@@ -881,10 +881,27 @@ window.SITE = {
     "acc": "1314132745",
     "hours": 24,
     "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
-    "opnKey": "",
+    "opnKey": "pkey_test_69fymwz5y4m08hm1zyl",
     "methods": [
+      "promptpay",
       "stripe",
-      "paypal"
+      "card",
+      "googlepay",
+      "installment",
+      "mobile_banking_kbank",
+      "mobile_banking_scb",
+      "mobile_banking_bbl",
+      "mobile_banking_bay",
+      "mobile_banking_ktb",
+      "truemoney_jumpapp",
+      "rabbit_linepay",
+      "shopeepay",
+      "grabpay",
+      "alipay",
+      "wechat_pay",
+      "alipay_hk",
+      "kakaopay",
+      "touch_n_go"
     ],
     "googlePayId": "",
     "usdRate": 0.0296,
@@ -1527,8 +1544,8 @@ window.SITE = {
       "q": "มีภาษาอื่นไหม",
       "qEn": "Do you have other languages",
       "k": "ภาษาอื่น ภาษาอังกฤษ ภาษาจีน ภาษาญี่ปุ่น english ญี่ปุ่น เยอรมัน แปลเป็น มาตรฐานต่างประเทศ",
-      "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษเป็นฉบับแปลของระบบ และมีหมายเหตุบนเอกสาร",
-      "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are translated by our system, and the document carries a note.",
+      "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษเป็นฉบับแปล และมีหมายเหตุบนเอกสาร",
+      "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are translations, and the document carries a note.",
       "href": "request.html"
     },
     {
@@ -1615,7 +1632,8 @@ window.SITE = {
     }
   ],
   "termsDate": "7 พ.ย. 2026",
-  "privacyDate": "30 ต.ค. 2026",
+  "privacyDate": "24 พ.ย. 2026",
+  "scope": "3ed",
   "sheets": [
     {
       "id": "F-01A",
@@ -3455,12 +3473,6 @@ window.SITE = {
           "th": "กฎกระทรวงการออกแบบโครงสร้างอาคาร และลักษณะและคุณสมบัติของวัสดุที่ใช้ในงานโครงสร้างอาคาร",
           "en": "Ministerial Regulation on Structural Design of Buildings and Structural Materials, B.E. 2566",
           "by": "กระทรวงมหาดไทย"
-        },
-        {
-          "code": "OSHA 29 CFR 1926.501",
-          "th": "การป้องกันการตกจากที่สูงตั้งแต่ 1.8 ม. ในงานก่อสร้าง (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
-          "en": "Duty to have fall protection at 6 ft (1.8 m) and above in construction (US, for comparison)",
-          "by": "OSHA"
         }
       ],
       "vars": [
@@ -3708,12 +3720,6 @@ window.SITE = {
           "by": "กรมโยธาธิการและผังเมือง"
         },
         {
-          "code": "OSHA 29 CFR 1926.451",
-          "th": "ข้อกำหนดทั่วไปของนั่งร้าน (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
-          "en": "Scaffolds: general requirements (US, for comparison)",
-          "by": "OSHA"
-        },
-        {
           "code": "มยผ. 1101-64",
           "th": "มาตรฐานงานคอนกรีตและคอนกรีตเสริมเหล็ก (เวลาถอดแบบและค้ำยันกลับ ข้อ 5.11.8–5.11.10)",
           "en": "Standard for Concrete and Reinforced Concrete Works (striking and re-propping, cl. 5.11.8–5.11.10)",
@@ -3878,12 +3884,6 @@ window.SITE = {
           "th": "มาตรฐานการติดตั้งทางไฟฟ้าสำหรับประเทศไทย (ฉบับล่าสุด)",
           "en": "Thai Electrical Code (latest edition)",
           "by": "วิศวกรรมสถานแห่งประเทศไทย ร่วมกับ กฟน. และ กฟภ."
-        },
-        {
-          "code": "OSHA 29 CFR 1926.501",
-          "th": "การป้องกันการตกจากที่สูงตั้งแต่ 1.8 ม. ในงานก่อสร้าง (กฎหมายสหรัฐอเมริกา ใช้เทียบ)",
-          "en": "Duty to have fall protection at 6 ft (1.8 m) and above in construction (US, for comparison)",
-          "by": "OSHA"
         }
       ],
       "vars": [
@@ -4195,6 +4195,5 @@ window.SITE = {
       "hidden": true,
       "of": "F-05"
     }
-  ],
-  "scope": "3ed"
+  ]
 };

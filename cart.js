@@ -105,7 +105,8 @@
     var rows = ids.map(function (id) {
       var x = B.find(id), bd = B.isBundle(x), sv = B.cart.saving(id);
       return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id))
-        + '">' + esc(B.code(x) + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small>" + (cfgLine(rootId(id))
+        + '">' + esc(B.code(x) + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small>"
+        + (cfgLine(rootId(id))
           ? '<small class="cf">' + esc(cfgLine(rootId(id))) + "</small>" : "") + "<small>"
         + (B.isMarket(x) ? esc(x.kind || "สินค้าฝากขาย") + (x.seller ? " โดย " + esc(x.seller) : "") : bd
           ? "ชุดรวม " + x.items.length + " ใบ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : "ไฟล์ PDF") : esc(x.nPro)
@@ -201,7 +202,8 @@
   }
   function stdHtml(cc, ids) { // ตัวย่อและชื่อมาตรฐาน (ประเทศ) ให้คนทั่วไปอ่านเข้าใจ · ตัวรหัสไม่ส่งไปแปล
     if (cc === "INT") return "ช่องเกณฑ์เว้นให้กรอกตามข้อกำหนดโครงการ ค่าไทยพิมพ์เป็นข้อมูลอ้างอิง";
-    var D0 = window.DOCREFS && window.DOCREFS.cc && window.DOCREFS.cc[cc], th = uiL() === "th", seen = {}, rows = [];
+    var D0 = window.DOCREFS && window.DOCREFS.cc && window.DOCREFS.cc[cc], th = uiL() === "th", seen = {},
+      rows = [];
     ids.forEach(function (id) {
       var s = D0 && D0.sheets && D0.sheets[id];
       ((s && s.t) || []).forEach(function (t) {
@@ -234,16 +236,19 @@
   function lawHtml(cc) {
     var r = rec(cc);
     if (!r) return "ยังไม่มีข้อมูลกฎหมายของประเทศนี้ ภาคผนวกกฎหมายจะว่างไว้ให้กรอก";
-    return 'กฎหมายท้ายเอกสาร: <span data-noi18n="1"><b>' + esc(r.lawName) + "</b>" + (r.lawNameLocal ? " (" + esc(r.lawNameLocal)
-      + ")" : "") + "</span> · " + esc(r.authority || "") + (window.REGION && REGION.scope3 && REGION.scope3() ? "" : ' · <a href="laws.html#' + esc(cc)
-      + '" target="_blank" rel="noopener">ดูกฎหมายทั้งหมดของประเทศนี้</a>'); // 21 Nov 2026 (Q62): scope 3ed = no link to the admin-only laws page
+    return 'กฎหมายท้ายเอกสาร: <span data-noi18n="1"><b>' + esc(r.lawName) + "</b>" + (r.lawNameLocal
+      ? " (" + esc(r.lawNameLocal)
+      + ")" : "") + "</span> · " + esc(r.authority || "") + (window.REGION && REGION.scope3 && REGION.scope3()
+        ? "" : ' · <a href="laws.html#' + esc(cc)
+        + '" target="_blank" rel="noopener">ดูกฎหมายทั้งหมดของประเทศนี้</a>'); // 21 Nov 2026 (Q62): scope 3ed = no link to the admin-only laws page
   }
   /* ฉบับที่ต้องซื้อ: ภาษาไทยและอังกฤษอยู่ในทุกฉบับ · ภาษาอื่นหรือมาตรฐานต่างประเทศต้องใช้ฉบับประเทศ 1 ประเทศ
      กฎหมายของประเทศที่ตั้งงานเป็นข้อมูลสาธารณะ ใส่ให้ทุกฉบับ จึงไม่ทำให้ราคาเปลี่ยน */
   // คำตอบ Q48 (สภา 3 พ.ย. 2026, ใช้คู่กับหลังบ้านรุ่น 2026-11-03k): ภาษาใดก็ได้ 1–2 ภาษาที่ราคาปกติ · × 1.5 เฉพาะเมื่อยึดมาตรฐานของต่างประเทศ
   function skuOf(x, c) {
     var L = [c.l1].concat(c.n === 2 ? [c.l2] : []).map(bl), S = c.std;
-    if (S && S !== "TH" && S !== "INT") return B.docOn() && B.find(x.id + "." + S) ? { id: x.id + "." + S, cc: S }
+    if (S && S !== "TH" && S !== "INT") return B.docOn() && B.find(x.id + "." + S) ? { id: x.id + "."
+      + S, cc: S }
       : { err: "ฉบับประเทศนี้ยังไม่เปิดขาย เลือกมาตรฐานไทย หรือตามข้อกำหนดโครงการ" };
     var vs = B.langsOf(x), one = c.n === 1 && (L[0] === "en" || L[0] === "th") ? (L[0] === "en" ? "EN" : "TH") : "";
     return { id: x.id + (one && vs.indexOf(one) > 0 ? "." + one : "") };
@@ -259,7 +264,8 @@
     var ln = function (l) {
       return R.langName(l, uiL());
     };
-    return "ภาษา: " + ln(c.l1) + (c.n === 2 ? " + " + ln(c.l2) : "") + " · มาตรฐาน: " + ccN(c.std) + " · ที่ตั้งงาน: " + ccN(c.site)
+    return "ภาษา: " + ln(c.l1) + (c.n === 2 ? " + " + ln(c.l2) : "") + " · มาตรฐาน: " + ccN(c.std) + " · ที่ตั้งงาน: "
+      + ccN(c.site)
       + (c.city ? " (" + c.city + ")" : "");
   }
   /* ---------- หน้าต่างตั้งค่า: ส่วนที่ใช้ร่วมกัน ---------- */
@@ -350,20 +356,26 @@
   }
   function cfgDraw3(x, o, eds, hasU, ed0, old) {
     var card = function (name, val, on, head, sub, price) {
-      return '<label class="cf-o"><input type="radio" name="' + name + '" value="' + val + '"' + (on ? " checked" : "") + "><span><b>" + esc(head)
-        + (price ? ' <span class="cf-pr">' + esc(price) + "</span>" : "") + "</b><small>" + esc(sub) + "</small></span></label>";
+      return '<label class="cf-o"><input type="radio" name="' + name + '" value="' + val + '"' + (on
+        ? " checked" : "") + "><span><b>" + esc(head)
+        + (price ? ' <span class="cf-pr">' + esc(price) + "</span>" : "") + "</b><small>" + esc(sub)
+        + "</small></span></label>";
     };
     var n = 0, step = function (t) {
       n++;
       return "<legend>" + (eds.length > 1 && hasU ? n + ". " : "") + t + "</legend>";
     };
-    var $ = cfgShow(cfgHead("เลือกฉบับก่อนใส่ตะกร้า", x) + (eds.length > 1 ? "<fieldset>" + step("ภาษาบนใบ") + eds.map(function (v) {
-      return card("cfe", v, v === ed0, B.LANGS[v], v ? "" : "บรรทัดอังกฤษและบรรทัดไทยอยู่ในใบเดียวกัน");
-    }).join("") + '<p class="cf-nt">ทุกฉบับราคาเท่ากัน</p></fieldset>' : "") + (hasU ? "<fieldset>" + step("แบบสิทธิ์")
-      + card("cfu", "0", !o.upd, "ซื้อฉบับนี้ เก็บได้ตลอด", "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
-        B.baht(B.cart.price(skuId(x, ed0, false))))
-      + card("cfu", "1", !!o.upd, "รับฉบับใหม่ตลอด", "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
-        B.baht(B.cart.price(skuId(x, ed0, true)))) + "</fieldset>" : "")
+    var $ = cfgShow(cfgHead("เลือกฉบับก่อนใส่ตะกร้า", x) + (eds.length > 1 ? "<fieldset>" + step("ภาษาบนใบ")
+      + eds.map(function (v) {
+        return card("cfe", v, v === ed0, B.LANGS[v], v ? "" : "บรรทัดอังกฤษและบรรทัดไทยอยู่ในใบเดียวกัน");
+      }).join("") + '<p class="cf-nt">ทุกฉบับราคาเท่ากัน</p></fieldset>' : "") + (hasU ? "<fieldset>"
+        + step("แบบสิทธิ์")
+        + card("cfu", "0", !o.upd, "ซื้อฉบับนี้ เก็บได้ตลอด",
+          "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
+          B.baht(B.cart.price(skuId(x, ed0, false))))
+        + card("cfu", "1", !!o.upd, "รับฉบับใหม่ตลอด",
+          "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
+          B.baht(B.cart.price(skuId(x, ed0, true)))) + "</fieldset>" : "")
       + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>' + cfgFoot(o));
     var pick = function () {
       var e = cf.querySelector("input[name=cfe]:checked"), u = cf.querySelector("input[name=cfu]:checked");
@@ -386,28 +398,32 @@
   }
   /* ---------- ระบบเต็ม (ปิดสวิตช์ 3ed): ภาษา 1–2 ภาษา ประเทศที่ตั้งงาน และมาตรฐานของประเทศ ---------- */
   function cfgDrawFull(x, o) {
-    var old = cfgAll()[x.id], u0 = uiL(), def = window.StdPick ? window.StdPick.defaultCc() : "TH", l1d = u0 === "th"
+    var old = cfgAll()[x.id], u0 = uiL(), def = window.StdPick ? window.StdPick.defaultCc() : "TH",
+      l1d = u0 === "th"
       ? "th" : u0 === "en" ? "en-" + (window.EnVar ? window.EnVar.cur() : "GB") : u0, c = old || {
         n: 2,
         l1: l1d,
         l2: l1d === "th" ? "en-GB" : "th",
         site: def,
-        std: lccOf(l1d) || def, // คำตอบ Q47 (3 พ.ย. 2026): มาตรฐานเริ่มต้นยึดประเทศของภาษาที่ 1 ลูกค้าเปลี่ยนได้
+        std: lccOf(l1d) || def,
+        // คำตอบ Q47 (3 พ.ย. 2026): มาตรฐานเริ่มต้นยึดประเทศของภาษาที่ 1 ลูกค้าเปลี่ยนได้
         city: ""
-      }, langs = R ? R.docLangs() : [["th", "ไทย"], ["en-GB", "English (UK)"]], ccs = Object.keys(window.CC_OF ? (function () {
-        var m = {};
-        Object.keys(window.CC_OF).forEach(function (k) {
-          m[window.CC_OF[k]] = 1;
-        });
-        return m;
-      })() : B.CTRY).filter(function (k) {
-        return k && k !== "INT";
-      }).sort(function (a, b) {
-        return ccN(a).localeCompare(ccN(b), u0);
-      }), hasU = !B.isMarket(x) && +x.priceU > 0;
+      }, langs = R ? R.docLangs() : [["th", "ไทย"], ["en-GB", "English (UK)"]], ccs = Object.keys(window.CC_OF
+        ? (function () {
+          var m = {};
+          Object.keys(window.CC_OF).forEach(function (k) {
+            m[window.CC_OF[k]] = 1;
+          });
+          return m;
+        })() : B.CTRY).filter(function (k) {
+          return k && k !== "INT";
+        }).sort(function (a, b) {
+          return ccN(a).localeCompare(ccN(b), u0);
+        }), hasU = !B.isMarket(x) && +x.priceU > 0;
     var lo = function (sel) {
       return langs.map(function (l) {
-        return '<option value="' + esc(l[0]) + '"' + (l[0] === sel ? " selected" : "") + ">" + esc(R ? R.langName(l[0], u0) : l[1]) + "</option>";
+        return '<option value="' + esc(l[0]) + '"' + (l[0] === sel ? " selected" : "") + ">" + esc(R
+          ? R.langName(l[0], u0) : l[1]) + "</option>";
       }).join("");
     }, co = function (sel) {
       return ccs.map(function (k) {
@@ -415,15 +431,20 @@
       }).join("");
     };
     var $ = cfgShow(cfgHead("ตั้งค่าเอกสารก่อนใส่ตะกร้า", x) + '<fieldset><legend>1. ภาษาบนเอกสาร</legend><div class="cf-r"><label><input type="radio" name="cfn" value="1"'
-      + (c.n === 1 ? " checked" : "") + '> 1 ภาษา</label><label><input type="radio" name="cfn" value="2"' + (c.n === 2 ? " checked" : "")
-      + '> 2 ภาษา</label></div><label class="cf-f"><span id="cfL1t">ภาษาที่ 1 (ข้อความหลัก มีช่องกรอก)</span><select id="lang1">' + lo(c.l1)
-      + '</select></label><label class="cf-f" id="cfL2w"><span>ภาษาที่ 2 (บรรทัดรอง)</span><select id="lang2">' + lo(c.l2)
+      + (c.n === 1 ? " checked" : "") + '> 1 ภาษา</label><label><input type="radio" name="cfn" value="2"'
+      + (c.n === 2 ? " checked" : "")
+      + '> 2 ภาษา</label></div><label class="cf-f"><span id="cfL1t">ภาษาที่ 1 (ข้อความหลัก มีช่องกรอก)</span><select id="lang1">'
+      + lo(c.l1)
+      + '</select></label><label class="cf-f" id="cfL2w"><span>ภาษาที่ 2 (บรรทัดรอง)</span><select id="lang2">'
+      + lo(c.l2)
       + '</select></label></fieldset><fieldset><legend>2. ประเทศที่ตั้งงานก่อสร้าง</legend><label class="cf-f"><span>ประเทศ</span><select id="cfSite" data-country-name="1">'
       + co(c.site) + '</select></label><label class="cf-f"><span>จังหวัด เมือง หรือรัฐ (ไม่บังคับ)</span><input id="cfCity" maxlength="80" autocomplete="off" data-noi18n="1" value="'
       + esc(c.city || "") + '"></label><p class="cf-nt" id="cfLaw"></p></fieldset><fieldset><legend>3. ยึดมาตรฐานของประเทศใด</legend><div id="cfStd"></div><label class="cf-f" id="cfOw" hidden><span>ประเทศอื่น</span><select id="cfOther" data-country-name="1">'
       + co(c.std) + '</select></label></fieldset>' + (hasU ? '<fieldset id="cfPl"><legend>4. แบบสิทธิ์</legend><div class="cf-r"><label><input type="radio" name="cfu" value="0"'
-        + (o.upd ? "" : " checked") + '> ซื้อฉบับนี้ เก็บได้ตลอด</label><label><input type="radio" name="cfu" value="1"' + (o.upd ? " checked" : "")
-        + "> รับฉบับใหม่ตลอด</label></div></fieldset>" : "") + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>' + cfgFoot(o));
+        + (o.upd ? "" : " checked") + '> ซื้อฉบับนี้ เก็บได้ตลอด</label><label><input type="radio" name="cfu" value="1"'
+        + (o.upd ? " checked" : "")
+        + "> รับฉบับใหม่ตลอด</label></div></fieldset>" : "") + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>'
+      + cfgFoot(o));
     var stdPick = c.std, picked = !!old;
     function cur() {
       var n = +((cf.querySelector("input[name=cfn]:checked") || {}).value || 2), s = $("cfStd").querySelector("input[name=cfs]:checked"),
@@ -458,8 +479,10 @@
         return p.cc === stdPick;
       }) || stdPick === "INT", ids = idsOf(x);
       $("cfStd").innerHTML = opt.map(function (p) {
-        return '<label class="cf-o"><input type="radio" name="cfs" value="' + p.cc + '"' + (p.cc === stdPick ? " checked" : "") + "><span><b>"
-          + esc(p.why.join(" และ ")) + ': <span data-noi18n="1">' + esc(ccN(p.cc)) + "</span></b><small>" + stdHtml(p.cc, ids) + "</small><small>"
+        return '<label class="cf-o"><input type="radio" name="cfs" value="' + p.cc + '"' + (p.cc === stdPick
+          ? " checked" : "") + "><span><b>"
+          + esc(p.why.join(" และ ")) + ': <span data-noi18n="1">' + esc(ccN(p.cc)) + "</span></b><small>"
+          + stdHtml(p.cc, ids) + "</small><small>"
           + esc(covTx(p.cc, ids)) + "</small></span></label>";
       }).join("") + '<label class="cf-o"><input type="radio" name="cfs" value="other"' + (known ? "" : " checked")
         + "><span><b>ประเทศอื่น</b><small>เลือกประเทศจากรายการด้านล่าง</small></span></label>"
@@ -467,13 +490,16 @@
         + "><span><b>ตามข้อกำหนดโครงการ</b><small>ช่องเกณฑ์เว้นให้กรอกค่าเอง</small></span></label>";
       if (!known) $("cfOther").value = stdPick;
       $("cfOw").hidden = known;
-      var w = cur(), k = skuOf(x, w), up = !!(cf.querySelector("input[name=cfu]:checked") || {}).value && cf.querySelector("input[name=cfu]:checked").value === "1";
+      var w = cur(), k = skuOf(x, w), up = !!(cf.querySelector("input[name=cfu]:checked") || {}).value
+        && cf.querySelector("input[name=cfu]:checked").value === "1";
       $("cfErr").textContent = k.err || "";
-      $("cfSum").innerHTML = k.err ? "" : "<b>ฉบับที่จะใส่ตะกร้า:</b> " + esc(B.code(x)) + " · " + esc(k.cc ? B.LANGS[B.varOf(k.id)] || "" : "ฉบับปกติ · ไฟล์ PDF "
-          + (B.LANGS[B.varOf(k.id)] || "") + " · เอกสารอัจฉริยะเลือกภาษาได้") + "<br>"
-        + esc(cfgTx(w)) + '<br><b class="cf-p">' + esc(B.baht(B.cart.price(k.id + (up && !k.cc ? "+U" : "")))) + "</b>" + (k.cc
+      $("cfSum").innerHTML = k.err ? "" : "<b>ฉบับที่จะใส่ตะกร้า:</b> " + esc(B.code(x)) + " · " + esc(k.cc
+        ? B.LANGS[B.varOf(k.id)] || "" : "ฉบับปกติ · ไฟล์ PDF "
+        + (B.LANGS[B.varOf(k.id)] || "") + " · เอกสารอัจฉริยะเลือกภาษาได้") + "<br>"
+        + esc(cfgTx(w)) + '<br><b class="cf-p">' + esc(B.baht(B.cart.price(k.id + (up && !k.cc ? "+U" : ""))))
+        + "</b>" + (k.cc
           ? " <small>ราคาปกติ × 1.5 เพราะยึดมาตรฐานของ" + esc(ccN(k.cc)) + "</small>" : "") + (machine(w)
-            ? "<small>ภาษาที่ไม่ใช่ไทยหรืออังกฤษฉบับแปลของระบบ มีหมายเหตุบนเอกสาร</small>" : "")
+            ? "<small>ภาษาที่ไม่ใช่ไทยหรืออังกฤษเป็นฉบับแปล มีหมายเหตุบนเอกสาร</small>" : "")
         + "<small>ปรับค่าเหล่านี้ได้อีกครั้งที่หน้าเอกสารอัจฉริยะ</small>";
       var pl = $("cfPl");
       if (pl) pl.hidden = !!k.cc;
@@ -483,8 +509,9 @@
       var ln = function (l) {
         return R ? R.langName(l, u0) : l;
       };
-      return "ภาษา: " + ln(v.l1) + (v.n === 2 ? " + " + ln(v.l2) : "") + " · มาตรฐาน: " + ccN(v.std) + " · ที่ตั้งงาน: " + ccN(v.site) + (v.city
-        ? " (" + v.city + ")" : "") + " · กฎหมายท้ายเอกสารตามประเทศที่ตั้งงาน";
+      return "ภาษา: " + ln(v.l1) + (v.n === 2 ? " + " + ln(v.l2) : "") + " · มาตรฐาน: " + ccN(v.std)
+        + " · ที่ตั้งงาน: " + ccN(v.site) + (v.city
+          ? " (" + v.city + ")" : "") + " · กฎหมายท้ายเอกสารตามประเทศที่ตั้งงาน";
     }
     cf.onchange = function (ev) {
       var t = ev.target;
@@ -529,7 +556,14 @@
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape" && cf && cf.innerHTML) cfClose();
   });
-  B.cfg = { open: cfgOpen, line: cfgLine, all: cfgAll, put: cfgPut, edition: edPut, simple: S3 };
+  B.cfg = {
+    open: cfgOpen,
+    line: cfgLine,
+    all: cfgAll,
+    put: cfgPut,
+    edition: edPut,
+    simple: S3
+  };
   fab.addEventListener("click", function () {
     open(true);
   });

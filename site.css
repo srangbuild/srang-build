@@ -86,6 +86,7 @@ form.f input[type=text], form.f input[type=email], form.f input[type=password], 
 form.f select, form.f textarea { font:inherit; font-size:16px; font-weight:400; padding:11px 12px; border:1.5px solid var(--line); border-radius:12px; background:#fff; width:100%; color:var(--ink); }
 form.f textarea { resize:vertical; min-height:110px; line-height:1.55; }
 form.f input:focus, form.f select:focus, form.f textarea:focus { border-color:var(--orange); outline:none; }
+form.f input:focus-visible, form.f select:focus-visible, form.f textarea:focus-visible { outline:3px solid var(--orange-d); outline-offset:2px; }
 form.f .ck { display:flex; gap:10px; align-items:flex-start; font-weight:400; color:var(--ink); font-size:14.5px; line-height:1.55; }
 form.f .ck input { width:20px; height:20px; margin-top:2px; flex:none; }
 .msg { font-size:15px; padding:10px 14px; border-radius:12px; margin:0; }
