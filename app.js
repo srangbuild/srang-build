@@ -34,9 +34,7 @@
     "เรื่องอื่น"];
 
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
+    return window.escHtml(s);
   }
   // ราคา (คำสั่งผู้ใช้ 2 พ.ย. 2026): แสดงตามภาษาที่เลือก แล้ววงเล็บดอลลาร์สหรัฐ · ภาษาอังกฤษแสดงดอลลาร์อย่างเดียว · thb() คือยอดเงินบาทจริงสำหรับหน้าชำระเงิน คำสั่งซื้อ และใบเสร็จ
   // ค่าอื่นนอกจากบาทเป็นค่าประมาณจากอัตราแลกเปลี่ยนล่าสุด · อักขระ U+2068 U+2069 กันทิศทางข้อความในภาษาขวาไปซ้าย และบอก i18n.js ว่านี่คือราคา ไม่ต้องแปล
@@ -329,8 +327,18 @@
       });
   }
   // 21 Nov 2026 (R3): mode.js sets SITE_MODE · admin preview sends its pass (the back end checks it) · maintenance stops new orders and payments here too (the back end also refuses them)
-  var MAINT_BLOCK = { order: 1, payStart: 1, ppStart: 1, ppCapture: 1, stStart: 1, lsStart: 1, slip: 1,
-    promoCheck: 1, request: 1, consign: 1 };
+  var MAINT_BLOCK = {
+    order: 1,
+    payStart: 1,
+    ppStart: 1,
+    ppCapture: 1,
+    stStart: 1,
+    lsStart: 1,
+    slip: 1,
+    promoCheck: 1,
+    request: 1,
+    consign: 1
+  };
   function call(action, data) {
     var body = { action: action, token: token.get(), ui: siteLang }, SM = window.SITE_MODE || {};
     Object.keys(data || {}).forEach(function (k) {
@@ -458,7 +466,8 @@
     var m = /^(\d{1,2}):(\d{2})$/.exec(hhmm || "");
     if (!m || !(dow >= 0 && dow <= 6)) return null;
     var o = off == null ? 420 : +off, now = Date.now(), s = new Date(now + o * 60000);
-    var d = new Date(Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate() + ((dow - s.getUTCDay() + 7) % 7), +m[1], +m[2]) - o * 60000);
+    var d = new Date(Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate() + ((dow - s.getUTCDay()
+      + 7) % 7), +m[1], +m[2]) - o * 60000);
     if (d.getTime() < now - 3600000) d = new Date(d.getTime() + 7 * 86400000);
     return d;
   }
@@ -467,7 +476,13 @@
     var t = "";
     if (siteLang !== "th") {
       try {
-        t = new Intl.DateTimeFormat(LOC, { weekday: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23", numberingSystem: "latn" }).format(d);
+        t = new Intl.DateTimeFormat(LOC, {
+          weekday: "long",
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+          numberingSystem: "latn"
+        }).format(d);
       } catch (e) {}
     }
     if (!t) t = DAY[d.getDay()] + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
@@ -475,12 +490,19 @@
     return siteLang !== "th" ? "⁨" + t + "⁩" : t;
   }
   function schedText(s) { // ข้อความตารางลงคลิปใน data.js เขียนเป็นเวลาไทย เช่น ลงคลิปใหม่ทุกวันอังคาร 18:00 → ส่วนหน้า + วันเวลาของผู้ชม + ส่วนท้าย
-    var m = /^(.*?)(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์)\s*(\d{1,2}:\d{2})\s*(?:น\.)?(.*)$/.exec(s || "");
+    var m = /^(.*?)(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์)\s*(\d{1,2}:\d{2})\s*(?:น\.)?(.*)$/.exec(s
+      || "");
     if (!m) return null;
     var d = weekly(DAY.indexOf(m[2] === "พฤหัส" ? "พฤหัสบดี" : m[2]), m[3]);
     if (!d) return null;
     var t = whenWeekly(d);
-    return { pre: m[1], when: t, post: m[4], date: d, text: m[1] + (siteLang === "th" ? "" : " ") + t + m[4] };
+    return {
+      pre: m[1],
+      when: t,
+      post: m[4],
+      date: d,
+      text: m[1] + (siteLang === "th" ? "" : " ") + t + m[4]
+    };
   }
   function rand(n) {
     var a = new Uint8Array(n || 16);

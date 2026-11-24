@@ -16,9 +16,7 @@
   var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
   if (!/\.html$/.test(here)) here = "index.html";
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
+    return window.escHtml(s);
   }
   function ok(u) {
     return /^https?:\/\//i.test(u || "");

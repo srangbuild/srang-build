@@ -14,7 +14,7 @@
       if (v === null) s.removeItem(k);
       else s.setItem(k, v);
     } catch (e) {}
-    return null;
+      return null;
   }
   function ss(k, v) {
     try {
@@ -76,7 +76,8 @@
 
   function api() {
     var a = (window.SITE && window.SITE.member && window.SITE.member.api) || "";
-    return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(a) && a.indexOf("/EMULATOR/") < 0 ? a : "";
+    return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(a) && a.indexOf("/EMULATOR/") < 0
+      ? a : "";
   }
   function adminCall(action, data) {
     var B = window.BUILD;
@@ -84,7 +85,11 @@
     var u = api();
     if (!u) return Promise.reject(new Error("ไม่มีหลังบ้าน"));
     data.action = action;
-    return fetch(u, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+    return fetch(u, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(data)
+    })
       .then(function (r) {
         return r.json();
       }).then(function (j) {
@@ -103,7 +108,8 @@
     location.reload();
   }
   function parse(t) {
-    return JSON.parse(String(t).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/, ""));
+    return JSON.parse(String(t).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/,
+      ""));
   }
   function refresh() {
     if (!PV) return;
@@ -145,21 +151,22 @@
     draw();
   }
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
+    return window.escHtml(s);
   }
   function when(iso) {
     var d = new Date(iso);
-    return isNaN(d) ? "" : d.toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    return isNaN(d) ? "" : d.toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit",
+      minute: "2-digit" });
   }
   function draw() {
     var m = mode.maint || {}, html = "", bg = "";
     if (PV && mode.preview) {
       bg = "#1f6f43";
-      html = "<b>โหมดพรีวิว · ลูกค้าไม่เห็นหน้านี้</b> · ข้อมูลจากร่างที่บันทึก " + esc(when(mode.at)) + (mode.who ? " โดย " + esc(mode.who) : "")
+      html = "<b>โหมดพรีวิว · ลูกค้าไม่เห็นหน้านี้</b> · ข้อมูลจากร่างที่บันทึก " + esc(when(mode.at))
+        + (mode.who ? " โดย " + esc(mode.who) : "")
         + (m.on ? " · เว็บจริงปิดปรับปรุงอยู่ ลูกค้าเห็นป้ายปิดปรับปรุง" : "")
-        + ' · <a href="' + esc(location.pathname + location.search.replace(/([?&])preview=1&?/, "$1").replace(/[?&]$/, "") + location.hash) + '">ออกจากพรีวิว</a>';
+        + ' · <a href="' + esc(location.pathname + location.search.replace(/([?&])preview=1&?/, "$1").replace(/[?&]$/,
+          "") + location.hash) + '">ออกจากพรีวิว</a>';
     }
     else if (PV) {
       bg = "#5a5a5a";
@@ -168,7 +175,8 @@
     }
     else if (m.on) {
       bg = "#8a1c1c";
-      html = "<b>ปิดปรับปรุงชั่วคราว</b>" + (m.back ? " · กลับมา " + esc(m.back) : "") + (m.msg ? " · " + esc(m.msg) : "")
+      html = "<b>ปิดปรับปรุงชั่วคราว</b>" + (m.back ? " · กลับมา " + esc(m.back) : "") + (m.msg ? " · "
+        + esc(m.msg) : "")
         + " · ยังสั่งซื้อและชำระเงินไม่ได้ · ลูกค้าเดิมเข้าสู่ระบบ ดูคำสั่งซื้อ ใบเสร็จ และดาวน์โหลดเอกสารที่ซื้อแล้วได้ตามปกติ";
     }
     var el = document.getElementById("site-mode");
@@ -206,7 +214,8 @@
     robots.name = "robots";
     robots.content = "noindex";
     document.head.appendChild(robots);
-    var box = document.createElement("section"), main = document.getElementById("main"), tok = ss(TK) || "";
+    var box = document.createElement("section"), main = document.getElementById("main"), tok = ss(TK)
+      || "";
     box.id = "admin-gate";
     box.className = "wrap";
     box.setAttribute("role", "status");

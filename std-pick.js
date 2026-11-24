@@ -20,9 +20,7 @@
     DN = new Intl.DisplayNames([lang], { type: "region", style: "short" });
   } catch (e) {}
     function esc(s) {
-      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-      });
+      return window.escHtml(s);
     }
   function regName(cc, lg) { // 7 พ.ย. 2026: ชื่อประเทศไทยและอังกฤษใช้ทะเบียนเดียวกับหน้ากฎหมาย (region.js จาก 00_โซน.json) ไม่ใช้ชื่อย่อของเบราว์เซอร์ เช่น สหรัฐฯ
     var R = window.REGION, b = String(lg || "").slice(0, 2);
@@ -204,8 +202,6 @@
       }).join("");
       return '<p class="sx-lead">' + (many ? "เรื่องนี้มีมาตรฐานหลายตัว ระบบใช้ทุกตัวที่เกี่ยวกับใบนี้ · ข้อที่มาตรฐานให้ค่าต่างกัน เอกสารพิมพ์ทุกค่าเป็นช่องติ๊กให้เลือกในฟอร์ม" : "มาตรฐานที่ใช้กับใบนี้")
         + '</p><div class="sx-list">' + rows + "</div>" +
-        (many ? '<p class="sx-tools"><button type="button" class="sx-l" data-sxall="1">เลือกทั้งหมด</button></p>' : "")
-        +
         '<div class="sx-sum"><div class="sx-m"><b>' + (d.t ? "ใช้เกณฑ์ตามมาตรฐานของใบนี้ " : "มีค่าที่ตรวจแล้ว ")
         + cv.have + " ข้อ จาก " + n + ' ข้อ</b><span class="sx-bar" aria-hidden="true"><i style="width:'
         + pct + '%"></i></span></div>' + (stage ? '<ul class="sx-st">' + stage + "</ul>" : "") + (cv.have < n
