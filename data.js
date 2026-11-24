@@ -871,7 +871,8 @@ window.SITE = {
     "googleClientId": "514263949305-6qth9e3ro6aecdcauoul2tflnegp0aa9.apps.googleusercontent.com",
     "fbVersion": "v26.0",
     "lineBotPrompt": "normal",
-    "tiktokClientKey": "aww8eep06fb3u6ob"
+    "tiktokClientKey": "aww8eep06fb3u6ob",
+    "tiktokLive": false
   },
   "pay": {
     "on": true,
