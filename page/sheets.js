@@ -69,8 +69,10 @@
   }
   // ราคาแสดงทุกใบ · ปุ่มใส่ตะกร้ามีเฉพาะรายการที่เปิดขายแล้ว (ตรวจรายการแล้ว + เปิดขาย + เปิดรับชำระ) · ชุดรวมบอกส่วนที่ถูกกว่าซื้อแยก
   function buy(x) {
-    var pr = +x.price > 0 ? '<span class="price">' + B.baht(B.memberPrice(x.price)) + "</span>" : "",
-      sv = B.cart.saving(x.id);
+    var ed = B.defEd(x), many = B.langsOf(x).length > 1; // ราคาบนการ์ด = ฉบับ 1 ภาษา (ถูกที่สุด) · ฉบับ 2 ภาษาราคาสูงกว่า
+    var pr = +x.price > 0 ? '<span class="price">' + (many ? '<small class="from">เริ่มต้น</small> ' : "")
+      + B.baht(B.memberPrice(x.price))
+      + "</span>" : "", sv = B.cart.saving(x.id + (ed ? "." + ed : ""));
     var save = sv > 0 ? '<span class="pill ok" style="margin-right:auto">ถูกกว่าซื้อแยก ' + B.baht(sv)
       + "</span>" : "";
     return B.canSell(x) ? save + pr + '<button class="b pri sm" type="button" data-add="' + esc(x.id)

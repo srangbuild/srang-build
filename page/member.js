@@ -1402,7 +1402,89 @@
       });
     }, 20000);
   }
+  /* ---------- ข้อมูลที่พิมพ์ค้างไว้ไม่หายเมื่อหน้าวาดใหม่ (25 พ.ย. 2026) ----------
+     หน้าวาดใหม่เมื่อบันทึกฟอร์มหนึ่ง หรือเมื่อระบบดึงสถานะคำสั่งซื้อทุก 20 วินาที
+     เก็บช่องที่ผู้ใช้แก้แล้วยังไม่บันทึก แล้วใส่คืนหลังวาดใหม่ · ฟอร์มที่บันทึกสำเร็จแสดงค่าจากหลังบ้าน
+     ไม่เก็บรหัสผ่าน ไฟล์ ช่องอ่านอย่างเดียว เลขบัญชีรับเงิน และห้องแชต (มีร่างของตัวเอง)
+     เก็บในหน่วยความจำของหน้าเท่านั้น ไม่เขียนลงเครื่อง */
+  // draftMap จำร่างไว้แม้ช่องนั้นหายไปชั่วคราวในรอบวาดหนึ่ง (เช่น ช่องชื่อประเทศเมื่อฟอร์มวาดซ้อนกัน)
+  var paintedTab = "", touched = {}, draftMap = {}, skipForm = "", NOKEEP = /^(f-sellpay|f-chat)$/;
+  function fKey(e) {
+    var f = e.form;
+    if (!f || !f.id || !e.name || NOKEEP.test(f.id)) return "";
+    return f.id + "|" + e.name + (e.type === "radio" || e.type === "checkbox" ? "|" + e.value : "");
+  }
+  function draftsDrop(formId) { // เรียกเมื่อบันทึกฟอร์มสำเร็จ
+    for (var k in touched) if (k.indexOf(formId + "|") === 0) delete touched[k];
+    for (var j in draftMap) if (j.indexOf(formId + "|") === 0) delete draftMap[j];
+    skipForm = formId;
+  }
+  ["input", "change"].forEach(function (t) {
+    document.addEventListener(t, function (ev) {
+      var e = ev.target, p = $("pane"), k = e && e.form && p && p.contains(e) ? fKey(e) : "";
+      if (!k) return;
+      if (e.type === "radio") { // ทั้งกลุ่มเปลี่ยนพร้อมกัน
+        [].forEach.call(e.form.querySelectorAll("input[type=radio]"), function (r) {
+          if (r.name === e.name) touched[fKey(r)] = 1;
+        });
+      } else touched[k] = 1;
+    }, true);
+  });
+  function selDefault(s) {
+    for (var i = 0; i < s.options.length; i++) if (s.options[i].defaultSelected) return s.options[i].value;
+    return s.options.length ? s.options[0].value : "";
+  }
+  function draftsTake(root) {
+    var out = { f: draftMap, a: null };
+    if (!root) return out;
+    [].forEach.call(root.querySelectorAll("input,select,textarea"), function (e) {
+      var k = fKey(e);
+      if (!k || e.readOnly || /^(password|file|hidden|submit|button)$/.test(e.type) || e.form.id === skipForm) return;
+      if (e.type === "radio" || e.type === "checkbox") {
+        if (touched[k] || e.checked !== e.defaultChecked) out.f[k] = { c: e.checked };
+      } else if (touched[k] || e.value !== (e.tagName === "SELECT" ? selDefault(e) : e.defaultValue)) out.f[k] = { v: e.value };
+    });
+    var a = document.activeElement, ak = a && root.contains(a) ? fKey(a) : "";
+    if (ak) out.a = { k: ak, s: a.selectionStart, e: a.selectionEnd };
+    return out;
+  }
+  function draftsPut(root, kept) {
+    if (!root) return;
+    var redo = [];
+    [].forEach.call(root.querySelectorAll("input,select,textarea"), function (e) {
+      var k = fKey(e), o = k && kept.f[k];
+      if (o) {
+        if ("c" in o) e.checked = o.c;
+        else if (e.tagName !== "SELECT" || [].some.call(e.options, function (x) {
+          return x.value === o.v;
+        })) e.value = o.v;
+        // ช่องที่เปลี่ยนรูปฟอร์ม (ประเทศ · ประเภทผู้ออกใบเสร็จ) วาดฟอร์มตามค่าที่ใส่คืน
+        var shape = (e.dataset && e.dataset.country) || (e.form.id === "f-tax" && e.name === "type");
+        if (shape && ("c" in o ? e.checked && !e.defaultChecked : e.tagName === "SELECT" && e.value !== selDefault(e))) redo.push(e);
+      }
+      if (kept.a && k === kept.a.k && e.focus) {
+        e.focus({ preventScroll: true });
+        try {
+          if (kept.a.s != null) e.setSelectionRange(kept.a.s, kept.a.e);
+        } catch (x) {} // ช่องบางชนิดไม่มีตำแหน่งเคอร์เซอร์
+      }
+    });
+    // ตัวฟัง change ของหน้า (ด้านล่าง) วาดฟอร์มใหม่ตามค่านี้ แล้วเรียก paint ที่ใส่ร่างคืนอีกรอบ
+    // รอบนั้นค่าเริ่มต้นของฟอร์มเท่ากับค่าที่ใส่คืน จึงไม่วนซ้ำ
+    if (redo[0]) redo[0].dispatchEvent(new Event("change", { bubbles: true }));
+  }
   function paint() {
+    if (!me || paintedTab !== tab) { // เปลี่ยนเมนูหรือออกจากระบบ: ล้างร่าง
+      touched = {};
+      draftMap = {};
+    }
+    var kept = me ? draftsTake($("pane")) : { f: {}, a: null };
+    skipForm = "";
+    paint0();
+    paintedTab = me ? tab : "";
+    if (me) draftsPut($("pane"), kept);
+  }
+  function paint0() {
     document.body.classList.toggle("on-chat", !!me && tab === "ask"); // ห้องแชต: ซ่อนปุ่มลอย (ผู้ช่วย ตะกร้า) ไม่ให้บังปุ่มส่ง
     if (!me) return authView();
     var m = me.member, c = counts();
@@ -1630,10 +1712,19 @@
       me = r;
       paint();
     }).catch(function (e) {
-      B.token.clear();
-      me = null;
-      authView();
-      if (!keepMsg) say(e.message, true);
+      if (/กรุณาเข้าสู่ระบบ/.test(String(e && e.message))) { // หลังบ้านไม่รับการเข้าสู่ระบบนี้แล้ว
+        B.token.clear();
+        me = null;
+        authView();
+        if (!keepMsg) say(e.message, true);
+        return;
+      }
+      // ปัญหาชั่วคราว (เครือข่าย เซิร์ฟเวอร์): ยังเข้าสู่ระบบอยู่ ให้ลองใหม่
+      $("view").innerHTML = '<div class="card pad"><p style="margin:0 0 12px">โหลดข้อมูลไม่สำเร็จ คุณยังเข้าสู่ระบบอยู่</p><button class="b pri" type="button" id="retryLoad">ลองใหม่</button></div>';
+      $("retryLoad").addEventListener("click", function () {
+        location.reload();
+      });
+      say((e && e.message) || "โหลดข้อมูลไม่สำเร็จ", true);
     });
   }
   function readHash() {
@@ -2225,6 +2316,7 @@
       return function (r) {
         me.member = mergeMember(r.member);
         avDraft = null;
+        draftsDrop(f.id); // ฟอร์มนี้บันทึกแล้ว แสดงค่าจากหลังบ้าน · ฟอร์มอื่นที่พิมพ์ค้างไว้ยังอยู่
         paint();
         say(txt);
       };

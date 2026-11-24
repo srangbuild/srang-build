@@ -632,9 +632,18 @@
     if (doneId && findOrder(doneId)) doneView(doneId);
     else formView();
   }).catch(function (e) {
-    B.token.clear();
-    me = null;
-    gateView();
-    say(e.message + " · เข้าสู่ระบบอีกครั้ง", true);
+    if (/กรุณาเข้าสู่ระบบ/.test(String(e && e.message))) { // หลังบ้านไม่รับการเข้าสู่ระบบนี้แล้ว
+      B.token.clear();
+      me = null;
+      gateView();
+      say(e.message + " · เข้าสู่ระบบอีกครั้ง", true);
+      return;
+    }
+    // ปัญหาชั่วคราว (เครือข่าย เซิร์ฟเวอร์): ยังเข้าสู่ระบบอยู่ ให้ลองใหม่
+    $("view").innerHTML = '<div class="card pad"><p style="margin:0 0 12px">โหลดข้อมูลไม่สำเร็จ คุณยังเข้าสู่ระบบอยู่ และตะกร้ายังอยู่ครบ</p><button class="b pri" type="button" id="retryLoad">ลองใหม่</button></div>';
+    $("retryLoad").addEventListener("click", function () {
+      location.reload();
+    });
+    say((e && e.message) || "โหลดข้อมูลไม่สำเร็จ", true);
   });
 })();
