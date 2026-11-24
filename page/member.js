@@ -540,8 +540,10 @@
   }
   // ---------- ประทับสิทธิ์ผู้ซื้อลงไฟล์ฉบับมืออาชีพ (คำสั่งผู้ใช้ 23 ต.ค. 2026) ----------
   // ข้อมูลผู้ซื้อและเวลามาจากหลังบ้าน (ไม่ใช่เครื่องลูกค้า) · เบราว์เซอร์วาดข้อความเป็นภาพ จึงพิมพ์ชื่อภาษาใดก็ได้ · บรรทัดเดียว ตัวเล็ก สีเทา ใต้หัวกระดาษท้ายหน้า ไม่บังเนื้อหา
+  // 25 พ.ย. 2026: ไฟล์อยู่บนเว็บเราเอง (สำเนาเดิมจาก cdnjs ไม่แก้ไข) · ไม่พึ่งเว็บภายนอกตอนลูกค้าดาวน์โหลดไฟล์ที่ซื้อ · SRI เดิมยังล็อกไฟล์
+  // สัญญาอนุญาต: vendor/pdf-lib-1.17.1.LICENSE.txt
   var PDFLIB = {
-    src: "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js",
+    src: "/vendor/pdf-lib-1.17.1.min.js",
     sri: "sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
   }, pdfLibReady = null;
   function loadPdfLib() {
