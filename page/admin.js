@@ -1090,6 +1090,7 @@
   }
   // 22 Nov 2026 (owner order): EasySlip status card · quota and the receiving accounts registered for matchAccount · the key never reaches the page
   function slipCard(su, hl) {
+    if (!SHOP) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag">' + (shopErr ? "โหลดข้อมูลไม่ได้" : "กำลังโหลด…") + "</span></h2><p class=\"hint\">รอข้อมูลจากหลังบ้าน</p></div>"; // 24 Nov 2026: no shop data yet = unknown, not "off"
     if (!su || !su.slipAuto) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">ปิด</span></h2><p class="hint">ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ร้านตรวจสลิปเองในแท็บ ร้าน</p></div>';
     if (hl.slip === false) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">คีย์ใช้ไม่ได้</span></h2><p class="hint">EasySlip ตอบรหัส '
       + esc(hl.slipCode || "-") + " · ตรวจคีย์ใน EasySlip แล้วใส่ EASYSLIP_KEY ใหม่ใน Script properties · ระหว่างนี้สลิปทุกใบส่งให้ร้านตรวจเอง</p></div>";
@@ -1233,6 +1234,11 @@
       });
       return names.indexOf(k) >= 0;
     };
+    // 24 Nov 2026 (owner saw "no key" while the back end had the keys): until the shop data arrives, key states are unknown
+    var NA = SHOP ? "" : '<span class="tag">' + (shopErr ? "โหลดข้อมูลไม่ได้" : "กำลังโหลด…") + "</span>";
+    var wait = SHOP ? "" : '<div class="card" role="status"><h2>' + (shopErr ? "โหลดข้อมูลจากหลังบ้านไม่ได้" : "กำลังโหลดข้อมูลจากหลังบ้าน…")
+      + '</h2><p class="hint">' + (shopErr ? esc(shopErr) + " · " : "") + "สถานะคีย์ EasySlip PayPal Stripe และ Lemon Squeezy แสดงหลังโหลดเสร็จ (ราว 10–40 วินาที เพราะหลังบ้านตรวจกับผู้ให้บริการทุกเจ้า)</p>"
+      + (shopBusy ? "" : '<div class="tools"><button type="button" class="pri" data-sh="load">โหลดใหม่</button></div>') + "</div>";
     var live = /^pkey_(?!test_)/.test(key), mode = !key ? '<span class="tag no">ยังไม่ใส่คีย์</span>' : live
       ? '<span class="tag ok">คีย์จริง รับเงินจริง</span>' : '<span class="tag">โหมดทดสอบ ยังไม่รับเงินจริง</span>';
     var rows = PAY_ROWS.map(function (r) {
@@ -1240,13 +1246,13 @@
       return "<tr><td>" + esc(r[1]) + "</td><td>" + (h === null ? "กำลังอ่าน…" : h ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">รอ Opn เปิด</span>')
         + "</td><td>" + (w ? "แสดง" : "ไม่แสดง") + "</td><td>" + esc(r[2]) + "</td></tr>";
     }).join("");
-    return '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
+    return wait + '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
       +
       '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
       + rows + "</tbody></table></div></div>" + slipCard(su, hl) +
       '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
       "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
-      + "</td><td>ไม่มีค่าธรรมเนียม · " + (su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
+      + "</td><td>ไม่มีค่าธรรมเนียม · " + (!SHOP ? "สถานะการตรวจสลิปอัตโนมัติแสดงหลังโหลดข้อมูล" : su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
         + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
       + " · " + (S.pay && S.pay.qrBase ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
       + "</td></tr>" +
@@ -1254,15 +1260,15 @@
         return m.name === "card";
       })[0] || {}).currencies || []).join(" ")) : "กำลังอ่าน…") + "</td><td>บัตรผ่าน Opn จ่ายได้ตามสกุลนี้ · PayPal จ่ายได้ทุกสกุลในรายการ ยกเว้น CNY · ช่องทางอื่นเป็นบาท · ร้านได้รับเป็นบาท · ใช้อัตราของ Opn บวกส่วนเผื่อ FX_MARGIN 1% และ PP_MARGIN 4% (ปรับได้ใน Script properties)</td></tr>"
       +
-      "<tr><td>PayPal</td><td>" + (f.paypal ? (hl.paypal === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.ppSandbox
+      "<tr><td>PayPal</td><td>" + (NA ? NA : f.paypal ? (hl.paypal === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.ppSandbox
         ? '<span class="tag">sandbox ทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
       + "</td><td>ลูกค้าในไทย 3.90% + 11 บาท · ต่างประเทศ 4.40% + 11 บาท · แปลงสกุลเงิน 4% · ไม่รวมภาษี (paypal.com/th อ่าน 31 ต.ค. 2026) · ใบละ 99 บาท PayPal หักราว 15 บาท</td></tr>"
       +
-      "<tr><td>Stripe</td><td>" + (f.stripe ? (hl.stripe === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.stTest
+      "<tr><td>Stripe</td><td>" + (NA ? NA : f.stripe ? (hl.stripe === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : f.stTest
         ? '<span class="tag">คีย์ทดสอบ</span>' : hl.stripeCharges === false ? '<span class="tag no">บัญชียังรับเงินไม่ได้</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
       + "</td><td>บัตรในไทย 3.65% + 10 บาท · บัตรต่างประเทศ 4.75% + 10 บาท + 2% ถ้าแปลงเงิน · พร้อมเพย์ 1.65% (stripe.com อ่าน 30 ต.ค. 2026) · ตั้ง STRIPE_SECRET ใน Script properties</td></tr>"
       +
-      "<tr><td>Lemon Squeezy</td><td>" + (f.lemon ? (hl.lemon === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : hl.lemonVariant === false
+      "<tr><td>Lemon Squeezy</td><td>" + (NA ? NA : f.lemon ? (hl.lemon === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : hl.lemonVariant === false
         ? '<span class="tag no">ไม่พบสินค้า ตรวจ LEMON_VARIANT_ID</span>' : f.lsTest ? '<span class="tag">โหมดทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
       + "</td><td>" + (hl.lemonStore ? "ร้าน " + esc(hl.lemonStore) + " · สินค้า " + esc(hl.lemonProduct || "") + (hl.lemonTest ? " (โหมดทดสอบ)" : "") + " · " : "") + "5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ " + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้งแค่ LEMON_API_KEY ใน Script properties ระบบหาร้าน สินค้า และโหมดทดสอบเอง (ตั้ง LEMON_STORE_ID LEMON_VARIANT_ID LEMON_TEST เองได้ถ้าต้องการบังคับ) · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที · LS_MIN_THB ยอดต่ำสุด</td></tr>"
       +
