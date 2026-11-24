@@ -29,9 +29,9 @@
 .bh-cart { position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:11px;min-height:42px;padding:0 11px;font-size:14.5px;font-weight:600 }
 .bh-cart:hover,.bh-cart[aria-current] { background:rgba(255,255,255,.13) }
 .bh-cart svg { width:20px;height:20px }
-.bh-cart i { font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#FF6B1A;color:#fff;font:700 12px/20px "Kanit",sans-serif;text-align:center }
-.bh-mem { display:inline-flex;align-items:center;text-decoration:none;background:#FF6B1A;color:#fff;font-weight:700;font-size:14.5px;border-radius:11px;min-height:42px;padding:0 13px;white-space:nowrap }
-.bh-mem:hover { background:#FF7C33 }
+.bh-cart i { font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#C24A08;color:#fff;font:700 12px/20px "Kanit",sans-serif;text-align:center }
+.bh-mem { display:inline-flex;align-items:center;text-decoration:none;background:#C24A08;color:#fff;font-weight:700;font-size:14.5px;border-radius:11px;min-height:42px;padding:0 13px;white-space:nowrap }
+.bh-mem:hover { background:#A83F05 }
 @media(max-width:1080px) {
   .bh-btn { display:block }
   .bh-tools { margin-left:auto }
@@ -47,7 +47,7 @@
   .bh-sub a { color:#fff;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.07);font-size:16.5px }
   .bh-sub a small { display:none }
   .bh-sub a:hover,.bh-sub a[aria-current] { background:rgba(255,255,255,.13);color:#fff }
-  .bh-mm { display:block!important;margin-top:10px;text-align:center;background:#FF6B1A!important;color:#fff!important;font-weight:700 }
+  .bh-mm { display:block!important;margin-top:10px;text-align:center;background:#C24A08!important;color:#fff!important;font-weight:700 }
 }
 @media(min-width:1081px) {
   .bh-mm { display:none!important }

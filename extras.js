@@ -31,7 +31,7 @@
     +
     ".bx-ck p{margin:0 0 10px}.bx-ck a{color:#FFB98F}.bx-ck .r{display:flex;flex-wrap:wrap;gap:8px}.bx-ck button{border:0;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",\"Leelawadee UI\",sans-serif;cursor:pointer}"
     +
-    ".bx-ck .a{background:#FF6B1A;color:#fff}.bx-ck .n{background:#fff;color:#0F2A44}" +
+    ".bx-ck .a{background:#C24A08;color:#fff}.bx-ck .n{background:#fff;color:#0F2A44}" +
     ".bx-ad{border:1px dashed #C9D2DC;border-radius:16px;padding:14px 16px;background:#fff;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0}.bx-ad .tg{font:700 12.5px/1 \"Kanit\",sans-serif;background:#E8ECF1;color:#475466;border-radius:999px;padding:5px 10px;flex:none}"
     +
     ".bx-ad img{width:120px;height:auto;border-radius:10px;flex:none}.bx-ad b{display:block;color:#0F2A44;font-size:17px}.bx-ad span{color:#3B4654;font-size:14.5px}.bx-ad a.go{margin-left:auto;background:#0F2A44;color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",sans-serif;white-space:nowrap}"

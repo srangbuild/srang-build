@@ -12,7 +12,7 @@
   var L = function (p) {
     return p + (q || "");
   };
-  var css = ".bc-fab{position:fixed;right:16px;bottom:16px;z-index:60;display:none;align-items:center;gap:10px;background:#FF6B1A;color:#fff;border:0;border-radius:999px;padding:12px 20px;font:700 17px/1.2 \"Kanit\",\"Leelawadee UI\",sans-serif;box-shadow:0 12px 30px rgba(15,42,68,.35);cursor:pointer}"
+  var css = ".bc-fab{position:fixed;right:16px;bottom:16px;z-index:60;display:none;align-items:center;gap:10px;background:#C24A08;color:#fff;border:0;border-radius:999px;padding:12px 20px;font:700 17px/1.2 \"Kanit\",\"Leelawadee UI\",sans-serif;box-shadow:0 12px 30px rgba(15,42,68,.35);cursor:pointer}"
     +
     ".bc-fab.on{display:flex}.bc-fab i{font-style:normal;background:#fff;color:#C24A08;border-radius:999px;min-width:26px;height:26px;display:grid;place-items:center;font-size:15px;padding:0 6px}"
     +
@@ -30,7 +30,7 @@
     +
     ".bc-ft{border-top:1px solid #DDE2E8;padding:14px 18px 18px;background:#F6F4EF;display:grid;gap:8px}.bc-sum{display:flex;justify-content:space-between;align-items:baseline;font-size:16px}.bc-sum b{font:700 26px/1 \"Kanit\",sans-serif;color:#0F2A44}"
     +
-    ".bc-nt{color:#5A6573;font-size:13px;margin:0}.bc-go{display:block;text-align:center;background:#FF6B1A;color:#fff;text-decoration:none;border-radius:999px;padding:12px;font:700 18px/1.2 \"Kanit\",sans-serif}.bc-vw{display:block;text-align:center;background:#fff;color:#0F2A44;text-decoration:none;border:2px solid #DDE2E8;border-radius:999px;padding:10px;font:700 16px/1.2 \"Kanit\",sans-serif}"
+    ".bc-nt{color:#5A6573;font-size:13px;margin:0}.bc-go{display:block;text-align:center;background:#C24A08;color:#fff;text-decoration:none;border-radius:999px;padding:12px;font:700 18px/1.2 \"Kanit\",sans-serif}.bc-vw{display:block;text-align:center;background:#fff;color:#0F2A44;text-decoration:none;border:2px solid #DDE2E8;border-radius:999px;padding:10px;font:700 16px/1.2 \"Kanit\",sans-serif}"
     +
     ".bc-msg{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:102;background:#0F2A44;color:#fff;border-radius:999px;padding:10px 20px;font-size:15px;box-shadow:0 10px 26px rgba(15,42,68,.35);display:none;max-width:92%;text-align:center}.bc-msg.on{display:block}"
     +

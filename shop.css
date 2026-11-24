@@ -8,7 +8,7 @@
 .stepbar li { flex:1; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--mute); padding:8px 10px; border-radius:12px; background:#EEF2F6; min-width:0; }
 .stepbar li::before { counter-increment:st; content:counter(st); flex:none; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:#fff; color:var(--mute); font:700 13px/1 "Kanit",sans-serif; border:1.5px solid #C9D2DC; }
 .stepbar li.on { background:var(--navy); color:#fff; }
-.stepbar li.on::before { background:var(--orange); border-color:var(--orange); color:#fff; }
+.stepbar li.on::before { background:#C24A08; border-color:#C24A08; color:#fff; }
 .stepbar li.done { background:#DFF3E8; color:var(--ok); }
 .stepbar li.done::before { content:"✓"; background:var(--ok); border-color:var(--ok); color:#fff; }
 .stepbar li a { color:inherit; text-decoration:none; }

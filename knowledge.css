@@ -9,7 +9,7 @@
 .k-short { background:#FFF6EF; border:1.5px solid #FFD2B3; border-radius:16px; padding:16px 18px; }
 .k-short ul { margin:0; padding:0; list-style:none; display:grid; gap:10px; }
 .k-short li { padding-left:30px; position:relative; }
-.k-short li::before { content:"✓"; position:absolute; left:0; top:1px; width:22px; height:22px; border-radius:50%; background:var(--orange); color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center; }
+.k-short li::before { content:"✓"; position:absolute; left:0; top:1px; width:22px; height:22px; border-radius:50%; background:#C24A08; color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center; }
 .k-check { background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:16px 18px; }
 .k-check .hint { margin:0 0 10px; color:var(--mute); font-size:15px; }
 .k-check ol { margin:0; padding-left:22px; display:grid; gap:12px; }
