@@ -63,15 +63,15 @@
       info.note = "คุณมีฉบับอื่นของใบนี้แล้ว ลด " + rOff + "% (ประหยัด " + B.baht(off) + ")";
       info.cls = "sv";
     }
-    if (B.isBundle(x)) {
-      var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) {
-        return R[k + sfx];
-      });
-      if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว",
-        cls: "bad" };
-      if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า";
-    }
-    return info;
+      if (B.isBundle(x)) {
+        var sfx = B.varOf(id) ? "." + B.varOf(id) : "", have = x.items.filter(function (k) {
+          return R[k + sfx];
+        });
+        if (have.length === x.items.length) return { amt: 0, block: true, note: "คุณมีทุกใบในชุดนี้แล้ว",
+          cls: "bad" };
+        if (have.length) info.note = "คุณมีบางใบในชุดนี้แล้ว (" + have.join(" ") + ") · ซื้อแยกเฉพาะใบที่ยังไม่มีอาจถูกกว่า";
+      }
+      return info;
   }
   // ชุดรวมที่คุ้มกว่า: ใบเดี่ยวในตะกร้าครอบคลุมครึ่งหนึ่งของชุดขึ้นไป
   function upsell(ids) {
@@ -128,12 +128,15 @@
       // 3 Nov 2026 (สภา + คำสั่งเจ้าของ): ระบบเต็มตั้งภาษา มาตรฐาน และที่ตั้งงานได้ที่เดียว คือหน้าต่างตั้งค่า · ในตะกร้าแสดงสรุปและปุ่มแก้
       // 21 Nov 2026 (คำสั่งเจ้าของ): รอบเปิดตัว 3ed เปลี่ยนฉบับภาษาได้ในแถวนี้เลย ไม่ต้องเปิดหน้าต่าง
       var cl = !B.isMarket(x) && B.cfg ? B.cfg.line(x.id) : "", ctry = B.isCtry(B.varOf(id)), eds = B.langsOf(x);
-      var edSel = eds.length > 1 ? '<label class="ctl"><span class="note" style="margin:0">ภาษาบนใบ</span><select data-lang="' + esc(x.id)
+      var edSel = eds.length > 1 ? '<label class="ctl"><span class="note" style="margin:0">ภาษาบนใบ</span><select data-lang="'
+        + esc(x.id)
         + '" aria-label="ภาษาบนใบของ ' + esc(x.id) + '">' + eds.map(function (v) {
-          return '<option value="' + v + '"' + (v === B.varOf(id) ? " selected" : "") + ">" + esc(B.LANGS[v]) + "</option>";
+          return '<option value="' + v + '"' + (v === B.varOf(id) ? " selected" : "") + ">" + esc(B.LANGS[v])
+            + "</option>";
         }).join("") + "</select></label>" : "";
       var opt = B.isMarket(x) || (B.cfg && B.cfg.simple) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
-        + esc(cl || "ภาษา: " + B.LANGS[B.varOf(id)] + " · มาตรฐาน: ไทย") + '</small><button class="b line sm" type="button" data-cfg="' + esc(x.id)
+        + esc(cl || "ภาษา: " + B.LANGS[B.varOf(id)] + " · มาตรฐาน: ไทย") + '</small><button class="b line sm" type="button" data-cfg="'
+        + esc(x.id)
         + '">แก้ภาษา มาตรฐาน และที่ตั้งงาน</button></div>';
       return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="'
         + L("product.html", "id=" + encodeURIComponent(x.id)) + '">' + esc(B.code(x) + " " + x.title)
@@ -142,13 +145,14 @@
           + " · " + esc({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งรายละเอียดทางอีเมล" }[x.delivery]
             || "ร้านส่งรายละเอียดทางอีเมล") : (B.isBundle(x) ? "ชุดรวม " + x.items.length + " ใบ: "
               + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " · " + esc(x.pages
-                || "") + " หน้า A4") + (ctry ? " · " + esc(B.LANGS[B.varOf(id)]) + " · ราคาปกติ × 1.5 · สร้างที่หน้าเอกสารอัจฉริยะ ข้อความเป็นฉบับแปลของระบบ"
+                || "") + " หน้า A4") + (ctry ? " · " + esc(B.LANGS[B.varOf(id)]) + " · ราคาปกติ × 1.5 · สร้างที่หน้าเอกสารอัจฉริยะ ข้อความเป็นฉบับแปล"
                   : " · ได้ไฟล์ PDF และสร้างที่หน้าเอกสารอัจฉริยะได้"))
         + "</small>" + opt +
         (s > 0 && !info.block ? '<small class="sv">ถูกกว่าซื้อแยก ' + B.baht(s) + "</small>" : "")
         + (info.note ? '<small class="' + (info.cls || "") + '">' + esc(info.note) + "</small>" : "")
         +
-        '<div class="ctl">' + (B.cfg && B.cfg.simple && !B.isMarket(x) ? edSel : "") + sel + '<button class="rm" type="button" data-rm="' + esc(x.id)
+        '<div class="ctl">' + (B.cfg && B.cfg.simple && !B.isMarket(x) ? edSel : "") + sel + '<button class="rm" type="button" data-rm="'
+        + esc(x.id)
         + '">เอาออก</button></div></div></article>';
     }).join("");
     var ups = upsell(ids).map(function (u) {

@@ -20,7 +20,8 @@
   })[0];
   if (low) $("cmp-price").textContent = "เริ่มต้น " + B.baht(low);
   $("hero-pts").innerHTML = ["ฉบับฟรี 1 ภาษา เลือกได้ทุกภาษา",
-    "ฉบับมืออาชีพ เลือกได้ 3 แบบ: อังกฤษ-ไทยในใบเดียว ไทยอย่างเดียว หรืออังกฤษอย่างเดียว", // 21 พ.ย. 2026: เปิดขายฉบับภาษาเดียวแล้ว
+    "ฉบับมืออาชีพ เลือกได้ 3 แบบ: อังกฤษ-ไทยในใบเดียว ไทยอย่างเดียว หรืออังกฤษอย่างเดียว",
+    // 21 พ.ย. 2026: เปิดขายฉบับภาษาเดียวแล้ว
     "จุดหยุดรอตรวจ (H) ตารางบันทึกค่า ใบข้อบกพร่อง ลงชื่อ 3 ฝ่าย",
     "ชำระแล้วดาวน์โหลดได้ทันที · ดาวน์โหลดซ้ำได้ทุกเมื่อ"].map(function (t) {
       return "<li>" + esc(t) + "</li>";
@@ -174,7 +175,7 @@
     var lg = "th";
     try {
       lg = localStorage.getItem("build_lang") || "th";
-    } catch (e) {} if (lg === "th") return;
+    } catch (e) {} if (lg === "th" || (window.REGION && window.REGION.scope3 && window.REGION.scope3())) return; // launch scope 3ed has the Thai edition only
     var load = function (u, cb) {
       var s = document.createElement("script");
       s.src = u;

@@ -12,7 +12,7 @@
       }
     }
   } catch (e) {}
-  var ORIG = JSON.stringify(window.SITE || {});
+    var ORIG = JSON.stringify(window.SITE || {});
   var S = JSON.parse(ORIG), dirty = false, staleNote = "";
   var SAVED = ORIG, DR = null; // SAVED = last saved state (the server draft, or data.js) · DR = draft, restore copy, maintenance (adminDraft)
   // draft safety (18 Oct 2026): an old draft once replaced the whole data.js (links, tribute, schedule were lost).
@@ -52,11 +52,7 @@
   var $ = function (id) {
     return document.getElementById(id);
   };
-  var esc = function (s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  };
+  var esc = window.escHtml;
   var ok = function (u) {
     return /^https?:\/\//i.test(u || "");
   };
@@ -101,7 +97,8 @@
   // ----- แบบฟอร์ม -----
   var OBJ = {
     brand: [["name", "ชื่อช่อง"], ["show", "ชื่อรายการ"], ["tagline", "สโลแกน"], ["schedule",
-      "ตารางลงคลิป (เวลาไทย · หน้าเว็บแปลงเป็นเวลาของผู้ชมเอง)"], ["about", "แนะนำช่อง 1–2 บรรทัด", "long"]],
+      "ตารางลงคลิป (เวลาไทย · หน้าเว็บแปลงเป็นเวลาของผู้ชมเอง)"], ["about", "แนะนำช่อง 1–2 บรรทัด",
+        "long"]],
     links: [["tiktok", "TikTok", "url"], ["youtube", "YouTube", "url"], ["facebook", "Facebook",
       "url"], ["instagram", "Instagram", "url"], ["x", "X", "url"], ["threads", "Threads", "url"], ["spotify",
         "Spotify (เพลงของช่อง)", "url"], ["line",
@@ -802,7 +799,8 @@
   function orderRowHtml(o) {
     var acts = o.status === "รอตรวจ" ? '<button class="sm" type="button" data-sh="slip" data-id="'
       + esc(o.id) + '">ดูสลิป</button>' + (SHOP && SHOP.setup && SHOP.setup.slipAuto ? '<button class="sm" type="button" data-sh="autochk" data-id="'
-      + esc(o.id) + '" title="ระบบตรวจซ้ำเองทุก 1 นาทีอยู่แล้ว ปุ่มนี้สั่งตรวจทันที">ตรวจอัตโนมัติตอนนี้</button>' : "") + '<button class="sm pri" type="button" data-sh="ok" data-id="'
+        + esc(o.id) + '" title="ระบบตรวจซ้ำเองทุก 1 นาทีอยู่แล้ว ปุ่มนี้สั่งตรวจทันที">ตรวจอัตโนมัติตอนนี้</button>' : "")
+      + '<button class="sm pri" type="button" data-sh="ok" data-id="'
       + esc(o.id) + '" data-amt="' + o.amount + '">ยืนยันชำระแล้ว</button><button class="sm del" type="button" data-sh="no" data-id="'
       + esc(o.id) + '">สลิปไม่ผ่าน</button>'
       : o.status === "รอชำระ" ? '<button class="sm" type="button" data-sh="cancel" data-id="' + esc(o.id)
@@ -871,9 +869,12 @@
           + " เข้าจริงก่อนกดยืนยัน (รูปสลิปปลอมได้)</small></div>";
       }).join("") +
       todoQ.map(function (c) {
-        return '<div class="todo-it"><b>แชต</b> · ' + esc(c.name || c.email || c.member) + " · " + esc(c.email) + " · " + esc(wh(c.at))
-          + ' · <span class="tag no">ยังไม่อ่าน ' + c.unread + '</span><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.last)
-          + '</p><div class="tools"><button class="sm pri" type="button" data-go="chat" data-crm="' + esc(c.member) + '">เปิดห้องแชตและตอบ</button></div></div>';
+        return '<div class="todo-it"><b>แชต</b> · ' + esc(c.name || c.email || c.member) + " · " + esc(c.email)
+          + " · " + esc(wh(c.at))
+          + ' · <span class="tag no">ยังไม่อ่าน ' + c.unread + '</span><p style="margin:6px 0;white-space:pre-wrap">'
+          + esc(c.last)
+          + '</p><div class="tools"><button class="sm pri" type="button" data-go="chat" data-crm="'
+          + esc(c.member) + '">เปิดห้องแชตและตอบ</button></div></div>';
       }).join("") + "</div>";
     var sales = '<div class="card"><h2>ยอดขายที่ชำระแล้ว 30 วัน</h2><p class="hint">ชี้ที่แท่งเพื่อดูยอดของวันนั้น · ตารางรายสินค้าอยู่ด้านล่าง</p>'
       + chart(SHOP.days) +
@@ -942,10 +943,18 @@
       "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ " + ((S.pay.methods || []).length) + " ช่องทาง",
       "เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริง · ขอเปิดช่องทางเพิ่มที่ support@omise.co");
     add(su.shopMail ? "ok" : "wa", "อีเมลแจ้งเตือนของร้าน", esc(su.shopMail || ""));
-    if (su.mailLeft !== undefined) add(su.mailLeft < 0 ? "wa" : su.mailLeft <= 30 ? "no" : "ok", "โควตาอีเมลวันนี้" + (su.mailLeft < 0 ? "" : " เหลือ " + su.mailLeft + " จาก " + (su.mailMax || 100) + " ผู้รับ"),
+    if (su.mailLeft !== undefined) add(su.mailLeft < 0 ? "wa" : su.mailLeft <= 30 ? "no" : "ok",
+      "โควตาอีเมลวันนี้" + (su.mailLeft < 0 ? "" : " เหลือ " + su.mailLeft + " จาก " + (su.mailMax
+        || 100) + " ผู้รับ"),
       "บัญชี Gmail ทั่วไปส่งได้ 100 ผู้รับต่อวัน รีเซ็ตทุกวัน · เหลือ 30 ระบบส่งเตือนร้าน 1 ครั้ง · เหลือ 5 งดอีเมลแจ้งร้าน ลูกค้ายังได้ครบ · ยอดขายราว 20 ใบต่อวันคือจุดที่ต้องขยาย ดูแผนขยายระบบ (3_แผนและเอกสาร\\1_แผนธุรกิจ)");
-    if (su.dataFiles) add(su.dataFiles.err ? "wa" : su.dataFiles.doc && su.dataFiles.std ? "ok" : "no", "ไฟล์ข้อมูลเอกสารที่หลังบ้านใช้อยู่", su.dataFiles.err ? "อ่านโฟลเดอร์ไดรฟ์ไม่ได้: " + esc(su.dataFiles.err) : "เนื้อหาใบ: " + esc(su.dataFiles.doc || "ไม่พบไฟล์ BUILD_smartdoc") + " · ค่ามาตรฐาน: " + esc(su.dataFiles.std || "ไม่พบไฟล์ BUILD_smartstd") + " · หลังบ้านใช้ไฟล์ที่ชื่อเรียงท้ายสุด (วันที่ใหม่สุด) · ลากไฟล์ใหม่ขึ้นไดรฟ์แล้วรอ 5 นาที ชื่อตรงนี้จะเปลี่ยนเอง");
-    if (su.pay && su.pay.repeatOff) add(su.pay.promoOn ? "ok" : "wa", "โค้ดส่วนลด" + (su.pay.promoOn ? " เปิดใช้อยู่" : " ยังไม่ได้ตั้ง (ไม่บังคับ)"), "ตั้งที่ Apps Script → Project Settings → Script properties → เพิ่ม PROMO_CODES เป็นข้อความ JSON เช่น {\"BUILD10\":{\"off\":10,\"until\":\"2026-12-31\",\"min\":0}} · off = ลดกี่เปอร์เซ็นต์ (1–90) · until = วันสุดท้ายที่ใช้ได้ · min = ยอดขั้นต่ำ (บาท) · บันทึกแล้วใช้ได้ทันที ไม่ต้อง Deploy · ลูกค้าพิมพ์โค้ดในหน้าชำระเงิน · ผู้ซื้อเดิมของใบเดียวกันได้ลด " + su.pay.repeatOff + "% อัตโนมัติอยู่แล้ว");
+    if (su.dataFiles) add(su.dataFiles.err ? "wa" : su.dataFiles.doc && su.dataFiles.std ? "ok" : "no",
+      "ไฟล์ข้อมูลเอกสารที่หลังบ้านใช้อยู่", su.dataFiles.err ? "อ่านโฟลเดอร์ไดรฟ์ไม่ได้: " + esc(su.dataFiles.err) : "เนื้อหาใบ: "
+      + esc(su.dataFiles.doc || "ไม่พบไฟล์ BUILD_smartdoc") + " · ค่ามาตรฐาน: " + esc(su.dataFiles.std
+        || "ไม่พบไฟล์ BUILD_smartstd") + " · หลังบ้านใช้ไฟล์ที่ชื่อเรียงท้ายสุด (วันที่ใหม่สุด) · ลากไฟล์ใหม่ขึ้นไดรฟ์แล้วรอ 5 นาที ชื่อตรงนี้จะเปลี่ยนเอง");
+    if (su.pay && su.pay.repeatOff) add(su.pay.promoOn ? "ok" : "wa", "โค้ดส่วนลด" + (su.pay.promoOn
+      ? " เปิดใช้อยู่" : " ยังไม่ได้ตั้ง (ไม่บังคับ)"),
+      "ตั้งที่ Apps Script → Project Settings → Script properties → เพิ่ม PROMO_CODES เป็นข้อความ JSON เช่น {\"BUILD10\":{\"off\":10,\"until\":\"2026-12-31\",\"min\":0}} · off = ลดกี่เปอร์เซ็นต์ (1–90) · until = วันสุดท้ายที่ใช้ได้ · min = ยอดขั้นต่ำ (บาท) · บันทึกแล้วใช้ได้ทันที ไม่ต้อง Deploy · ลูกค้าพิมพ์โค้ดในหน้าชำระเงิน · ผู้ซื้อเดิมของใบเดียวกันได้ลด "
+      + su.pay.repeatOff + "% อัตโนมัติอยู่แล้ว");
     var setup = '<div class="card"><h2>ความพร้อมของหลังบ้าน</h2><ul class="chk">' + rows.join("")
       + "</ul></div>";
     return conn + kpis + todo + sales + orders + mem + stock + setup;
@@ -1090,25 +1099,30 @@
   }
   // 22 Nov 2026 (owner order): EasySlip status card · quota and the receiving accounts registered for matchAccount · the key never reaches the page
   function slipCard(su, hl) {
-    if (!SHOP) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag">' + (shopErr ? "โหลดข้อมูลไม่ได้" : "กำลังโหลด…") + "</span></h2><p class=\"hint\">รอข้อมูลจากหลังบ้าน</p></div>"; // 24 Nov 2026: no shop data yet = unknown, not "off"
+    if (!SHOP) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag">' + (shopErr
+      ? "โหลดข้อมูลไม่ได้" : "กำลังโหลด…") + "</span></h2><p class=\"hint\">รอข้อมูลจากหลังบ้าน</p></div>"; // 24 Nov 2026: no shop data yet = unknown, not "off"
     if (!su || !su.slipAuto) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">ปิด</span></h2><p class="hint">ยังไม่ใส่ EASYSLIP_KEY ใน Script properties · ร้านตรวจสลิปเองในแท็บ ร้าน</p></div>';
     if (hl.slip === false) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) <span class="tag no">คีย์ใช้ไม่ได้</span></h2><p class="hint">EasySlip ตอบรหัส '
       + esc(hl.slipCode || "-") + " · ตรวจคีย์ใน EasySlip แล้วใส่ EASYSLIP_KEY ใหม่ใน Script properties · ระหว่างนี้สลิปทุกใบส่งให้ร้านตรวจเอง</p></div>";
     if (hl.slip !== true) return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip)</h2><p class="hint">กำลังอ่านสถานะ…</p></div>';
     var left = hl.slipLeft, low = typeof left === "number" && left < 50, acc = hl.slipAccounts;
-    var quota = (left === null || left === undefined ? "ไม่จำกัด" : esc(left) + " สลิป") + (hl.slipUsed !== undefined && hl.slipUsed !== null ? " · ใช้แล้ว " + esc(hl.slipUsed) : "")
+    var quota = (left === null || left === undefined ? "ไม่จำกัด" : esc(left) + " สลิป") + (hl.slipUsed !== undefined
+      && hl.slipUsed !== null ? " · ใช้แล้ว " + esc(hl.slipUsed) : "")
       + (hl.slipMax ? " จาก " + esc(hl.slipMax) : "");
     var rows = acc === null || acc === undefined ? '<tr><td colspan="4">อ่านรายการบัญชีไม่ได้ · ดูในหน้า EasySlip</td></tr>' : !acc.length
       ? '<tr><td colspan="4"><b>ยังไม่มีบัญชีรับเงิน</b> · สลิปทุกใบจะไม่ผ่าน (บัญชีผู้รับไม่ใช่บัญชีของร้าน) · เพิ่มบัญชีในหน้า EasySlip ให้ผูกกับสาขาของคีย์นี้</td></tr>'
       : acc.map(function (a) {
-        return "<tr><td>" + esc(a.bank) + "</td><td data-noi18n=\"1\">" + esc(a.acc) + "</td><td data-noi18n=\"1\">" + esc(a.name) + "</td><td>" + esc(a.type)
+        return "<tr><td>" + esc(a.bank) + "</td><td data-noi18n=\"1\">" + esc(a.acc) + "</td><td data-noi18n=\"1\">"
+          + esc(a.name) + "</td><td>" + esc(a.type)
           + (a.extra ? " · " + esc(a.extra) : "") + "</td></tr>";
       }).join("");
     return '<div class="card"><h2>ตรวจสลิปอัตโนมัติ (EasySlip) ' + (acc && !acc.length ? '<span class="tag no">ยังไม่มีบัญชีรับเงิน</span>' : low
       ? '<span class="tag no">โควตาใกล้หมด</span>' : '<span class="tag ok">พร้อมใช้</span>') + "</h2>"
-      + '<p class="hint">' + (hl.slipApp ? "แอป " + esc(hl.slipApp) + " · " : "") + (hl.slipBranch ? "สาขา " + esc(hl.slipBranch) + " · " : "")
+      + '<p class="hint">' + (hl.slipApp ? "แอป " + esc(hl.slipApp) + " · " : "") + (hl.slipBranch ? "สาขา "
+        + esc(hl.slipBranch) + " · " : "")
       + "โควตาเหลือ " + quota + " · ระบบตรวจสลิปที่ลูกค้าแนบทันที ผ่าน = ชำระแล้ว เปิดดาวน์โหลดเอง · ไม่ผ่าน = แจ้งเหตุผลให้ลูกค้าแนบใหม่ · โควตาหมด = อีเมลเตือนร้าน แล้วร้านตรวจเอง</p>"
-      + '<div class="tbl"><table><thead><tr><th>ธนาคาร</th><th>เลขบัญชี</th><th>ชื่อบัญชี</th><th>ประเภท</th></tr></thead><tbody>' + rows + "</tbody></table></div>"
+      + '<div class="tbl"><table><thead><tr><th>ธนาคาร</th><th>เลขบัญชี</th><th>ชื่อบัญชี</th><th>ประเภท</th></tr></thead><tbody>'
+      + rows + "</tbody></table></div>"
       + '<p class="hint">บัญชีที่ลูกค้าโอนเข้าต้องอยู่ในรายการนี้ ระบบจึงยืนยันว่าผู้รับเป็นร้าน · เพิ่มหรือแก้บัญชีที่ <a href="https://easyslip.com" target="_blank" rel="noopener">easyslip.com</a> (เข้าสู่ระบบด้วยบัญชีของร้าน)</p></div>';
   }
   // ----- ฝากขาย (26 ต.ค. 2026): ใบสมัครจากหน้า market.html + รายการสินค้าฝากขายที่วางขาย -----
@@ -1118,32 +1132,45 @@
     var P = SHOP.payouts;
     if (!P) return "";
     var m2 = function (n) {
-      return "฿" + (+n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return "฿" + (+n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2,
+        maximumFractionDigits: 2 });
     }, wait = P.list.filter(function (p) {
       return p.status === "รอโอน";
     });
-    return '<div class="card"><h2>ถอนเงินของผู้ขาย <span class="tag ' + (wait.length ? "no" : "ok") + '">รอโอน ' + wait.length + "</span></h2>"
+    return '<div class="card"><h2>ถอนเงินของผู้ขาย <span class="tag ' + (wait.length ? "no" : "ok")
+      + '">รอโอน ' + wait.length + "</span></h2>"
       + '<p class="hint">โอนเงินเองจากบัญชีร้านตามยอดโอน แล้วใส่เลขอ้างอิงจากสลิปธนาคาร ระบบส่งใบสรุปรายได้ให้ผู้ขายทางอีเมล · ยกเลิกได้เมื่อมีเหตุผล ยอดกลับเข้ายอดถอนได้</p>'
       + (wait.length ? wait.map(function (p) {
-        return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.email) + " · ขอเมื่อ " + esc(wh(p.created)) + " · " + esc(p.src)
-          + "<br>ยอดก่อนหัก " + m2(p.gross) + " · หักภาษี " + m2(p.wht) + " · <b>ยอดโอน " + m2(p.net) + "</b><br>" + esc(p.method) + " <b>"
-          + esc(p.acc) + "</b> · " + esc(p.accName) + '<div class="grid"><label>เลขอ้างอิงการโอน<input id="po-ref-' + esc(p.id)
-          + '" maxlength="60" autocomplete="off"></label><label class="full">หมายเหตุ (ต้องใส่เมื่อยกเลิก)<input id="po-nt-' + esc(p.id)
-          + '" maxlength="500"></label></div><div class="tools"><button class="sm pri" type="button" data-sh="popaid" data-id="' + esc(p.id)
-          + '">โอนแล้ว</button><button class="sm" type="button" data-sh="pocancel" data-id="' + esc(p.id) + '">ยกเลิกรายการ</button></div></div>';
+        return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.email) + " · ขอเมื่อ " + esc(wh(p.created))
+          + " · " + esc(p.src)
+          + "<br>ยอดก่อนหัก " + m2(p.gross) + " · หักภาษี " + m2(p.wht) + " · <b>ยอดโอน " + m2(p.net)
+          + "</b><br>" + esc(p.method) + " <b>"
+          + esc(p.acc) + "</b> · " + esc(p.accName) + '<div class="grid"><label>เลขอ้างอิงการโอน<input id="po-ref-'
+          + esc(p.id)
+          + '" maxlength="60" autocomplete="off"></label><label class="full">หมายเหตุ (ต้องใส่เมื่อยกเลิก)<input id="po-nt-'
+          + esc(p.id)
+          + '" maxlength="500"></label></div><div class="tools"><button class="sm pri" type="button" data-sh="popaid" data-id="'
+          + esc(p.id)
+          + '">โอนแล้ว</button><button class="sm" type="button" data-sh="pocancel" data-id="' + esc(p.id)
+          + '">ยกเลิกรายการ</button></div></div>';
       }).join("") : '<p class="hint" style="margin:0">ไม่มีรายการรอโอน</p>')
       + (P.sellers.length ? '<h3>ยอดของผู้ขาย</h3><div class="tbl"><table><thead><tr><th>ผู้ขาย</th><th>ถอนได้</th><th>รอพ้นช่วงคืนเงิน</th><th>รอโอน</th><th>โอนแล้ว</th><th>รอบ</th></tr></thead><tbody>'
         + P.sellers.map(function (s) {
-          return "<tr><td>" + esc(s.name || s.email) + "<br><small>" + esc(s.email) + "</small></td><td>" + m2(s.balance.free) + "</td><td>"
-            + m2(s.balance.hold) + "</td><td>" + m2(s.balance.wait) + "</td><td>" + m2(s.balance.paid) + "</td><td>"
+          return "<tr><td>" + esc(s.name || s.email) + "<br><small>" + esc(s.email) + "</small></td><td>"
+            + m2(s.balance.free) + "</td><td>"
+            + m2(s.balance.hold) + "</td><td>" + m2(s.balance.wait) + "</td><td>" + m2(s.balance.paid)
+            + "</td><td>"
             + (s.mode === "monthly" ? "รายเดือน" : s.mode ? "ขอเอง" : "ยังไม่ตั้งบัญชี") + "</td></tr>";
         }).join("") + "</tbody></table></div>" : "")
-      + (P.list.length > wait.length ? '<details><summary>รายการที่ปิดแล้ว ' + (P.list.length - wait.length) + "</summary>" + P.list.filter(function (p) {
-        return p.status !== "รอโอน";
-      }).map(function (p) {
-        return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.status) + " · " + esc(p.email) + " · " + m2(p.net)
-          + (p.ref ? " · อ้างอิง " + esc(p.ref) : "") + (p.note ? " · " + esc(p.note) : "") + " · " + esc(wh(p.paidAt || p.created)) + "</div>";
-      }).join("") + "</details>" : "") + "</div>";
+      + (P.list.length > wait.length ? '<details><summary>รายการที่ปิดแล้ว ' + (P.list.length - wait.length)
+        + "</summary>" + P.list.filter(function (p) {
+          return p.status !== "รอโอน";
+        }).map(function (p) {
+          return '<div class="todo-it"><b>' + esc(p.id) + "</b> · " + esc(p.status) + " · " + esc(p.email)
+            + " · " + m2(p.net)
+            + (p.ref ? " · อ้างอิง " + esc(p.ref) : "") + (p.note ? " · " + esc(p.note) : "") + " · "
+            + esc(wh(p.paidAt || p.created)) + "</div>";
+        }).join("") + "</details>" : "") + "</div>";
   }
   function consignTab() {
     var top = "";
@@ -1171,15 +1198,21 @@
             + (c.contact ? " · " + esc(c.contact) : "") + " · ส่งเมื่อ " + esc(wh(c.created)) + (c.url
               ? ' · <a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer">ลิงก์ตัวอย่าง</a>' : "")
             + " · " + esc(c.own) + '</small><p style="margin:6px 0;white-space:pre-wrap">' + esc(c.desc)
-            + "</p>" + (c.sellerMsg ? '<p class="hint" style="margin:0 0 6px;white-space:pre-wrap"><b>ข้อความจากผู้ขาย:</b> ' + esc(c.sellerMsg) + "</p>" : "")
-            + '<p style="margin:0 0 6px">' + (c.share != null ? '<span class="tag ok">ส่วนแบ่งตกลงแล้ว ร้าน ' + c.share + "% · ผู้ขาย " + (100 - c.share)
-              + "% · ล็อก" + (c.agreedAt ? " " + esc(wh(c.agreedAt)) : "") + "</span>" : c.offer != null ? '<span class="tag">เสนอแล้ว ร้าน ' + c.offer
-              + "% · รอผู้ขายตอบ</span>" : '<span class="tag no">ยังไม่เสนอส่วนแบ่ง</span>') + (c.linked ? "" : ' <small>ผู้สมัครยังไม่ได้ผูกบัญชีสมาชิก (ระบบผูกเองเมื่อเข้าสู่ระบบด้วยอีเมลนี้)</small>')
+            + "</p>" + (c.sellerMsg ? '<p class="hint" style="margin:0 0 6px;white-space:pre-wrap"><b>ข้อความจากผู้ขาย:</b> '
+              + esc(c.sellerMsg) + "</p>" : "")
+            + '<p style="margin:0 0 6px">' + (c.share != null ? '<span class="tag ok">ส่วนแบ่งตกลงแล้ว ร้าน '
+              + c.share + "% · ผู้ขาย " + (100 - c.share)
+              + "% · ล็อก" + (c.agreedAt ? " " + esc(wh(c.agreedAt)) : "") + "</span>" : c.offer != null
+              ? '<span class="tag">เสนอแล้ว ร้าน ' + c.offer
+              + "% · รอผู้ขายตอบ</span>" : '<span class="tag no">ยังไม่เสนอส่วนแบ่ง</span>') + (c.linked
+                ? "" : ' <small>ผู้สมัครยังไม่ได้ผูกบัญชีสมาชิก (ระบบผูกเองเมื่อเข้าสู่ระบบด้วยอีเมลนี้)</small>')
             + '</p><div class="grid"><label>สถานะ<select id="cs-st-' + esc(c.id) + '">' + CSS.slice(0,
               5).map(function (s) {
                 return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
-              }).join("") + "</select></label>" + (c.share == null ? '<label>เสนอส่วนแบ่งร้าน (%)<input id="cs-of-' + esc(c.id)
-                + '" type="number" min="0" max="90" step="1" inputmode="numeric" value="' + (c.offer != null ? c.offer : "")
+              }).join("") + "</select></label>" + (c.share == null ? '<label>เสนอส่วนแบ่งร้าน (%)<input id="cs-of-'
+                + esc(c.id)
+                + '" type="number" min="0" max="90" step="1" inputmode="numeric" value="' + (c.offer != null
+                  ? c.offer : "")
                 + '" placeholder="เช่น 30"></label>' : "") + '<label class="full">ข้อความถึงผู้สมัคร หรือบันทึกของร้าน<textarea id="cs-nt-'
             + esc(c.id) + '" rows="2">' + esc(c.note) + '</textarea></label><label class="chk"><input type="checkbox" id="cs-tell-'
             + esc(c.id) + '"> ส่งอีเมลแจ้งผู้สมัคร</label></div><div class="tools"><button class="sm pri" type="button" data-sh="cssave" data-id="'
@@ -1238,7 +1271,8 @@
     var NA = SHOP ? "" : '<span class="tag">' + (shopErr ? "โหลดข้อมูลไม่ได้" : "กำลังโหลด…") + "</span>";
     var wait = SHOP ? "" : '<div class="card" role="status"><h2>' + (shopErr ? "โหลดข้อมูลจากหลังบ้านไม่ได้" : "กำลังโหลดข้อมูลจากหลังบ้าน…")
       + '</h2><p class="hint">' + (shopErr ? esc(shopErr) + " · " : "") + "สถานะคีย์ EasySlip PayPal Stripe และ Lemon Squeezy แสดงหลังโหลดเสร็จ (ราว 10–40 วินาที เพราะหลังบ้านตรวจกับผู้ให้บริการทุกเจ้า)</p>"
-      + (shopBusy ? "" : '<div class="tools"><button type="button" class="pri" data-sh="load">โหลดใหม่</button></div>') + "</div>";
+      + (shopBusy ? "" : '<div class="tools"><button type="button" class="pri" data-sh="load">โหลดใหม่</button></div>')
+      + "</div>";
     var live = /^pkey_(?!test_)/.test(key), mode = !key ? '<span class="tag no">ยังไม่ใส่คีย์</span>' : live
       ? '<span class="tag ok">คีย์จริง รับเงินจริง</span>' : '<span class="tag">โหมดทดสอบ ยังไม่รับเงินจริง</span>';
     var rows = PAY_ROWS.map(function (r) {
@@ -1247,14 +1281,17 @@
         + "</td><td>" + (w ? "แสดง" : "ไม่แสดง") + "</td><td>" + esc(r[2]) + "</td></tr>";
     }).join("");
     var opnCard = !key ? '<div class="card"><h2>Opn Payments <span class="tag no">ปิด</span></h2><p class="hint">ซ่อนช่องทางของ Opn จากลูกค้าแล้ว (ไม่มี opnKey ในข้อมูลเว็บ) · ลูกค้าชำระด้วย Stripe Lemon Squeezy หรือโอนเงินแล้วแนบสลิป · ถ้าจะเปิด Opn ภายหลัง ใส่ opnKey และเลือกช่องทางในแท็บ สมาชิกและชำระเงิน</p></div>' : null; // 24 Nov 2026: Opn application not approved, hidden by owner
-    return wait + (opnCard !== null ? opnCard + "<div hidden>" : "") + '<div class="card"><h2>ช่องทางชำระเงิน ' + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
+    return wait + (opnCard !== null ? opnCard + "<div hidden>" : "") + '<div class="card"><h2>ช่องทางชำระเงิน '
+      + mode + '</h2><p class="hint">ลูกค้าเห็นเฉพาะช่องทางที่ เปิดในบัญชี + แสดงบนเว็บ · โหมดทดสอบของ Opn ลูกค้าทั่วไปไม่เห็นช่องทางของ Opn · ร้านไม่เก็บค่าธรรมเนียมเพิ่มจากลูกค้า หน้าชำระเงินบอกค่าใช้จ่ายของแต่ละวิธีตอนเลือก · เลือกช่องทางที่แสดงได้ในแท็บ สมาชิกและชำระเงิน ช่อง ช่องทางชำระออนไลน์</p>'
       +
       '<div class="tbl"><table><thead><tr><th>ผ่าน Opn Payments</th><th>ในบัญชี</th><th>บนเว็บ</th><th>ค่าธรรมเนียม</th></tr></thead><tbody>'
-      + rows + "</tbody></table></div></div>" + (opnCard !== null ? "</div>" : "") + slipCard(su, hl) +
+      + rows + "</tbody></table></div></div>" + (opnCard !== null ? "</div>" : "") + slipCard(su, hl)
+      +
       '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
       "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
-      + "</td><td>ไม่มีค่าธรรมเนียม · " + (!SHOP ? "สถานะการตรวจสลิปอัตโนมัติแสดงหลังโหลดข้อมูล" : su.slipAuto ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
-        + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
+      + "</td><td>ไม่มีค่าธรรมเนียม · " + (!SHOP ? "สถานะการตรวจสลิปอัตโนมัติแสดงหลังโหลดข้อมูล" : su.slipAuto
+        ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
+          + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
       + " · " + (S.pay && S.pay.qrBase ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
       + "</td></tr>" +
       "<tr><td>จ่ายหลายสกุลเงิน</td><td>" + (capData ? esc(((capData.payment_methods.filter(function (m) {
@@ -1271,7 +1308,9 @@
       +
       "<tr><td>Lemon Squeezy</td><td>" + (NA ? NA : f.lemon ? (hl.lemon === false ? '<span class="tag no">คีย์ใช้ไม่ได้ ตรวจอีกครั้ง</span>' : hl.lemonVariant === false
         ? '<span class="tag no">ไม่พบสินค้า ตรวจ LEMON_VARIANT_ID</span>' : f.lsTest ? '<span class="tag">โหมดทดสอบ</span>' : '<span class="tag ok">เปิด เชื่อมต่อได้</span>') : '<span class="tag no">ยังไม่ตั้งคีย์</span>')
-      + "</td><td>" + (hl.lemonStore ? "ร้าน " + esc(hl.lemonStore) + " · สินค้า " + esc(hl.lemonProduct || "") + (hl.lemonTest ? " (โหมดทดสอบ)" : "") + " · " : "") + "5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ " + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้งแค่ LEMON_API_KEY ใน Script properties ระบบหาร้าน สินค้า และโหมดทดสอบเอง (ตั้ง LEMON_STORE_ID LEMON_VARIANT_ID LEMON_TEST เองได้ถ้าต้องการบังคับ) · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที · LS_MIN_THB ยอดต่ำสุด</td></tr>"
+      + "</td><td>" + (hl.lemonStore ? "ร้าน " + esc(hl.lemonStore) + " · สินค้า " + esc(hl.lemonProduct
+        || "") + (hl.lemonTest ? " (โหมดทดสอบ)" : "") + " · " : "") + "5% + 0.50 ดอลลาร์ต่อรายการ · +1.5% บัตรนอกสหรัฐ · +1.5% ถ้าลูกค้าจ่ายด้วย PayPal (lemonsqueezy.com/pricing อ่าน 5 พ.ย. 2026) · Lemon Squeezy เป็นผู้ขายตามกฎหมาย เก็บภาษีของประเทศลูกค้าให้ · ร้านได้รับเป็นดอลลาร์ ถอนเข้าธนาคารไทยหรือ PayPal · ยอดต่ำสุดของช่องทางนี้ "
+      + (f.lemonMin ? f.lemonMin + " บาท" : "ตามขั้นต่ำร้าน") + " (LS_MIN_THB) · ตั้งแค่ LEMON_API_KEY ใน Script properties ระบบหาร้าน สินค้า และโหมดทดสอบเอง (ตั้ง LEMON_STORE_ID LEMON_VARIANT_ID LEMON_TEST เองได้ถ้าต้องการบังคับ) · LEMON_WEBHOOK_TOKEN เพื่อรู้ผลทันที · LS_MIN_THB ยอดต่ำสุด</td></tr>"
       +
       "<tr><td>จ่ายที่เคาน์เตอร์ Lotus's</td><td><span class=\"tag no\">Opn ปิดแล้ว</span></td><td>Opn แจ้งว่าช่องทางนี้ไม่มีให้ใช้แล้ว (ทดสอบ 30 ต.ค. 2026)</td></tr>"
       +
@@ -1505,13 +1544,19 @@
       return;
     }
     if (sh === "cssave") {
-      var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id), cof = $("cs-of-" + id),
+      var cst = $("cs-st-" + id), cnt = $("cs-nt-" + id), ctl = $("cs-tell-" + id), cof = $("cs-of-"
+        + id),
         ofv = cof && cof.value.trim() !== "" ? +cof.value : null;
       if (ofv !== null && !(ofv >= 0 && ofv <= 90 && ofv === Math.round(ofv))) {
         toast("ส่วนแบ่งร้านต้องเป็นจำนวนเต็ม 0–90");
         return;
       }
-      var csd = { id: id, status: cst.value, note: cnt.value.trim(), tell: !!(ctl && ctl.checked) };
+      var csd = {
+        id: id,
+        status: cst.value,
+        note: cnt.value.trim(),
+        tell: !!(ctl && ctl.checked)
+      };
       if (ofv !== null) csd.offer = ofv;
       shopAct("adminConsign", csd, "บันทึกใบสมัคร " + id + (ofv !== null ? " · ข้อเสนอส่วนแบ่งส่งถึงผู้สมัครทางอีเมลเมื่อเปลี่ยนตัวเลข" : "")
         + (ctl && ctl.checked ? " และแจ้งผู้สมัครแล้ว" : ""));
@@ -1527,9 +1572,16 @@
         toast("ใส่เหตุผลที่ยกเลิกในช่องหมายเหตุ");
         return;
       }
-      if (!confirm(sh === "popaid" ? "ยืนยันว่าโอนเงินรายการ " + id + " แล้ว? ระบบส่งอีเมลแจ้งผู้ขาย" : "ยกเลิกรายการถอน " + id + "?")) return;
-      shopAct("adminPayout", { id: id, status: sh === "popaid" ? "โอนแล้ว" : "ยกเลิก", ref: pref.value.trim(), note: pnt.value.trim() },
-        sh === "popaid" ? "บันทึกโอนแล้ว " + id + " · ส่งอีเมลแจ้งผู้ขายแล้ว" : "ยกเลิกรายการ " + id + " แล้ว");
+      if (!confirm(sh === "popaid" ? "ยืนยันว่าโอนเงินรายการ " + id + " แล้ว? ระบบส่งอีเมลแจ้งผู้ขาย" : "ยกเลิกรายการถอน "
+        + id + "?")) return;
+      shopAct("adminPayout", {
+        id: id,
+        status: sh === "popaid" ? "โอนแล้ว" : "ยกเลิก",
+        ref: pref.value.trim(),
+        note: pnt.value.trim()
+      },
+        sh === "popaid" ? "บันทึกโอนแล้ว " + id + " · ส่งอีเมลแจ้งผู้ขายแล้ว" : "ยกเลิกรายการ " + id
+        + " แล้ว");
       return;
     }
     if (sh === "ok") {
@@ -1565,7 +1617,8 @@
       adm("adminSlipCheck", { order: id }).then(function (r) {
         shopBusy = false;
         var x = (r.checked || [])[0] || {};
-        toast(x.state === "ok" ? "ตรวจผ่าน " + id + " เปิดสิทธิ์ดาวน์โหลดแล้ว" : x.state === "fail" ? "สลิปไม่ผ่าน " + id + ": " + (x.why || "")
+        toast(x.state === "ok" ? "ตรวจผ่าน " + id + " เปิดสิทธิ์ดาวน์โหลดแล้ว" : x.state === "fail"
+          ? "สลิปไม่ผ่าน " + id + ": " + (x.why || "")
           : "ยังตรวจไม่ได้ " + id + (x.why ? ": " + x.why : "") + " · ระบบตรวจซ้ำให้เองทุก 1 นาที");
         shopLoad();
       }).catch(function (e) {
@@ -1761,12 +1814,15 @@
       delete DR.text;
       if (pending() && txt && !dirty) {
         if (r.draft.base === GH.sha) {
-          S = JSON.parse(String(txt).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/, ""));
+          S = JSON.parse(String(txt).replace(/^﻿/, "").trim().replace(/^window\.SITE\s*=\s*/, "").replace(/;\s*$/,
+            ""));
           shape();
           SAVED = JSON.stringify(S);
-          bar("เปิดร่างที่ยังไม่เผยแพร่ (บันทึก " + wh(r.draft.at) + " โดย " + (r.draft.who || "") + ") มาแก้ต่อ · ลูกค้ายังเห็นฉบับบนเว็บ", false);
+          bar("เปิดร่างที่ยังไม่เผยแพร่ (บันทึก " + wh(r.draft.at) + " โดย " + (r.draft.who || "") + ") มาแก้ต่อ · ลูกค้ายังเห็นฉบับบนเว็บ",
+            false);
         }
-        else bar("ร่างบนหลังบ้านแก้จาก data.js รุ่นก่อน จึงไม่เปิดมาแก้ และเผยแพร่ไม่ได้ · แก้ในหน้านี้แล้วกด บันทึกร่าง ใหม่", true);
+        else bar("ร่างบนหลังบ้านแก้จาก data.js รุ่นก่อน จึงไม่เปิดมาแก้ และเผยแพร่ไม่ได้ · แก้ในหน้านี้แล้วกด บันทึกร่าง ใหม่",
+          true);
       }
       render();
     }).catch(function (e) {
@@ -1776,16 +1832,23 @@
   }
   function siteCard() {
     if (!DR) return "";
-    if (DR.err) return '<div class="card"><h2>ร่าง · เผยแพร่ · ปิดปรับปรุง</h2><p class="hint" style="color:var(--bad)">' + esc(DR.err)
+    if (DR.err) return '<div class="card"><h2>ร่าง · เผยแพร่ · ปิดปรับปรุง</h2><p class="hint" style="color:var(--bad)">'
+      + esc(DR.err)
       + " · ต้องใช้หลังบ้านรุ่น " + NEED_API + "</p></div>";
     var d = DR.draft, p = DR.prev, m = DR.maint || {}, li = function (cls, t, x) {
-      return '<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : "!") + "</span><span>" + t + "<small>" + x + "</small></span></li>";
+      return '<li><span class="' + cls + '">' + (cls === "ok" ? "✓" : "!") + "</span><span>" + t + "<small>"
+        + x + "</small></span></li>";
     };
     return '<div class="card"><h2>ร่าง · เผยแพร่ · ปิดปรับปรุง</h2><p class="hint">บันทึกร่าง = ลูกค้ายังไม่เห็น · ดูตัวอย่าง = เปิดเว็บด้วยร่างในแท็บใหม่ (หลังบ้านตรวจสิทธิ์ก่อนส่งร่าง) · เผยแพร่ = ขึ้นเว็บจริง และเก็บฉบับเดิมไว้ย้อนกลับ</p><ul class="chk">'
-      + li(pending() ? "wa" : "ok", "ร่าง", d ? "บันทึก " + esc(wh(d.at)) + " โดย " + esc(d.who || "") + (pending() ? " · ยังไม่เผยแพร่" : " · เผยแพร่แล้ว " + esc(wh(d.pubAt))) : "ยังไม่มีร่าง")
-      + li(p ? "ok" : "wa", "ฉบับย้อนกลับ", p ? (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่") + " เก็บ " + esc(wh(p.at)) + " โดย " + esc(p.who || "") : "ยังไม่มี (มีหลังเผยแพร่ครั้งแรก)")
-      + li(m.on ? "wa" : "ok", "ปิดปรับปรุง", m.on ? "ปิดอยู่ · ลูกค้าเห็นป้าย กลับมา " + esc(m.back) + " · สั่งซื้อและชำระเงินไม่ได้ · ลูกค้าเดิมยังเข้าระบบและดาวน์โหลดได้" : "เว็บเปิดตามปกติ")
-      + '</ul><div class="grid"><label>เวลาที่เว็บกลับมา (แสดงบนป้าย)<input type="text" id="mt-back" value="' + esc(m.back || "") + '" placeholder="29 พ.ย. 09:00 น."></label><label>ข้อความเพิ่ม (ไม่บังคับ)<input type="text" id="mt-msg" value="' + esc(m.msg || "") + '"></label></div><div class="tools">'
+      + li(pending() ? "wa" : "ok", "ร่าง", d ? "บันทึก " + esc(wh(d.at)) + " โดย " + esc(d.who || "")
+        + (pending() ? " · ยังไม่เผยแพร่" : " · เผยแพร่แล้ว " + esc(wh(d.pubAt))) : "ยังไม่มีร่าง")
+      + li(p ? "ok" : "wa", "ฉบับย้อนกลับ", p ? (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่")
+        + " เก็บ " + esc(wh(p.at)) + " โดย " + esc(p.who || "") : "ยังไม่มี (มีหลังเผยแพร่ครั้งแรก)")
+      + li(m.on ? "wa" : "ok", "ปิดปรับปรุง", m.on ? "ปิดอยู่ · ลูกค้าเห็นป้าย กลับมา " + esc(m.back)
+        + " · สั่งซื้อและชำระเงินไม่ได้ · ลูกค้าเดิมยังเข้าระบบและดาวน์โหลดได้" : "เว็บเปิดตามปกติ")
+      + '</ul><div class="grid"><label>เวลาที่เว็บกลับมา (แสดงบนป้าย)<input type="text" id="mt-back" value="'
+      + esc(m.back || "") + '" placeholder="29 พ.ย. 09:00 น."></label><label>ข้อความเพิ่ม (ไม่บังคับ)<input type="text" id="mt-msg" value="'
+      + esc(m.msg || "") + '"></label></div><div class="tools">'
       + '<button type="button" class="del" data-st="mt-on">ปิดปรับปรุงตอนนี้</button><button type="button" class="pri" data-st="mt-off">เปิดเว็บตามปกติ</button></div></div>';
   }
   function stClick(act) {
@@ -1905,7 +1968,8 @@
 
   // ----- ห้องแชตกับลูกค้า (22 พ.ย. 2026): รายชื่อห้อง (ห้องที่รอตอบอยู่บนสุด) · ข้อความ · ตอบพร้อมแนบรูป ไฟล์ หรือคลิป -----
   // ข้อมูลอยู่ที่หลังบ้านแผ่น chat ที่เดียว · ไฟล์แนบดึงผ่านหลังบ้านด้วยรหัสหลังบ้าน (ไม่มีลิงก์สาธารณะ) · หน้านี้ดึงข้อความใหม่เองขณะเปิดแท็บนี้
-  var CR = null, crSel = "", crMsgs = null, crBusy = false, crTimer = 0, crUrl = {}, crGet = {}, crPend = null, crDraft = "", crQ = "", crSig = "";
+  var CR = null, crSel = "", crMsgs = null, crBusy = false, crTimer = 0, crUrl = {}, crGet = {},
+    crPend = null, crDraft = "", crQ = "", crSig = "";
   var CR_MAX = { image: 8, video: 20, file: 15 };
   function crSize(n) {
     return n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
@@ -1926,21 +1990,29 @@
     if (!crMsgs.length) return '<p class="chat-empty">ยังไม่มีข้อความ</p>';
     var day = "";
     return crMsgs.map(function (x) {
-      var d = String(wh(x.at)).replace(/,?\s*\d{1,2}:\d{2}.*$/, ""), head = d !== day ? '<div class="chat-day">' + esc(d) + "</div>" : "";
+      var d = String(wh(x.at)).replace(/,?\s*\d{1,2}:\d{2}.*$/, ""), head = d !== day ? '<div class="chat-day">'
+        + esc(d) + "</div>" : "";
       day = d;
       var shop = x.from === "shop", f = x.file, u = crUrl[x.id], tm = new Date(x.at);
-      var fh = !f ? "" : f.kind === "image" && u ? '<img class="chat-img" src="' + u + '" alt="' + esc(f.name) + '" data-crv="' + esc(x.id) + '">'
+      var fh = !f ? "" : f.kind === "image" && u ? '<img class="chat-img" src="' + u + '" alt="' + esc(f.name)
+        + '" data-crv="' + esc(x.id) + '">'
         : f.kind === "video" && u ? '<video class="chat-vid" src="' + u + '" controls playsinline preload="metadata"></video>'
-          : '<button type="button" class="chat-file" data-crf="' + esc(x.id) + '"><span aria-hidden="true">' + (f.kind === "image" ? "🖼️"
-            : f.kind === "video" ? "🎬" : "📄") + "</span><b>" + esc(f.name) + "</b><small>" + crSize(f.size) + "</small></button>";
-      return head + '<div class="chat-row ' + (shop ? "me" : "shop") + '"><div class="chat-bub">' + fh + (x.text ? crText(x.text) : "")
-        + (x.old ? '<span class="chat-old">คำถามจากระบบเดิม</span>' : "") + '</div><div class="chat-meta">' + (shop ? (x.read ? "ลูกค้าอ่านแล้ว<br>" : "")
-          + (x.by ? esc(x.by) + "<br>" : "") : "") + (isNaN(tm) ? "" : ("0" + tm.getHours()).slice(-2) + ":" + ("0" + tm.getMinutes()).slice(-2))
+        : '<button type="button" class="chat-file" data-crf="' + esc(x.id) + '"><span aria-hidden="true">'
+        + (f.kind === "image" ? "🖼️"
+          : f.kind === "video" ? "🎬" : "📄") + "</span><b>" + esc(f.name) + "</b><small>" + crSize(f.size)
+        + "</small></button>";
+      return head + '<div class="chat-row ' + (shop ? "me" : "shop") + '"><div class="chat-bub">' + fh
+        + (x.text ? crText(x.text) : "")
+        + (x.old ? '<span class="chat-old">คำถามจากระบบเดิม</span>' : "") + '</div><div class="chat-meta">'
+        + (shop ? (x.read ? "ลูกค้าอ่านแล้ว<br>" : "")
+          + (x.by ? esc(x.by) + "<br>" : "") : "") + (isNaN(tm) ? "" : ("0" + tm.getHours()).slice(-2)
+            + ":" + ("0" + tm.getMinutes()).slice(-2))
         + "</div></div>";
     }).join("");
   }
   function crPendHtml() {
-    return crPend ? '<div class="chat-pend">' + (crPend.kind === "image" ? '<img src="' + crPend.data + '" alt="">' : "<b>"
+    return crPend ? '<div class="chat-pend">' + (crPend.kind === "image" ? '<img src="' + crPend.data
+      + '" alt="">' : "<b>"
       + (crPend.kind === "video" ? "🎬" : "📄") + "</b>") + "<span>" + esc(crPend.name) + " · " + crSize(crPend.size)
       + '</span><button type="button" class="sm" data-crx="1">เอาออก</button></div>' : "";
   }
@@ -1959,16 +2031,22 @@
     }).length ? "no" : "ok") + '">รอตอบ ' + CR.filter(function (c) {
       return c.unread;
     }).length + ' ห้อง</span></h2><p class="hint">ลูกค้าได้อีเมลแจ้งเมื่อร้านตอบ (ไม่เกิน 1 ฉบับต่อ 10 นาที) · ไฟล์แนบเก็บในโฟลเดอร์ไดรฟ์ของร้าน ไม่มีลิงก์สาธารณะ · ตอบเรื่องงานก่อสร้างเป็นความรู้ทั่วไป ไม่รับรองงานของลูกค้า</p>'
-      + '<div class="cr"><div class="cr-list"><input type="search" id="crq" placeholder="ค้นหาชื่อ อีเมล ข้อความ" value="' + esc(crQ) + '" aria-label="ค้นหาห้องแชต">'
+      + '<div class="cr"><div class="cr-list"><input type="search" id="crq" placeholder="ค้นหาชื่อ อีเมล ข้อความ" value="'
+      + esc(crQ) + '" aria-label="ค้นหาห้องแชต">'
       + (list.length ? list.map(function (c) {
-        return '<button type="button" class="cr-it" data-crm="' + esc(c.member) + '" aria-pressed="' + (c.member === crSel) + '"><b>'
-          + esc(c.name || c.email || c.member) + (c.unread ? " <i>" + c.unread + "</i>" : "") + "</b><small>" + (c.lastFrom === "shop" ? "ร้าน: " : "")
+        return '<button type="button" class="cr-it" data-crm="' + esc(c.member) + '" aria-pressed="'
+          + (c.member === crSel) + '"><b>'
+          + esc(c.name || c.email || c.member) + (c.unread ? " <i>" + c.unread + "</i>" : "") + "</b><small>"
+          + (c.lastFrom === "shop" ? "ร้าน: " : "")
           + esc(c.last || "") + "</small><small>" + esc(wh(c.at)) + "</small></button>";
       }).join("") : '<p class="hint">ยังไม่มีห้องแชต</p>') + "</div>"
-      + '<div class="chat cr-room">' + (r ? '<div class="cr-head"><b>' + esc(r.name || "-") + "</b> <small>" + esc(r.email || "") + " · " + esc(r.member)
-        + "</small></div>" : "") + '<div class="chat-log" id="crlog" role="log" aria-live="polite">' + crLog() + "</div>"
+      + '<div class="chat cr-room">' + (r ? '<div class="cr-head"><b>' + esc(r.name || "-") + "</b> <small>"
+        + esc(r.email || "") + " · " + esc(r.member)
+        + "</small></div>" : "") + '<div class="chat-log" id="crlog" role="log" aria-live="polite">'
+      + crLog() + "</div>"
       + (crSel ? '<div id="crpend">' + crPendHtml() + '</div><form class="chat-bar" id="f-cr" novalidate><label class="chat-att" title="แนบรูป ไฟล์ หรือคลิป"><span aria-hidden="true">📎</span><input type="file" id="crfile" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm,.pdf,.docx,.xlsx,.pptx,.zip" aria-label="แนบรูป ไฟล์ หรือคลิป"></label><textarea id="crtext" rows="1" maxlength="2000" placeholder="พิมพ์คำตอบ (Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่)">'
-        + esc(crDraft) + '</textarea><button class="pri" type="submit" id="crsend">ส่ง</button></form>' : "") + "</div></div></div>";
+        + esc(crDraft) + '</textarea><button class="pri" type="submit" id="crsend">ส่ง</button></form>' : "")
+      + "</div></div></div>";
   }
   function crDraw(stick) {
     var lg = $("crlog");
@@ -2086,14 +2164,21 @@
   function crPick(file) {
     return new Promise(function (res, rej) {
       if (!file || !/\.(jpe?g|png|gif|webp|mp4|mov|webm|pdf|docx|xlsx|pptx|zip)$/i.test(file.name || "")) return rej(new Error("แนบได้เฉพาะรูป คลิป และไฟล์ PDF DOCX XLSX PPTX ZIP"));
-      var k = /\.(jpe?g|png|gif|webp)$/i.test(file.name) ? "image" : /\.(mp4|mov|webm)$/i.test(file.name) ? "video" : "file";
-      if (file.size > CR_MAX[k] * 1048576) return rej(new Error((k === "image" ? "รูป" : k === "video" ? "คลิป" : "ไฟล์") + "ใหญ่เกิน " + CR_MAX[k] + " MB"));
+      var k = /\.(jpe?g|png|gif|webp)$/i.test(file.name) ? "image" : /\.(mp4|mov|webm)$/i.test(file.name)
+        ? "video" : "file";
+      if (file.size > CR_MAX[k] * 1048576) return rej(new Error((k === "image" ? "รูป" : k === "video"
+        ? "คลิป" : "ไฟล์") + "ใหญ่เกิน " + CR_MAX[k] + " MB"));
       var fr = new FileReader();
       fr.onerror = function () {
         rej(new Error("อ่านไฟล์ไม่ได้"));
       };
       fr.onload = function () {
-        res({ name: file.name, data: String(fr.result || ""), kind: k, size: file.size });
+        res({
+          name: file.name,
+          data: String(fr.result || ""),
+          kind: k,
+          size: file.size
+        });
       };
       fr.readAsDataURL(file);
     });
@@ -2105,7 +2190,11 @@
     crBusy = true;
     btn.disabled = true;
     btn.textContent = crPend ? "กำลังส่งไฟล์…" : "กำลังส่ง…";
-    adm("adminChatSend", { member: crSel, text: text, file: crPend ? { name: crPend.name, data: crPend.data } : null }).then(function (r) {
+    adm("adminChatSend", {
+      member: crSel,
+      text: text,
+      file: crPend ? { name: crPend.name, data: crPend.data } : null
+    }).then(function (r) {
       crBusy = false;
       if (crPend && crPend.kind !== "file") { // รูปหรือคลิปที่เพิ่งส่ง: ใช้ไฟล์ในเครื่องแสดงทันที
         var mine = ((r && r.chat) || []).filter(function (x) {
@@ -2258,18 +2347,20 @@
   ];
   var tab = "ov";
   // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
-  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop", "chat",
+  var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop",
+    "chat",
     "cust", "cons", "req", "pay", "bot", "soon"];
   function badge(id) {
     if (!SHOP) return "";
-    var n = id === "shop" ? SHOP.kpi.check || 0 : id === "chat" ? SHOP.kpi.asksOpen || 0 : id === "cons" ? (SHOP.consigns
-      || []).filter(function (c) {
-        return c.status === "ใหม่";
-      }).length : id === "req" ? (SHOP.requests || []).filter(function (c) {
-        return c.status === "ใหม่";
-      }).length : id === "bot" ? (SHOP.bot || []).filter(function (c) {
-        return c.status === "ใหม่";
-      }).length : 0;
+    var n = id === "shop" ? SHOP.kpi.check || 0 : id === "chat" ? SHOP.kpi.asksOpen || 0 : id === "cons"
+      ? (SHOP.consigns
+        || []).filter(function (c) {
+          return c.status === "ใหม่";
+        }).length : id === "req" ? (SHOP.requests || []).filter(function (c) {
+          return c.status === "ใหม่";
+        }).length : id === "bot" ? (SHOP.bot || []).filter(function (c) {
+          return c.status === "ใหม่";
+        }).length : 0;
     return n ? "<i>" + n + "</i>" : "";
   }
   function render() {
@@ -2502,7 +2593,7 @@
     try {
       sessionStorage.removeItem("build_pv_site");
     } catch (e) {}
-    if (dirty && tokGet()) toast("ตัวอย่างแสดงร่างที่บันทึกแล้ว · กด บันทึกร่าง ก่อนเพื่อดูสิ่งที่เพิ่งแก้");
+      if (dirty && tokGet()) toast("ตัวอย่างแสดงร่างที่บันทึกแล้ว · กด บันทึกร่าง ก่อนเพื่อดูสิ่งที่เพิ่งแก้");
     window.open("index.html?preview=1", "_blank");
   });
   $("b-imp").addEventListener("click", function () {
@@ -2566,7 +2657,8 @@
       busy(btn, false, "บันทึกร่าง");
       touch();
       render();
-      bar("บันทึกร่างแล้ว " + new Date().toLocaleTimeString("th-TH") + " · ลูกค้ายังเห็นฉบับเดิม · กด ดูตัวอย่าง หรือ เผยแพร่", false);
+      bar("บันทึกร่างแล้ว " + new Date().toLocaleTimeString("th-TH") + " · ลูกค้ายังเห็นฉบับเดิม · กด ดูตัวอย่าง หรือ เผยแพร่",
+        false);
     }).catch(function (e) {
       busy(btn, false, "บันทึกร่าง");
       bar(e.message || "บันทึกไม่สำเร็จ", true);
@@ -2588,7 +2680,8 @@
       SAVED = ORIG;
       BASE = hashOf(ORIG);
       busy(btn, false, "เผยแพร่");
-      bar("เผยแพร่แล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที · ถ้าพบปัญหา กด ย้อนกลับ", false);
+      bar("เผยแพร่แล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที · ถ้าพบปัญหา กด ย้อนกลับ",
+        false);
       draftLoad();
     }).catch(function (e) {
       busy(btn, false, "เผยแพร่");
@@ -2599,11 +2692,13 @@
     var btn = this, p = DR && DR.prev;
     if (btn.disabled || !p) return;
     if (dirty) return toast("มีการแก้ที่ยังไม่บันทึก · บันทึกร่างหรือทิ้งที่แก้ก่อน");
-    if (!confirm("ย้อนกลับ data.js บนเว็บเป็น" + (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่") + " (เก็บ " + wh(p.at) + ")?\n\nลูกค้าเห็นภายในราว 1–2 นาที\nกด ย้อนกลับ อีกครั้งจะกลับมาฉบับปัจจุบัน · ร่างไม่หาย")) return;
+    if (!confirm("ย้อนกลับ data.js บนเว็บเป็น" + (p.kind === "restore" ? "ฉบับก่อนย้อนกลับ" : "ฉบับก่อนเผยแพร่")
+      + " (เก็บ " + wh(p.at) + ")?\n\nลูกค้าเห็นภายในราว 1–2 นาที\nกด ย้อนกลับ อีกครั้งจะกลับมาฉบับปัจจุบัน · ร่างไม่หาย")) return;
     busy(btn, true, "กำลังย้อนกลับ…");
     adm("adminRestore", { confirm: "RESTORE" }).then(function () {
       busy(btn, false, "ย้อนกลับ");
-      bar("ย้อนกลับแล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที", false);
+      bar("ย้อนกลับแล้ว " + new Date().toLocaleTimeString("th-TH") + " · หน้าเว็บอัปเดตภายในราว 1–2 นาที",
+        false);
       siteLoad(true);
     }).catch(function (e) {
       busy(btn, false, "ย้อนกลับ");

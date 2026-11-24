@@ -63,10 +63,13 @@
   }
   function planTx(id) {
     var x = B.find(id);
-    if (B.isMarket(x)) return "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล");
+    if (B.isMarket(x)) return "สินค้าฝากขาย · " + ({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ",
+      manual: "ร้านส่งทางอีเมล" }[x.delivery] || "ร้านส่งทางอีเมล");
     // ระบบเต็ม: ค่าที่ตั้งตอนใส่ตะกร้า (ภาษา มาตรฐาน ที่ตั้งงาน) · รอบเปิดตัว 3ed หรือยังไม่ได้ตั้ง: ชื่อฉบับภาษา · ฉบับประเทศบอกในชื่อรายการแล้ว
-    var cl = B.cfg && x ? B.cfg.line(x.id) : "", ed = B.isCtry(B.varOf(id)) ? "" : B.LANGS[B.varOf(id)] || "";
-    return (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด") + (cl || ed ? " · " + (cl || ed) : "");
+    var cl = B.cfg && x ? B.cfg.line(x.id) : "", ed = B.isCtry(B.varOf(id)) ? "" : B.LANGS[B.varOf(id)]
+      || "";
+    return (B.isUpd(id) ? "รับฉบับใหม่ตลอด" : "ซื้อฉบับนี้ เก็บได้ตลอด") + (cl || ed ? " · " + esc(cl
+      || ed) : "");
   }
   function trackUrl(o) {
     return o.track ? HERE.replace(/[^\/]*$/, "") + "track.html?o=" + encodeURIComponent(o.id) + "&k="
@@ -126,7 +129,7 @@
       var off0 = Math.round(a0 * rOff / 100);
       return { amt: Math.max(1, a0 - off0), off: off0, pct: rOff };
     }
-    return { amt: a0 };
+      return { amt: a0 };
   }
 
   // ---------- ตัวติดตาม 5 ขั้น ----------
@@ -159,7 +162,8 @@
   function summary(ids, total, withOwn) {
     return '<aside><div class="card sumc"><h2>คำสั่งซื้อของคุณ</h2><ul class="mini">' + ids.map(function (id) {
       var a = withOwn ? lineAmt(id) : { amt: B.cart.price(id) };
-      return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "") + (a.off ? " · ผู้ซื้อเดิม ลด " + a.pct + "%" : "")
+      return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + (a.up ? " · อัปเกรด จ่ายส่วนต่าง" : "")
+        + (a.off ? " · ผู้ซื้อเดิม ลด " + a.pct + "%" : "")
         + (a.block ? " · คุณมีแล้ว" : "") + "</small></span><b>" + (a.block ? "–" : B.thb(a.amt))
         + "</b></li>";
     }).join("") + "</ul>" +
@@ -236,7 +240,8 @@
       +
       (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html")
         + '">แก้ไขในตะกร้า</a> ก่อนสั่งซื้อ</p>' : "") +
-      (me.pay && me.pay.promoOn ? '<div class="promo"><label for="promo">โค้ดส่วนลด (ถ้ามี)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="promo" name="promo" autocomplete="off" maxlength="24" style="flex:1;min-width:150px;text-transform:uppercase"><button class="b line" type="button" id="promoGo">ใช้โค้ด</button></div><p class="hint" id="promoHint" aria-live="polite"></p></div>' : "") +
+      (me.pay && me.pay.promoOn ? '<div class="promo"><label for="promo">โค้ดส่วนลด (ถ้ามี)</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="promo" name="promo" autocomplete="off" maxlength="24" style="flex:1;min-width:150px;text-transform:uppercase"><button class="b line" type="button" id="promoGo">ใช้โค้ด</button></div><p class="hint" id="promoHint" aria-live="polite"></p></div>' : "")
+      +
       '<button class="b pri" type="submit" data-go="1"' + (blocked ? " disabled" : "") + ">ยืนยันคำสั่งซื้อ · ชำระ "
       + B.thb(total) + '</button><p class="note">กดแล้วระบบสร้างคำสั่งซื้อ ส่งอีเมลยืนยัน และพาไปขั้นชำระเงิน · ยกเลิกคำสั่งซื้อที่ยังไม่ชำระได้เองในหน้าสมาชิก</p></div>'
       +
@@ -253,7 +258,8 @@
       h.className = "hint";
       B.call("promoCheck", { code: code }).then(function (r) {
         var pr = r.promo, cut = total >= pr.min ? Math.min(total - 1, Math.round(total * pr.off / 100)) : 0;
-        h.textContent = cut > 0 ? "ใช้โค้ด " + pr.code + " ได้ ลด " + pr.off + "% · ยอดชำระใหม่ " + B.thb(total - cut) : "โค้ดนี้ใช้ได้เมื่อยอดซื้อตั้งแต่ " + B.thb(pr.min);
+        h.textContent = cut > 0 ? "ใช้โค้ด " + pr.code + " ได้ ลด " + pr.off + "% · ยอดชำระใหม่ " + B.thb(total - cut) : "โค้ดนี้ใช้ได้เมื่อยอดซื้อตั้งแต่ "
+          + B.thb(pr.min);
         h.className = "hint " + (cut > 0 ? "ok" : "bad");
       }).catch(function (e) {
         h.textContent = (e && e.message) || "ตรวจโค้ดไม่ได้ ลองใหม่";
@@ -270,13 +276,15 @@
       });
       if (!list.length) return "";
       var had = first;
-      return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", PAY.groupNote(list) + list.map(function (k) {
-        var c = first;
-        first = false;
-        return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>"
-          + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k, list)
-          + "</label>";
-      }).join(""), had);
+      return PAY.groupBox(g, list.length, '<p class="kn pmh">' + esc(g[1]) + "</p>", PAY.groupNote(list)
+        + list.map(function (k) {
+          var c = first;
+          first = false;
+          return '<label><input type="radio" name="pm" value="' + k + '"' + (c ? " checked" : "") + "><b>"
+            + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k,
+              list)
+            + "</label>";
+        }).join(""), had);
     }).join("");
   }
   function taxHint() {
@@ -331,7 +339,8 @@
       '<p class="note">ปิดหน้านี้ได้ ชำระภายหลังได้ที่หน้าสมาชิก เมนู คำสั่งซื้อ</p>'
       // 22 พ.ย. 2026 (คำสั่งเจ้าของ: หาปุ่มยกเลิกไม่เจอ): ปุ่มยกเลิกเป็นปุ่มเต็ม ไม่ใช่ลิงก์เล็กในข้อความ
       + '<div style="display:flex;justify-content:flex-end;margin:6px 0 0"><button type="button" class="b line sm" data-cancel="'
-      + esc(o.id) + '" aria-label="ยกเลิกคำสั่งซื้อ ' + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></div></div>' +
+      + esc(o.id) + '" aria-label="ยกเลิกคำสั่งซื้อ ' + esc(o.id) + '">ยกเลิกคำสั่งซื้อนี้</button></div></div>'
+      +
       '<aside><div class="card sumc"><h2>รายการ</h2><ul class="mini">' + o.items.map(function (id) {
         return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
       }).join("") + '</ul><div class="tot"><span>ยอดชำระ</span><b>' + B.thb(o.amount) + "</b></div></div></aside></div>";
@@ -366,8 +375,10 @@
     var paid = o.status === ST.paid, tl = trackUrl(o);
     var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
       + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
-      : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>' + (me.pay && me.pay.slipAuto
-        ? "ระบบกำลังตรวจสลิปกับธนาคารอัตโนมัติ หน้านี้อัปเดตผลให้เอง · ถ้าระบบตรวจไม่ได้ ร้านตรวจให้ภายใน " + esc(P.hours || 24) + " ชั่วโมง"
+      : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>'
+      + (me.pay && me.pay.slipAuto
+        ? "ระบบกำลังตรวจสลิปกับธนาคารอัตโนมัติ หน้านี้อัปเดตผลให้เอง · ถ้าระบบตรวจไม่ได้ ร้านตรวจให้ภายใน "
+        + esc(P.hours || 24) + " ชั่วโมง"
         : "ร้านกำลังตรวจยอดเข้าบัญชี ภายใน " + esc(P.hours || 24) + " ชั่วโมง") + " · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
       : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
     $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">'
@@ -384,7 +395,7 @@
     try {
       history.replaceState(null, "", HERE + (q || "") + (q ? "&" : "?") + "done=" + encodeURIComponent(o.id));
     } catch (e) {}
-    doneWatch(o);
+      doneWatch(o);
   }
   // 22 Nov 2026 (owner: show the automatic slip check in real time): while this order waits for the check, ask again every
   // 15 s (up to 40 times, only while the tab is visible) and show the result as soon as it changes
@@ -400,7 +411,8 @@
         if (!n) return;
         if (n.status === ST.check) return doneWatch(n);
         doneTries = 0;
-        doneView(n.id, n.status === ST.reject ? "สลิปไม่ผ่านการตรวจ" + (n.note ? ": " + n.note : "") + " · แนบสลิปใหม่ได้ด้านล่าง" : "");
+        doneView(n.id, n.status === ST.reject ? "สลิปไม่ผ่านการตรวจ" + (n.note ? ": " + n.note : "")
+          + " · แนบสลิปใหม่ได้ด้านล่าง" : "");
       }).catch(function () {
         doneWatch(o);
       });
@@ -473,7 +485,8 @@
         return (o.status === ST.wait || o.status === ST.reject) && sameItems(o.items, ids);
       })[0];
       var code = $("promo") ? $("promo").value.trim().toUpperCase() : ""; // มีโค้ดส่วนลด = สร้างคำสั่งซื้อใหม่เสมอ เพื่อให้หลังบ้านคิดยอดด้วยโค้ด
-      return reuse && !code ? { order: reuse, reused: true } : B.call("order", code ? { items: ids, code: code } : { items: ids });
+      return reuse && !code ? { order: reuse, reused: true } : B.call("order", code ? { items: ids,
+        code: code } : { items: ids });
     }).then(function (r) {
       var o = r.order;
       B.cart.clear();
