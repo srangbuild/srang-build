@@ -1304,8 +1304,66 @@
     if (ev.key === "Enter" && ev.target.classList && (ev.target.classList.contains("bl") || ev.target.classList.contains("iv"))) {
       ev.preventDefault();
       ev.target.blur();
+      return;
+    }
+    // ช่องติ๊ก: Space หรือ Enter ทำงานเหมือนคลิก (ใช้ตัวฟังคลิกด้านบนตัวเดียว)
+    if ((ev.key === " " || ev.key === "Enter") && ev.target.hasAttribute && ev.target.hasAttribute("data-mk")) {
+      ev.preventDefault();
+      ev.target.click();
     }
   });
+  /* ---------- ช่องติ๊กใช้ได้ด้วยคีย์บอร์ดและโปรแกรมอ่านหน้าจอ (25 พ.ย. 2026) ----------
+     ช่องติ๊กวาดเป็น td.bx และ b.tick (ไม่ใช่ input) เพื่อให้พิมพ์ออกมาเหมือนแบบฟอร์มกระดาษ
+     ตัวนี้เพิ่ม tabindex role และ aria-checked ให้ทุกช่อง และอัปเดตเมื่อสถานะเปลี่ยน
+     ช่องในแถวเดียวกัน (td.bx) เลือกได้ช่องเดียว จึงใช้ role="radio" · ช่อง .wx ใช้ทั้งช่องเป็นปุ่ม */
+  function markName(e) {
+    if (e.tagName === "TD") { // ชื่อคอลัมน์จากหัวตาราง + ข้อตรวจของแถว
+      var tb = e.closest("table"), hr = tb && tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1], col = 0, c;
+      for (c = e.previousElementSibling; c; c = c.previousElementSibling) col += c.colSpan || 1;
+      var h = "";
+      if (hr) for (var i = 0, at = 0; i < hr.cells.length; i++) {
+        if (col >= at && col < at + (hr.cells[i].colSpan || 1)) h = hr.cells[i].textContent;
+        at += hr.cells[i].colSpan || 1;
+      }
+      var it = e.parentNode.querySelector(".it");
+      return (h.trim() || "ช่องติ๊ก") + (it && it.textContent.trim() ? " · " + it.textContent.trim().slice(0, 80) : "");
+    }
+    var own = e.textContent; // .wx: ข้อความในช่องเอง
+    if (e.classList.contains("tick")) { // ข้อความหลังช่องติ๊กจนถึงช่องติ๊กถัดไป
+      own = "";
+      for (var n = e.nextSibling; n && !(n.nodeType === 1 && n.classList.contains("tick")); n = n.nextSibling) own += n.textContent;
+      var grp = e.closest(".ordb"), ttl = grp && grp.querySelector("b:not(.tick)");
+      if (ttl) own = ttl.textContent + " · " + own; // หัวข้อของกลุ่ม เช่น ลำดับการแก้ไข
+    }
+    return String(own || "").replace(/\s+/g, " ").trim().slice(0, 80) || "ช่องติ๊ก";
+  }
+  function markTarget(e) { // ช่องที่เก็บสถานะ on
+    return e.classList.contains("wx") ? e.querySelector(".tick") : e;
+  }
+  function markSync(root) {
+    [].forEach.call(root.querySelectorAll("td.bx, .wx, .tick"), function (e) {
+      if (e.classList.contains("tick") && e.closest(".wx")) return; // ช่องใน .wx ใช้ .wx เป็นปุ่มแทน
+      var t = markTarget(e);
+      if (!t) return;
+      if (!e.hasAttribute("data-mk")) {
+        e.setAttribute("data-mk", "1");
+        e.setAttribute("tabindex", "0");
+        e.setAttribute("role", e.tagName === "TD" || e.closest(".res,.ordb") ? "radio" : "checkbox");
+        e.setAttribute("aria-label", markName(e));
+      }
+      e.setAttribute("aria-checked", t.classList.contains("on") ? "true" : "false");
+    });
+  }
+  if (window.MutationObserver) {
+    var mkBusy = false;
+    new MutationObserver(function () {
+      if (mkBusy) return;
+      mkBusy = true; // การตั้งค่า aria ไม่ใช่ class จึงไม่เรียกตัวนี้ซ้ำ · กันไว้อีกชั้น
+      markSync($("sheetOut"));
+      mkBusy = false;
+    }).observe($("sheetOut"), { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+  }
+  markSync($("sheetOut"));
   $("docNote").addEventListener("click", function (ev) { // 7 พ.ย. 2026: ปุ่ม "ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว" สร้างเอกสารใหม่ด้วยมาตรฐานไทยทันที
     if (!ev.target.closest("#useTH")) return;
     touched.c1 = true;

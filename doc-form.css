@@ -136,3 +136,6 @@
 .fm .weak { margin-top: 1mm; padding: .8mm 1.6mm; border-left: 2pt solid #C24A08; background: #FFF1E8; color: #7A2E05; font-size: 7.2pt; }
 .fm label.pick.pweak .ctag { border-color: #C24A08; color: #C24A08; }
 .fm .rf2.wk { color: #7A2E05; font-weight: 700; }
+/* 25 Nov 2026: keyboard focus on tick cells (doc.js markSync). Not printed. */
+.fm td.bx:focus-visible, .fm .wx:focus-visible, .fm .tick:focus-visible { outline: 2px solid #E07B00; outline-offset: -2px; border-radius: 2px; }
+@media print { .fm td.bx:focus, .fm .wx:focus, .fm .tick:focus { outline: none; } }

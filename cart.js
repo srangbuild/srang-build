@@ -269,7 +269,27 @@
       + (c.city ? " (" + c.city + ")" : "");
   }
   /* ---------- หน้าต่างตั้งค่า: ส่วนที่ใช้ร่วมกัน ---------- */
-  var cf = null;
+  var cf = null, cfBack = null; // cfBack = ปุ่มที่เปิดหน้าต่าง · ปิดแล้วโฟกัสกลับไปที่ปุ่มนี้
+  // กักปุ่ม Tab ไว้ในหน้าต่าง (หน้าต่างแบบ modal) · ปุ่มตัวเลือกกลุ่มเดียวกันนับเฉพาะตัวที่เลือกอยู่
+  function tabTrap(ev, root) {
+    if (ev.key !== "Tab" || !root) return;
+    var all = root.querySelectorAll("a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex='-1'])"), f = [];
+    for (var i = 0; i < all.length; i++) {
+      var e = all[i];
+      if (!e.getClientRects().length) continue; // ซ่อนอยู่
+      if (e.type === "radio" && e.name && !e.checked && root.querySelector("input[type=radio][name='" + e.name + "']:checked")) continue;
+      f.push(e);
+    }
+    if (!f.length) return;
+    var a = document.activeElement, first = f[0], last = f[f.length - 1];
+    if (ev.shiftKey && (a === first || !root.contains(a))) {
+      ev.preventDefault();
+      last.focus();
+    } else if (!ev.shiftKey && (a === last || !root.contains(a))) {
+      ev.preventDefault();
+      first.focus();
+    }
+  }
   function cfgOpen(id, o) {
     o = o || {};
     var x = B.find(id);
@@ -288,6 +308,7 @@
       cf.className = "cf-wrap";
       document.body.appendChild(cf);
     }
+    if (!document.body.classList.contains("cf-on")) cfBack = document.activeElement;
     cf.innerHTML = html;
     cf.onchange = null; // ตัวฟังของหน้าต่างรอบก่อน
     cf.onclick = function (ev) {
@@ -559,10 +580,17 @@
   function cfgClose0() {
     if (cf) cf.innerHTML = "";
     document.body.classList.remove("cf-on");
+    var b = cfBack;
+    cfBack = null;
+    if (b && b.focus && document.contains(b)) b.focus();
   }
   var cfClose = cfgClose0;
   document.addEventListener("keydown", function (ev) {
-    if (ev.key === "Escape" && cf && cf.innerHTML) cfClose();
+    if (!(cf && cf.innerHTML)) return;
+    if (ev.key === "Escape") {
+      ev.preventDefault(); // ปิดเฉพาะหน้าต่างบนสุด · ตะกร้าข้างล่างยังเปิดอยู่
+      cfClose();
+    } else tabTrap(ev, cf.querySelector(".cf-box") || cf);
   });
   B.cfg = {
     open: cfgOpen,
@@ -579,7 +607,9 @@
     open(false);
   });
   document.addEventListener("keydown", function (ev) {
-    if (ev.key === "Escape" && box.classList.contains("on")) open(false);
+    if (ev.defaultPrevented || !box.classList.contains("on") || (cf && cf.innerHTML)) return; // หน้าต่างตั้งค่าอยู่บนสุด ให้ตัวฟังของหน้าต่างนั้นจัดการ
+    if (ev.key === "Escape") open(false);
+    else tabTrap(ev, box);
   });
   box.addEventListener("click", function (ev) {
     var t = ev.target;

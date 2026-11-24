@@ -72,6 +72,7 @@ h2::before { content:""; display:inline-block; width:10px; height:22px; backgrou
 .fl3 { display:flex; flex-wrap:wrap; gap:6px; } .fl3 .b { flex:1 1 auto; padding-left:10px; padding-right:10px; }
 .price { font-family:"Kanit",sans-serif; font-weight:700; font-size:20px; color:var(--navy); }
 .price s { font-weight:400; font-size:14px; color:var(--mute); margin-left:6px; }
+.price .from { font:500 12.5px/1.2 "IBM Plex Sans Thai",sans-serif; color:var(--mute); margin-inline-end:2px; }
 table.cmp { width:100%; border-collapse:collapse; font-size:15.5px; }
 table.cmp th, table.cmp td { border-bottom:1px solid var(--line); padding:9px 10px; text-align:left; vertical-align:top; }
 table.cmp th { color:var(--navy); font-weight:700; background:#F1F4F8; }
