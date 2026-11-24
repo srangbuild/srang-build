@@ -666,8 +666,9 @@
     h += '</tbody></table><p class="lgd">C = ' + One(L.cC) + " · NC = " + One(L.cNC) + " · " + One(L.lgFree)
       + freeRefs() + "</p>";
     var hasRec = (d.recs || []).length > 0;
-    var tail = '<div class="keep"><p class="sh2 top">' + M(L.sh2) + "</p>" + sign([L.sIns, L.sAck]) + "</div>" + notesBox(L.notesF,
-      hasRec ? 2 : 4) + upBox() + '<p class="fine">' + One(L.fine) + " · " + One(L.freeShare) + "</p>"
+    var tail = '<div class="keep"><p class="sh2 top">' + M(L.sh2) + "</p>" + sign([L.sIns, L.sAck])
+      + "</div>" + notesBox(L.notesF,
+        hasRec ? 2 : 4) + upBox() + '<p class="fine">' + One(L.fine) + " · " + One(L.freeShare) + "</p>"
       + flagNote();
     if (hasRec) h += '<div class="pb">' + rpBar(false) + d.recs.map(recTable).join("") + tail + "</div>";
     else h += tail;
@@ -1189,7 +1190,8 @@
     form.nlang = nLang();
     form.site = $("site") ? $("site").value : "";
     form.geo = $("geo") ? $("geo").value : "";
-    var name = (String(form.project || "").trim() || String(form.detail || "").trim() || String(form.location || "").trim() || "งานไม่มีชื่อ")
+    var name = (String(form.project || "").trim() || String(form.detail || "").trim() || String(form.location
+      || "").trim() || "งานไม่มีชื่อ")
       + " · " + D.id;
     if (!j[name] && Object.keys(j).length >= 60) {
       window.alert("บันทึกได้ไม่เกิน 60 งานในเครื่องนี้ ลบงานเก่าก่อน");

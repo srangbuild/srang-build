@@ -173,7 +173,7 @@
   function isUpd(id) {
     return /\+U$/.test(String(id || ""));
   }
-  // ฉบับภาษา (โปรเจกต์กำแพง 24 ต.ค. 2026): ไม่มีท้ายรหัส = อังกฤษ + ไทย · .EN = อังกฤษอย่างเดียว · .TH = ไทยอย่างเดียว · ราคาเท่ากัน (ตรงกับหลังบ้าน VARS)
+  // ฉบับภาษา (โปรเจกต์กำแพง 24 ต.ค. 2026): ไม่มีท้ายรหัส = อังกฤษ + ไทย · .EN = อังกฤษอย่างเดียว · .TH = ไทยอย่างเดียว · ราคาฉบับ 2 ภาษา = ราคา 1 ภาษา × pay.edFactor (edStep ด้านล่าง ตรงกับหลังบ้าน)
   var LANGS = { "": "อังกฤษ + ไทย", EN: "อังกฤษอย่างเดียว", TH: "ไทยอย่างเดียว" }, LANGS_EN = { "": "English + Thai",
     EN: "English only", TH: "Thai only" };
   // ฉบับประเทศ (2 พ.ย. 2026): F-05.JP = ภาษาของประเทศนั้น ไทย อังกฤษ + ค่ามาตรฐานและกฎหมายของประเทศนั้นเทียบกับค่าไทย · สร้างจากหน้าเอกสารอัจฉริยะ ไม่มีไฟล์ PDF · ตรงกับหลังบ้าน CTRY · [ชื่อไทย, ชื่ออังกฤษ, ภาษาบนเอกสาร]
@@ -520,11 +520,58 @@
     var x = find(id);
     return !!(x && canSell(x) && (!isUpd(id) || +x.priceU > 0));
   }
+  // 24 พ.ย. 2026 (สภาราคา): price และ priceU ใน data.js คือราคาฉบับ 1 ภาษา · ฉบับ 2 ภาษา (รหัสไม่มีท้าย) = ราคานั้น × pay.edFactor
+  // ปัดขึ้นให้ลงท้าย 9 (ต่ำกว่า 1,000) หรือ 90 (ตั้งแต่ 1,000) · สูตรเดียวกับ edStep และ price ของหลังบ้าน (Code.gs) ยอดจึงตรงกัน
+  function edStep(p) {
+    var f = Math.min(3, Math.max(1, +P.edFactor || 1));
+    if (f <= 1) return +p || 0;
+    var n = Math.ceil((+p || 0) * f);
+    return n >= 1000 ? Math.ceil((n - 90) / 100) * 100 + 90 : Math.ceil((n - 9) / 10) * 10 + 9;
+  }
+  // ราคาตั้งของรายการ x ตามแบบสิทธิ์และฉบับ · v: "" = 2 ภาษา · TH EN = 1 ภาษา · รหัสประเทศ = ฉบับประเทศ
+  function listPrice(x, upd, v) {
+    var p = upd ? x.priceU : x.price;
+    return CTRY[v] ? docPrice(p) : !v && x.hidden !== true && langsOf(x).length > 1 ? edStep(p) : +p
+      || 0;
+  }
   function unitPrice(id) {
     var x = find(id);
-    if (!x) return 0;
-    var p = isUpd(id) ? x.priceU : x.price;
-    return memberPrice(CTRY[varOf(id)] ? docPrice(p) : p);
+    return x ? memberPrice(listPrice(x, isUpd(id), varOf(id))) : 0;
+  }
+  // ฉบับที่เลือกไว้ให้ก่อน: 1 ภาษาตามภาษาของหน้าเว็บ (ไม่เลือกฉบับที่แพงกว่าให้ลูกค้าล่วงหน้า)
+  function defEd(x) {
+    var vs = langsOf(x), l = "th";
+    try {
+      l = String(localStorage.getItem("build_lang") || "th").slice(0, 2);
+    } catch (e) {}
+      var v = l === "th" ? "TH" : "EN";
+    return vs.indexOf(v) > 0 ? v : vs.indexOf("TH") > 0 ? "TH" : vs.indexOf("EN") > 0 ? "EN" : "";
+  }
+  // ยอดของ 1 บรรทัดตามสิทธิ์ที่ผู้ซื้อมีอยู่ · กติกาเดียวกับ order() ของหลังบ้าน (หน้าตะกร้าและหน้าชำระเงินเรียกที่นี่ที่เดียว)
+  // R = { รหัสฐาน: "edition" | "updates" } · rOff = เปอร์เซ็นต์ส่วนลดผู้ซื้อเดิมที่หลังบ้านส่งมา (0 = ยังไม่รู้ ไม่ลด)
+  function lineAmt(id, R, rOff) {
+    var x = find(id), b = baseOf(id), upd = isUpd(id), own = R[b];
+    if (!x) return { amt: 0, block: true };
+    if (!isBundle(x) && own) {
+      if (own === "edition" && upd) return { amt: Math.max(1, unitPrice(b + "+U") - unitPrice(b)),
+        up: true };
+      return { amt: 0, block: true, own: own };
+    }
+    var a = unitPrice(id), root = rootOf(b);
+    if (isBundle(x) || x.hidden === true || !rOff || !Object.keys(R).some(function (k) {
+      return k !== b && rootOf(k) === root;
+    })) return { amt: a };
+    var off = Math.round(a * rOff / 100), lang = false, own1 = varOf(b) ? [] : ["EN", "TH"].map(function (k) {
+      return R[root + "." + k];
+    }).filter(Boolean);
+    if (own1.length) { // มีฉบับ 1 ภาษาแล้ว ซื้อฉบับ 2 ภาษา = จ่ายส่วนต่าง (ได้ราคาที่ต่ำกว่าระหว่างส่วนต่างกับส่วนลดผู้ซื้อเดิม)
+      var d = a - Math.max(1, a - memberPrice(listPrice(x, upd && own1.indexOf("updates") >= 0, "TH")));
+      if (d > off) {
+        off = d;
+        lang = true;
+      }
+    }
+    return { amt: Math.max(1, a - off), off: off, pct: lang ? 0 : rOff, lang: lang };
   }
   var cart = {
     get: function () {
@@ -617,6 +664,7 @@
       cart.put([]);
     },
     price: unitPrice,
+    lineAmt: lineAmt,
     total: function () {
       return cart.get().reduce(function (t, id) {
         return t + unitPrice(id);
@@ -628,8 +676,7 @@
       if (!isBundle(x)) return 0;
       var s = x.items.reduce(function (t, k) {
         var y = find(k);
-        var q = y ? (u && +y.priceU > 0 ? y.priceU : y.price) : 0;
-        return t + (y ? memberPrice(CTRY[varOf(id)] ? docPrice(q) : q) : 0);
+        return t + (y ? memberPrice(listPrice(y, u && +y.priceU > 0, varOf(id))) : 0);
       }, 0);
       return Math.max(0, s - unitPrice(id));
     }
@@ -658,6 +705,9 @@
     rootOf: rootOf,
     varOf: varOf,
     langsOf: langsOf,
+    defEd: defEd,
+    edStep: edStep,
+    listPrice: listPrice,
     langLabel: langLabel,
     LANGS: LANGS,
     LANGS_EN: LANGS_EN,

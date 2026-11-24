@@ -909,7 +909,8 @@ window.SITE = {
     "qrBase": "00020101021229370016A0000006770101110113006661746699153037645802TH6304A221",
     "bankMin": 200,
     "docOn": true,
-    "docFactor": 1.5
+    "docFactor": 1.5,
+    "edFactor": 1.5
   },
   "sheetsNext": [
     "งานรั้วและประตูรั้ว",

@@ -345,7 +345,7 @@
   }
   function cfgAsk3(x, o) {
     var eds = B.langsOf(x), hasU = !B.isMarket(x) && +x.priceU > 0, line = B.cart.line(x.id), old = cfgAll()[x.id];
-    var ed0 = line ? B.varOf(line) : edOf(old);
+    var ed0 = line ? B.varOf(line) : old ? edOf(old) : B.defEd(x); // ยังไม่เคยเลือก = 1 ภาษาตามภาษาของหน้าเว็บ
     if (eds.indexOf(ed0) < 0) ed0 = "";
     if (eds.length < 2 && !hasU) { // ไม่มีอะไรให้เลือก
       var e0 = cfgCommit(x, o, skuId(x, ed0, false), false, edCfg(ed0, old), ADDED3);
@@ -366,9 +366,12 @@
       return "<legend>" + (eds.length > 1 && hasU ? n + ". " : "") + t + "</legend>";
     };
     var $ = cfgShow(cfgHead("เลือกฉบับก่อนใส่ตะกร้า", x) + (eds.length > 1 ? "<fieldset>" + step("ภาษาบนใบ")
-      + eds.map(function (v) {
-        return card("cfe", v, v === ed0, B.LANGS[v], v ? "" : "บรรทัดอังกฤษและบรรทัดไทยอยู่ในใบเดียวกัน");
-      }).join("") + '<p class="cf-nt">ทุกฉบับราคาเท่ากัน</p></fieldset>' : "") + (hasU ? "<fieldset>"
+      + eds.slice().sort(function (a, b) { // 1 ภาษาก่อน 2 ภาษาท้ายสุด · ราคาแสดงข้างตัวเลือกทุกตัว
+        return (a ? 0 : 1) - (b ? 0 : 1);
+      }).map(function (v) {
+        return card("cfe", v, v === ed0, B.LANGS[v], v ? "" : "บรรทัดอังกฤษและบรรทัดไทยอยู่ในใบเดียวกัน",
+          B.baht(B.cart.price(skuId(x, v, !!o.upd))));
+      }).join("") + "</fieldset>" : "") + (hasU ? "<fieldset>"
         + step("แบบสิทธิ์")
         + card("cfu", "0", !o.upd, "ซื้อฉบับนี้ เก็บได้ตลอด",
           "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
@@ -383,6 +386,11 @@
     };
     var sum = function () {
       var p = pick();
+      [].forEach.call(cf.querySelectorAll("input[name=cfe],input[name=cfu]"), function (r) { // ราคาบนตัวเลือกตามสิ่งที่เลือกอยู่อีกข้อ
+        var s = r.parentNode.querySelector(".cf-pr");
+        if (s) s.textContent = B.baht(B.cart.price(r.name === "cfe" ? skuId(x, r.value, p.upd) : skuId(x,
+          p.ed, r.value === "1")));
+      });
       $("cfSum").innerHTML = '<b class="cf-p">' + esc(B.baht(B.cart.price(skuId(x, p.ed, p.upd)))) + "</b><small>ได้ไฟล์ PDF และใช้หน้าเอกสารอัจฉริยะได้ · มาตรฐานอ้างอิงและที่ตั้งงานตั้งได้ที่หน้าเอกสารอัจฉริยะ ไม่มีผลต่อราคา</small>";
     };
     cf.onchange = sum;
