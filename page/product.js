@@ -89,8 +89,8 @@
       "จุดหยุดรอตรวจ (H)"], [sumOf("pages"), "หน้า A4 รวม"], ["2", "ภาษา อังกฤษ-ไทย"], ["PDF",
         "ไฟล์พิมพ์ได้"]]
       : [[src.nPro, "รายการตรวจ"], [src.nHold, "จุดหยุดรอตรวจ (H)"], [(src.recs || []).length || "–",
-        "ตารางบันทึก"], [src.pages || "–", "หน้า A4"], [langTx(src.langs), "ภาษา"], [dmy(src.revDate)
-          || "–", "ฉบับวันที่"]];
+        "ตารางบันทึก"], [src.pages || "–", "หน้า A4"], [langTx(src.langs), "ภาษา"], ["PDF",
+          "ไฟล์พิมพ์ได้"]]; // 26 พ.ย. 2026 (คำสั่งเจ้าของ): ไม่แสดงวันที่ฉบับก่อนซื้อ · ผู้ซื้อเห็นฉบับของคำสั่งซื้อในหน้าสมาชิก
     return '<dl class="facts">' + f.map(function (a) {
       return "<div><dt>" + esc(a[1]) + "</dt><dd>" + esc(a[0]) + "</dd></div>";
     }).join("") + "</dl>";
@@ -259,7 +259,7 @@
     if (mk) return '<ul class="trust"><li><i>✓</i><span>ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · ร้านรับชำระและดูแลการส่งมอบ</span></li><li><i>✓</i><span>ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร กระเป๋าเงินออนไลน์ หรือโอนเงิน</span></li><li><i>✓</i><span>'
       + esc(DEL[x.delivery] || DEL.manual) + "</span></li>" + (x.delivery === "file" ? "<li><i>✓</i><span>ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li>" : "")
       + "</ul>";
-    return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่าน Opn Payments หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน '
+    return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่านผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน '
       + h + ' ชั่วโมง</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
   }
   // 2 พ.ย. 2026: บรรทัดอังกฤษที่สองมีเฉพาะหน้าภาษาไทย · หน้าอังกฤษใช้ข้อความอังกฤษที่เขียนไว้ · ภาษาอื่นแปลจากข้อความหลัก
@@ -357,6 +357,14 @@
         ? " · ชุดรวมฉบับปีให้สิทธิ์ทุกใบของฉบับปีนั้น รวมใบที่ออกเพิ่มและรุ่นปรับปรุงภายในปีของฉบับ" : "")
       + "</p></section>";
   }
+  // 26 พ.ย. 2026: การ์ดชุดบอกชื่องาน ไม่ใช่รหัสใบ (รหัสอ่านยาก) · แสดง 5 ชื่อแรก ที่เหลือบอกเป็นจำนวน
+  function setNames(ids) {
+    var nm = ids.map(function (i) {
+      var y = B.find(i);
+      return y ? y.title : i;
+    }), n = 5;
+    return nm.slice(0, n).join(" · ") + (nm.length > n ? " และอีก " + (nm.length - n) + " ใบ" : "");
+  }
   function secBundles() {
     if (bundle) return "";
     var bs = B.bundlesOf(x.id);
@@ -367,10 +375,8 @@
         return t + (y ? B.memberPrice(y.price) : 0);
       }, 0), p = B.memberPrice(b.price);
       return '<a class="bcard" href="' + L("product.html", "id=" + encodeURIComponent(b.id)) + '"><b>'
-        + esc(B.code(b) + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(b.items.map(function (i) {
-          var y = B.find(i);
-          return y ? B.code(y) : i;
-        }).join(" · ")) + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p
+        + esc(B.code(b) + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(setNames(b.items))
+        + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p
           ? ' <span class="sv">ถูกกว่าซื้อแยก ' + B.baht(s - p) + "</span>" : "") + "</span></a>";
     }).join("") + "</div></section>";
   }

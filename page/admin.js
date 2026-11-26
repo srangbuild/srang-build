@@ -1688,9 +1688,9 @@
     var gid = (S.member || {}).googleClientId;
     return '<div class="card login"><h2>เข้าสู่ระบบหลังบ้าน</h2><p class="hint">ร้าน ลูกค้า ฝากขาย และเนื้อหาเว็บอยู่ในหน้านี้ · เปิดได้ทุกเครื่อง · ข้อมูลร้านมาจากหลังบ้านหลังเข้าระบบเท่านั้น</p>'
       +
-      (gid && live() ? '<div id="g-btn" style="min-height:44px"></div><p class="hint" style="margin:6px 0 0">ใช้บัญชี Google ของอีเมลร้าน (อีเมลใน ADMIN_EMAILS หรือบัญชีเจ้าของหลังบ้าน)</p><div class="or">หรือ</div>' : "")
+      (gid && live() ? '<div id="g-btn" style="min-height:44px"></div><p class="hint" style="margin:6px 0 0">ใช้บัญชี Google ของอีเมลที่เจ้าของร้านอนุญาต</p><div class="or">หรือ</div>' : "")
       +
-      '<label>รหัสหลังบ้าน (ADMIN_KEY)<input type="password" id="ak" autocomplete="current-password" spellcheck="false"></label><div class="tools"><button type="button" class="pri" data-sh="login"'
+      '<label>รหัสหลังบ้าน<input type="password" id="ak" autocomplete="current-password" spellcheck="false"></label><div class="tools"><button type="button" class="pri" data-sh="login"'
       + (loginBusy ? " disabled" : "") + ">" + (loginBusy ? "กำลังเข้า…" : "เข้าสู่ระบบ") + "</button></div>"
       +
       (loginErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0" role="alert">' + esc(loginErr)

@@ -125,8 +125,14 @@
     return refresh(true);
   }
   function dmy(iso) {
-    var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || ""));
-    return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : String(iso || "");
+    var s = String(iso || ""), mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(s);
+    if (mt) return mt[3] + "/" + mt[2] + "/" + mt[1];
+    // 26 พ.ย. 2026: ชีตส่งวันที่มาเป็นข้อความยาว ("Sun Oct 18 2026 00:00:00 GMT+0700") → แสดงเป็น วว/ดด/ปปปป
+    // อ่านจากตัวอักษรตรง ๆ ไม่ผ่าน Date เพื่อให้ทุกเขตเวลาเห็นวันเดียวกัน
+    var en = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* (\d{1,2}),? (\d{4})\b/.exec(s);
+    if (!en) return s;
+    var mo = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(en[1]) / 3 + 1;
+    return (en[2].length < 2 ? "0" : "") + en[2] + "/" + (mo < 10 ? "0" : "") + mo + "/" + en[3];
   }
 
   // ---------- รหัสผ่าน (กติกาเดียวกับหลังบ้าน · ผู้ใช้เลือก 18 ต.ค. 2026: มาตรฐานทั่วไป) ----------

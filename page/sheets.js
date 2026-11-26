@@ -103,8 +103,7 @@
           + '" download>English</a><a class="b line sm" href="doc.html' + (q ? q + "&" : "?") + "item="
           + encodeURIComponent(x.id) + '" data-full="1">ภาษาอื่น</a></span>' : '<span class="pill gray">กำลังตรวจรายการ</span>')
         + '</div><div class="ver pro"><b>ฉบับมืออาชีพ</b><small>' + esc(x.nPro) + " ข้อ · จุด H "
-        + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + (x.revDate ? " · ฉบับวันที่ "
-          + esc(String(x.revDate).replace(/^(\d{4})-(\d\d)-(\d\d).*$/, "$3/$2/$1")) : "") + "</small>"
+        + esc(x.nHold) + " จุด" + (x.pages ? " · " + esc(x.pages) + " หน้า" : "") + "</small>" // 26 พ.ย. 2026: ไม่แสดงวันที่ฉบับก่อนซื้อ (คำสั่งเจ้าของ)
         + buy(x) + '<a class="note" style="margin:0" href="' + esc(pLink(x.id)) + '">ดูรายละเอียด แบบสิทธิ์ และมาตรฐานอ้างอิง ›</a></div></div></div></article>';
     }).join("") || '<p class="note">' + (term ? "ไม่พบใบตรวจงานที่ตรงกับ “" + esc(term) + "” ลองคำอื่น หรือเลือกกลุ่ม ทั้งหมด" : "ยังไม่มีใบตรวจงานในกลุ่มนี้")
       + "</p>";
