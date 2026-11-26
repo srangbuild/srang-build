@@ -78,11 +78,17 @@
   }
   var hasStats = /^G-[A-Z0-9]{6,}$/.test((S.site && S.site.ga4) || "");
   var bar = null;
+  // 26 พ.ย. 2026: แถบนี้ลอยอยู่ล่างจอ จึงเว้นที่ท้ายหน้าเท่าความสูงของแถบ เพื่อไม่ให้บังลิงก์กฎหมายท้ายหน้า
+  function ckRoom() {
+    document.body.style.paddingBottom = bar ? bar.offsetHeight + 24 + "px" : "";
+  }
+  window.addEventListener("resize", ckRoom);
   function consent(force) {
     if (S.consent && S.consent.on === false) return;
     if (bar) {
       bar.remove();
       bar = null;
+      ckRoom();
     }
     if (getC() && !force) return;
     var txt = (S.consent && S.consent.text) || "เว็บนี้เก็บข้อมูลในเบราว์เซอร์ของคุณเท่าที่จำเป็นต่อการใช้งาน เช่น การเข้าสู่ระบบสมาชิกและตะกร้า";
@@ -98,10 +104,12 @@
       setC(v);
       bar.remove();
       bar = null;
+      ckRoom();
       if (v === "all" && typeof window.BUILD_GA === "function") window.BUILD_GA();
       floatAd();
     });
     document.body.appendChild(bar);
+    ckRoom();
   }
 
   // ---------- 2) พื้นที่โฆษณา ----------

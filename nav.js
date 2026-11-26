@@ -49,6 +49,17 @@
   var gear = (S.products || []).some(function (p) {
     return p.on !== false && /^https?:\/\//i.test(p.url || "");
   });
+  /* 26 Nov 2026: a menu item must not point to a section that the home page hides.
+     The home page hides a section when it has no open item (index.js, showSec). The same test is used here. */
+  var isUrl = function (u) {
+    return /^https?:\/\//i.test(u || "");
+  }, adm = !!(window.SITE_MODE && window.SITE_MODE.preview);
+  var svcOpen = adm || (S.services || []).some(function (x) {
+    return isUrl(x.url) || /^[a-z0-9_-]+\.html(#[\w-]+)?$/i.test(x.page || "");
+  });
+  var musicOpen = adm || (S.music || []).some(function (m) {
+    return isUrl(m.url);
+  });
   // [หน้า, #หัวข้อ, ชื่อไทย, ชื่ออังกฤษ]
   var menu = [
     { t: "หน้าหลัก", e: "Home", i: ["index.html", ""] },
@@ -71,12 +82,14 @@
             "Method statements"], ["sheets.html", "compare", "ใบตรวจงานฉบับฟรี", "Free check sheets"]])
     },
     {
-      t: "คลิปและเพลง",
+      t: musicOpen ? "คลิปและเพลง" : "คลิป",
       e: "Videos",
-      sub: [["index.html", "episodes", "คลิปทุกตอน", "All episodes"], ["index.html", "music", "เพลง",
-        "Music"]].concat(gear ? [["index.html", "gear", "ของที่ใช้ในคลิป", "Gear in the videos"]] : [])
+      sub: [["index.html", "episodes", "คลิปทุกตอน", "All episodes"]].concat(musicOpen ? [["index.html",
+        "music", "เพลง", "Music"]] : []).concat(gear ? [["index.html", "gear", "ของที่ใช้ในคลิป",
+          "Gear in the videos"]] : [])
     },
-    { t: "บริการ", e: "Services", i: ["index.html", "service"] },
+    // ยังไม่มีบริการที่เปิด: เมนู บริการ ไปหน้าสั่งทำงานเฉพาะโครงการ ซึ่งเปิดรับงานอยู่
+    { t: "บริการ", e: "Services", i: svcOpen ? ["index.html", "service"] : ["request.html", ""] },
     { t: "เกี่ยวกับ", e: "About", i: ["index.html", "about"] }
   ].filter(Boolean);
   var shopPages = ["sheets.html", "product.html", "cart.html", "checkout.html", "market.html",

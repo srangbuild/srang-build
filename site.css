@@ -151,7 +151,7 @@ footer a { color:#fff; }
 .pwr li.lvl { font-weight:600; color:var(--navy); } .pwr li.lvl::before { content:""; }
 /* หน้าสมาชิกแบบมืออาชีพ (23 ต.ค. 2026): หัวบัญชี เมนู ภาพรวม คลังเอกสาร โปรไฟล์ ชำระออนไลน์ */
 .pageh { font-size:30px; color:var(--navy); margin:0 0 6px; }
-form.f input[type=tel] { font:inherit; font-size:16px; padding:11px 12px; border:1.5px solid var(--line); border-radius:12px; background:#fff; width:100%; }
+form.f input[type=tel], form.f input[type=number], form.f input[type=url], form.f input[type=search], form.f input[type=date] { font:inherit; font-size:16px; padding:11px 12px; border:1.5px solid var(--line); border-radius:12px; background:#fff; width:100%; }
 form.f input[readonly] { background:#F2F4F7; color:var(--mute); }
 .soc .sb.tt { background:#111; border-color:#111; color:#fff; }
 .acct-head { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
@@ -163,6 +163,8 @@ form.f input[readonly] { background:#F2F4F7; color:var(--mute); }
 .av.lg.ini { font-size:28px; } .av.xl.ini { font-size:40px; }
 .acct-nav { position:sticky; top:58px; z-index:5; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; margin:14px -4px 4px; padding:6px 4px; background:var(--paper); }
 .acct-nav::-webkit-scrollbar { display:none; }
+/* 26 พ.ย. 2026: จอกว้างให้เมนูขึ้นบรรทัดใหม่ เห็นครบทุกเมนู ไม่ถูกตัดขอบ · จอแคบยังเลื่อนซ้ายขวาได้ */
+@media (min-width:700px) { .acct-nav { flex-wrap:wrap; overflow-x:visible; } }
 .acct-nav a { flex:none; display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size:15px; font-weight:600; color:var(--navy); padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:#fff; min-height:40px; }
 .acct-nav a[aria-current] { background:var(--navy); color:#fff; border-color:var(--navy); }
 .acct-nav a em { font-style:normal; font-size:12px; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#C24A08; color:#fff; display:inline-flex; align-items:center; justify-content:center; }
