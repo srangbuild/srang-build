@@ -4,6 +4,7 @@
 html { scroll-behavior:smooth; scroll-padding-top:72px; }
 body { margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI","Sarabun",system-ui,sans-serif; font-size:17px; line-height:1.7; -webkit-text-size-adjust:100%; }
 h1,h2,h3,.kn { font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif; line-height:1.25; }
+/* 26 พ.ย. 2026: หัวข้อ 2 บรรทัดแบ่งให้ยาวใกล้กัน ไม่เหลือเศษคำบรรทัดสุดท้าย เช่น "มุง)" */ h1,h2,h3 { text-wrap:balance; }
 /* heading scale */ h1 { font-size:clamp(26px, 5vw, 36px); } h3 { font-size:18px; }
 a { color:inherit; }
 img { max-width:100%; display:block; }
