@@ -359,6 +359,11 @@
   }
   // 26 พ.ย. 2026: การ์ดชุดบอกชื่องาน ไม่ใช่รหัสใบ (รหัสอ่านยาก) · แสดง 5 ชื่อแรก ที่เหลือบอกเป็นจำนวน
   function setNames(ids) {
+    // หน้าภาษาอื่นแสดงรหัสใบตามเดิม เพราะชื่องานที่ต่อกันเป็นข้อความเดียว ระบบแปลหาไม่เจอ
+    if (uiLang() !== "th") return ids.map(function (i) {
+      var z = B.find(i);
+      return z ? B.code(z) : i;
+    }).join(" · ");
     var nm = ids.map(function (i) {
       var y = B.find(i);
       return y ? y.title : i;

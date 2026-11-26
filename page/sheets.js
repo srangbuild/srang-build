@@ -148,10 +148,16 @@
     return !x.aud || x.aud === "job";
   }).map(function (x) {
     // 26 พ.ย. 2026: บอกชื่องาน ไม่ใช่รหัสใบ · แสดง 4 ชื่อแรก ที่เหลือบอกเป็นจำนวน (แบบเดียวกับหน้าสินค้า)
+    // หน้าภาษาอื่นแสดงรหัสใบตามเดิม เพราะชื่องานที่ต่อกันเป็นข้อความเดียว ระบบแปลหาไม่เจอ
+    var thUi = true;
+    try {
+      thUi = (localStorage.getItem("build_lang") || "th") === "th";
+    } catch (e) {}
     var nm = x.items.map(function (id) {
       var s = B.find(id);
-      return s ? s.title : id;
-    }), names = nm.slice(0, 4).join(" · ") + (nm.length > 4 ? " และอีก " + (nm.length - 4) + " ใบ" : "");
+      return s ? (thUi ? s.title : s.id) : id;
+    }), names = thUi ? nm.slice(0, 4).join(" · ") + (nm.length > 4 ? " และอีก " + (nm.length - 4) + " ใบ" : "")
+      : nm.join(" · ");
     return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">'
       + esc(B.code(x)) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit"><a href="'
       + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0 0 4px;font-size:15.5px">'
