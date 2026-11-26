@@ -68,13 +68,14 @@
     $("cmp-pages").textContent = lo === hi ? String(lo) : lo + "–" + hi;
   }
   // ราคาแสดงทุกใบ · ปุ่มใส่ตะกร้ามีเฉพาะรายการที่เปิดขายแล้ว (ตรวจรายการแล้ว + เปิดขาย + เปิดรับชำระ) · ชุดรวมบอกส่วนที่ถูกกว่าซื้อแยก
-  function buy(x) {
+  // 26 พ.ย. 2026: ป้าย "ถูกกว่าซื้อแยก" อยู่บรรทัดของตัวเอง ราคากับปุ่มจึงอยู่แถวเดียวกันเสมอ แม้ราคา 4 หลัก · noSave = การ์ดที่บอกส่วนต่างไว้แล้ว
+  function buy(x, noSave) {
     var ed = B.defEd(x), many = B.langsOf(x).length > 1; // ราคาบนการ์ด = ฉบับ 1 ภาษา (ถูกที่สุด) · ฉบับ 2 ภาษาราคาสูงกว่า
     var pr = +x.price > 0 ? '<span class="price">' + (many ? '<small class="from">เริ่มต้น</small> ' : "")
       + B.baht(B.memberPrice(x.price))
       + "</span>" : "", sv = B.cart.saving(x.id + (ed ? "." + ed : ""));
-    var save = sv > 0 ? '<span class="pill ok" style="margin-right:auto">ถูกกว่าซื้อแยก ' + B.baht(sv)
-      + "</span>" : "";
+    var save = sv > 0 && !noSave ? '<span style="flex:1 0 100%"><span class="pill ok">ถูกกว่าซื้อแยก ' + B.baht(sv)
+      + "</span></span>" : "";
     return B.canSell(x) ? save + pr + '<button class="b pri sm" type="button" data-add="' + esc(x.id)
       + '">ใส่ตะกร้า</button>' : save + pr + '<span class="pill">' + (B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "กำลังตรวจรายการ")
       + "</span>";
@@ -140,16 +141,17 @@
       + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0;font-weight:600;font-size:15px;color:#344054">'
       + esc(x.who || "") + '</p><p style="margin:0;font-size:15px">' + esc(x.text) + '</p><p class="note" style="margin:0">ถูกกว่าซื้อแยก '
       + B.baht(saveOf(x)) + ' · <a href="' + esc(pLink(x.id)) + '">ดูว่ามีใบอะไรบ้าง ›</a></p><div class="sum" style="margin:auto 0 0">'
-      + buy(x) + "</div></div>";
+      + buy(x, true) + "</div></div>";
   }).join("");
   if (!packs.length) $("packs").hidden = true;
   $("bundles").innerHTML = B.bundles.filter(function (x) {
     return !x.aud || x.aud === "job";
   }).map(function (x) {
-    var names = x.items.map(function (id) {
+    // 26 พ.ย. 2026: บอกชื่องาน ไม่ใช่รหัสใบ · แสดง 4 ชื่อแรก ที่เหลือบอกเป็นจำนวน (แบบเดียวกับหน้าสินค้า)
+    var nm = x.items.map(function (id) {
       var s = B.find(id);
-      return s ? s.id : id;
-    }).join(" · ");
+      return s ? s.title : id;
+    }), names = nm.slice(0, 4).join(" · ") + (nm.length > 4 ? " และอีก " + (nm.length - 4) + " ใบ" : "");
     return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">'
       + esc(B.code(x)) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit"><a href="'
       + esc(pLink(x.id)) + '" style="color:inherit;text-decoration:none">' + esc(x.title) + '</a></h3><p style="margin:0 0 4px;font-size:15.5px">'

@@ -1076,7 +1076,7 @@
       return s[0] === custSeg;
     })[0] || SEG[0], t = custQ.toLowerCase(), q = function (v) {
       v = String(v == null ? "" : v);
-      if (/^[=+\-@]/.test(v)) v = "'" + v;
+      if (/^[\s]*[=+\-@]|^[\t\r]/.test(v)) v = "'" + v; // กันสูตรในไฟล์ CSV (รวมกรณีขึ้นต้นด้วยช่องว่าง แท็บ หรือขึ้นบรรทัด)
       return '"' + v.replace(/"/g, '""') + '"';
     };
     var list = (SHOP.members || []).filter(seg[1]).filter(function (m) {
@@ -1445,7 +1445,7 @@
       "ลิงก์ติดตามคำสั่งซื้อ", "เลขที่ใบเสร็จ"];
     var q = function (v) {
       v = String(v == null ? "" : v);
-      if (/^[=+\-@]/.test(v)) v = "'" + v;
+      if (/^[\s]*[=+\-@]|^[\t\r]/.test(v)) v = "'" + v; // กันสูตรในไฟล์ CSV (รวมกรณีขึ้นต้นด้วยช่องว่าง แท็บ หรือขึ้นบรรทัด)
       return '"' + v.replace(/"/g, '""') + '"';
     };
     var lines = [head.map(q).join(",")].concat(SHOP.orders.map(function (o) {
