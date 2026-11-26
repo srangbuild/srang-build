@@ -1634,7 +1634,7 @@ window.SITE = {
     }
   ],
   "termsDate": "7 พ.ย. 2026",
-  "privacyDate": "24 พ.ย. 2026",
+  "privacyDate": "26 พ.ย. 2026",
   "scope": "3ed",
   "sheets": [
     {
