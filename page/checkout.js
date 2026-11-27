@@ -182,6 +182,7 @@
     var drawPm = function () {
       ms = PAY.methods(me, capNames, total);
       var thb = PAY.cur(me) === "THB", can2 = online && ms.length && total >= minOn;
+      if (!PAY.slip()) return can2 ? methodGroups(ms) + PAY.instTable(ms, total) : PAY.NOPAY; // ร้านซ่อนช่องทางโอนแนบสลิป
       return (can2 ? methodGroups(ms) + PAY.instTable(ms, total) : "") + (thb || !can2 ? transferRow(can2) : '<p class="note" style="margin:8px 0 0">ช่องทางอื่นและการโอนเงินจ่ายเป็นบาท เลือกสกุลเงิน THB เพื่อดูทั้งหมด</p>');
     };
     var transferRow = function (can2) {
@@ -194,7 +195,8 @@
       var b = $("pmbox");
       if (b) b.innerHTML = drawPm();
     };
-    var why = online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
+    var why = !PAY.slip() ? (online && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "")
+      : online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
       && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
     var hasTax = !!(t.name || t.id);
     taxOpen = taxOpen || hasTax;
@@ -318,7 +320,7 @@
     $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id)
       + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.thb(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>"
       + tracker(o) +
-      (method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "")
+      (!PAY.slip() ? (online ? on : PAY.NOPAY) : method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "")
         + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
         : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx
           + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
@@ -415,6 +417,10 @@
       say("ตะกร้าว่าง", true);
       return;
     }
+    if (pm === "transfer" && !PAY.slip()) { // ร้านซ่อนช่องทางโอนแนบสลิป และไม่มีช่องทางออนไลน์ให้เลือก
+      say("ตอนนี้ยังไม่มีช่องทางชำระสำหรับยอดนี้ ลองใหม่ภายหลัง", true);
+      return;
+    }
     if (!f.elements.agree.checked) {
       say("กดยอมรับข้อตกลงการใช้งานก่อนสั่งซื้อ", true);
       f.elements.agree.focus();
@@ -503,9 +509,13 @@
       } catch (e) {} return;
     }
     if (t.dataset.copy != null) {
-      if (navigator.clipboard) navigator.clipboard.writeText(t.dataset.copy).then(function () {
+      var byHand = function () { // เบราว์เซอร์ไม่ยอมให้คัดลอก → แสดงข้อความให้คัดลอกเอง ปุ่มไม่เงียบ
+        window.prompt("คัดลอกข้อความนี้", t.dataset.copy);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t.dataset.copy).then(function () {
         t.textContent = "คัดลอกแล้ว";
-      }, function () {});
+      }, byHand);
+      else byHand();
       return;
     }
     if (busy) return;

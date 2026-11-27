@@ -764,6 +764,9 @@
     if (o.status === ST.wait || o.status === ST.reject) {
       var minOn = +(me && me.minOnline) || 20;
       if (P.on !== true) body = '<p class="note">ร้านยังไม่เปิดรับชำระเงิน</p>';
+      // 27 พ.ย. 2026: ร้านซ่อนช่องทางโอนแนบสลิป (pay.js slip) → มีเฉพาะช่องทางออนไลน์ · สลิปที่ถูกตีกลับยังแนบใหม่ได้
+      else if (!B.pay.slip() && o.status !== ST.reject) body = payOnline() && payMethods().length && o.amount >= minOn
+        ? payChooser(o) : B.pay.NOPAY;
       else if (payOnline() && payMethods().length && o.amount >= minOn) body = payChooser(o) + '<details class="alt"><summary>หรือโอนเงินเข้าบัญชีร้านแล้วแนบสลิป (ร้านตรวจยอดภายใน '
         + esc(P.hours || 24) + ' ชั่วโมง)</summary>' + payBox(o) + "</details>";
       else body = (payOnline() && payMethods().length ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : "")
@@ -1916,9 +1919,13 @@
     }
     if (t.dataset.copy != null) {
       var tx = t.dataset.copy;
-      if (navigator.clipboard) navigator.clipboard.writeText(tx).then(function () {
+      var byHand = function () { // เบราว์เซอร์ไม่ยอมให้คัดลอก → แสดงข้อความให้คัดลอกเอง ปุ่มไม่เงียบ
+        window.prompt("คัดลอกข้อความนี้", tx);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(function () {
         t.textContent = "คัดลอกแล้ว";
-      }, function () {});
+      }, byHand);
+      else byHand();
       return;
     }
     if (t.dataset.rcpt) {
