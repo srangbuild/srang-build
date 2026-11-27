@@ -8,6 +8,7 @@ Static site on GitHub Pages, with one Google Apps Script back end (`Code.gs`). N
 |---|---|---|
 | `*.html` | One file per page: content and markup only | By hand |
 | `page/<name>.js`, `page/<name>.css` | The script and style of one page | By hand |
+| `util.js` | Shared helpers, loaded first on every page: `window.escHtml`, the one copy of the HTML escape. Other scripts call it through a local `esc` | By hand |
 | `app.js` | Shared shop logic (`window.BUILD`): prices, currency, cart rules, API call | By hand |
 | `nav.js`, `nav.css` | Shared header and language menu | By hand |
 | `pick.js` | Long lists: search box, flags, alphabetical order. The `<select>` stays and holds the value | By hand |
