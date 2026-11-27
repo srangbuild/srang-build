@@ -16,7 +16,9 @@
   try {
     id = (new URLSearchParams(location.search).get("id") || "").trim().toUpperCase();
   } catch (e) {}
-    var x = B.find(id);
+    // 27 Nov 2026: a page file of one item (sheet-F-01A.html, pack-B-HO.html) names its item on the html tag
+    if (!id) id = String(document.documentElement.getAttribute("data-id") || "").trim().toUpperCase();
+  var x = B.find(id);
   var dmy = function (iso) {
     var mt = /^(\d{4})-(\d\d)-(\d\d)/.exec(String(iso || ""));
     return mt ? mt[3] + "/" + mt[2] + "/" + mt[1] : "";
@@ -28,6 +30,11 @@
   var src = x && x.of ? B.find(x.of) || x : x;
 
   if (!x) {
+    // 27 Nov 2026: an address without an item is not a page for search engines
+    var noIdx = document.createElement("meta");
+    noIdx.name = "robots";
+    noIdx.content = "noindex";
+    document.head.appendChild(noIdx);
     $("crumbs").innerHTML = '<a href="' + L("index.html") + '">หน้าหลัก</a><span aria-hidden="true">›</span><a href="'
       + L("sheets.html") + '">ใบตรวจงาน</a>';
     $("pd").innerHTML = '<div class="card empty" style="margin-top:14px"><h1 class="kn" style="color:var(--navy);margin:0 0 8px">ไม่พบสินค้านี้</h1><p>ลิงก์อาจพิมพ์ไม่ครบ หรือสินค้านี้ไม่มีแล้ว</p><a class="b pri" href="'
@@ -66,10 +73,15 @@
       + '" alt="' + esc(x.title) + '"></div>' : '<div class="frame wait" style="background:linear-gradient(160deg,#16395C,#0F2A44);color:#fff;font:700 22px/1.3 Kanit,sans-serif">'
       + esc(x.kind || "สินค้า") + "</div>") + '<figcaption>สินค้าฝากขาย' + (x.seller ? " โดย " + esc(x.seller) : "")
       + " · ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย</figcaption></figure>";
-    if (bundle) return '<figure class="pd-media"><div class="frame set" aria-hidden="true">' + items.slice(0,
-      9).map(function (s) {
-        return "<span>" + esc(s.id) + "</span>";
-      }).join("") + '</div><figcaption>ชุดนี้มี ' + items.length + " ใบ · กดชื่อใบด้านล่างเพื่อดูรายละเอียดแต่ละใบ</figcaption></figure>";
+    // 27 Nov 2026: each tile shows the real first page of the sheet (small picture from sheets/thumb, made by gen_sheet_thumbs.ps1)
+    // with its code and job name, and opens that sheet. A sheet without a checked picture keeps the plain tile.
+    if (bundle) return '<figure class="pd-media"><div class="frame set">' + items.slice(0, 9).map(function (s) {
+      var th = s.ok === true && /^sheets\/img\/[\w\-]+\.png$/.test(s.img || "") ? s.img.replace("sheets/img/",
+        "sheets/thumb/").replace(/\.png$/, ".jpg") : "";
+      return '<a class="st' + (th ? "" : " noimg") + '" href="' + esc(B.itemHref(s))
+        + '">' + (th ? '<img src="' + esc(th) + '" alt="" loading="lazy" decoding="async" width="300" height="424">' : "")
+        + "<span><b>" + esc(B.code(s)) + "</b>" + esc(s.title) + "</span></a>";
+    }).join("") + '</div><figcaption>ชุดนี้มี ' + items.length + " ใบ · กดภาพหรือชื่อใบด้านล่างเพื่อดูรายละเอียดแต่ละใบ</figcaption></figure>";
     var img = src.ok === true && src.img ? src.img : "";
     if (!img) return '<figure class="pd-media"><div class="frame wait"><span>ภาพตัวอย่างหน้าแรกจะแสดง<br>เมื่อร้านตรวจรายการของใบนี้เสร็จ</span></div></figure>';
     return '<figure class="pd-media"><div class="frame"><img src="' + esc(img) + '" alt="ตัวอย่างหน้าแรกของ '
@@ -255,12 +267,16 @@
         + "item=" + encodeURIComponent(src.id) + '" data-full="1">ภาษาอื่น</a></p>' : "");
   }
   function trust() {
-    var h = +P.hours || 24;
-    if (mk) return '<ul class="trust"><li><i>✓</i><span>ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · ร้านรับชำระและดูแลการส่งมอบ</span></li><li><i>✓</i><span>ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร กระเป๋าเงินออนไลน์ หรือโอนเงิน</span></li><li><i>✓</i><span>'
+    var h = +P.hours || 24, noSlip = P.transfer === false; // 27 Nov 2026: the transfer channel is hidden, so the page names only the ways a buyer can use now
+    if (mk) return '<ul class="trust"><li><i>✓</i><span>ร้านตรวจสินค้าและลิขสิทธิ์ก่อนวางขาย · ร้านรับชำระและดูแลการส่งมอบ</span></li><li><i>✓</i><span>'
+      + (noSlip ? "ชำระด้วยบัตรหรือพร้อมเพย์ ผ่านผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต" : "ชำระด้วยบัตร พร้อมเพย์ แอปธนาคาร กระเป๋าเงินออนไลน์ หรือโอนเงิน")
+      + "</span></li><li><i>✓</i><span>"
       + esc(DEL[x.delivery] || DEL.manual) + "</span></li>" + (x.delivery === "file" ? "<li><i>✓</i><span>ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li>" : "")
       + "</ul>";
-    return '<ul class="trust"><li><i>✓</i><span>ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่านผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน '
-      + h + ' ชั่วโมง</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
+    return '<ul class="trust"><li><i>✓</i><span>' + (noSlip
+      ? "ชำระด้วยบัตรไทยและต่างประเทศ หรือพร้อมเพย์ ผ่านผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระแล้วดาวน์โหลดได้ทันที"
+      : "ชำระด้วยพร้อมเพย์ บัตรไทยและต่างประเทศ แอปธนาคาร หรือกระเป๋าเงินออนไลน์ ผ่านผู้ให้บริการรับชำระเงินที่ได้รับอนุญาต หรือโอนเงินแล้วแนบสลิป · เลขบัตรไม่ผ่านเว็บร้าน</span></li><li><i>✓</i><span>ชำระออนไลน์ ดาวน์โหลดได้ทันที · โอนเงิน ร้านตรวจยอดภายใน "
+      + h + " ชั่วโมง") + '</span></li><li><i>✓</i><span>ทุกหน้ามีชื่อผู้ซื้อและเลขสิทธิ์พิมพ์ท้ายกระดาษ · ดาวน์โหลดซ้ำได้ทุกเมื่อจากหน้าสมาชิก</span></li><li><i>✓</i><span>ไฟล์ PDF ขนาด A4 พิมพ์ใช้หน้างานได้ทันที · ไม่มีค่าส่ง</span></li></ul>';
   }
   // 2 พ.ย. 2026: บรรทัดอังกฤษที่สองมีเฉพาะหน้าภาษาไทย · หน้าอังกฤษใช้ข้อความอังกฤษที่เขียนไว้ · ภาษาอื่นแปลจากข้อความหลัก
   function uiLang() {
@@ -348,7 +364,7 @@
       return t + B.memberPrice(s.price);
     }, 0);
     return '<section class="pd-sec" id="inside"><h2>ใบในชุดนี้</h2><ul class="inc">' + items.map(function (s) {
-      return '<li><a href="' + L("product.html", "id=" + encodeURIComponent(s.id)) + '"><span>' + esc(B.code(s)
+      return '<li><a href="' + esc(B.itemHref(s)) + '"><span>' + esc(B.code(s)
         + " " + s.title) + "</span><em>" + esc(s.nPro) + " ข้อ · " + B.baht(B.memberPrice(s.price))
         + "</em></a></li>";
     }).join("") + "</ul>" +
@@ -379,7 +395,7 @@
         var y = B.find(k);
         return t + (y ? B.memberPrice(y.price) : 0);
       }, 0), p = B.memberPrice(b.price);
-      return '<a class="bcard" href="' + L("product.html", "id=" + encodeURIComponent(b.id)) + '"><b>'
+      return '<a class="bcard" href="' + esc(B.itemHref(b)) + '"><b>'
         + esc(B.code(b) + " " + b.title) + "</b><small>" + b.items.length + " ใบ: " + esc(setNames(b.items))
         + "</small><span><span class=\"price\">" + B.baht(p) + "</span>" + (s > p
           ? ' <span class="sv">ถูกกว่าซื้อแยก ' + B.baht(s - p) + "</span>" : "") + "</span></a>";
@@ -415,8 +431,9 @@
     var qa = [
       ["แบบ ซื้อฉบับนี้ กับ รับฉบับใหม่ตลอด ต่างกันอย่างไร",
         "ซื้อฉบับนี้: ได้ไฟล์ฉบับวันที่ซื้อ เก็บและดาวน์โหลดซ้ำได้ตลอด · รับฉบับใหม่ตลอด: เมื่อร้านปรับใบตามกฎหมาย มาตรฐาน หรือข้อกำหนดที่เปลี่ยน คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง · ซื้อฉบับนี้ไปแล้ว อัปเกรดภายหลังได้โดยจ่ายเฉพาะส่วนต่าง"],
-      ["ได้ไฟล์อย่างไร",
-        "ชำระออนไลน์ ระบบเปิดสิทธิ์ทันที · โอนเงินแล้วแนบสลิป ร้านตรวจยอดภายใน " + h + " ชั่วโมง · กดดาวน์โหลดได้ที่หน้าสมาชิก เมนู เอกสารของฉัน ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ"],
+      ["ได้ไฟล์อย่างไร", P.transfer === false
+        ? "ชำระออนไลน์ ระบบเปิดสิทธิ์ทันที · กดดาวน์โหลดได้ที่หน้าสมาชิก เมนู เอกสารของฉัน ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ"
+        : "ชำระออนไลน์ ระบบเปิดสิทธิ์ทันที · โอนเงินแล้วแนบสลิป ร้านตรวจยอดภายใน " + h + " ชั่วโมง · กดดาวน์โหลดได้ที่หน้าสมาชิก เมนู เอกสารของฉัน ระบบส่งอีเมลแจ้งทุกขั้น และมีลิงก์ติดตามสถานะ"],
       ["ใช้กับหลายโครงการได้ไหม",
         "ได้ ผู้ซื้อใช้ในงานของตนเองและของหน่วยงานที่ตนทำงานอยู่ได้ไม่จำกัดจำนวนครั้ง พิมพ์ได้ · ไม่อนุญาตให้ขาย แจกจ่าย เผยแพร่ต่อสาธารณะ หรือดัดแปลงแล้วนำไปขาย"],
       ["ออกใบเสร็จได้ไหม",
@@ -439,6 +456,13 @@
       + "</p>" + facts() + '<div id="buybox">' + buyBox() + "</div>" + trust() + "</div></div>" +
       (mk ? secMarket() : (bundle ? secIncluded() : secOutline() + secStandards() + secRecords())
         + secBundles()) + secFaq();
+    Array.prototype.forEach.call(document.querySelectorAll(".pd-media .frame.set img"), function (im) {
+      im.addEventListener("error", function () { // no small picture for this sheet: show the plain tile
+        var a = im.parentNode;
+        im.remove();
+        if (a) a.classList.add("noimg");
+      });
+    });
     mountPicker();
     mbar();
   }
@@ -583,12 +607,17 @@
   }).catch(function () {});
 
   // ที่อยู่หลักของหน้านี้ (1 หน้าต่อ 1 สินค้า) และภาพตัวอย่างตอนแชร์
-  var siteUrl = String((B.S.site || {}).url || "").replace(/\/+$/, "");
+  // 27 Nov 2026: the main address is the page file of the item (sheet-…html, pack-…html) when the item has one
+  var siteUrl = String((B.S.site || {}).url || "").replace(/\/+$/, ""), pageFile = B.pageOf(x);
+  var mainUrl = siteUrl + "/" + (pageFile || "product.html?id=" + encodeURIComponent(x.id));
   if (/^https:\/\//.test(siteUrl) && !x.hidden) {
-    var cl = document.createElement("link");
-    cl.rel = "canonical";
-    cl.href = siteUrl + "/product.html?id=" + encodeURIComponent(x.id);
-    document.head.appendChild(cl);
+    var cl = document.querySelector('link[rel="canonical"]');
+    if (!cl) {
+      cl = document.createElement("link");
+      cl.rel = "canonical";
+      document.head.appendChild(cl);
+    }
+    cl.href = mainUrl;
     var og = document.querySelector('meta[property="og:title"]');
     if (og) og.setAttribute("content", document.title);
     if (!bundle && src.ok === true && src.img) {
@@ -596,8 +625,8 @@
       if (oi) oi.setAttribute("content", siteUrl + "/" + src.img);
     }
   }
-  // ข้อมูลสินค้าสำหรับเครื่องมือค้นหา (เฉพาะรายการที่เปิดขาย)
-  if (sell && !x.hidden) {
+  // ข้อมูลสินค้าสำหรับเครื่องมือค้นหา (เฉพาะรายการที่เปิดขาย) · หน้าไฟล์ของสินค้ามีข้อมูลนี้ในไฟล์แล้ว (id ld-product) จึงไม่ใส่ซ้ำ
+  if (sell && !x.hidden && !document.getElementById("ld-product")) {
     var ld = {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -610,7 +639,7 @@
         priceCurrency: "THB",
         price: String(pE),
         availability: "https://schema.org/InStock",
-        url: location.href.split("#")[0]
+        url: /^https:\/\//.test(siteUrl) ? mainUrl : location.href.split("#")[0]
       }
     };
     if (!bundle && src.img) ld.image = new URL(src.img, location.href).href;

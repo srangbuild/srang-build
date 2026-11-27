@@ -19,7 +19,9 @@
     return a - b;
   })[0];
   if (low) $("cmp-price").textContent = "เริ่มต้น " + B.baht(low);
-  $("hero-pts").innerHTML = ["ฉบับฟรี 1 ภาษา เลือกได้ทุกภาษา",
+  // 27 Nov 2026: launch scope 3ed makes documents in Thai and English only, so the text says so. The full text comes back when the scope key leaves data.js.
+  var s3ed = !!(window.REGION && window.REGION.scope3 && window.REGION.scope3());
+  $("hero-pts").innerHTML = [s3ed ? "ฉบับฟรี 1 ภาษา: ไทยหรืออังกฤษ" : "ฉบับฟรี 1 ภาษา เลือกได้ทุกภาษา",
     "ฉบับมืออาชีพ เลือกได้ 3 แบบ: อังกฤษ-ไทยในใบเดียว ไทยอย่างเดียว หรืออังกฤษอย่างเดียว",
     // 21 พ.ย. 2026: เปิดขายฉบับภาษาเดียวแล้ว
     "จุดหยุดรอตรวจ (H) ตารางบันทึกค่า ใบข้อบกพร่อง ลงชื่อ 3 ฝ่าย",
@@ -74,7 +76,8 @@
     var pr = +x.price > 0 ? '<span class="price">' + (many ? '<small class="from">เริ่มต้น</small> ' : "")
       + B.baht(B.memberPrice(x.price))
       + "</span>" : "", sv = B.cart.saving(x.id + (ed ? "." + ed : ""));
-    var save = sv > 0 && !noSave ? '<span style="flex:1 0 100%"><span class="pill ok">ถูกกว่าซื้อแยก ' + B.baht(sv)
+    var save = sv > 0 && !noSave ? '<span style="flex:1 0 100%"><span class="pill ok">ถูกกว่าซื้อแยก '
+      + B.baht(sv)
       + "</span></span>" : "";
     return B.canSell(x) ? save + pr + '<button class="b pri sm" type="button" data-add="' + esc(x.id)
       + '">ใส่ตะกร้า</button>' : save + pr + '<span class="pill">' + (B.reviewed(x) ? "เปิดขายเร็ว ๆ นี้" : "กำลังตรวจรายการ")
@@ -86,8 +89,8 @@
     } catch (e) {}
   }
   function pLink(id) {
-    return "product.html" + (q ? q + "&" : "?") + "id=" + encodeURIComponent(id);
-  } // หน้าสินค้ารายใบ (24 ต.ค. 2026)
+    return B.itemHref(id);
+  } // หน้าสินค้ารายใบ (24 ต.ค. 2026) · 27 Nov 2026: the address comes from BUILD.itemHref (the page file of the item)
   function draw() {
     $("cards").innerHTML = sh.filter(function (x) {
       return (cur === "ทั้งหมด" || x.group === cur) && hit(x);
@@ -153,10 +156,11 @@
     try {
       thUi = (localStorage.getItem("build_lang") || "th") === "th";
     } catch (e) {}
-    var nm = x.items.map(function (id) {
-      var s = B.find(id);
-      return s ? (thUi ? s.title : s.id) : id;
-    }), names = thUi ? nm.slice(0, 4).join(" · ") + (nm.length > 4 ? " และอีก " + (nm.length - 4) + " ใบ" : "")
+      var nm = x.items.map(function (id) {
+        var s = B.find(id);
+        return s ? (thUi ? s.title : s.id) : id;
+      }), names = thUi ? nm.slice(0, 4).join(" · ") + (nm.length > 4 ? " และอีก " + (nm.length - 4)
+        + " ใบ" : "")
       : nm.join(" · ");
     return '<div class="card pad"><span class="code" style="font-family:Kanit,sans-serif;font-weight:700;color:#C24A08;font-size:14px">'
       + esc(B.code(x)) + " · " + x.items.length + ' ใบ</span><h3 style="margin:2px 0 4px;font-size:19px;color:#0F2A44;font-family:inherit"><a href="'
@@ -178,7 +182,10 @@
   }
   var f02 = B.find("F-02");
   if (f02 && f02.ok === true) $("how-guide").hidden = false;
-  if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
+  if (B.P.transfer === false) { // 27 Nov 2026: the transfer channel is hidden, so the steps name only the ways a buyer can use now
+    $("how-pay").textContent = "เปิดตะกร้า ตรวจรายการ แล้วกด ชำระเงิน · เข้าสู่ระบบหรือสมัครสมาชิก (ฟรี) · ชำระด้วยบัตรหรือพร้อมเพย์ · ระบบส่งอีเมลทุกขั้น และมีลิงก์ติดตามสถานะ";
+    $("how-wait").textContent = "ชำระแล้ว ระบบเปิดสิทธิ์ให้ดาวน์โหลดทันที";
+  } else if (B.P.hours) $("how-wait").textContent = "ร้านตรวจยอดเข้าบัญชีภายใน " + B.P.hours + " ชั่วโมง แล้วเปิดสิทธิ์ให้ดาวน์โหลด (ชำระออนไลน์ เปิดได้ทันที)";
   // 2 พ.ย. 2026: ลูกค้าภาษาอื่นเห็นว่ามาตรฐานตามประเทศของตน มีข้อมูลแล้วกี่ใบ
   (function () {
     var lg = "th";

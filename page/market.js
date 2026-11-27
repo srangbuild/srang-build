@@ -10,7 +10,7 @@
     a.href = a.getAttribute("href") + q;
   });
   var pLink = function (id) {
-    return "product.html" + (q ? q + "&" : "?") + "id=" + encodeURIComponent(id);
+    return B.itemHref(id);
   };
   var DEL = {
     file: "ดาวน์โหลดได้ทันทีหลังชำระ",

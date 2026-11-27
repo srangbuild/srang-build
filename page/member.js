@@ -34,7 +34,8 @@
     line: B.demo || /^\d{8,12}$/.test(String(M.lineChannelId || "")),
     facebook: B.demo || /^\d{8,20}$/.test(String(M.facebookAppId || "")),
     // tiktokLive: false = ซ่อนปุ่มไว้จนกว่า TikTok อนุมัติแอป (25 พ.ย. 2026 TikTok ตอบ unauthorized_client)
-    tiktok: B.demo || (M.tiktokLive !== false && /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey || "")))
+    tiktok: B.demo || (M.tiktokLive !== false && /^[A-Za-z0-9]{8,40}$/.test(String(M.tiktokClientKey
+      || "")))
   };
   // อวาตาร์สัตว์ 12 ตัวของแก๊งสัตว์ (รหัสตรงกับหลังบ้าน Code.gs ตัวแปร AVATARS)
   var AV = [["otter", "นากช่าง"], ["koon", "คูน"], ["sloth", "ลอธ"], ["somo", "ส้มโอ"], ["nim",
@@ -1194,8 +1195,8 @@
       + list.map(function (id) {
         var x = B.find(id);
         return '<p style="margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center"><span>'
-          + esc(B.code(x) + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="product.html?id='
-          + encodeURIComponent(id) + (q ? "&" + q.replace(/^\?/, "") : "") + '">ดูใบนี้</a></p>';
+          + esc(B.code(x) + " " + x.title) + "<br><small>" + B.baht(B.memberPrice(x.price)) + '</small></span><a class="b line sm" href="'
+          + esc(B.itemHref(x)) + '">ดูใบนี้</a></p>';
       }).join("") + "</div></section>";
   }
   function paneDocs() {
@@ -2528,7 +2529,7 @@
     try {
       history.replaceState(null, "", HERE + (q || ""));
     } catch (e) {}
-    authView();
+      authView();
     say("กำลังยืนยันอีเมล…");
     run(B.call("registerVerify", { link: m[1].toLowerCase() }).then(function (r) {
       mode = "in";

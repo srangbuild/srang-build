@@ -101,10 +101,10 @@
     }).slice(0, 2);
   }
   function thumb(x) {
-    if (B.isBundle(x)) return '<a class="th set" href="' + L("product.html", "id=" + encodeURIComponent(x.id))
+    if (B.isBundle(x)) return '<a class="th set" href="' + esc(B.itemHref(x))
       + '" aria-hidden="true" tabindex="-1">' + esc(x.id) + "<br>" + x.items.length + " ใบ</a>";
     var s = x.of ? B.find(x.of) || x : x, img = s.ok === true && s.img ? s.img : "";
-    return '<a class="th" href="' + L("product.html", "id=" + encodeURIComponent(x.id)) + '" aria-hidden="true" tabindex="-1">'
+    return '<a class="th" href="' + esc(B.itemHref(x)) + '" aria-hidden="true" tabindex="-1">'
       + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy">' : esc(x.id)) + "</a>";
   }
   function draw() {
@@ -139,7 +139,7 @@
         + esc(x.id)
         + '">แก้ภาษา มาตรฐาน และที่ตั้งงาน</button></div>';
       return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="'
-        + L("product.html", "id=" + encodeURIComponent(x.id)) + '">' + esc(B.code(x) + " " + x.title)
+        + esc(B.itemHref(x)) + '">' + esc(B.code(x) + " " + x.title)
         + "</a><em>" + (info.block ? "–" : B.baht(info.amt)) + "</em></div>" +
         "<small>" + (B.isMarket(x) ? "สินค้าฝากขาย · " + esc(x.kind || "") + (x.seller ? " โดย " + esc(x.seller) : "")
           + " · " + esc({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งรายละเอียดทางอีเมล" }[x.delivery]
