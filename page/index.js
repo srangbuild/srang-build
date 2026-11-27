@@ -164,8 +164,14 @@
     })[0];
     $("sheetbox").innerHTML = "<p><strong>" + shs.length + " ใบ: " + esc(shs.slice(0, 4).map(function (x) {
       return x.title.replace(/\s*\(.*$/, "");
-    }).join(" · ")) + " และอื่น ๆ</strong><small>ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า, 1 ภาษา เลือกได้ทุกภาษา) และฉบับมืออาชีพอังกฤษ-ไทยที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง"
-      + (onSale.length ? " · เปิดขายแล้ว " + onSale.length + " ใบ ราคาเริ่มต้น " + (window.BUILD && window.BUILD.baht
+    }).join(" · ")) + " และอื่น ๆ</strong><small><span>" + (window.REGION && window.REGION.scope3 && window.REGION.scope3()
+      /* 27 Nov 2026: launch scope 3ed makes documents in Thai and English only.
+         The sentence has its own element: the translation list holds this sentence alone, and a longer text node found no pair
+         (English readers then got a machine translation of poor quality). */
+      ? "ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า ฉบับไทยหรืออังกฤษ) และฉบับมืออาชีพอังกฤษ-ไทยที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง"
+      : "ฉบับฟรีพิมพ์ใช้ได้ทันที (1–2 หน้า, 1 ภาษา เลือกได้ทุกภาษา) และฉบับมืออาชีพอังกฤษ-ไทยที่มีจุดหยุดรอตรวจ ตารางบันทึกค่าเฉพาะงาน และใบข้อบกพร่อง")
+      + "</span>" + (onSale.length ? " · เปิดขายแล้ว " + onSale.length + " ใบ ราคาเริ่มต้น " + (window.BUILD
+        && window.BUILD.baht
         ? window.BUILD.baht(minP) : "฿" + Number(minP).toLocaleString("th-TH")) + " · ชุดรวมถูกกว่าซื้อแยก · ชำระแล้วดาวน์โหลดได้ทันที" : rdy < shs.length
         ? " · กำลังทยอยเปิดให้ดาวน์โหลด" : "") + '</small></p><span class="row"><a class="b pri" href="sheets.html'
       + pv + '">' + (onSale.length ? "เลือกซื้อใบตรวจงาน" : "ดูใบตรวจงาน") + "</a>" + (memOn ? '<a class="b sec" href="member.html'

@@ -62,7 +62,7 @@
           + encodeURIComponent(o.id)) + '">' + (paid ? "เปิดเอกสารของฉัน" : o.status === ST.check
             ? "ดูคำสั่งซื้อของฉัน" : "ไปชำระหรือแนบสลิป") + "</a>") + (paid && o.receipt ? '<a class="b line sm" href="member.html#orders">ใบเสร็จรับเงิน'
               + (o.receipt !== "pending" ? " " + esc(o.receipt) : "") + "</a>" : "") // ใบเสร็จมีข้อมูลส่วนตัว: เปิดจากหน้าสมาชิกหรืออีเมล ไม่ใช่จากลิงก์ติดตาม + '<button class="b line sm" type="button" id="re">ตรวจสถานะล่าสุด</button></p></div>';
-    var re = $("re");
+      var re = $("re");
     if (re) re.onclick = load;
   }
   function load() {

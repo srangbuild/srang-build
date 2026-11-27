@@ -9,9 +9,9 @@
   try {
     EN = !/^th/.test(localStorage.getItem("build_lang") || "th");
   } catch (e) {}
-  function L(th, en) {
-    return EN ? en : th;
-  }
+    function L(th, en) {
+      return EN ? en : th;
+    }
   if (EN) {
     var bar = document.querySelector(".bar"), bt = function (sel, t) {
       var n = bar && bar.querySelector(sel);
@@ -74,7 +74,8 @@
       timeZone: "Asia/Bangkok" }) + " (GMT+7)"; // 7 พ.ย. 2026: ใบเสร็จเป็นเอกสารของร้านในไทย วันที่ตามเวลาไทย จึงบอกเขตเวลาให้ชัด
   }
   function fail(t, detail) { // detail = the shop's own message, kept for support when the page shows English
-    $("out").innerHTML = '<p class="msg bad">' + esc(t) + (detail ? '<br><small lang="th">' + esc(detail) + "</small>" : "") + "</p>";
+    $("out").innerHTML = '<p class="msg bad">' + esc(t) + (detail ? '<br><small lang="th">' + esc(detail)
+      + "</small>" : "") + "</p>";
   }
   if (!/^BT-\d{6}-\d{3,6}$/.test(order)) { // รูปแบบเดียวกับหลังบ้าน (3 ถึง 6 หลักต่อวัน)
     fail(L("ลิงก์ใบเสร็จไม่ครบ · เปิดจากหน้าสมาชิก เมนู คำสั่งซื้อของฉัน หรือจากลิงก์ในอีเมล",
@@ -85,7 +86,8 @@
     var S = r.shop, rc = r.receipt || {}, by = rc.buyer || {}, tax = r.kind === "tax";
     var title = tax ? "ใบเสร็จรับเงิน / ใบกำกับภาษี" : "ใบเสร็จรับเงิน", titleEn = tax ? "Receipt / Tax invoice" : "Receipt";
     var note = !r.ready ? '<p class="msg noprint">' + esc(L("ร้านกำลังตั้งค่าข้อมูลผู้ออกใบเสร็จ (ชื่อตามกฎหมายและเลขประจำตัวผู้เสียภาษี) · เลขที่ใบเสร็จและรายการด้านล่างบันทึกไว้แล้ว เปิดลิงก์นี้อีกครั้งภายหลังเพื่อได้ใบเสร็จฉบับสมบูรณ์",
-      "The shop is setting up the issuer details (legal name and tax ID). The receipt number and the items below are saved. Open this link again later to get the complete receipt.")) + "</p>" : "",
+      "The shop is setting up the issuer details (legal name and tax ID). The receipt number and the items below are saved. Open this link again later to get the complete receipt."))
+      + "</p>" : "",
       wait = L("(รอร้านตั้งค่า)", "(shop is setting this up)");
     var rows = (rc.lines || []).map(function (l, i) {
       return "<tr><td class=\"n hide\">" + (i + 1) + "</td><td>" + (l.id ? "<b>" + esc(window.BUILD
@@ -106,17 +108,21 @@
       + "</b><span>" + esc(S.brand) + "</span></div></div>" +
       '<div class="ttl"><h1>' + esc(title) + '</h1><div class="en">' + esc(titleEn) + '</div><span class="orig">ต้นฉบับ · Original</span></div></div>'
       +
-      '<div class="two"><div class="blk"><h2>ผู้ขาย / ผู้ออกใบเสร็จ <small>Seller / Issuer</small></h2><p><b>' + esc(S.name || wait)
+      '<div class="two"><div class="blk"><h2>ผู้ขาย / ผู้ออกใบเสร็จ <small>Seller / Issuer</small></h2><p><b>'
+      + esc(S.name || wait)
       + "</b>" + (tax ? " (" + esc(S.branch) + ")" : "") + "<br>" + esc(S.addr || "") + "<br>เลขประจำตัวผู้เสียภาษีอากร (Tax ID) "
       + esc(S.id || wait) + "</p></div>" +
       // 27 Nov 2026: one "paid by" row (the back end sends the same method twice, so the old page showed it twice)
-      '<div class="blk"><dl class="meta"><dt>เล่มที่ <small>Book</small></dt><dd>' + esc(rc.book || "") + "</dd><dt>เลขที่ <small>No.</small></dt><dd>"
+      '<div class="blk"><dl class="meta"><dt>เล่มที่ <small>Book</small></dt><dd>' + esc(rc.book || "")
+      + "</dd><dt>เลขที่ <small>No.</small></dt><dd>"
       + esc(rc.no || "") + "</dd><dt>วันที่ <small>Date</small></dt><dd>" + thDate(rc.at) + "</dd><dt>คำสั่งซื้อ <small>Order</small></dt><dd>"
       + esc(r.order.id) + "</dd><dt>ชำระด้วย <small>Paid by</small></dt><dd>"
       + esc(r.order.method || rc.method || "โอนเงิน") + "</dd></dl></div></div>" +
-      '<div class="blk" style="margin:0 0 6px"><h2>ผู้ซื้อ / ลูกค้า <small>Buyer / Customer</small></h2><p><b>' + esc(by.name || by.email
+      '<div class="blk" style="margin:0 0 6px"><h2>ผู้ซื้อ / ลูกค้า <small>Buyer / Customer</small></h2><p><b>'
+      + esc(by.name || by.email
         || "") + "</b>" + (by.type === "company" && by.branch ? " (" + esc(by.branch) + ")" : "")
-      + (by.addr ? "<br>" + esc(by.addr) : "") + (by.id ? "<br>เลขประจำตัวผู้เสียภาษีอากร (Tax ID) " + esc(by.id) : "")
+      + (by.addr ? "<br>" + esc(by.addr) : "") + (by.id ? "<br>เลขประจำตัวผู้เสียภาษีอากร (Tax ID) "
+        + esc(by.id) : "")
       + (by.email ? "<br>" + esc(by.email) : "") + "</p></div>" +
       '<table><thead><tr><th class="n hide">ลำดับ<small>No.</small></th><th>รายการ<small>Description</small></th><th class="n hide">จำนวน<small>Qty</small></th><th class="n">จำนวนเงิน (บาท)<small>Amount (THB)</small></th></tr></thead><tbody>'
       + rows + "</tbody></table>" +
@@ -130,7 +136,8 @@
     document.title = (rc.no || L("ใบเสร็จ", "Receipt")) + " — " + (S.name || S.brand);
   }).catch(function (e) {
     var m = e && e.message ? String(e.message) : "";
-    if (EN) fail("Could not open this receipt. Check the link, or open it from My orders on the member page.", m);
+    if (EN) fail("Could not open this receipt. Check the link, or open it from My orders on the member page.",
+      m);
     else fail(m || "เปิดใบเสร็จไม่ได้ ลองใหม่อีกครั้ง");
   });
   $("print").addEventListener("click", function () {

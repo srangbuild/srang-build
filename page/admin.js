@@ -124,11 +124,11 @@
     pay: [["on", "เปิดรับชำระเงิน (โอนแล้วแนบสลิป และชำระออนไลน์ถ้าใส่คีย์ Opn)", "bool"], ["transfer",
       "แสดงช่องทาง โอนเงินแล้วแนบสลิป ให้ลูกค้า (ไม่ติ๊ก = ซ่อนจากลูกค้า · แอดมินยังเห็นและทดสอบได้ในโหมดดูตัวอย่าง)",
       "bool"], ["opnKey",
-      "Opn Payments public key ขึ้นต้น pkey_ (ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ระบบตรวจยอดเอง · เว้นว่าง = โอนแล้วแนบสลิปอย่างเดียว · ห้ามใส่คีย์ลับ skey_ ที่นี่)",
-      "", "full"], ["methods",
-        "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ บรรทัดละ 1 · เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริงให้เอง (promptpay พร้อมเพย์ · card บัตร · googlepay · alipay · stripe · paypal · wechat_pay · alipay_hk · kakaopay · touch_n_go · installment ผ่อนชำระ · mobile_banking_kbank / _scb / _bbl / _bay / _ktb แอปธนาคาร · truemoney_jumpapp · rabbit_linepay · shopeepay · grabpay)",
-        "lines", "full"], ["bankMin",
-          "ยอดขั้นต่ำที่แสดงแอปธนาคาร (บาท) เพราะ Opn คิด 10 บาทต่อรายการ · ยอดต่ำกว่านี้ลูกค้าใช้พร้อมเพย์แทน · ใส่ 0 = แสดงทุกยอด"],
+        "Opn Payments public key ขึ้นต้น pkey_ (ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ ระบบตรวจยอดเอง · เว้นว่าง = โอนแล้วแนบสลิปอย่างเดียว · ห้ามใส่คีย์ลับ skey_ ที่นี่)",
+        "", "full"], ["methods",
+          "ช่องทางชำระออนไลน์ที่แสดงบนเว็บ บรรทัดละ 1 · เว็บแสดงเฉพาะช่องทางที่บัญชี Opn เปิดอยู่จริงให้เอง (promptpay พร้อมเพย์ · card บัตร · googlepay · alipay · stripe · paypal · wechat_pay · alipay_hk · kakaopay · touch_n_go · installment ผ่อนชำระ · mobile_banking_kbank / _scb / _bbl / _bay / _ktb แอปธนาคาร · truemoney_jumpapp · rabbit_linepay · shopeepay · grabpay)",
+          "lines", "full"], ["bankMin",
+            "ยอดขั้นต่ำที่แสดงแอปธนาคาร (บาท) เพราะ Opn คิด 10 บาทต่อรายการ · ยอดต่ำกว่านี้ลูกค้าใช้พร้อมเพย์แทน · ใส่ 0 = แสดงทุกยอด"],
       ["qrBase",
         "ข้อความในคิวอาร์พร้อมเพย์ของร้าน ระบบใช้สร้างคิวอาร์ที่ใส่ยอดให้เอง · ถ้าเปลี่ยนบัญชีรับเงิน ต้องเปลี่ยนรูปคิวอาร์และช่องนี้พร้อมกัน · เว้นว่าง = ใช้รูปคิวอาร์เดิม",
         "", "full"], ["currencies",
@@ -136,9 +136,10 @@
           "lines", "full"], ["usdRate",
             "อัตราเงินบาทเป็นดอลลาร์ สำหรับแสดงราคาโดยประมาณในโหมดภาษาอังกฤษ เช่น 0.0296"], ["googlePayId",
               "Google Pay merchant ID (ใช้กับคีย์จริงเท่านั้น · เว้นว่างในโหมดทดสอบ)"], ["bank",
-                "ธนาคาร"], ["name", "ชื่อบัญชี"], ["acc",
-                  "เลขบัญชี (เว้นว่างได้ ถ้าใช้คิวอาร์อย่างเดียว)"], ["qr",
-                    "รูปคิวอาร์รับเงิน: วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่องนี้"],
+                "ธนาคาร (ใส่ 4 ช่องนี้เฉพาะตอนเปิดช่องทาง โอนเงินแล้วแนบสลิป · ข้อมูลอยู่ในไฟล์ข้อมูลของเว็บที่ทุกคนเปิดอ่านได้)"],
+      ["name", "ชื่อบัญชี"], ["acc",
+        "เลขบัญชี (เว้นว่างได้ ถ้าใช้คิวอาร์อย่างเดียว)"], ["qr",
+          "รูปคิวอาร์รับเงิน: วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในช่องนี้"],
       ["hours", "ตรวจยอดภายในกี่ชั่วโมง"], ["note", "ข้อความใต้ข้อมูลรับเงิน", "long", "full"]]
   };
   var W = PL.map(function (p) {
@@ -235,11 +236,12 @@
       blank: function () {
         return { title: "", text: "", status: "ยังไม่เปิดรับ", price: "", url: "" };
       },
-      fields: [["title", "ชื่อบริการ"], ["status", "สถานะเตรียมงาน (เห็นเฉพาะหลังบ้าน)"], ["text",
-        "รายละเอียด (ผู้ใช้เห็นเมื่อเปิดรับแล้ว · ตอนนี้ผู้ใช้เห็นแค่ชื่อและคำว่า เร็ว ๆ นี้)",
-        "long", "full"], ["price", "ราคา (แสดงเมื่อเปิดรับแล้ว)"], ["todo",
-          "สิ่งที่ต้องเตรียมก่อนเปิด (เห็นเฉพาะหลังบ้าน)", "long", "full"], ["url",
-            "ลิงก์จอง (ใส่แล้ว = เปิดรับ)", "url"]]
+      /* 27 Nov 2026: every field here is saved in data.js, a public file. The page hides a service that is not open,
+         but the file does not. The internal to-do field left this form. Fill text and price only near the opening date. */
+      fields: [["title", "ชื่อบริการ"], ["status", "สถานะ (ไม่แสดงบนหน้าเว็บ)"], ["text",
+        "รายละเอียด (ใส่เมื่อใกล้เปิดรับ · ช่องนี้อยู่ในไฟล์ข้อมูลของเว็บที่ทุกคนเปิดอ่านได้ แม้หน้าเว็บยังไม่แสดง)",
+        "long", "full"], ["price", "ราคา (ใส่เมื่อใกล้เปิดรับ · อยู่ในไฟล์ข้อมูลของเว็บเช่นกัน)"], ["url",
+          "ลิงก์จอง (ใส่แล้ว = เปิดรับ)", "url"]]
     },
     shop: {
       name: "สินค้าของช่อง",
@@ -501,10 +503,19 @@
         + " · ต้องใส่ OPN_SKEY ใน Script properties ด้วย" : "ยังไม่ใส่คีย์ ลูกค้าชำระด้วยการโอนแล้วแนบสลิปได้ตามเดิม · สมัคร Opn Payments ตามคู่มือ");
       add(lo.length ? "ok" : "wa", "เข้าสู่ระบบด้วย Google LINE Facebook TikTok: เปิด " + lo.length
         + " จาก 4", lo.length < 4 ? "ทำตามคู่มือ รายได้\\หลังบ้านสมาชิก\\ติดตั้งหลังบ้านสมาชิก.md ส่วนที่ 2 · ปุ่มที่ยังไม่ตั้งจะไม่แสดง สมัครด้วยอีเมลได้เสมอ" : "");
-      add(S.pay.qr ? "ok" : "wa", "รูปคิวอาร์รับเงิน", S.pay.qr ? esc(S.pay.qr) + " · ลูกค้าเห็นตอนชำระเงินเท่านั้น" : "วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในแท็บ สมาชิกและชำระเงิน");
-      add(S.pay.on === true && apiOk && sl ? "ok" : "wa", "รับชำระเงิน: " + (S.pay.on === true ? "เปิด" : "ปิด")
-        + " · เปิดขาย " + sl + " ใบ", S.pay.on === true ? (!apiOk ? "เปิดรับเงินแต่ยังไม่ต่อหลังบ้าน ลูกค้าจะส่งสลิปถึงร้านไม่ได้" : !(S.pay.name
-          && (S.pay.acc || S.pay.qr)) ? "ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl
+      /* 27 Nov 2026: the transfer channel is hidden (pay.transfer false), so the bank data left data.js (a public file).
+         No bank data is then the correct state, not a warning. A transfer channel that is open still needs it. */
+      var tfOff = S.pay.transfer === false, accSet = !!(S.pay.name && (S.pay.acc || S.pay.qr)),
+        accIn = !!(S.pay.bank || S.pay.name || S.pay.acc || S.pay.qr || S.pay.qrBase);
+      add(tfOff ? (accIn ? "wa" : "ok") : S.pay.qr ? "ok" : "wa",
+        "ข้อมูลบัญชีรับเงิน (โอนแล้วแนบสลิป)", tfOff ? (accIn
+          ? "ปิดช่องทางโอนแล้ว แต่ยังมีข้อมูลบัญชีในไฟล์ข้อมูลของเว็บ ซึ่งทุกคนเปิดอ่านได้ · ลบ 5 ช่อง (ธนาคาร ชื่อบัญชี เลขบัญชี รูปคิวอาร์ ข้อความในคิวอาร์) ในแท็บ สมาชิกและชำระเงิน"
+          : "ปิดช่องทางโอนแล้ว และไม่มีข้อมูลบัญชีในไฟล์ข้อมูลของเว็บ") : S.pay.qr ? esc(S.pay.qr)
+        + " · ลูกค้าเห็นตอนชำระเงินเท่านั้น" : "วางรูปที่ เว็บ\\pay\\qr.jpg แล้วพิมพ์ pay/qr.jpg ในแท็บ สมาชิกและชำระเงิน");
+      add(S.pay.on === true && apiOk && sl && (tfOff || accSet) ? "ok" : "wa", "รับชำระเงิน: " + (S.pay.on === true
+        ? "เปิด" : "ปิด") + " · เปิดขาย " + sl + " ใบ", S.pay.on === true ? (!apiOk
+          ? "เปิดรับเงินแต่ยังไม่ต่อหลังบ้าน ลูกค้าจะชำระเงินไม่ได้" : !tfOff && !accSet
+          ? "เปิดช่องทางโอนเงิน แต่ยังไม่ใส่ชื่อบัญชี หรือยังไม่มีเลขบัญชีและรูปคิวอาร์" : sl
           ? "พร้อมขาย" : "ยังไม่เปิดขายใบใด") : "ใบที่เปิดขายได้ต้องตรวจรายการแล้วเท่านั้น");
     }
     return todayCard() + siteCard() + linksCard() + '<div class="card"><h2>ความพร้อมของเว็บ</h2><p class="hint">ตรวจจากข้อมูลที่กรอกไว้ตอนนี้</p><ul class="chk">'
@@ -1290,11 +1301,13 @@
       + rows + "</tbody></table></div></div>" + (opnCard !== null ? "</div>" : "") + slipCard(su, hl)
       +
       '<div class="card"><h2>ช่องทางอื่น</h2><div class="tbl"><table><tbody>' +
-      "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? '<span class="tag ok">เปิด</span>' : '<span class="tag no">ปิด</span>')
+      "<tr><td>โอนเงินหรือพร้อมเพย์ แล้วแนบสลิป</td><td>" + (S.pay && S.pay.on ? (S.pay.transfer === false
+        ? '<span class="tag no">ซ่อนจากลูกค้า</span>' : '<span class="tag ok">เปิด</span>') : '<span class="tag no">ปิด</span>')
       + "</td><td>ไม่มีค่าธรรมเนียม · " + (!SHOP ? "สถานะการตรวจสลิปอัตโนมัติแสดงหลังโหลดข้อมูล" : su.slipAuto
         ? (hl.slip === false ? "คีย์ EasySlip ใช้ไม่ได้ ระบบส่งให้ร้านตรวจเอง" : "ระบบตรวจสลิปเอง (EasySlip)"
           + (hl.slipLeft !== undefined && hl.slipLeft !== null ? " เหลือ " + hl.slipLeft + " สลิป" : "")) : "ร้านตรวจสลิปเอง · ตั้ง EASYSLIP_KEY เพื่อให้ระบบตรวจ")
-      + " · " + (S.pay && S.pay.qrBase ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
+      + " · " + (S.pay && S.pay.transfer === false ? "ลูกค้าไม่เห็นช่องทางนี้" : S.pay && S.pay.qrBase
+        ? "คิวอาร์ใส่ยอดให้เองแล้ว" : "คิวอาร์แบบลูกค้าพิมพ์ยอดเอง")
       + "</td></tr>" +
       "<tr><td>จ่ายหลายสกุลเงิน</td><td>" + (capData ? esc(((capData.payment_methods.filter(function (m) {
         return m.name === "card";

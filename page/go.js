@@ -33,16 +33,34 @@
   try { // 27 Nov 2026: this page has no translation system, so readers in other languages get English
     EN = !/^th/.test(localStorage.getItem("build_lang") || "th");
   } catch (e) {}
-  var T = EN ? { wait: "Taking you there…", hint: "If the page does not change in 2 seconds, press the button below.",
-    none: "This link is not ready yet", noneHint: "See all channels and free files on the home page.", home: "Go to the home page", go: "Continue" }
-    : { wait: "กำลังพาไป…", hint: "ถ้าหน้าไม่เปลี่ยนใน 2 วินาที กดปุ่มด้านล่าง", none: "ลิงก์นี้ยังไม่พร้อม",
-      noneHint: "ดูทุกช่องทางและของแจกฟรีได้ที่หน้าหลัก", home: "ไปหน้าหลัก", go: "ไปต่อ" };
+    var T = EN ? {
+      wait: "Taking you there…",
+      hint: "If the page does not change in 2 seconds, press the button below.",
+      none: "This link is not ready yet",
+      noneHint: "See all channels and free files on the home page.",
+      home: "Go to the home page",
+      go: "Continue"
+    }
+    : {
+      wait: "กำลังพาไป…",
+      hint: "ถ้าหน้าไม่เปลี่ยนใน 2 วินาที กดปุ่มด้านล่าง",
+      none: "ลิงก์นี้ยังไม่พร้อม",
+      noneHint: "ดูทุกช่องทางและของแจกฟรีได้ที่หน้าหลัก",
+      home: "ไปหน้าหลัก",
+      go: "ไปต่อ"
+    };
   function put(h, p, label, href, id) {
     box.textContent = "";
     var a = document.createElement("h1"), b = document.createElement("p"), c = document.createElement("a");
-    a.textContent = h; b.textContent = p; c.className = "btn"; c.textContent = label; c.href = href;
+    a.textContent = h;
+    b.textContent = p;
+    c.className = "btn";
+    c.textContent = label;
+    c.href = href;
     if (id) c.id = id;
-    box.appendChild(a); box.appendChild(b); box.appendChild(c);
+    box.appendChild(a);
+    box.appendChild(b);
+    box.appendChild(c);
   }
   if (EN) {
     document.documentElement.lang = "en";

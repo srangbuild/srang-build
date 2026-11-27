@@ -197,7 +197,7 @@
     };
     var why = !PAY.slip() ? (online && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "")
       : online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
-      && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
+        && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
     var hasTax = !!(t.name || t.id);
     taxOpen = taxOpen || hasTax;
     $("view").innerHTML = '<div class="cog"><form class="f" id="f-co" novalidate style="gap:14px">'
@@ -310,8 +310,9 @@
         });
         return list.length ? PAY.groupBox(g, list.length, '<p class="note pmh2">' + esc(g[1]) + "</p>",
           PAY.groupNote(list) + '<div class="po">' + list.map(function (k) {
-            return '<button type="button" class="pobtn" data-pay="' + k + '"><b>' + esc(PAY.LABEL[k][0])
-              + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k, list) + "</button>";
+            return '<button type="button" class="pobtn" data-pay="' + k + '" data-oid="' + esc(o.id)
+              + '"><b>' + esc(PAY.LABEL[k][0]) + "</b><small>" + esc(PAY.LABEL[k][1]) + "</small>" + PAY.feeHtml(k,
+                list) + "</button>";
           }).join("") + "</div>") : "";
       }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
       + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
@@ -320,7 +321,8 @@
     $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id)
       + '</h2><p style="margin:0">ยอดชำระ <b class="price">' + B.thb(o.amount) + "</b> · ระบบส่งอีเมลยืนยันคำสั่งซื้อไปแล้ว</p>"
       + tracker(o) +
-      (!PAY.slip() ? (online ? on : PAY.NOPAY) : method === "transfer" && online ? payBox(o) + '<details class="alt"' + (keep ? " open" : "")
+      (!PAY.slip() ? (online ? on : PAY.NOPAY) : method === "transfer" && online ? payBox(o) + '<details class="alt"'
+        + (keep ? " open" : "")
         + "><summary>เปลี่ยนวิธี: จ่ายออนไลน์ เปิดไฟล์ได้ทันที</summary>" + on + "</details>"
         : on + (online ? '<details class="alt"><summary>โอนเงินเข้าบัญชีร้านแล้วแนบสลิป (' + slipTx
           + ")</summary>" + payBox(o) + "</details>" : payBox(o))) +
@@ -534,9 +536,12 @@
       return;
     }
     if (t.dataset.pay) {
-      var oid = (document.querySelector("#f-slip") || {}).dataset ? document.querySelector("#f-slip").dataset.oid : "";
+      /* 27 Nov 2026: the order number is on the button. It was read from the slip form before, and that form is not on the page
+         when the transfer channel is hidden (pay.transfer false), so every method button did nothing. A click is never silent now. */
+      var slipForm = document.querySelector("#f-slip"), oid = t.dataset.oid || (slipForm ? slipForm.dataset.oid : "");
       var o1 = findOrder(oid);
       if (o1) startOnline(o1, t.dataset.pay);
+      else say("ไม่พบคำสั่งซื้อนี้ในหน้า โหลดหน้านี้ใหม่ แล้วเลือกวิธีชำระอีกครั้ง", true);
       return;
     }
     if (t.dataset.cancel) {
