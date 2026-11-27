@@ -1,4 +1,4 @@
-:root { --navy:#0F2A44; --orange:#FF6B1A; --ink:#16202B; --paper:#F3F5F8; --card:#fff; --line:#D8DEE6; --mute:#5A6573; --ok:#1E7D4F; --bad:#B42318; --warn:#9A5B00; }
+:root { --navy:#0F2A44; --orange:#FF6B1A; --ink:#16202B; --paper:#F3F5F8; --card:#fff; --line:#D8DEE6; --mute:#5A6573; --ok:#1B6E40; --bad:#B42318; --warn:#9A5B00; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans Thai","Leelawadee UI",system-ui,sans-serif; font-size:16px; line-height:1.6; }
   h1,h2,h3 { font-family:"Kanit","IBM Plex Sans Thai",sans-serif; line-height:1.3; margin:0; }

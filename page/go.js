@@ -29,13 +29,30 @@
     var it = ((m[1] === "shop" ? S.shop : S.services) || [])[+m[2] - 1];
     url = it && ok(it.url) ? it.url : "index.html#" + m[1];
   }
-  var box = document.getElementById("box");
+  var box = document.getElementById("box"), EN = false;
+  try { // 27 Nov 2026: this page has no translation system, so readers in other languages get English
+    EN = !/^th/.test(localStorage.getItem("build_lang") || "th");
+  } catch (e) {}
+  var T = EN ? { wait: "Taking you there…", hint: "If the page does not change in 2 seconds, press the button below.",
+    none: "This link is not ready yet", noneHint: "See all channels and free files on the home page.", home: "Go to the home page", go: "Continue" }
+    : { wait: "กำลังพาไป…", hint: "ถ้าหน้าไม่เปลี่ยนใน 2 วินาที กดปุ่มด้านล่าง", none: "ลิงก์นี้ยังไม่พร้อม",
+      noneHint: "ดูทุกช่องทางและของแจกฟรีได้ที่หน้าหลัก", home: "ไปหน้าหลัก", go: "ไปต่อ" };
+  function put(h, p, label, href, id) {
+    box.textContent = "";
+    var a = document.createElement("h1"), b = document.createElement("p"), c = document.createElement("a");
+    a.textContent = h; b.textContent = p; c.className = "btn"; c.textContent = label; c.href = href;
+    if (id) c.id = id;
+    box.appendChild(a); box.appendChild(b); box.appendChild(c);
+  }
+  if (EN) {
+    document.documentElement.lang = "en";
+    document.title = T.wait + " — BUILD TH";
+  }
   if (!url) {
-    box.innerHTML = '<h1>ลิงก์นี้ยังไม่พร้อม</h1><p>ดูทุกช่องทางและของแจกฟรีได้ที่หน้าหลัก</p><a class="btn" href="index.html">ไปหน้าหลัก</a>';
+    put(T.none, T.noneHint, T.home, "index.html");
     return;
   }
-  box.insertAdjacentHTML("beforeend", '<a class="btn" id="go">ไปต่อ</a>');
-  document.getElementById("go").href = url;
+  put(T.wait, T.hint, T.go, url, "go");
   var done = false, go = function () {
     if (!done) {
       done = true;

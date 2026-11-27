@@ -25,5 +25,8 @@
   .sig { text-align:center; min-width:220px; color:var(--ink); } .sig .ln { border-top:1px solid var(--ink); margin-top:36px; padding-top:4px; } .sig .paid { display:inline-block; border:2px solid #1E7D4F; color:#1E7D4F; font:700 16px/1 "Kanit",sans-serif; padding:6px 14px; border-radius:6px; transform:rotate(-4deg); }
   .msg { max-width:840px; margin:0 auto 16px; padding:14px 16px; border-radius:10px; background:#FFF6EF; border:1px solid #FFC9A8; }
   .msg.bad { background:#FBE4E2; border-color:#F0B8B2; color:#7A1A12; }
+  /* 27 Nov 2026: English labels on the Thai receipt */
+  .blk h2 small, dl.meta dt small { font-size:11.5px; font-weight:500; color:var(--mute); text-transform:none; letter-spacing:0; margin-left:4px; }
+  .tot .en, .ft .en { display:block; font-size:12px; color:var(--mute); margin-top:2px; }
   @media (max-width:640px) { .doc { padding:20px 16px; } .two { grid-template-columns:1fr; } .hd { flex-direction:column; } .ttl { text-align:left; } th.hide, td.hide { display:none; } }
   @media print { @page { size:A4; margin:12mm; } body { background:#fff; } .bar, .msg.noprint { display:none !important; } .doc { border:0; padding:0; margin:0; max-width:none; } }
