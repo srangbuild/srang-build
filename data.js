@@ -880,6 +880,7 @@ window.SITE = {
     "bank": "ธนาคารกรุงเทพ",
     "name": "Thanatat J",
     "acc": "1314132745",
+    "transfer": false,
     "hours": 24,
     "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
     "opnKey": "pkey_test_69fymwz5y4m08hm1zyl",
@@ -1634,7 +1635,7 @@ window.SITE = {
     }
   ],
   "termsDate": "7 พ.ย. 2026",
-  "privacyDate": "26 พ.ย. 2026",
+  "privacyDate": "27 พ.ย. 2026",
   "scope": "3ed",
   "sheets": [
     {

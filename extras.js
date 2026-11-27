@@ -198,8 +198,10 @@
       var s = slides[at];
       inner.innerHTML = '<span class="tg">' + esc(s.tag) + "</span>" + (s.img ? '<img src="' + esc(s.img)
         + '" alt="" loading="lazy">' : "") + "<b>" + esc(s.title) + '</b><span class="t">' + esc(s.text)
-        + '</span><a class="go" href="' + esc(s.href) + '"' + (s.out ? ' target="_blank"' : "") + (s.rel
-          ? ' rel="' + s.rel + '"' : "") + ">" + esc(s.cta) + "</a>" + (slides.length > 1 ? '<span class="dots">'
+        + '</span><a class="go" href="' + esc(s.href) + '"' + (s.out ? ' target="_blank"' : "")
+        // 27 พ.ย. 2026: ลิงก์ที่เปิดแท็บใหม่ต้องมี noopener เสมอ แม้รายการนั้นไม่ได้ตั้งค่า rel
+        + (s.out || s.rel ? ' rel="' + esc(((s.rel || "") + (s.out && !/noopener/.test(s.rel || "") ? " noopener" : "")).trim())
+          + '"' : "") + ">" + esc(s.cta) + "</a>" + (slides.length > 1 ? '<span class="dots">'
             + slides.map(function (q, i) {
               return '<i class="' + (i === at ? "on" : "") + '"></i>';
             }).join("") + "</span>" : "");

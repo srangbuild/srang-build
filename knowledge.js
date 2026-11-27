@@ -58,9 +58,13 @@
           t.textContent = was;
         }, 1500);
       };
+      // 27 พ.ย. 2026: เบราว์เซอร์ไม่ยอมให้คัดลอก (หรือไม่มีคำสั่งนี้) → แสดงลิงก์ให้คัดลอกเอง ปุ่มไม่เงียบ
+      var byHand = function () {
+        window.prompt("คัดลอกลิงก์นี้", location.href);
+      };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).then(ok,
-        function () {});
-      else ok();
+        byHand);
+      else byHand();
     }
     if (a === "line") {
       window.open("https://social-plugins.line.me/lineit/share?url=" + encodeURIComponent(location.href),

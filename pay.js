@@ -703,7 +703,15 @@
       });
     return { oid: oid, check: p };
   }
+  /* 27 พ.ย. 2026 (คำสั่งเจ้าของ): pay.transfer === false = ซ่อนช่องทาง "โอนเงินแล้วแนบสลิป" จากลูกค้า
+     แอดมินในโหมดดูตัวอย่าง (mode.js, ?preview=1 + รหัสแอดมิน) ยังเห็นและทดสอบได้ · ไม่ตั้งค่า = แสดงตามเดิม */
+  function slip() {
+    return P.transfer !== false || !!(window.SITE_MODE && window.SITE_MODE.preview);
+  }
+  var NOPAY = '<p class="note">ตอนนี้ยังไม่มีช่องทางชำระสำหรับยอดนี้ ลองใหม่ภายหลัง หรือถามร้านที่หน้าสมาชิก เมนู ถามร้าน</p>';
   B.pay = {
+    slip: slip,
+    NOPAY: NOPAY,
     groupBox: groupBox,
     feeHtml: feeHtml,
     groupNote: groupNote,
