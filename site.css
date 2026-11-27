@@ -131,6 +131,8 @@ form.f .ck input { width:20px; height:20px; margin-top:2px; flex:none; }
 .pick small { color:var(--mute); display:block; font-size:13.5px; }
 .pick em { font-style:normal; font-family:"Kanit",sans-serif; font-weight:700; color:var(--navy); white-space:nowrap; }
 .sum { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; }
+.sum .pill { white-space:normal; } /* 27 Nov 2026: the saving label is long in many languages and made the card wider than a phone screen */
+.grid > * { min-width:0; } /* a card never grows past its column */
 
 footer { margin:44px 0 0; padding:24px 0 40px; background:var(--navy); color:#B9CADB; font-size:14px; }
 footer p { margin:0 0 8px; max-width:60em; }

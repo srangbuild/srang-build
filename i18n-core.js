@@ -1,3 +1,4 @@
+/*! (c) 2026 Srang | BUILD TH - srangbuild.com - All rights reserved. No copying, scraping, redistribution, model training or reuse in another product or data set without written permission. BTH-OWN-2026 */
 /* i18n-core.js: core words for languages other than Thai and English (1 Nov 2026).
    The text is a first draft and a native speaker has not checked it. Words that are not listed stay in English.
    Keep the order of I18N_KEYS. Each language has the same number of items, separated by |. */

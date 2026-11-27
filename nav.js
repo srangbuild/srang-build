@@ -66,10 +66,13 @@
     hasSheets ? {
       t: "ร้านค้า",
       e: "Store",
-      sub: [["sheets.html", "packs", "แพ็กเกจตามงาน", "Packages by project"], ["sheets.html", "list",
-        "ใบตรวจงานทีละใบ", "Check sheets"], ["market.html", "", "ร้านฝากขาย โปรแกรม หนังสือ",
-          "Marketplace"], ["doc.html", "", "ฟอร์มเอกสารอัจฉริยะ ภาษา มาตรฐาน กฎหมาย",
-            "Smart documents"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
+      // 27 Nov 2026: the step chart is first, for a visitor who does not know the name of the sheet
+      sub: [["guide.html", "", "งานไหนใช้ใบไหน", "Which sheet for which job"], ["sheets.html",
+        "packs",
+        "แพ็กเกจตามงาน", "Packages by project"], ["sheets.html", "list",
+          "ใบตรวจงานทีละใบ", "Check sheets"], ["market.html", "", "ร้านฝากขาย โปรแกรม หนังสือ",
+            "Marketplace"], ["doc.html", "", "ฟอร์มเอกสารอัจฉริยะ ภาษา มาตรฐาน กฎหมาย",
+              "Smart documents"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
     } : null,
     {
       t: "ความรู้",
@@ -89,7 +92,11 @@
           "Gear in the videos"]] : [])
     },
     // ยังไม่มีบริการที่เปิด: เมนู บริการ ไปหน้าสั่งทำงานเฉพาะโครงการ ซึ่งเปิดรับงานอยู่
-    { t: "บริการ", e: "Services", i: svcOpen ? ["index.html", "service"] : ["request.html", ""] },
+    {
+      t: "บริการ",
+      e: "Services",
+      i: svcOpen ? ["index.html", "service"] : ["request.html", ""]
+    },
     { t: "เกี่ยวกับ", e: "About", i: ["index.html", "about"] }
   ].filter(Boolean);
   var shopPages = ["sheets.html", "product.html", "cart.html", "checkout.html", "market.html",
@@ -118,7 +125,7 @@
     }
     var cur = m.sub.some(function (x) {
       return x[0] === here;
-    }) || (i === 1 && shopPages.indexOf(here) >= 0);
+    }) || (i === 1 && (shopPages.indexOf(here) >= 0 || !!(window.BUILD && window.BUILD.isItemPage(here)))); // the page file of one item (sheet-…, pack-…) is a shop page
     navHtml += '<div class="bh-grp"><button class="bh-top' + (cur ? " on" : "") + '" type="button" aria-expanded="false" data-noi18n="1">'
       + lab(m.t, m.e) + '</button><div class="bh-sub">' + m.sub.map(function (x) {
         var c = x[0] === here && !x[1];

@@ -1318,7 +1318,8 @@
      ช่องในแถวเดียวกัน (td.bx) เลือกได้ช่องเดียว จึงใช้ role="radio" · ช่อง .wx ใช้ทั้งช่องเป็นปุ่ม */
   function markName(e) {
     if (e.tagName === "TD") { // ชื่อคอลัมน์จากหัวตาราง + ข้อตรวจของแถว
-      var tb = e.closest("table"), hr = tb && tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1], col = 0, c;
+      var tb = e.closest("table"), hr = tb && tb.tHead && tb.tHead.rows[tb.tHead.rows.length - 1],
+        col = 0, c;
       for (c = e.previousElementSibling; c; c = c.previousElementSibling) col += c.colSpan || 1;
       var h = "";
       if (hr) for (var i = 0, at = 0; i < hr.cells.length; i++) {
@@ -1326,7 +1327,8 @@
         at += hr.cells[i].colSpan || 1;
       }
       var it = e.parentNode.querySelector(".it");
-      return (h.trim() || "ช่องติ๊ก") + (it && it.textContent.trim() ? " · " + it.textContent.trim().slice(0, 80) : "");
+      return (h.trim() || "ช่องติ๊ก") + (it && it.textContent.trim() ? " · " + it.textContent.trim().slice(0,
+        80) : "");
     }
     var own = e.textContent; // .wx: ข้อความในช่องเอง
     if (e.classList.contains("tick")) { // ข้อความหลังช่องติ๊กจนถึงช่องติ๊กถัดไป

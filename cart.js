@@ -104,7 +104,7 @@
     });
     var rows = ids.map(function (id) {
       var x = B.find(id), bd = B.isBundle(x), sv = B.cart.saving(id);
-      return '<li><div><b><a href="' + esc(L("product.html") + (q ? "&" : "?") + "id=" + encodeURIComponent(x.id))
+      return '<li><div><b><a href="' + esc(B.itemHref(x))
         + '">' + esc(B.code(x) + " " + x.title) + '</a></b><small class="pl">' + planTx(id) + "</small>"
         + (cfgLine(rootId(id))
           ? '<small class="cf">' + esc(cfgLine(rootId(id))) + "</small>" : "") + "<small>"
@@ -120,7 +120,10 @@
       (n ? '<ul class="bc-li">' + rows + "</ul>" : '<p class="bc-emp">ยังไม่มีรายการในตะกร้า</p>')
       +
       '<div class="bc-ft"><div class="bc-sum"><span>ยอดรวม ' + n + " รายการ</span><b>" + esc(B.baht(total))
-      + '</b></div><p class="bc-nt">ไฟล์ดิจิทัล PDF · ไม่มีค่าส่ง · ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงิน</p>'
+      + '</b></div><p class="bc-nt">' + (B.P && B.P.transfer === false
+        /* 27 Nov 2026: the transfer channel is hidden, so the note names only the ways a buyer can use now */
+        ? "ไฟล์ดิจิทัล PDF · ไม่มีค่าส่ง · ชำระด้วยบัตรหรือพร้อมเพย์" : "ไฟล์ดิจิทัล PDF · ไม่มีค่าส่ง · ชำระด้วยบัตร พร้อมเพย์ ทรูมันนี่ หรือโอนเงิน")
+      + "</p>"
       +
       (n ? '<a class="bc-go" href="' + esc(L("checkout.html")) + '">ชำระเงิน →</a><a class="bc-vw" href="'
         + esc(L("cart.html")) + '">ดูและแก้ไขตะกร้า</a>' : '<a class="bc-vw" href="' + esc(L("sheets.html"))
@@ -273,11 +276,13 @@
   // กักปุ่ม Tab ไว้ในหน้าต่าง (หน้าต่างแบบ modal) · ปุ่มตัวเลือกกลุ่มเดียวกันนับเฉพาะตัวที่เลือกอยู่
   function tabTrap(ev, root) {
     if (ev.key !== "Tab" || !root) return;
-    var all = root.querySelectorAll("a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex='-1'])"), f = [];
+    var all = root.querySelectorAll("a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex='-1'])"),
+      f = [];
     for (var i = 0; i < all.length; i++) {
       var e = all[i];
       if (!e.getClientRects().length) continue; // ซ่อนอยู่
-      if (e.type === "radio" && e.name && !e.checked && root.querySelector("input[type=radio][name='" + e.name + "']:checked")) continue;
+      if (e.type === "radio" && e.name && !e.checked && root.querySelector("input[type=radio][name='"
+        + e.name + "']:checked")) continue;
       f.push(e);
     }
     if (!f.length) return;

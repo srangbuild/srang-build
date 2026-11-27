@@ -122,11 +122,15 @@
   }
 
   /* ---------- helper ---------- */
+  /* 27 Nov 2026: launch scope 3ed makes documents in Thai and English only. An answer can hold a second text for that scope
+     (a3, a3En in data.js). The full answer comes back when the scope key leaves data.js. */
+  var S3ED = window.REGION && window.REGION.scope3 ? !!window.REGION.scope3() : S.scope === "3ed";
   var FAQ = (Array.isArray(S.botfaq) ? S.botfaq : []).map(function (x) {
+    var aTh = S3ED && x.a3 ? x.a3 : x.a, aEn = S3ED && x.a3En ? x.a3En : x.aEn;
     return {
       id: x.id,
       q: EN && x.qEn ? x.qEn : x.q,
-      a: EN && x.aEn ? x.aEn : x.a,
+      a: EN && aEn ? aEn : aTh,
       href: x.href,
       top: x.top,
       words: String(x.k || "").split(/[\s,]+/).concat(String(x.qEn || "").toLowerCase().split(/\s+/).filter(function (w) {

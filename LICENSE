@@ -1,0 +1,23 @@
+Copyright (c) 2026 Srang | BUILD TH (srangbuild.com). All rights reserved.
+
+This is not an open-source licence.
+
+The files in this repository are the published files of the website
+https://srangbuild.com. The repository is public only because the website is
+served from it.
+
+No permission is granted to copy, modify, distribute, sublicense or sell the
+code, text, images, documents or data sets in this repository, in whole or in
+part, or to use them to build another product, service, data set or computer
+model, without the prior written permission of the owner.
+
+You may view the published website in a web browser.
+
+The text of laws and standards that the data sets name belongs to the bodies
+that issued it. The owner claims no right in that text. The selection, the
+arrangement and the summaries are the work of the owner.
+
+Third-party component, under its own licence:
+- vendor/pdf-lib-1.17.1.min.js: see vendor/pdf-lib-1.17.1.LICENSE.txt
+
+Contact: srang.build@gmail.com

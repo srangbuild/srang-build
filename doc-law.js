@@ -1,3 +1,4 @@
+/*! (c) 2026 Srang | BUILD TH - srangbuild.com - All rights reserved. No copying, scraping, redistribution, model training or reuse in another product or data set without written permission. BTH-OWN-2026 */
 /* doc-law.js: building law and standards by country. Researched 1 Nov 2026. A blank field could not be confirmed. Recheck before relying on it. */
 /* language -> country of its standards. English is used in many countries, so it follows the other language or the project specification. */
 window.LANG_CC = window.REGION.langCc();

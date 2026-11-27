@@ -151,7 +151,8 @@
   // หมายเหตุราคา: แสดงในหน้าที่มีราคา
   document.addEventListener("DOMContentLoaded", function () {
     var pg = location.pathname.split("/").pop() || "index.html", m = document.getElementById("main");
-    if (!m || !/^(sheets|product|cart|checkout|market|member)\.html$/.test(pg)) return;
+    // 27 Nov 2026: the page file of one item (sheet-F-01A.html, pack-B-HO.html) is the product page too (BUILD.isItemPage)
+    if (!m || !(/^(sheets|cart|checkout|market|member)\.html$/.test(pg) || window.BUILD.isItemPage(pg))) return;
     var p = document.createElement("p");
     p.className = "note noprint";
     p.style.cssText = "margin:18px 0 0;font-size:13.5px";
@@ -759,4 +760,27 @@ window.BUILD.code = function (x) {
   if (/^[FT]-\d/.test(id)) return "BTH-" + id.replace("-", "") + "-P";
   if (x.items) return "BTH-" + id.replace(/-/g, "");
   return id;
+};
+/* 27 Nov 2026: each check sheet and each pack has its own page file for search engines and link previews
+   (sheet-F-01A.html, pack-B-HO.html, made by gen_product_pages.ps1). The file loads the same product script.
+   product.html?id=… still works for every item. gen_product_pages.ps1 and web_check.ps1 hold the same rule. */
+window.BUILD.pageOf = function (x) {
+  var id = String((x && x.id) || "");
+  if (!x || x.hidden === true || x.of) return "";
+  if (/^[FT]-\w+$/.test(id) && !x.items) return "sheet-" + id + ".html";
+  if (/^B-\w+$/.test(id) && x.items) return "pack-" + id + ".html";
+  return "";
+};
+/* The address of an item, for every link in the site (27 Nov 2026). x = an item or an id.
+   An item with a page file gets that file. An edition id (F-01A.TH), a market item and an unknown id keep product.html?id=…
+   The address carries the preview mark when the visitor is in the preview. */
+window.BUILD.itemHref = function (x) {
+  var B = window.BUILD, id = String(typeof x === "string" ? x : (x && x.id) || ""), it = typeof x === "string"
+    ? B.find(id) : x;
+  var file = it && it.id === id ? B.pageOf(it) : "", keep = B.preview;
+  return file ? file + keep : "product.html" + (keep ? keep + "&" : "?") + "id=" + encodeURIComponent(id);
+};
+/* True when the file name is the product page or the page file of one item (the same page under another name). */
+window.BUILD.isItemPage = function (file) {
+  return /^(product|(sheet|pack)-[\w-]+)\.html$/i.test(String(file || ""));
 };

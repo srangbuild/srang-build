@@ -34,7 +34,7 @@
     ".bx-ck .a{background:#C24A08;color:#fff}.bx-ck .n{background:#fff;color:#0F2A44}" +
     ".bx-ad{border:1px dashed #C9D2DC;border-radius:16px;padding:14px 16px;background:#fff;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0}.bx-ad .tg{font:700 12.5px/1 \"Kanit\",sans-serif;background:#E8ECF1;color:#475466;border-radius:999px;padding:5px 10px;flex:none}"
     +
-    ".bx-ad img{width:120px;height:auto;border-radius:10px;flex:none}.bx-ad b{display:block;color:#0F2A44;font-size:17px}.bx-ad span{color:#3B4654;font-size:14.5px}.bx-ad a.go{margin-left:auto;background:#0F2A44;color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",sans-serif;white-space:nowrap}"
+    ".bx-ad img{width:120px;height:auto;border-radius:10px;flex:none}.bx-ad b{display:block;color:#0F2A44;font-size:17px}.bx-ad span{color:#3B4654;font-size:14.5px}.bx-ad a.go{margin-left:auto;background:#0F2A44;color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font:700 15px/1.2 \"Kanit\",sans-serif;max-width:100%;text-align:center}" // 27 Nov 2026: no nowrap, long translations (Russian, Japanese) pushed a phone screen sideways
     +
     ".bx-tb{position:fixed;inset:0;z-index:95;background:rgba(10,20,34,.82);display:grid;place-items:center;padding:16px}.bx-tc{background:#FFFDF6;color:#3A2B05;max-width:560px;width:100%;border-radius:18px;border:3px solid #C9A227;padding:26px 22px 22px;text-align:center;font-family:\"IBM Plex Sans Thai\",\"Leelawadee UI\",sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.5)}"
     +
@@ -200,7 +200,8 @@
         + '" alt="" loading="lazy">' : "") + "<b>" + esc(s.title) + '</b><span class="t">' + esc(s.text)
         + '</span><a class="go" href="' + esc(s.href) + '"' + (s.out ? ' target="_blank"' : "")
         // 27 พ.ย. 2026: ลิงก์ที่เปิดแท็บใหม่ต้องมี noopener เสมอ แม้รายการนั้นไม่ได้ตั้งค่า rel
-        + (s.out || s.rel ? ' rel="' + esc(((s.rel || "") + (s.out && !/noopener/.test(s.rel || "") ? " noopener" : "")).trim())
+        + (s.out || s.rel ? ' rel="' + esc(((s.rel || "") + (s.out && !/noopener/.test(s.rel || "")
+          ? " noopener" : "")).trim())
           + '"' : "") + ">" + esc(s.cta) + "</a>" + (slides.length > 1 ? '<span class="dots">'
             + slides.map(function (q, i) {
               return '<i class="' + (i === at ? "on" : "") + '"></i>';

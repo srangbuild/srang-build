@@ -23,7 +23,13 @@
 .pd-media .frame .zoom { position:absolute; right:10px; bottom:10px; }
 .pd-media .frame.wait { aspect-ratio:794/1123; display:grid; place-items:center; color:var(--mute); text-align:center; padding:20px; background:repeating-linear-gradient(135deg,#EEF2F6 0 12px,#E6EBF1 12px 24px); }
 .pd-media .frame.set { aspect-ratio:auto; padding:18px; display:grid; gap:8px; grid-template-columns:repeat(3,1fr); background:linear-gradient(160deg,#16395C,#0F2A44); }
-.pd-media .frame.set span { aspect-ratio:794/1123; background:#fff; border-radius:6px; display:grid; place-items:center; font:700 15px/1.2 "Kanit",sans-serif; color:var(--navy); box-shadow:0 6px 16px rgba(0,0,0,.25); }
+/* 27 Nov 2026: bundle tiles = the real first page of each sheet (sheets/thumb) + code and job name; a tile is a link to that sheet */
+.pd-media .frame.set .st { position:relative; display:block; aspect-ratio:794/1123; background:#fff; border-radius:6px; overflow:hidden; color:var(--navy); text-decoration:none; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+.pd-media .frame.set .st img { display:block; width:100%; height:100%; object-fit:cover; object-position:top; }
+.pd-media .frame.set .st span { position:absolute; left:0; right:0; bottom:0; padding:5px 7px 6px; background:rgba(255,255,255,.95); border-top:1px solid var(--line); font-size:12px; line-height:1.3; font-weight:600; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+.pd-media .frame.set .st b { display:block; font:700 12.5px/1.2 "Kanit",sans-serif; color:#B84607; }
+.pd-media .frame.set .st.noimg span { position:static; height:100%; border-top:0; display:grid; align-content:center; text-align:center; font-size:13px; -webkit-line-clamp:unset; }
+.pd-media .frame.set .st:hover, .pd-media .frame.set .st:focus-visible { outline:3px solid var(--orange); outline-offset:2px; }
 .pd-media figcaption { font-size:13.5px; color:var(--mute); margin:8px 2px 0; }
 @media (max-width:859px) { .pd-media .frame:not(.set):not(.wait) { max-height:52vh; } .pd-media .frame.wait { aspect-ratio:auto; min-height:120px; } }
 .own { background:#DFF3E8; border:1px solid #B5DEC6; color:#14532F; border-radius:14px; padding:12px 14px; margin:0 0 12px; font-size:15px; display:grid; gap:8px; }
@@ -62,6 +68,7 @@
 .outl li span { font-weight:600; color:var(--navy); line-height:1.4; }
 .outl li span small { display:block; font-weight:400; color:var(--mute); font-size:13px; }
 .outl li em { font-style:normal; font-size:13.5px; color:#3F4A58; white-space:nowrap; text-align:right; }
+@media (max-width:420px) { .outl li em { white-space:normal; } .outl li span { min-width:0; overflow-wrap:anywhere; } } /* 27 Nov 2026: long words in some languages made the row wider than a phone screen */
 .twocol { display:grid; gap:14px; }
 @media (min-width:760px) { .twocol { grid-template-columns:1fr 1fr; } }
 .reclist, .reflist { margin:0; padding-left:20px; display:grid; gap:6px; font-size:15.5px; }

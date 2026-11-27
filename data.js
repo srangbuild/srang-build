@@ -876,10 +876,10 @@ window.SITE = {
   },
   "pay": {
     "on": true,
-    "qr": "pay/qr.jpg",
-    "bank": "ธนาคารกรุงเทพ",
-    "name": "Thanatat J",
-    "acc": "1314132745",
+    "qr": "",
+    "bank": "",
+    "name": "",
+    "acc": "",
     "transfer": false,
     "hours": 24,
     "note": "โอนให้ตรงยอด แล้วแนบสลิปในหน้าคำสั่งซื้อ · เปิดไฟล์ได้เมื่อร้านตรวจยอดเข้าบัญชีแล้ว",
@@ -908,7 +908,7 @@ window.SITE = {
     "googlePayId": "",
     "usdRate": 0.0296,
     "usdDate": "2026-10-28",
-    "qrBase": "00020101021229370016A0000006770101110113006661746699153037645802TH6304A221",
+    "qrBase": "",
     "bankMin": 200,
     "docOn": true,
     "docFactor": 1.5,
@@ -969,7 +969,7 @@ window.SITE = {
   },
   "tribute": {
     "on": true,
-    "note": "เปิดแล้ว 18 ต.ค. 2026: เจ้าของเว็บยืนยันในแชตว่าภาพมาจากแหล่งทางการและข้อความถูกต้อง แล้วเลือก เปิดหน้าถวายพระพร · mode always = แสดงที่หน้าแรกวันละครั้งต่อผู้ชม · 3 มิ.ย. และ 28 ก.ค. ใช้ข้อความของวันนั้น · ปิดได้ด้วยปุ่มเข้าสู่เว็บไซต์ปุ่มเดียว · ห้ามใช้ภาพที่สร้างด้วย AI",
+    "note": "",
     "sign": "ข้าพระพุทธเจ้า คณะผู้จัดทำ สร้าง | BUILD TH",
     "days": [
       {
@@ -1400,39 +1400,39 @@ window.SITE = {
   "services": [
     {
       "title": "ตรวจรับคอนโดก่อนโอน",
-      "text": "ตรวจห้องชุดทีละหมวดตามใบตรวจงาน F-18 พร้อมรายงานรูปถ่ายและรายการแก้ไข รวมการตรวจซ้ำ 1 ครั้งหลังแก้ไข",
+      "text": "",
       "status": "ยังไม่เปิดรับ",
       "url": "",
-      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ",
-      "price": "100 บาทต่อตารางเมตร ขั้นต่ำ 2,900 บาท"
+      "todo": "",
+      "price": ""
     },
     {
       "title": "ตรวจรับบ้านและทาวน์โฮมก่อนโอน",
-      "text": "ตรวจโครงสร้างที่มองเห็น หลังคา ผนัง พื้น ประตูหน้าต่าง ไฟฟ้า และประปา พร้อมรายงานรูปถ่าย รวมการตรวจซ้ำ 1 ครั้ง · ราคาตามพื้นที่ใช้สอย แจ้งเมื่อเปิดรับ",
+      "text": "",
       "status": "ยังไม่เปิดรับ",
       "url": "",
-      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+      "todo": ""
     },
     {
       "title": "ตรวจงานก่อสร้างรายงวด",
-      "text": "เข้าตรวจหน้างานก่อนจ่ายเงินแต่ละงวด ใช้ใบตรวจงานของช่องตามชนิดงาน ได้รายงานข้อที่ผ่านและข้อที่ต้องแก้",
+      "text": "",
       "status": "ยังไม่เปิดรับ",
       "url": "",
-      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+      "todo": ""
     },
     {
       "title": "ปรึกษาจากรูปถ่าย: รอยร้าวและน้ำท่วมบ้าน",
-      "text": "ส่งรูปและข้อมูลไม่เกิน 10 รูป ได้คำตอบเป็นข้อเขียน: เฝ้าดู แก้เอง หรือควรให้วิศวกรเข้าตรวจ",
+      "text": "",
       "status": "ยังไม่เปิดรับ",
       "url": "",
-      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+      "todo": ""
     },
     {
       "title": "อ่านใบเสนอราคาและ BOQ",
-      "text": "เทียบใบเสนอราคา 2 เจ้า บอกว่าแต่ละเจ้ารวมอะไร ขาดอะไร และคำถามที่ควรถามผู้รับเหมาก่อนเซ็นสัญญา",
+      "text": "",
       "status": "ยังไม่เปิดรับ",
       "url": "",
-      "todo": "หาวิศวกรผู้มีใบอนุญาตที่ลงชื่อรับผิดชอบรายงาน · แบบรายงาน · ประกันวิชาชีพ · ถามผู้ทำบัญชีเรื่องภาษีบริการ"
+      "todo": ""
     }
   ],
   "notices": [],
@@ -1484,6 +1484,8 @@ window.SITE = {
       "k": "ฟรี มืออาชีพ โปร pro ต่างกัน ความต่าง",
       "a": "ฉบับฟรีมีจุดสำคัญที่เจ้าของบ้านควรดูเอง 1 ภาษา เลือกได้ทุกภาษา ฉบับมืออาชีพมีรายการตรวจครบทุกขั้น จุดหยุดรอตรวจ ตารางบันทึกค่า ใบรายการข้อบกพร่อง ช่องลงชื่อ 3 ฝ่าย และมี 2 ภาษาได้ ดูตารางเทียบได้ที่หน้าใบตรวจงาน",
       "aEn": "The free edition has the key points an owner should check, in 1 language, any language. The professional edition has all items of every stage, hold points, tables for measured values, a defect list, sign-off by 3 parties, and can have 2 languages. See the comparison on the check sheet page.",
+      "a3": "ฉบับฟรีมีจุดสำคัญที่เจ้าของบ้านควรดูเอง 1 ภาษา ไทยหรืออังกฤษ ฉบับมืออาชีพมีรายการตรวจครบทุกขั้น จุดหยุดรอตรวจ ตารางบันทึกค่า ใบรายการข้อบกพร่อง ช่องลงชื่อ 3 ฝ่าย และมี 2 ภาษาได้ ดูตารางเทียบได้ที่หน้าใบตรวจงาน",
+      "a3En": "The free edition has the key points an owner should check, in 1 language, Thai or English. The professional edition has all items of every stage, hold points, tables for measured values, a defect list, sign-off by 3 parties, and can have 2 languages. See the comparison on the check sheet page.",
       "href": "sheets.html#compare"
     },
     {
@@ -1549,6 +1551,8 @@ window.SITE = {
       "k": "ภาษาอื่น ภาษาอังกฤษ ภาษาจีน ภาษาญี่ปุ่น english ญี่ปุ่น เยอรมัน แปลเป็น มาตรฐานต่างประเทศ",
       "a": "มี ฉบับฟรีเลือกได้ทุกภาษา ภาษาเดียว ฉบับมืออาชีพมีอังกฤษคู่ไทย หรือภาษาเดียว ภาษาและมาตรฐานของประเทศอื่นซื้อเป็นฉบับประเทศ แล้วสร้างได้ทันทีที่หน้าระบบฟอร์มเอกสารอัจฉริยะ ไม่ต้องรอใบเสนอราคา ภาษาอื่นนอกจากไทยและอังกฤษเป็นฉบับแปล และมีหมายเหตุบนเอกสาร",
       "aEn": "Yes. The free edition is available in any language, 1 language per sheet. The professional edition has English with Thai, or 1 language. Languages and standards of other countries are sold as country editions, and you create the document at once on the smart document page, with no quotation step. Languages other than Thai and English are translations, and the document carries a note.",
+      "a3": "ใบตรวจงานมีภาษาไทยและอังกฤษ ฉบับฟรีเลือกได้ 1 ภาษา ฉบับมืออาชีพเลือกได้ 3 ฉบับ: ไทย อังกฤษ หรืออังกฤษคู่ไทยในใบเดียว หน้าเว็บอ่านได้หลายภาษาจากเมนูภาษา เอกสารภาษาอื่นยังไม่เปิดขาย",
+      "a3En": "The check sheets are in Thai and English. The free edition has 1 language. The professional edition has 3 editions: Thai, English, or English with Thai on one sheet. You can read the site in many languages from the language menu. Documents in other languages are not on sale yet.",
       "href": "request.html"
     },
     {
@@ -1634,7 +1638,7 @@ window.SITE = {
       "href": "member.html#ask"
     }
   ],
-  "termsDate": "7 พ.ย. 2026",
+  "termsDate": "27 พ.ย. 2026",
   "privacyDate": "27 พ.ย. 2026",
   "scope": "3ed",
   "sheets": [
