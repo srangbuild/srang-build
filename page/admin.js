@@ -1503,6 +1503,78 @@
       }, "บันทึกคำถาม " + id);
       return;
     }
+    if (sh === "rpseg") {
+      rpSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "fxseg") {
+      fxSeg = b.dataset.v;
+      render();
+      return;
+    }
+    if (sh === "fxjson") {
+      fixJson();
+      return;
+    }
+    if (sh === "fxnew" || sh === "fxadd") { // the report is right: it goes to the fix queue, the customer is told
+      var fan = (($("rp-an-" + id) || {}).value || "").trim(), fpk = ($("fx-pick-" + id) || {}).value
+        || "";
+      if (sh === "fxadd" && !fpk) return;
+      if (!confirm("ยืนยันว่าเรื่อง " + id + " ผิดจริง และส่งเข้างานแก้" + (sh === "fxadd" ? " " + fpk : "ใหม่")
+        + "?\nลูกค้าได้ข้อความว่า ยืนยันแล้ว รอฉบับใหม่")) return;
+      shopAct("adminFix", sh === "fxnew" ? { op: "create", reports: [id], answer: fan } : { op: "add",
+        fix: fpk, report: id,
+        answer: fan }, "ส่งเรื่อง " + id + " เข้างานแก้แล้ว และแจ้งลูกค้าแล้ว");
+      return;
+    }
+    if (sh === "fxsave") { // a fix: status, edition date, shop note · ออกฉบับใหม่แล้ว closes every report of the fix
+      var fst = $("fx-st-" + id).value, fdt = (($("fx-fx-" + id) || {}).value || "").trim();
+      if (fdt && !/^\d{4}-\d\d-\d\d$/.test(fdt)) {
+        toast("วันที่ของฉบับใหม่ ใช้รูปแบบ ปี-เดือน-วัน");
+        return;
+      }
+      if (fst === "ออกฉบับใหม่แล้ว" && !fdt) {
+        toast("ใส่วันที่ของฉบับใหม่ก่อน");
+        return;
+      }
+      if (fst === "ออกฉบับใหม่แล้ว" && !confirm("ออกฉบับใหม่แล้ว: ทุกเรื่องในงาน " + id
+        + " เปลี่ยนเป็น แก้แล้ว และระบบแจ้งลูกค้าทุกคน?")) return;
+      shopAct("adminFix", {
+        op: "status",
+        fix: id,
+        status: fst,
+        fixedIn: fdt,
+        note: $("fx-nt-" + id).value.trim()
+      },
+        "บันทึกงานแก้ " + id + (fst === "ออกฉบับใหม่แล้ว" ? " · แจ้งลูกค้าทุกคนในงานนี้แล้ว" : ""));
+      return;
+    }
+    if (sh === "rpsave") { // report a problem in a document: status, answer, edition date of the fix
+      var rpf = (($("rp-fx-" + id) || {}).value || "").trim();
+      if (rpf && !/^\d{4}-\d\d-\d\d$/.test(rpf)) {
+        toast("วันที่ของฉบับที่แก้ ใช้รูปแบบ ปี-เดือน-วัน");
+        return;
+      }
+      shopAct("adminReport", {
+        id: id,
+        status: $("rp-st-" + id).value,
+        answer: $("rp-an-" + id).value.trim(),
+        fixedIn: rpf
+      }, "บันทึกเรื่อง " + id + " และแจ้งลูกค้าแล้ว");
+      return;
+    }
+    if (sh === "rpchat") { // the photos of a report are in the customer's chat room
+      crSel = b.dataset.v;
+      crMsgs = null;
+      crSig = "";
+      crDraft = "";
+      crPend = null;
+      tab = "chat";
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
     if (sh === "rqsave") {
       var rst = $("rq-st-" + id), rnt = $("rq-nt-" + id), rtl = $("rq-tell-" + id), rqv = (($("rq-q-"
         + id) || {}).value || "").replace(/[^\d]/g, "");
@@ -1941,12 +2013,15 @@
     }).length, ship = SHOP.orders.filter(function (o) {
       return o.status === "ชำระแล้ว" && o.shipTo && !o.ship;
     }).length;
-    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["chat", "แชตรอตอบ", k.asksOpen, true], ["shop",
-      "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req",
-        "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) {
-          return c.status === "ใหม่";
-        }).length, true], ["shop", "รอลูกค้าชำระ", k.wait, false], ["cust", "สมาชิกใหม่ 30 วัน", k.members30,
-          false]];
+    var it = [["shop", "สลิปรอตรวจ", k.check, true], ["chat", "แชตรอตอบ", k.asksOpen, true], ["rep",
+      "แจ้งปัญหาเอกสาร รอตรวจ", k.reportsOpen || 0, true], ["rep", "งานแก้เอกสาร", k.fixesOpen || 0,
+        true], ["shop",
+          "รอส่งพัสดุ", ship, true], ["cons", "ใบสมัครฝากขายใหม่", csNew, true], ["req",
+            "คำขอสั่งทำใหม่", (SHOP.requests || []).filter(function (c) {
+              return c.status === "ใหม่";
+            }).length, true], ["shop", "รอลูกค้าชำระ", k.wait, false], ["cust", "สมาชิกใหม่ 30 วัน",
+              k.members30,
+              false]];
     return '<div class="card"><h2>ต้องทำวันนี้</h2><div class="kpis">' + it.map(function (x) {
       return '<button type="button" class="kpi' + (x[2] && x[3] ? " todo" : "") + '" data-go="' + x[0]
         + '" style="text-align:left;display:block;min-height:0;font:inherit;cursor:pointer"><span>'
@@ -2307,11 +2382,144 @@
     }
   });
 
+  // ----- แจ้งปัญหาในเอกสาร (28 Nov 2026, owner's order): 1 report = 1 record with a number and a status -----
+  // The back end adds the purchase data (order, licence, plan, edition used, purchase date). Photos stay in the customer's chat room.
+  // Save = the customer gets a message in the chat room and an email.
+  // Fix queue (งานแก้เอกสาร, FX-): the shop checks a report against the official source. When the report is right, the shop
+  // sends it to the fix queue (a new fix, or an open fix of the same document when two customers report the same error).
+  // When the new edition is out, the shop sets the fix to ออกฉบับใหม่แล้ว with the edition date: every report of that fix
+  // becomes แก้แล้ว and each customer gets a message. The JSON file of the open fixes is the work list for the document files.
+  var rpSeg = "รอตรวจ", fxSeg = "เปิดอยู่", RP_ST = ["รับเรื่องแล้ว", "กำลังตรวจ",
+    "ยืนยันแล้ว รอฉบับใหม่", "แก้แล้ว",
+    "ไม่ใช่ข้อผิดพลาด"], FX_ST = ["รอแก้", "กำลังแก้", "ออกฉบับใหม่แล้ว", "ยกเลิก"];
+  function rpToCheck(c) { // the shop has not decided yet
+    return (c.status === RP_ST[0] || c.status === RP_ST[1]) && !c.fix;
+  }
+  function fxOpen(f) {
+    return f.status === FX_ST[0] || f.status === FX_ST[1];
+  }
+  function fixCard() {
+    var all = SHOP.fixes || [], open = all.filter(fxOpen), list = fxSeg === "ทั้งหมด" ? all : open;
+    return '<div class="card"><h2>งานแก้เอกสาร <span class="tag ' + (open.length ? "no" : "ok") + '">เปิดอยู่ '
+      + open.length + '</span></h2><p class="hint">เรื่องที่ร้านตรวจแล้วว่าผิดจริง รวมเป็นงานแก้ (1 งาน = 1 จุดที่ต้องแก้ในเอกสาร) · ไฟล์รายการงานแก้ไม่มีข้อมูลลูกค้า ใช้ส่งให้ระบบแก้ไฟล์เอกสาร · ออกฉบับใหม่แล้ว: เลือกสถานะ ออกฉบับใหม่แล้ว ใส่วันที่ของฉบับ แล้วกดบันทึก ลูกค้าทุกคนในงานนั้นได้รับแจ้งเอง</p><div class="chips">'
+      + ["เปิดอยู่", "ทั้งหมด"].map(function (s) {
+        return '<button class="sm" type="button" data-sh="fxseg" data-v="' + s + '" aria-pressed="'
+          + (s === fxSeg)
+          + '">' + s + " " + (s === "ทั้งหมด" ? all.length : open.length) + "</button>";
+      }).join("") + '<button class="sm" type="button" data-sh="fxjson"' + (open.length ? "" : " disabled")
+      + '>ดาวน์โหลดรายการงานแก้ที่เปิดอยู่ (JSON)</button></div>' + (list.length ? list.map(function (f) {
+        return '<div class="todo-it"><b>' + esc(f.id) + '</b> <span class="tag ' + (fxOpen(f) ? "no" : "ok")
+          + '">'
+          + esc(f.status) + "</span> " + esc(sheetTitle(f.sheet)) + (f.page ? " · หน้า " + esc(f.page) : "")
+          + (f.item ? " · ข้อ " + esc(f.item) : "") + "<br><small>สร้างเมื่อ " + esc(wh(f.at)) + " โดย "
+          + esc(f.by)
+          + " · เรื่องที่แจ้ง " + f.reports.length + " เรื่อง: " + esc(f.reports.join(" ")) + (f.fixedIn
+            ? " · ออกในฉบับวันที่ " + esc(f.fixedIn) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap"><b>สิ่งที่ต้องแก้:</b> '
+          + esc(f.what) + "</p>" + (f.should ? '<p style="margin:6px 0;white-space:pre-wrap"><b>ค่าที่ลูกค้าเสนอ:</b> '
+            + esc(f.should) + "</p>" : "") + '<div class="grid"><label>สถานะงาน<select id="fx-st-' + esc(f.id)
+          + '">'
+          + FX_ST.map(function (s) {
+            return "<option" + (s === f.status ? " selected" : "") + ">" + s + "</option>";
+          }).join("") + '</select></label><label>ออกในฉบับวันที่<input type="date" id="fx-fx-' + esc(f.id)
+          + '" value="'
+          + esc(f.fixedIn) + '"></label><label class="full">บันทึกของร้าน (ค่าที่ถูกต้อง และแหล่งอ้างอิงทางการที่ตรวจแล้ว)<textarea id="fx-nt-'
+          + esc(f.id) + '" rows="2" maxlength="1000">' + esc(f.note) + '</textarea></label></div><div class="tools"><button class="sm pri" type="button" data-sh="fxsave" data-id="'
+          + esc(f.id) + '">บันทึกงานแก้</button></div></div>';
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีงานแก้ในกลุ่มนี้</p>') + "</div>";
+  }
+  function reportTab() {
+    if (!SHOP) return needShop("แจ้งปัญหาเอกสาร");
+    if (!SHOP.reports) return '<div class="card"><h2>แจ้งปัญหาเอกสาร</h2><p class="hint">หลังบ้านรุ่น '
+      + esc(SHOP.setup.version)
+      + " ยังไม่มีระบบแจ้งปัญหาเอกสาร · วาง Code.gs รุ่น 2026-11-28a แล้ว Deploy เป็น New version</p></div>";
+    var SEG = ["รอตรวจ"].concat(RP_ST, ["ทั้งหมด"]), all = SHOP.reports, fixes = SHOP.fixes || [],
+      list = all.filter(function (c) {
+        return rpSeg === "ทั้งหมด" || (rpSeg === "รอตรวจ" ? rpToCheck(c) : c.status === rpSeg);
+      }), n = all.filter(rpToCheck).length;
+    return '<div class="card"><h2>แจ้งปัญหาเอกสาร <span class="tag ' + (n ? "no" : "ok") + '">รอตรวจ '
+      + n
+      + '</span></h2><p class="hint">ลูกค้าแจ้งจากปุ่มในเอกสาร หรือในคำสั่งซื้อ ระบบแนบข้อมูลการซื้อให้เอง · ขั้นตอน: เปลี่ยนเป็น กำลังตรวจ → ตรวจกับเล่มมาตรฐานหรือกฎหมายฉบับทางการ → ผิดจริง: กด ผิดจริง สร้างงานแก้ใหม่ (หรือเพิ่มเข้างานแก้ที่มีอยู่ของใบเดียวกัน) · ไม่ผิด: เลือก ไม่ใช่ข้อผิดพลาด เขียนเหตุผล แล้วกดบันทึก · ทุกการบันทึก ลูกค้าได้ข้อความในห้องแชตและอีเมล · รูปที่ลูกค้าแนบอยู่ในห้องแชตของลูกค้า</p><div class="chips">'
+      + SEG.map(function (s) {
+        return '<button class="sm" type="button" data-sh="rpseg" data-v="' + s + '" aria-pressed="'
+          + (s === rpSeg)
+          + '">' + s + " " + (s === "ทั้งหมด" ? all.length : s === "รอตรวจ" ? n : all.filter(function (c) {
+            return c.status === s;
+          }).length) + "</button>";
+      }).join("") + "</div>" + (list.length ? list.map(function (c) {
+        var same = fixes.filter(function (f) { // open fixes of the same document: the same error may be reported twice
+          return fxOpen(f) && f.sheet === c.sheet;
+        }), canFix = !c.fix && (c.status === RP_ST[0] || c.status === RP_ST[1]);
+        return '<div class="todo-it"><b>' + esc(c.id) + '</b> <span class="tag ' + (rpToCheck(c) ? "no" : "ok")
+          + '">'
+          + esc(c.status) + "</span> " + esc(sheetTitle(c.sheet)) + (c.page ? " · หน้า " + esc(c.page) : "")
+          + (c.item ? " · ข้อ " + esc(c.item) : "") + (c.fix ? ' · <span class="tag">งานแก้ ' + esc(c.fix)
+            + "</span>" : "")
+          + "<br><small>" + esc(c.email || c.member) + " · แจ้งเมื่อ " + esc(wh(c.at)) + " · " + (c.order
+            ? "คำสั่งซื้อ " + esc(c.order) + " · เลขสิทธิ์ " + esc(c.lic) + " · " : "") + esc(c.plan)
+          + " · ฉบับที่ลูกค้าใช้ " + esc(c.rev || "-") + (c.buy ? " · ซื้อเมื่อ " + esc(c.buy) : "")
+          + " · รูป "
+          + (c.pics || []).length + " รูป" + (c.by ? " · ตอบล่าสุดโดย " + esc(c.by) + " " + esc(wh(c.upd)) : "")
+          + '</small><p style="margin:6px 0;white-space:pre-wrap"><b>สิ่งที่ผิด:</b> ' + esc(c.what)
+          + "</p>"
+          + (c.should ? '<p style="margin:6px 0;white-space:pre-wrap"><b>ที่ควรเป็น:</b> ' + esc(c.should)
+            + "</p>" : "")
+          + '<div class="grid"><label>สถานะ<select id="rp-st-' + esc(c.id) + '">' + RP_ST.map(function (s) {
+            return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
+          }).join("") + '</select></label><label>แก้ในฉบับวันที่<input type="date" id="rp-fx-' + esc(c.id)
+          + '" value="'
+          + esc(c.fixedIn || "") + '"></label><label class="full">ข้อความถึงลูกค้า (ส่งในห้องแชตและอีเมล · เว้นว่างตอนส่งเข้างานแก้ = ใช้ข้อความมาตรฐาน)<textarea id="rp-an-'
+          + esc(c.id) + '" rows="3" maxlength="1000">' + esc(c.answer) + '</textarea></label></div><div class="tools">'
+          + (canFix ? '<button class="sm pri" type="button" data-sh="fxnew" data-id="' + esc(c.id)
+            + '">ผิดจริง สร้างงานแก้ใหม่</button>' + (same.length ? '<label style="display:inline-flex;gap:6px;align-items:center">หรือเพิ่มเข้างาน <select id="fx-pick-'
+              + esc(c.id) + '">' + same.map(function (f) {
+                return '<option value="' + esc(f.id) + '">' + esc(f.id + " · " + (f.page ? "หน้า " + f.page
+                  + " " : "")
+                  + String(f.what).slice(0, 40)) + "</option>";
+              }).join("") + '</select></label><button class="sm" type="button" data-sh="fxadd" data-id="'
+              + esc(c.id)
+              + '">ผิดจริง เพิ่มเข้างานนี้</button>' : "") : "") + '<button class="sm' + (canFix ? "" : " pri")
+          + '" type="button" data-sh="rpsave" data-id="' + esc(c.id) + '">บันทึกสถานะและแจ้งลูกค้า</button>'
+          + (c.member && c.member !== "บัญชีถูกลบ" ? '<button class="sm" type="button" data-sh="rpchat" data-v="'
+            + esc(c.member) + '">เปิดห้องแชตของลูกค้า (ดูรูป)</button>' : "") + (c.email
+              ? '<button class="sm" type="button" data-sh="cmail" data-v="' + esc(c.email) + '">คัดลอกอีเมล</button>' : "")
+          + "</div></div>";
+      }).join("") : '<p class="hint" style="margin:0">ไม่มีเรื่องในกลุ่มนี้</p>') + "</div>" + (SHOP.fixes
+        ? fixCard() : "");
+  }
+  function fixJson() { // the work list for the document files: open fixes only, no customer data
+    var open = (SHOP.fixes || []).filter(fxOpen).map(function (f) {
+      return {
+        fix: f.id,
+        sheet: f.sheet,
+        lang: f.lang,
+        page: f.page,
+        item: f.item,
+        wrong: f.what,
+        proposed: f.should,
+        shopNote: f.note,
+        status: f.status,
+        reports: f.reports.length,
+        created: f.at
+      };
+    });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({
+      about: "BUILD TH: open document fixes (no customer data)",
+      made: new Date().toISOString(),
+      fixes: open
+    }, null, 2)], { type: "application/json" }));
+    a.download = "BUILD_งานแก้เอกสาร_" + new Date().toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   // ----- แท็บ -----
   var TABS = [
     ["ov", "ภาพรวม", overview],
     ["shop", "ร้าน (คำสั่งซื้อ)", shopTab],
     ["chat", "แชตกับลูกค้า", chatTab],
+    ["rep", "แจ้งปัญหาเอกสาร", reportTab],
     ["cust", "ลูกค้า", custTab],
     ["cons", "ฝากขาย", consignTab],
     ["req", "สั่งทำ", requestTab],
@@ -2363,11 +2571,12 @@
   var tab = "ov";
   // กลุ่มแท็บ (27 ต.ค. 2026): งานร้านอยู่หน้าสุด · เนื้อหาเว็บ · การตลาด · ตัวเลขสีส้ม = งานที่รอทำ
   var GROUPS = { ov: "งานร้าน", brand: "เนื้อหาเว็บ", kit: "การตลาด" }, SHOPTABS = ["ov", "shop",
-    "chat",
+    "chat", "rep",
     "cust", "cons", "req", "pay", "bot", "soon"];
   function badge(id) {
     if (!SHOP) return "";
-    var n = id === "shop" ? SHOP.kpi.check || 0 : id === "chat" ? SHOP.kpi.asksOpen || 0 : id === "cons"
+    var n = id === "shop" ? SHOP.kpi.check || 0 : id === "chat" ? SHOP.kpi.asksOpen || 0 : id === "rep"
+      ? (SHOP.kpi.reportsOpen || 0) + (SHOP.kpi.fixesOpen || 0) : id === "cons"
       ? (SHOP.consigns
         || []).filter(function (c) {
           return c.status === "ใหม่";

@@ -195,9 +195,9 @@
       var b = $("pmbox");
       if (b) b.innerHTML = drawPm();
     };
-    var why = !PAY.slip() ? (online && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "")
+    var why = !PAY.slip() ? (online && PAY.testNote(me) ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "")
       : online && total < minOn ? '<p class="note">ยอดต่ำกว่า ' + minOn + " บาท ชำระออนไลน์ไม่ได้ (ขั้นต่ำของผู้ให้บริการรับชำระ) · ชำระด้วยการโอนแล้วแนบสลิป</p>" : (online
-        && me.pay.test && !B.demo ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
+        && PAY.testNote(me) ? '<p class="note">ตอนนี้ชำระออนไลน์เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง</p>' : "");
     var hasTax = !!(t.name || t.id);
     taxOpen = taxOpen || hasTax;
     $("view").innerHTML = '<div class="cog"><form class="f" id="f-co" novalidate style="gap:14px">'
@@ -315,7 +315,7 @@
                 list) + "</button>";
           }).join("") + "</div>") : "";
       }).join("") + PAY.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
-      + (me.pay && me.pay.test && !B.demo ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
+      + (PAY.testNote(me) ? " · โหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "") + "</p></div>" : "";
     var slipTx = me.pay && me.pay.slipAuto ? "ระบบตรวจสลิปอัตโนมัติ" : "ร้านตรวจยอดภายใน " + esc(P.hours
       || 24) + " ชั่วโมง";
     $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>ชำระคำสั่งซื้อ ' + esc(o.id)

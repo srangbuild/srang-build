@@ -54,7 +54,8 @@
           return x.hidden !== true;
         }).length + " งาน (เสาเข็ม ฐานราก เหล็กเสริม คอนกรีต หลังคา กันซึม ไฟฟ้า ประปา และอื่น ๆ) ที่หน้าใบตรวจงานของ "
         + esc(B.name) + "</p>" : "") +
-      '<div class="foot"><b>' + esc(code) + " · ฉบับวันที่ " + esc(f.revDate || "12/10/2026") + "</b><span>© "
+      // 28 Nov 2026 (owner's order): the edition date shows in the back office only, not on the printed sheet
+      '<div class="foot"><b>' + esc(code) + "</b><span>© "
       + esc(B.name) + " · ใช้และส่งต่อได้โดยไม่ดัดแปลง</span><span>" + esc(where) + "</span></div></article>";
   }).join("") : '<article class="sheet"><h1>ไม่พบเช็กลิสต์นี้</h1><p><a href="free.html">ดูทุกชุด</a></p></article>';
   if (list.length === 1) document.title = list[0].title + " — " + (B.name || "");

@@ -578,11 +578,11 @@
   // 2 บรรทัด อังกฤษบน ไทยล่าง (แบบเดียวกับแบบฟอร์ม) · ตัวอักษรอย่างน้อยราว 5.5 pt อ่านได้เมื่อพิมพ์
   function licLines(l) {
     var no = l.no || l.order; // เลขสิทธิ์ = เลขคำสั่งซื้อ/รหัสเอกสาร (หลังบ้าน 24 ต.ค. 2026) · รุ่นก่อนหน้าใช้เลขคำสั่งซื้อ
+    // 28 Nov 2026 (owner's order): no edition date on the stamp · the shop finds the edition from the licence number
     return ["Licensed to " + l.name + " (" + l.email + ") · Licence " + no + " · " + (l.plan === "updates"
-      ? "Updates plan" : "This edition") + (l.rev ? " " + dmy(l.rev) : "") + " · Downloaded " + l.at
-      + " · Not for resale or sharing",
+      ? "Updates plan" : "This edition") + " · Downloaded " + l.at + " · Not for resale or sharing",
       "สิทธิ์ใช้งานของ " + l.name + " · เลขสิทธิ์ " + no + " · " + (l.plan === "updates" ? "แบบรับฉบับใหม่" : "แบบฉบับนี้")
-      + (l.rev ? " ฉบับ " + dmy(l.rev) : "") + " · ดาวน์โหลด " + l.at + " · ห้ามจำหน่ายหรือแจกจ่ายต่อ"];
+      + " · ดาวน์โหลด " + l.at + " · ห้ามจำหน่ายหรือแจกจ่ายต่อ"];
   }
   function licText(l) {
     return licLines(l).join("  |  ");
@@ -621,6 +621,7 @@
             pg.drawImage(img, { x: (sz.width - w) / 2, y: 32, width: w, height: w * 15 / 560 });
           });
           doc.setSubject(text);
+          // 28 Nov 2026 (owner's order): the edition date is in the back office only (licences sheet), not in the file
           doc.setKeywords(["BUILD TH", j.lic.order, j.lic.member]);
           doc.setProducer("สร้าง | BUILD TH");
           doc.setModificationDate(new Date());
@@ -646,11 +647,9 @@
       return {
         id: id,
         title: s.title || id,
-        rev: s.revDate || "",
         lastAt: "",
-        lastRev: "",
         newer: false
-      };
+        };
     });
   }
   function payOnline() {
@@ -738,7 +737,7 @@
               + "</button>";
           }).join("") + "</div>") : "";
       }).join("") + B.pay.instTable(ms, o.amount) + '<p class="note" style="margin:8px 0 0">เลขบัตรไม่ผ่านเว็บร้าน ผู้ให้บริการรับชำระเงินเป็นผู้ดูแล'
-      + (me.pay && me.pay.test && !B.demo ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "")
+      + (B.pay.testNote(me) ? " · ตอนนี้เป็นโหมดทดสอบของร้าน ยังไม่ตัดเงินจริง" : "")
       + "</p></div>";
   }
   // ตัวติดตาม 5 ขั้น: สั่งซื้อ → ชำระ → ร้านตรวจยอด → พร้อมดาวน์โหลด → ได้รับไฟล์แล้ว
@@ -786,7 +785,11 @@
         return B.isCtry(B.varOf(id)) ? docLink(id) : '<button class="b line sm" type="button" data-dl="'
           + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>";
       }).join("") + '<button class="b line sm" type="button" data-rcpt="' + esc(o.id) + '">ใบเสร็จรับเงิน'
-      + (o.receipt && o.receipt !== "pending" ? " " + esc(o.receipt) : "") + '</button></div>';
+      + (o.receipt && o.receipt !== "pending" ? " " + esc(o.receipt) : "") + "</button>"
+      // 28 Nov 2026 (owner's order): one report button per order, not one per file · the form lists the documents of this order
+      + (rpIdsOf(o.id).length ? '<button class="b line sm" type="button" data-rpord="' + esc(o.id) + '" aria-expanded="'
+        + (rpOrd === o.id) + '">แจ้งปัญหาเอกสาร</button>' : "") + "</div>"
+      + (rpOrd === o.id && rpOpen ? rpForm(rpOpen, rpIdsOf(o.id)) : "");
     var how = o.method ? '<span class="note" style="margin:0"> · ' + esc(o.method) + "</span>" : "";
     // ลิงก์ติดตามส่วนตัว (เปิดได้โดยไม่ต้องเข้าระบบ ส่งต่อให้ฝ่ายบัญชีหรือผู้ร่วมงานได้) + ข้อมูลพัสดุเมื่อร้านส่งของจริง
     var tl = o.track ? location.origin + location.pathname.replace(/[^\/]*$/, "") + "track.html?o="
@@ -1201,12 +1204,12 @@
   }
   function paneDocs() {
     var lib = libOf();
-    var rows = lib.map(function (d) {
+    var docRow = function (d) {
       if (d.doc || B.isCtry(B.varOf(d.id))) return '<div class="doc card"><div><b>' + esc(d.id) + "</b> "
         + esc(d.title) + "<small>ฉบับประเทศ สร้างจากหน้าเอกสารอัจฉริยะ เลือกภาษาและพิมพ์ได้ทุกครั้ง"
         + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">' + esc(d.lic) + "</span>" : "")
         + '</small></div><span class="row" style="display:flex;gap:6px;flex-wrap:wrap">' + docLink(d.id)
-        + "</span></div>";
+        + rpBtn(d.id) + "</span></div>";
       // สินค้าฝากขาย (26 ต.ค. 2026): ส่งมอบแบบไฟล์ = ปุ่มดาวน์โหลด · ส่งพัสดุหรือส่งทางอีเมล = ข้อความบอกวิธีรับ
       var mx = B.find(d.id);
       if (B.isMarket(mx)) {
@@ -1218,25 +1221,31 @@
             + (d.lastAt ? "line" : "pri") + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด</button></span>' : '<span class="pill gray">'
             + (mx.delivery === "ship" ? "ส่งพัสดุ" : "ส่งทางอีเมล") + "</span>") + "</div>";
       }
-      var ed = d.plan === "edition", has = d.has || d.rev;
-      var st = ed && d.newer ? '<span class="pill">มีฉบับใหม่ ' + esc(dmy(d.rev)) + "</span>" : d.newer
-        ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">' + (ed ? "ฉบับของคุณ" : "ฉบับล่าสุดแล้ว")
-        + "</span>" : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
-      var planTx = ed ? "แบบฉบับนี้ (ฉบับ " + esc(dmy(has) || "-") + " เก็บได้ตลอด)" : d.plan === "updates"
-        ? "แบบรับฉบับใหม่ตลอด" : "";
+      // 28 Nov 2026 (owner's order): the edition date shows in the back office only · the member sees the plan and whether a newer edition exists
+      var ed = d.plan === "edition";
+      var st = d.newer ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">'
+        + (ed ? "ฉบับของคุณ"
+          : "ฉบับล่าสุดแล้ว") + "</span>" : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
+      var planTx = ed ? "แบบฉบับนี้ (เก็บได้ตลอด)" : d.plan === "updates" ? "แบบรับฉบับใหม่ตลอด" : "";
       var upg = ed && d.upgrade ? '<button class="b line sm" type="button" data-upg="' + esc(d.id)
         + '">อัปเกรดเป็นรับฉบับใหม่ ' + B.baht(d.upgrade) + "</button>" : "";
-      return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + '<small>' + (planTx
-        ? planTx + (ed && !d.lastAt ? "" : " · ") : "") + (ed ? "" : "ฉบับวันที่ " + esc(dmy(d.rev)
-          || "-")) + (d.lastAt ? (ed ? "" : " · ") + "ดาวน์โหลดล่าสุด " + esc(B.when(d.lastAt)) + (d.lastRev
-            ? " (ฉบับ " + esc(dmy(d.lastRev)) + ")" : "") : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">'
-              + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b '
+      return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + "<small>" + (planTx
+        ? "<span>"
+        + planTx + "</span>" : "") + (d.lastAt ? (planTx ? " · " : "") + "<span>ดาวน์โหลดล่าสุด</span> "
+          + esc(B.when(d.lastAt))
+          : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">'
+            + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b '
         + ((d.newer && !ed) || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id)
-        + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + "</span></div>";
-    }).join("");
-    return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + (lib.length ? '<div class="docs">'
+        + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + rpBtn(d.id) + "</span></div>";
+    };
+    var rows = lib.map(function (d) { // the report form opens under its document
+      return docRow(d) + (rpOpen === d.id && !rpOrd ? rpForm(d.id) : "");
+    }).join(""), rpTop = rpOpen && !rpOrd && !lib.some(function (d) {
+      return d.id === rpOpen;
+    }) ? rpForm(rpOpen) : ""; // from a product page for a sheet that the member did not buy
+    return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + rpTop + (lib.length ? '<div class="docs">'
       + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>')
-      + "</section>" +
+      + "</section>" + rpList() +
       '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="TH">ไฟล์รวมฉบับฟรี ภาษาไทย</button><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="EN">ไฟล์รวมฉบับฟรี ภาษาอังกฤษ</button><a class="b line sm" href="doc.html'
       + q + '" data-full="1">ฉบับฟรีภาษาอื่น</a><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
   }
@@ -1251,6 +1260,142 @@
     return '<section class="sec"><h2>ซื้อฉบับมืออาชีพ</h2><div class="card pad" style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span style="flex:1;min-width:200px">เลือกดูรายละเอียดทีละใบ เลือกแบบสิทธิ์ แล้วชำระในหน้าชำระเงิน</span><a class="b line sm" href="sheets.html'
       + q + '">ดูร้านใบตรวจงาน</a>' + (n ? '<a class="b pri sm" href="checkout.html' + q + '">ชำระเงิน ('
         + n + " รายการในตะกร้า)</a>" : "") + "</div>" + shopBox() + "</section>";
+  }
+  /* 28 Nov 2026 (owner's order): report a problem in a document. Each document row has the button.
+     The form asks only for the page, the item, what is wrong and what it should be, with up to 3 photos.
+     The back end adds the purchase data itself (order, licence number, plan, edition used, purchase date),
+     keeps the report as a record with a number and a status, and posts it in the shop chat with the photos. */
+  // rpOpen = the document of the open form · rpOrd = the order whose card holds the form (orders tab), "" = documents tab
+  var rpOpen = "", rpOrd = "", rpPics = [], rpBusy = false;
+  var RP_PILL = { "แก้แล้ว": "ok", "ไม่ใช่ข้อผิดพลาด": "gray" };
+  var RP_ID = /^[FT]-\d\d[A-Z]?(\.[A-Z]{2})?$/;
+  function rpIdsOf(oid) { // the check sheets of one paid order that a buyer can report (not shop items of other sellers)
+    var o = (me.orders || []).filter(function (x) {
+      return x.id === oid;
+    })[0];
+    return o ? B.expand(o.items).filter(function (id, i, arr) {
+      return RP_ID.test(id) && B.find(id) && arr.indexOf(id) === i;
+    }) : [];
+  }
+  function rpName(id) {
+    var x = B.find(id);
+    return x ? esc(B.code(x)) + " <span>" + esc(x.title) + "</span>" : esc(id);
+  }
+  function rpSay(t) { // the page translates a whole text: the option text of a document is its code plus its title
+    var tr = window.I18N_TR ? window.I18N_TR(t) : t;
+    return tr || t;
+  }
+  function rpBtn(id) {
+    return '<button class="b line sm" type="button" data-report="' + esc(id) + '" aria-expanded="' + (rpOpen === id)
+      + '">แจ้งปัญหาในเอกสาร</button>';
+  }
+  function rpInfo(id) { // shown only; the back end reads the same data again from the orders
+    var d = libOf().filter(function (x) {
+      return x.id === id;
+    })[0];
+    if (!d) return "<span>คุณยังไม่ได้ซื้อใบนี้ ระบบบันทึกว่าแจ้งจากฉบับฟรีหรือหน้าตัวอย่าง</span>";
+    // fixed words in their own span: the English page translates whole text nodes
+    // the edition date shows in the back office only (owner, 28 Nov 2026): the back end adds it to the report itself
+    return (d.lic ? "<span>เลขสิทธิ์</span> " + pv(d.lic) + " · " : "") + "<span>" + (d.plan === "updates"
+      ? "แบบรับฉบับใหม่ตลอด" : "แบบฉบับนี้") + "</span>" + (d.buy ? " · <span>ซื้อวันที่</span> " + esc(dmy(d.buy)) : "");
+  }
+  function rpPicsHtml() {
+    return rpPics.map(function (p, i) {
+      return '<span class="rp-pic"><img src="' + p.data + '" alt="รูปที่ ' + (i + 1) + '"><button type="button" class="b line sm" data-rpx="'
+        + i + '">เอาออก</button></span>';
+    }).join("");
+  }
+  function rpForm(id, choices) { // choices = the documents of one order (orders tab): the buyer picks one
+    var pick = choices && choices.length > 1 ? '<label>เอกสารที่ต้องการแจ้ง<select name="sheet">' + choices.map(function (c) {
+      var x = B.find(c);
+      return '<option value="' + esc(c) + '"' + (c === id ? " selected" : "") + ">" + esc(c + (x ? " "
+        + rpSay(x.title) : ""))
+        + "</option>";
+    }).join("") + "</select></label>" : "";
+    return '<form class="f card pad rp-form" id="f-report" data-id="' + esc(id) + '" novalidate><h3><span>แจ้งปัญหาในเอกสาร</span> <span class="rp-name">'
+      + rpName(id) + '</span></h3>' + pick + '<p class="note"><span>ระบบแนบข้อมูลการซื้อให้เอง:</span> <span class="rp-info">'
+      + rpInfo(id)
+      + '</span></p><div class="rp-two"><label>หน้าที่<input type="text" name="page" maxlength="20" inputmode="numeric" autocomplete="off"></label><label>ข้อที่ หรือหัวข้อ<input type="text" name="item" maxlength="40" autocomplete="off"></label></div>'
+      + '<label>สิ่งที่ผิดหรือไม่ชัด (ต้องกรอก)<textarea name="what" rows="3" maxlength="1000" required></textarea></label>'
+      + '<label>ที่ควรเป็น และแหล่งอ้างอิง (ถ้าทราบ)<textarea name="should" rows="2" maxlength="1000"></textarea></label>'
+      + '<div class="rp-row"><label class="b line sm rp-add">เพิ่มรูป<input type="file" name="pic" accept="image/jpeg,image/png,image/gif,image/webp" multiple></label><span class="note">ไม่เกิน 3 รูป เช่น รูปหน้าที่ผิด</span></div><div class="rp-pics" id="rppics">'
+      + rpPicsHtml() + '</div><p class="rp-row"><button class="b pri" type="submit">ส่งเรื่อง</button><button class="b line" type="button" data-rpx="close">ปิด</button></p><p class="note">ร้านตอบในห้องแชตและทางอีเมล ภายใน 2 วันทำการ · อย่าพิมพ์รหัสผ่านหรือเลขบัตรในแบบนี้</p></form>';
+  }
+  function rpList() {
+    var L = me.reports || [];
+    if (!L.length) return "";
+    return '<section class="sec"><h2>เรื่องที่คุณแจ้ง</h2><div class="rp-list">' + L.map(function (r) {
+      var x = B.find(r.sheet);
+      return '<div class="card pad"><div class="rp-head"><b>' + esc(r.id) + '</b><span class="pill '
+        + (RP_PILL[r.status]
+          || "") + '">' + esc(r.status) + "</span></div><small>" + (x ? esc(B.code(x)) + " <span>" + esc(x.title)
+            + "</span>" : esc(r.sheet)) + (r.page ? " · <span>หน้าที่</span> " + pv(r.page) : "") + (r.item
+              ? " · <span>ข้อที่</span> " + pv(r.item) : "")
+        + " · <span>แจ้งเมื่อ</span> " + esc(B.when(r.at)) + '</small><p class="rp-what">' + pv(r.what)
+        + "</p>"
+        + (r.answer ? '<p class="note"><span>ร้านตอบ:</span> ' + pv(r.answer) + "</p>" : "") + (r.fixed
+          ? '<p class="note"><span>แก้ในฉบับใหม่แล้ว</span></p>' : "") + "</div>";
+    }).join("") + "</div></section>";
+  }
+  function rpAdd(files) { // photos only · each photo goes through the same check and resize as a chat photo
+    var room = Math.max(0, 3 - rpPics.length), list = [].slice.call(files || [], 0, room), drawPics = function () {
+      var pe = $("rppics");
+      if (pe) pe.innerHTML = rpPicsHtml();
+    };
+    if ((files || []).length > room) say("แนบได้ไม่เกิน 3 รูป", true);
+    return list.reduce(function (p, file) {
+      return p.then(function () {
+        if (!/\.(jpe?g|png|gif|webp)$/i.test(file.name || "")) throw new Error("แนบได้เฉพาะรูป JPG PNG GIF WEBP");
+        return chatPick(file).then(function (d) {
+          if (d.kind !== "image") throw new Error("แนบได้เฉพาะรูป JPG PNG GIF WEBP");
+          if (rpPics.length < 3) rpPics.push(d);
+        });
+      });
+    }, Promise.resolve()).then(drawPics).catch(function (er) {
+      drawPics();
+      say(er.message, true);
+    });
+  }
+  function rpSend(f) {
+    var what = String(f.elements.what.value || "").trim();
+    if (what.length < 5) {
+      say("บอกสิ่งที่ผิดอย่างน้อย 5 ตัวอักษร", true);
+      f.elements.what.focus();
+      return;
+    }
+    if (rpBusy || busy) return;
+    var btn = f.querySelector("button[type=submit]");
+    rpBusy = true;
+    btn.disabled = true;
+    btn.textContent = rpPics.length ? "กำลังส่งรูป…" : "กำลังส่ง…";
+    B.call("report", {
+      sheet: f.dataset.id,
+      page: f.elements.page.value,
+      item: f.elements.item.value,
+      what: what,
+      should: f.elements.should.value,
+      files: rpPics.map(function (p) {
+        return { name: p.name, data: p.data };
+      })
+    }).then(function (r) {
+      var fromOrd = rpOrd;
+      rpBusy = false;
+      rpOpen = "";
+      rpOrd = "";
+      rpPics = [];
+      if (r && r.reports) me.reports = r.reports;
+      chat = null; // the chat has the new report message: load it again when the chat opens
+      paint();
+      say(fromOrd ? "ส่งเรื่องแล้ว ร้านจะตอบในห้องแชตและทางอีเมล ดูสถานะได้ที่เมนู เอกสารของฉัน"
+        : "ส่งเรื่องแล้ว ร้านจะตอบในห้องแชตและทางอีเมล ดูสถานะได้ที่ เรื่องที่คุณแจ้ง");
+      var li = fromOrd ? document.querySelector('[data-rpord="' + fromOrd + '"]') : document.querySelector(".rp-list");
+      if (li) li.scrollIntoView({ block: "nearest" });
+    }).catch(function (e) {
+      rpBusy = false;
+      btn.disabled = false;
+      btn.textContent = "ส่งเรื่อง";
+      say((e && e.message) || "ส่งเรื่องไม่สำเร็จ", true);
+    });
   }
   function paneAsk() {
     return '<section class="sec" id="askbox"><h2>ห้องแชตกับร้าน</h2>' + askBox() + "</section>";
@@ -1754,12 +1899,26 @@
     if (!me) return;
     tab = readHash();
     if (tab === "sell") sellData = null; // ตัวเลขยอดเงินโหลดใหม่ทุกครั้งที่เปิดเมนู
+    rpOpen = ""; // another menu: the report form closes (28 Nov 2026)
+    rpOrd = "";
+    rpPics = [];
     say("");
     paint();
     window.scrollTo({ top: 0 });
   });
   tab = readHash();
   if (want && !location.hash) tab = "shop"; // ลิงก์ซื้อ member.html?buy=รหัส เปิดหน้าซื้อทันทีหลังเข้าระบบหรือสมัคร
+  // 28 Nov 2026: link member.html?report=<code>#docs from a product page opens the report form of that sheet
+  (function () {
+    var rp = "";
+    try {
+      rp = String(new URLSearchParams(location.search).get("report") || "").trim().toUpperCase();
+    } catch (e) {}
+      if (/^[FT]-\d\d[A-Z]?(\.[A-Z]{2})?$/.test(rp) && B.find(rp)) {
+        rpOpen = rp;
+        tab = "docs";
+      }
+  })();
 
   // ---------- รูปโปรไฟล์: ตัดเป็นสี่เหลี่ยมจัตุรัส 256 จุดในเครื่องผู้ใช้ก่อนส่ง ----------
   function cropAvatar(file) {
@@ -1858,8 +2017,65 @@
 
   // ---------- เหตุการณ์ ----------
   $("view").addEventListener("click", function (ev) {
-    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear],[data-sell],[data-chatf],[data-chatv],[data-chatx]");
+    // 28 Nov 2026: [data-upg] was missing here, so the upgrade button of a document did nothing · [data-report] [data-rpx] are new
+    var t = ev.target.closest("[data-geo],[data-mode],[data-out],[data-dl],[data-cancel],[data-approve],[data-erase],[data-soc],[data-copy],[data-rcpt],[data-fg],[data-eye],[data-vr],[data-pend],[data-pay],[data-outall],[data-export],[data-avdel],[data-fill],[data-clear],[data-sell],[data-chatf],[data-chatv],[data-chatx],[data-upg],[data-report],[data-rpx],[data-rpord]");
     if (!t) return;
+    if (t.dataset.rpord) { // orders tab: open or close the report form under this order, with a list of its documents
+      var oid = t.dataset.rpord, oids = rpIdsOf(oid);
+      if (rpOrd === oid || !oids.length) {
+        rpOrd = "";
+        rpOpen = "";
+      } else {
+        rpOrd = oid;
+        rpOpen = oids[0];
+      }
+      rpPics = [];
+      say("");
+      paint();
+      var rfo = $("f-report");
+      if (rfo) {
+        rfo.scrollIntoView({ block: "nearest" });
+        (rfo.elements.sheet || rfo.elements.page).focus();
+      } else {
+        var rbo = document.querySelector('[data-rpord="' + oid + '"]');
+        if (rbo) rbo.focus();
+      }
+      return;
+    }
+    if (t.dataset.report) { // open or close the report form under this document
+      var rid = t.dataset.report;
+      rpOpen = rpOpen === rid ? "" : rid;
+      rpOrd = "";
+      rpPics = [];
+      say("");
+      paint();
+      var rf = $("f-report");
+      if (rf) {
+        rf.scrollIntoView({ block: "nearest" });
+        rf.elements.page.focus();
+      } else {
+        var rb = document.querySelector('[data-report="' + rid + '"]');
+        if (rb) rb.focus();
+      }
+      return;
+    }
+    if (t.dataset.rpx) { // the report form: cancel, or take one photo out
+      if (t.dataset.rpx === "close") {
+        var was = rpOpen, wasOrd = rpOrd;
+        rpOpen = "";
+        rpOrd = "";
+        rpPics = [];
+        paint();
+        var rb2 = document.querySelector(wasOrd ? '[data-rpord="' + wasOrd + '"]' : '[data-report="'
+          + was + '"]');
+        if (rb2) rb2.focus();
+      } else {
+        rpPics.splice(+t.dataset.rpx, 1);
+        var pe0 = $("rppics");
+        if (pe0) pe0.innerHTML = rpPicsHtml();
+      }
+      return;
+    }
     if (t.dataset.sell) { // ขายของฉัน (21 Nov 2026)
       var sa = t.dataset.sell;
       if (sa === "reload") {
@@ -2102,6 +2318,17 @@
     var e = ev.target;
     if (e.name === "it" || e.name === "plan") total();
     if (e.form && e.form.id === "f-sellpay" && e.name === "method") $("sp-bank").hidden = e.value !== "bank";
+    if (e.form && e.form.id === "f-report" && e.name === "pic" && e.files && e.files.length) {
+      rpAdd(e.files);
+      e.value = "";
+    }
+    if (e.form && e.form.id === "f-report" && e.name === "sheet" && RP_ID.test(e.value)) { // another document of the order
+      rpOpen = e.value;
+      e.form.dataset.id = e.value;
+      var rn = e.form.querySelector(".rp-name"), ri = e.form.querySelector(".rp-info");
+      if (rn) rn.innerHTML = rpName(e.value);
+      if (ri) ri.innerHTML = rpInfo(e.value);
+    }
     if (e.form && e.form.id === "f-chat" && e.name === "file" && e.files && e.files[0]) {
       chatPick(e.files[0]).then(function (d) {
         chatPend = d;
@@ -2191,6 +2418,7 @@
     var f = ev.target, v = function (n) {
       return f.elements[n] ? f.elements[n].value : "";
     };
+    if (f.id === "f-report") return rpSend(f);
     if (f.id === "f-sellpay") { // บัญชีรับเงินของผู้ขาย · หลังบ้านตรวจรูปแบบเลขอีกครั้ง
       var meth = (f.querySelector("input[name=method]:checked") || {}).value || "promptpay", acc0 = v("acc").replace(/[\s-]/g,
         "");

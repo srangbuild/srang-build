@@ -443,9 +443,14 @@
       ["ใบตรวจงานแทนการตรวจของวิศวกรได้ไหม",
         "ไม่ได้ ใบตรวจงานเป็นเครื่องมือช่วยตรวจและบันทึก งานจริงให้ยึดแบบ ข้อกำหนด และมาตรฐานที่สัญญาอ้างอิง งานที่กฎหมายกำหนดให้ผู้มีใบอนุญาตทำ ต้องให้ผู้มีใบอนุญาตเป็นผู้ทำและรับรอง"]
     ];
+    // 28 Nov 2026 (owner's order): a reader who finds wrong data reports it in the shop chat, with photos (member.js reportDraft)
+    var report = bundle ? "" : '<p class="note pd-report"><span>พบข้อมูลผิดหรือไม่ชัดในใบนี้</span> <a href="'
+      + L("member.html", "report=" + encodeURIComponent(x.id)) + '#docs">แจ้งปัญหาในเอกสาร แนบรูปได้</a></p>';
     return '<section class="pd-sec faq" id="faq"><h2>คำถามที่พบบ่อย</h2>' + qa.map(function (a) {
       return "<details><summary>" + esc(a[0]) + "</summary><p>" + esc(a[1]) + "</p></details>";
-    }).join("") + '<p class="note">อ่านข้อตกลงเต็มที่ <a href="' + L("terms.html") + '">ข้อตกลงการใช้งาน</a></p></section>';
+    }).join("") + '<p class="note">อ่านข้อตกลงเต็มที่ <a href="' + L("terms.html") + '">ข้อตกลงการใช้งาน</a></p>'
+      + report
+      + "</section>";
   }
 
   function draw() {
