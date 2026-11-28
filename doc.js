@@ -359,6 +359,44 @@
   $("loginLink").addEventListener("click", keepNext);
   // เข้าสู่ระบบแล้ว: ทำเครื่องหมายใบที่มีสิทธิ์ และบอกว่าได้ฉบับไหน
   var OWN = {};
+  /* 28 Nov 2026 (owner): a paid document opened from the member page (go=1) follows the edition bought, and the choices are
+     locked: sheet, number of languages, languages, standard country. TH = Thai · EN = English · "" = English + Thai. */
+  function lockToEdition(v) {
+    var two = !v, fire = function (el) {
+      if (el) el.dispatchEvent(new Event("change", { bubbles: true }));
+    }, pick = function (sel, code) {
+      if (!sel) return;
+      var o = [].filter.call(sel.options, function (x) {
+        return x.value === code || x.value.indexOf(code + "-") === 0;
+      })[0];
+      if (o && !(code === "en" && /^en-/.test(sel.value))) sel.value = o.value;
+      fire(sel);
+    }, r = document.querySelector('input[name=nlang][value="' + (two ? 2 : 1) + '"]');
+    if (r) {
+      r.checked = true;
+      fire(r);
+    }
+    pick($("lang1"), v === "TH" ? "th" : "en");
+    if (two) pick($("lang2"), "th");
+    if ($("c1")) {
+      $("c1").value = "TH";
+      fire($("c1"));
+    }
+    if ($("c2")) {
+      $("c2").value = "";
+      fire($("c2"));
+    }
+    ["sheet", "lang1", "lang2", "c1", "c2"].forEach(function (id) {
+      if ($(id)) $(id).disabled = true;
+    });
+    [].forEach.call(document.querySelectorAll("input[name=nlang]"), function (i) {
+      i.disabled = true;
+    });
+    if ($("rightInfo")) {
+      $("rightInfo").hidden = false;
+      $("rightInfo").textContent = "ล็อกตามฉบับที่ซื้อ: ใบ ภาษา และมาตรฐานเปลี่ยนไม่ได้ · กรอกข้อมูลงาน แล้วกด สร้างเอกสาร ได้เลย";
+    }
+  }
   function drawRight() {
     var vs = OWN[$("sheet").value], el = $("rightInfo");
     el.hidden = !vs;
@@ -381,6 +419,7 @@
     /* 28 Nov 2026 (owner's order: the paid edition is this system): the link "เปิดเอกสาร" of the member page carries go=1.
        The document of a bought sheet opens at once, in the languages of the edition (cc). Rights are known here. */
     if (q.get("go") === "1" && OWN[$("sheet").value]) {
+      lockToEdition(q.has("cc") ? String(q.get("cc") || "").toUpperCase() : OWN[$("sheet").value][0]);
       if ($("f-doc").requestSubmit) $("f-doc").requestSubmit();
       else $("f-doc").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     }
@@ -949,6 +988,11 @@
     $("result").hidden = false;
     drawPicks();
     partsDraw();
+    // 28 Nov 2026 (owner): report a problem from the document itself; the member page opens the report form of this sheet
+    if ($("reportLink")) {
+      $("reportLink").hidden = !d.owned;
+      $("reportLink").href = "member.html?report=" + encodeURIComponent(d.id) + "#docs";
+    }
     fit();
   }
   function render(d, meta) {
@@ -1020,10 +1064,12 @@
       .then(function (r) {
         say("");
         render(enDoc(r.doc, /^en-/.test(pick1) ? pick1 : pick2), {
-          project: [v("project"), f.elements.detail ? v("detail") : ""].filter(Boolean).join(" · "),
+          project: [v("project"), f.elements.detail ? v("detail") : "", f.elements.org ? v("org") : "",
+            f.elements.contractNo ? v("contractNo") : ""].filter(Boolean).join(" · "),
+          // 28 Nov 2026: B2B and B2G: company or agency, contract no. or project code
           contractor: v("contractor"),
           location: [v("location"), geoVal()].filter(Boolean).join(" · "),
-          supervisor: f.elements.supervisor ? v("supervisor") : "",
+          supervisor: [f.elements.supervisor ? v("supervisor") : "", f.elements.committee ? v("committee") : ""].filter(Boolean).join(" · "),
           drawRev: f.elements.drawRev ? v("drawRev") : "",
           area: f.elements.area ? v("area") : "",
           date: f.elements.chkDate && /^\d{4}-\d{2}-\d{2}$/.test(v("chkDate")) ? v("chkDate").split("-").reverse().join("/") : ""
@@ -1258,7 +1304,8 @@
      เก็บ: ค่าในฟอร์มด้านบน + ข้อความในช่องกรอก + ช่องติ๊ก + ค่าที่เลือก ของเอกสารที่สร้างแล้ว · เปิดงาน = ตั้งฟอร์ม สร้างเอกสารใหม่ แล้วเติมข้อมูลกลับตามลำดับช่อง */
   var JOBK = "build_doc_jobs", jobPending = null, JOBF = ["sheet", "lang1", "lang2", "c1", "c2",
     "stdName", "project", "detail",
-    "contractor", "location", "supervisor", "drawRev", "area", "chkDate"];
+    "contractor", "location", "supervisor", "drawRev", "area", "chkDate", "org", "contractNo",
+    "committee"];
   function jobsGet() {
     try {
       var j = JSON.parse(localStorage.getItem(JOBK) || "{}");

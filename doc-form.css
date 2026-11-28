@@ -155,3 +155,8 @@
   body.pp-split #printParts { display: block !important; }
   .fm .ppart + .ppart { break-before: page; page-break-before: always; }
 }
+/* 28 Nov 2026 (owner: keep the form short): extra job fields fold away */
+.jobmore { border: 1px solid #d5dbe1; border-radius: 12px; padding: 8px 14px; background: #fff; }
+.jobmore > summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.jobmore[open] > summary { margin-bottom: 8px; }
+.jobmore > label, .jobmore > .g3 { margin-top: 8px; }
