@@ -312,7 +312,12 @@
   }
 
   // ---------- ต่อหลังบ้าน ----------
-  function post(url, body) {
+  /* 28 Nov 2026: once, just after a Deploy, a POST came back with the status reply of the service (the doGet answer:
+     service, version) instead of its own answer. The member page then broke on the missing member data and showed a raw
+     script error. The status reply is the only reply with service "BUILD TH member" at the top level. A read is asked
+     again once; any other action stops with a message, because the action itself may have run. */
+  var STATUS_REPLY = "BUILD TH member", READ_AGAIN = { me: 1, chat: 1 };
+  function post(url, body, again) {
     return fetch(url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -324,6 +329,15 @@
       })
       .then(function (j) {
         if (!j || j.ok !== true) throw new Error((j && j.error) || "ทำรายการไม่สำเร็จ");
+        if (j.service === STATUS_REPLY) {
+          if (READ_AGAIN[body.action] && !again) return new Promise(function (res) {
+            setTimeout(res, 1200);
+          }).then(function () {
+            return post(url, body, true);
+          });
+          throw new Error(READ_AGAIN[body.action] ? "โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง"
+            : "ระบบตอบกลับไม่ครบ ตรวจผลในหน้าสมาชิกก่อนทำรายการซ้ำ");
+        }
         return j;
       });
   }
