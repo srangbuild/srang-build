@@ -709,7 +709,15 @@
     return P.transfer !== false || !!(window.SITE_MODE && window.SITE_MODE.preview);
   }
   var NOPAY = '<p class="note">ตอนนี้ยังไม่มีช่องทางชำระสำหรับยอดนี้ ลองใหม่ภายหลัง หรือถามร้านที่หน้าสมาชิก เมนู ถามร้าน</p>';
+  /* 28 Nov 2026: pay.test is the test mode of Opn. The note "test mode, no real charge" shows only when a method of Opn is on
+     the page. Stripe, PayPal and Lemon have their own mode (Stripe is live), so the note was wrong when only Stripe was shown. */
+  function testNote(me) {
+    return !!(me && me.pay && me.pay.test && !B.demo && methods(me).some(function (k) {
+      return !/^(stripe|paypal|lemon)$/.test(k);
+    }));
+  }
   B.pay = {
+    testNote: testNote,
     slip: slip,
     NOPAY: NOPAY,
     groupBox: groupBox,

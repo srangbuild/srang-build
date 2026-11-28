@@ -313,3 +313,26 @@ label.sx-i { cursor:pointer; }
 .acct-nav a em.dot { background:var(--bad); }
 .chat-att .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 body.on-chat .bt-fab, body.on-chat .bc-fab { display:none !important; }
+/* 28 Nov 2026: report a problem in a document (member page, documents tab) */
+.doc > .row { justify-content:flex-end; max-width:360px; }
+@media (max-width:760px) { .doc { grid-template-columns:1fr; } .doc > .row { max-width:none; justify-content:flex-start; } }
+.rp-form, .rp-list { scroll-margin-top:150px; }
+.rp-form { margin:-4px 0 12px; border-color:var(--orange); }
+.ord .rp-form { margin:12px 0 0; }
+.rp-form select { width:100%; }
+.rp-form h3 { margin:0 0 6px; font-size:17px; }
+.rp-form .note { margin:0 0 10px; }
+.rp-form textarea { width:100%; resize:vertical; }
+.rp-two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.rp-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0 0; }
+.rp-add { position:relative; cursor:pointer; }
+.rp-add:focus-within { outline:2px solid var(--orange); outline-offset:2px; }
+.rp-add input { position:absolute; width:1px; height:1px; opacity:0; }
+.rp-pics { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.rp-pic { display:grid; gap:4px; justify-items:center; }
+.rp-pic img { width:88px; height:88px; object-fit:cover; border-radius:8px; border:1px solid var(--line); }
+.rp-list { display:grid; gap:10px; }
+.rp-head { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
+.rp-what { margin:6px 0 0; overflow-wrap:anywhere; white-space:pre-line; }
+.rp-list .note { margin:6px 0 0; overflow-wrap:anywhere; white-space:pre-line; }
+@media (max-width:420px) { .rp-two { grid-template-columns:1fr; } }

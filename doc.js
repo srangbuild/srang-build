@@ -870,7 +870,7 @@
       + M(L.lnote) + "</div></section>";
     return h;
   }
-  function pageCss(d) { // ท้ายทุกหน้า: รหัส ฉบับวันที่ ชื่อผู้ซื้อ เลขหน้า
+  function pageCss(d) { // ท้ายทุกหน้า: รหัส ชื่อผู้ซื้อ เลขหน้า · 28 พ.ย. 2026 คำสั่งเจ้าของ: ฉบับวันที่เห็นเฉพาะหลังบ้าน ไม่พิมพ์ในเอกสาร
     var st = $("pageCss"), L = d.lab, q2 = function (s) {
       return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ")
         + '"';
@@ -882,7 +882,7 @@
     }
     var f = 'font: 7.6pt "Segoe UI", "Leelawadee UI", Arial, sans-serif; color: #111;';
     st.textContent = "@media print { @page { size: A4; margin: 12mm 11mm 15mm 11mm; @bottom-left { content: "
-      + q2(docCode(d) + (d.revDate ? " · " + L.issue[0] + " " + d.revDate : "")) + "; " + f + " } @bottom-center { content: "
+      + q2(docCode(d)) + "; " + f + " } @bottom-center { content: "
       + q2("สร้าง | BUILD TH" + (d.owned && d.licensee ? " · Licensed to " + d.licensee + (d.licNo
         ? " · " + d.licNo : "") : "")) + "; " + f + " } @bottom-right { content: " + q2(L.page[0]
           + " ") + ' counter(page) " / " counter(pages); ' + f + " }"
