@@ -4185,5 +4185,46 @@ window.SITE = {
       "hidden": true,
       "of": "F-05"
     }
-  ]
+  ],
+  "plans": [
+    {
+      "id": "P-12",
+      "title": "แผนรายปี บุคคล: ใบตรวจงานทุกใบ 1 ปี",
+      "titleEn": "Yearly plan for one person: every check sheet for 1 year",
+      "price": 2990,
+      "sale": true,
+      "ok": true,
+      "days": 365,
+      "seats": 1
+    }
+  ],
+  "biz": {
+    "seatMin": 5,
+    "seatFloorPct": 70,
+    "extraSeat": 2100,
+    "b2b": [
+      {
+        "seats": 5,
+        "price": 13490
+      },
+      {
+        "seats": 10,
+        "price": 23900
+      },
+      {
+        "seats": 25,
+        "price": 52490
+      }
+    ],
+    "b2g": [
+      {
+        "seats": 10,
+        "price": 23900
+      },
+      {
+        "seats": 30,
+        "price": 62990
+      }
+    ]
+  }
 };

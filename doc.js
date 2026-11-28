@@ -934,9 +934,16 @@
     st.textContent = "@media print { @page { size: A4; margin: 12mm 11mm 15mm 11mm; @bottom-left { content: "
       + q2(docCode(d)) + "; " + f + " } @bottom-center { content: "
       + q2("สร้าง | BUILD TH" + (d.owned && d.licensee ? " · Licensed to " + d.licensee + (d.licNo
-        ? " · " + d.licNo : "") : "")) + "; " + f + " } @bottom-right { content: " + q2(L.page[0]
+        ? " · " + d.licNo : "") + planTo(d) : "")) + "; " + f + " } @bottom-right { content: " + q2(L.page[0]
           + " ") + ' counter(page) " / " counter(pages); ' + f + " }"
       + " } }";
+  }
+  // 28 Nov 2026 (28c): a document made under a time plan prints the end of the right in the footer (no-overlap rule 1)
+  function planTo(d) {
+    if (!d || !d.until) return "";
+    var t = new Date(d.until);
+    if (isNaN(t.getTime())) return "";
+    return " · Plan valid to " + t.toLocaleDateString("en-GB", { timeZone: "Asia/Bangkok" });
   }
   function noteBar(d) { // ข้อความบนจอเหนือเอกสาร ไม่พิมพ์ · แปลตามภาษาของเว็บ
     var h = "", cm = d.cmp || {};
@@ -977,6 +984,7 @@
     box.setAttribute("lang", cs[0]);
     box.innerHTML = (d.owned ? proForm(META) : freeForm(META)) + (d.owned ? '<p class="lic">' + esc(docCode(d))
       + " · สร้าง | BUILD TH · Licensed to " + esc(d.licensee) + (d.licNo ? " · " + esc(d.licNo) : "")
+      + esc(planTo(d))
       + "</p>" : "") + '<p class="fine editedNote" hidden>' + One(d.lab.edited) + "</p>";
     noteBar(d);
     pageCss(d);

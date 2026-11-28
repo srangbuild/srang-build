@@ -70,8 +70,9 @@
       sub: [["guide.html", "", "งานไหนใช้ใบไหน", "Which sheet for which job"], ["sheets.html",
         "packs",
         "แพ็กเกจตามงาน", "Packages by project"], ["sheets.html", "list",
-          "ใบตรวจงานทีละใบ", "Check sheets"], ["market.html", "", "ร้านฝากขาย โปรแกรม หนังสือ",
-            "Marketplace"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
+          "ใบตรวจงานทีละใบ", "Check sheets"], ["packages.html", "", "แผนรายปี บริษัท และหน่วยงานรัฐ",
+            "Yearly, company and agency plans"], ["market.html", "", "ร้านฝากขาย โปรแกรม หนังสือ",
+              "Marketplace"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
         // 28 Nov 2026 (owner's order): no separate menu item for the document system. It is the same product:
         // a bought sheet opens there from the member page, and the free form of a sheet opens there from the sheet's page.
     } : null,

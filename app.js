@@ -22,6 +22,10 @@
   }), bundles = Array.isArray(S.bundles) ? S.bundles : [];
   // สินค้าฝากขาย (รุ่น 26 ต.ค. 2026): โปรแกรม หนังสือ อีบุ๊ก เทมเพลต · รหัส M-001 · ซื้อผ่านตะกร้าเดียวกัน
   var market = Array.isArray(S.market) ? S.market : [];
+  // 28 Nov 2026 (28c): time plans (P-12 = yearly plan for one person). Same rules as the back end (Code.gs isPlan, planFloor, canSell).
+  var plans = Array.isArray(S.plans) ? S.plans.filter(function (x) {
+    return !!x && /^P-\d{2}$/.test(String(x.id));
+  }) : [];
   var ST = {
     wait: "รอชำระ",
     check: "รอตรวจ",
@@ -206,7 +210,25 @@
       return x.id === id;
     })[0] || market.filter(function (x) {
       return x.id === id;
+    })[0] || plans.filter(function (x) {
+      return x.id === id;
     })[0] || null;
+  }
+  function isPlan(x) {
+    return !!(x && /^P-\d{2}$/.test(String(x.id)) && +x.days > 0);
+  }
+  // No-overlap rule 2 (owner order 28 Nov 2026): a plan is never cheaper than every sheet bought once in one language
+  function planFloor() {
+    return allSheets.filter(function (s) {
+      return s.hidden !== true && s.ok === true && s.sale === true;
+    }).reduce(function (t, s) {
+      return t + (+s.price || 0);
+    }, 0);
+  }
+  function planSheets() {
+    return allSheets.filter(function (s) {
+      return s.hidden !== true && s.ok === true;
+    });
   }
   function langsOf(x) {
     if (!x || isMarket(x)) return [""];
@@ -252,6 +274,7 @@
     return x.ok === true;
   }
   function canSell(x) {
+    if (isPlan(x) && (+x.days < 365 || +x.price < planFloor())) return false; // no-overlap rules 2 and 3
     return !!(P.on === true && x && x.sale === true && +x.price > 0 && reviewed(x));
   }
   function expand(ids) {
@@ -748,6 +771,10 @@
     planOk: planOk,
     market: market,
     isMarket: isMarket,
+    plans: plans,
+    isPlan: isPlan,
+    planFloor: planFloor,
+    planSheets: planSheets,
     token: token,
     call: call,
     callAdmin: callAdmin,
@@ -781,6 +808,7 @@ window.BUILD.code = function (x) {
 window.BUILD.pageOf = function (x) {
   var id = String((x && x.id) || "");
   if (!x || x.hidden === true || x.of) return "";
+  if (/^P-\d{2}$/.test(id)) return "packages.html"; // 28c: plans live on the packages page
   if (/^[FT]-\w+$/.test(id) && !x.items) return "sheet-" + id + ".html";
   if (/^B-\w+$/.test(id) && x.items) return "pack-" + id + ".html";
   return "";
