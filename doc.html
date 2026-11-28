@@ -46,6 +46,9 @@
       <label data-full="1">ชื่อมาตรฐานที่โครงการใช้ (ไม่บังคับ)<input type="text" name="stdName" maxlength="80" list="stds" placeholder="เช่น ACI, Eurocode, JIS"><datalist id="stds"><option value="ACI 318"><option value="Eurocode 2"><option value="BS EN 206"><option value="JIS A 5308"><option value="ASTM C94"><option value="IEC 60364"></datalist></label>
       <div class="g3"><label>ชื่อโครงการ (ไม่บังคับ)<input type="text" name="project" maxlength="100"></label><label>ผู้รับเหมา (ไม่บังคับ)<input type="text" name="contractor" maxlength="100"></label><label>พื้นที่ตรวจ (ไม่บังคับ)<input type="text" name="location" maxlength="100"></label></div>
       <label>รายละเอียดโครงการ (ไม่บังคับ)<input type="text" name="detail" maxlength="160" placeholder="เช่น อาคาร 3 ชั้น · ชั้น 2 โซน A"></label>
+      <div class="g3"><label>ผู้ควบคุมงาน (ไม่บังคับ)<input type="text" name="supervisor" maxlength="100"></label><label>แบบเลขที่ / แก้ไขครั้งที่ (ไม่บังคับ)<input type="text" name="drawRev" maxlength="60"></label><label>พื้นที่ / ผัง / ชั้น (ไม่บังคับ)<input type="text" name="area" maxlength="80"></label></div>
+      <label>วันที่ตรวจ (ไม่บังคับ)<input type="date" name="chkDate"></label>
+      <p class="note" style="margin:0">ข้อมูลงานที่กรอกที่นี่พิมพ์ลงหัวเอกสารให้เอง และเก็บในเครื่องนี้เท่านั้น ไม่ส่งไปที่ร้าน</p>
       <label>ประเทศที่ตั้งงาน (กฎหมายในภาคผนวก ข ใช้ประเทศนี้)<select id="site" data-country-name="1"></select></label>
       <div class="g3" style="align-items:end"><label>พิกัดหน้างาน (ไม่บังคับ)<input type="text" id="geo" maxlength="40" inputmode="decimal" autocomplete="off" placeholder="13.7563,100.5018"></label><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px"><button class="b line sm" type="button" id="geoBtn">ใช้ตำแหน่งปัจจุบัน</button><a id="geoMap" hidden target="_blank" rel="noopener noreferrer">เปิดใน Google Maps</a><a id="geoCountry" target="_blank" rel="noopener noreferrer">เปิดแผนที่ของประเทศที่ตั้งงาน</a></div><p class="note" style="margin:0">พิกัดอยู่ในเครื่องนี้ และพิมพ์บนเอกสารเท่านั้น ระบบไม่เก็บ · แผนที่เปิดตามประเทศที่ตั้งงานที่เลือก</p></div>
       <div class="g3" style="align-items:end"><label>งานที่บันทึกไว้ในเครื่องนี้<select id="jobPick"><option value="">งานใหม่</option></select></label><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px"><button class="b line sm" type="button" id="jobLoad">เปิดงานนี้</button><button class="b line sm" type="button" id="jobDel">ลบงานนี้</button></div><p class="note" style="margin:0">งานที่บันทึกอยู่ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ระบบไม่ส่งขึ้นเซิร์ฟเวอร์</p></div>
@@ -59,7 +62,18 @@
     <div class="rbar noprint"><button class="b pri" type="button" id="printBtn">พิมพ์หรือบันทึกเป็น PDF</button> <button class="b line" type="button" id="swapBtn" hidden>สลับภาษา 1 ↔ 2</button> <button class="b line" type="button" id="editBtn">แก้ไขเอกสาร</button> <button class="b line" type="button" id="jobSave">บันทึกงานนี้</button> <button class="b line" type="button" id="addRow" hidden>เพิ่มรายการ</button> <button class="b line" type="button" id="fitBtn" hidden>ขยายเต็มขนาด</button></div>
     <p class="note noprint" style="margin:0 0 10px">กรอกในกล่องและติ๊กช่องบนจอได้เลย แล้วกดพิมพ์ หรือพิมพ์เปล่าไปกรอกหน้างาน · เลือกขนาด A4 ตอนพิมพ์</p>
     <div class="noprint" id="docNote"></div>
-    <div class="pagewrap" id="pagewrap"><div class="fm" id="sheetOut" data-noi18n="1"></div></div>
+    <details class="pparts noprint" id="partsBox" hidden>
+      <summary>เลือกส่วนที่จะพิมพ์ <span class="note" id="ppCount"><span data-pp="all">พิมพ์ทั้งใบ</span><span data-pp="none" hidden>เลือกอย่างน้อย 1 ส่วนก่อนพิมพ์</span><span data-pp="stages" hidden><span>ขั้นที่พิมพ์</span> <b data-pp="n"></b></span><span data-pp="parts" hidden><span>ส่วนที่พิมพ์</span> <b data-pp="m"></b></span></span></summary>
+      <fieldset><legend>ขั้นของงาน</legend><div id="ppStages"></div></fieldset>
+      <fieldset><legend>ส่วนอื่นของเอกสาร</legend>
+        <label><input type="checkbox" name="ppP" value="sign" checked> ผลการตรวจ ลงนาม และวิธีใช้</label>
+        <label><input type="checkbox" name="ppP" value="rec" checked> แผ่นบันทึกผล ข้อบกพร่อง และรูปถ่าย</label>
+        <label><input type="checkbox" name="ppP" value="annex" checked> ภาคผนวกมาตรฐานอ้างอิงและกฎหมาย</label>
+      </fieldset>
+      <label><input type="checkbox" id="ppSplit"> แยกแต่ละขั้นขึ้นหน้าใหม่ พร้อมหัวกระดาษ ข้อมูลงาน คำอธิบายจุดตรวจ และช่องลงนามทุกส่วน (พกไปเฉพาะขั้นที่ตรวจ)</label>
+      <p class="note">ในหน้าพิมพ์ ปิดตัวเลือก ส่วนหัวและส่วนท้าย (Headers and footers) เพื่อไม่ให้เบราว์เซอร์พิมพ์ชื่อหน้าและวันที่เพิ่ม · ท้ายทุกหน้ามีรหัสเอกสาร ชื่อผู้ได้รับสิทธิ์ และเลขสิทธิ์เหมือนเดิม</p>
+    </details>
+    <div class="pagewrap" id="pagewrap"><div class="fm" id="sheetOut" data-noi18n="1"></div><div class="fm" id="printParts" data-noi18n="1"></div></div>
   </section>
 </main>
 

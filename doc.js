@@ -526,7 +526,8 @@
       + esc(tt[0]) + "</h1>" + tt.slice(1).map(function (x, i) {
         return "<h2" + at(cs[i + 1] || "en") + ">" + esc(x) + "</h2>";
       }).join("") + '</div><div class="cd"><div><b>' + Sla(L.sheetNo) + '</b><span class="w"' + CEA
-      + '></span></div><div><b>' + Sla(L.dateChk) + '</b><span class="w"' + CEA + "></span></div></div>"
+      + '></span></div><div><b>' + Sla(L.dateChk) + '</b><span class="w"' + CEA + ">" + esc((META && META.date)
+        || "") + "</span></div></div>"
       + (plan ? keyPlan() : "") + "</header>";
   }
   function info(rows) {
@@ -690,8 +691,9 @@
     }), lawText = (d.ctry || []).filter(function (c) {
       return c.cc !== "INT";
     }).map(ctryName).join(" + "), two = langs().length > 1;
+    // 28 Nov 2026 (owner): every job field typed on the form prints in the sheet, so nobody writes it again on paper
     var rows = [[L.project, m.project], [L.location, m.location], [L.contractor, m.contractor], [L.supervisor,
-      ""], [L.drawRev, ""], [L.areaGrid, ""], [L.refer, stdText()], [L.time, ""]];
+      m.supervisor], [L.drawRev, m.drawRev], [L.areaGrid, m.area], [L.refer, stdText()], [L.time, ""]];
     if (intl) rows.push([L.law, lawText ? lawText + " · Annex B" : ""], [L.licensed, ""], [L.permit,
       ""]);
     var h = head((isT ? L.kindPT : L.kindP).map(esc).join(" · "), true) + info(rows) + strip() + notices()
@@ -708,10 +710,11 @@
       + "</th><th>" + M(L.method) + "</th><th>C</th><th>NC</th><th>N/A</th><th>" + M(L.hRem) + "</th></tr></thead>";
     var n = 0;
     d.stages.forEach(function (st, si) {
-      h += '<tbody class="sg"><tr class="st"><td colspan="9">' + (si + 1) + ". " + M(st.name) + "</td></tr>";
+      h += '<tbody class="sg" data-sg="' + si + '"><tr class="st"><td colspan="9">' + (si + 1) + ". "
+        + M(st.name) + "</td></tr>";
       st.items.forEach(function (r, ii) {
         n++;
-        if (ii === 1) h += "</tbody><tbody>";
+        if (ii === 1) h += '</tbody><tbody data-sg="' + si + '">';
         var isH = r.p === "H";
         h += "<tr" + (isH || r.warn ? ' class="' + (isH ? "hp" : "") + (r.warn ? " fl" : "") + '"' : "")
           + '><td class="n">' + (si + 1) + "." + (ii + 1) + (r.warn ? " ⚑" : "") + '</td><td class="pt"><b class="'
@@ -731,7 +734,8 @@
       + "</span></p>"; // 24 Nov 2026 (owner): one group per line, items never split, aligned to the start
 
     // ผลการตรวจ ลายเซ็น 3 ฝ่าย วิธีใช้ หมายเหตุ
-    h += '<div class="keep"><h3>' + M(L.result) + '</h3><div class="res"><span><b class="tick"></b>'
+    // data-part marks the blocks that the print choice can leave out (stages: data-sg on each tbody)
+    h += '<div data-part="sign"><div class="keep"><h3>' + M(L.result) + '</h3><div class="res"><span><b class="tick"></b>'
       + One(L.r1) + '</span><span><b class="tick"></b>' + esc(L.r2[0]) + ' <span class="bl"' + CEA
       + "></span>" + L.r2.slice(1).map(function (x, i) {
         return '<span class="l2"' + at(langs()[i + 1]) + ">" + esc(x) + "</span>";
@@ -741,10 +745,11 @@
     h += '<ol class="use">' + [L.use1, L.use2, L.use3, L.use4, L.use5].map(function (u) {
       return "<li>" + M(u) + "</li>";
     }).join("") + "</ol>" + notesBox(L.notesP, 4);
-    h += '<p class="fine">' + One(L.fine) + " · " + One(L.proOnly) + "</p>" + flagNote();
+    h += '<p class="fine">' + One(L.fine) + " · " + One(L.proOnly) + "</p>" + flagNote() + "</div>";
     // แผ่นบันทึก: หน้าใหม่ พิมพ์เพิ่มได้ตามจำนวนรายการ
-    h += '<div class="pb">' + rpBar(true) + '<p class="addn">' + One(L.rpAdd) + "</p>" + (d.recs
-      || []).map(recTable).join("");
+    h += '<div class="pb" data-part="rec">' + rpBar(true) + '<p class="addn">' + One(L.rpAdd) + "</p>"
+      + (d.recs
+        || []).map(recTable).join("");
     h += '<div class="keep"><h3>' + M(L.defT) + "<small>" + One(L.defS) + '</small></h3><table class="rec"><thead><tr><th style="width:9mm">'
       + M(L.seq) + '</th><th style="width:14mm">' + M(L.dItem) + '</th><th style="width:30mm">' + M(L.dLoc)
       + "</th><th>" + M(L.dFound) + '</th><th style="width:38mm">' + M(L.dFix) + '</th><th style="width:17mm">'
@@ -754,7 +759,7 @@
       + M(L.phNo) + '</th><th style="width:14mm">' + M(L.dItem) + '</th><th style="width:38mm">' + M(L.dLoc)
       + "</th><th>" + M(L.phSub) + '</th><th style="width:27mm">' + M(L.phDt) + "</th></tr></thead><tbody>"
       + blankRows(5, 7) + "</tbody></table></div></div>";
-    return h + annexes();
+    return h + '<div data-part="annex">' + annexes() + "</div>";
   }
   function refRow(x) {
     var cs = langs(), hasTh = cs.indexOf("th") >= 0, onlyTh = cs.every(function (c) {
@@ -943,6 +948,7 @@
     $("addRow").hidden = true;
     $("result").hidden = false;
     drawPicks();
+    partsDraw();
     fit();
   }
   function render(d, meta) {
@@ -1016,7 +1022,11 @@
         render(enDoc(r.doc, /^en-/.test(pick1) ? pick1 : pick2), {
           project: [v("project"), f.elements.detail ? v("detail") : ""].filter(Boolean).join(" · "),
           contractor: v("contractor"),
-          location: [v("location"), geoVal()].filter(Boolean).join(" · ")
+          location: [v("location"), geoVal()].filter(Boolean).join(" · "),
+          supervisor: f.elements.supervisor ? v("supervisor") : "",
+          drawRev: f.elements.drawRev ? v("drawRev") : "",
+          area: f.elements.area ? v("area") : "",
+          date: f.elements.chkDate && /^\d{4}-\d{2}-\d{2}$/.test(v("chkDate")) ? v("chkDate").split("-").reverse().join("/") : ""
         });
         if (jobPending) {
           if (D && jobPending.id === D.id) jobApply(jobPending);
@@ -1033,9 +1043,133 @@
         b.textContent = old;
       });
   });
+  /* 28 Nov 2026 (owner + council): print the sheet in parts (before / during / after work) so the inspector takes only the part
+     of that visit. Works on whatever the sheet holds (any language, country layers, custom rows), because it reads the built sheet.
+     Every printed part repeats the header, the job data, the weather strip, the legend with the hold-point rule, the sign boxes
+     and the disclaimer; the page footer (code, licensee, licence no., page x / y) stays the same for every page.
+     Nothing is rebuilt: the parts are copies made at print time, so text typed in the sheet stays. */
+  function partsDraw() {
+    var box = $("partsBox"), d = D;
+    if (!box) return;
+    box.hidden = !(d && d.owned);
+    if (box.hidden) return;
+    var st = [].map.call($("sheetOut").querySelectorAll("tbody.sg tr.st td"), function (td, i) {
+      return '<label><input type="checkbox" name="ppS" value="' + i + '" checked> <span data-noi18n="1">'
+        + esc(td.textContent.trim()) + "</span></label>";
+    }).join("");
+    $("ppStages").innerHTML = st;
+    partsCount();
+  }
+  function partsPick() {
+    var g = function (n) {
+      return [].filter.call(document.querySelectorAll('#partsBox input[name="' + n + '"]'), function (i) {
+        return i.checked;
+      }).map(function (i) {
+        return i.value;
+      });
+    };
+    return {
+      st: g("ppS").map(Number),
+      parts: g("ppP"),
+      split: !!($("ppSplit") && $("ppSplit").checked),
+      all: document.querySelectorAll('#partsBox input[name="ppS"]').length
+    };
+  }
+  function partsCount() {
+    var p = partsPick(), el = $("ppCount");
+    if (!el) return;
+    var n = p.split ? p.st.length + p.parts.length : (p.st.length || p.parts.length ? 1 : 0);
+    // the words are fixed in doc.html (translated once with the page); only the numbers change here
+    var mode = !p.st.length && !p.parts.length ? "none" : p.st.length === p.all && p.parts.length === 3
+      && !p.split
+      ? "all" : p.split ? "parts" : "stages";
+    [].forEach.call(el.querySelectorAll(":scope > [data-pp]"), function (s) {
+      s.hidden = s.getAttribute("data-pp") !== mode;
+    });
+    el.querySelector('[data-pp="n"]').textContent = p.st.length + " / " + p.all;
+    el.querySelector('[data-pp="m"]').textContent = String(n);
+  }
+  function partsBuild(p) { // print copies: one part per chosen stage, then the chosen blocks, each on its own page
+    var src = $("sheetOut"), out = $("printParts"), q = function (s) {
+      return src.querySelector(s);
+    }, keepTop = [q("header.hd"), q("section.info"), q(".strip")].filter(Boolean), table = q("table.chk"),
+      lgd = q("p.lgd"), sig = q('[data-part="sign"] .sig'), fine = q('[data-part="sign"] p.fine'),
+      total = p.st.length;
+    out.className = src.className;
+    out.setAttribute("dir", src.getAttribute("dir") || "ltr");
+    out.setAttribute("lang", src.getAttribute("lang") || "th");
+    out.innerHTML = "";
+    function part(label) {
+      var pt = document.createElement("div");
+      pt.className = "ppart";
+      keepTop.forEach(function (e) {
+        pt.appendChild(e.cloneNode(true));
+      });
+      var l = document.createElement("p");
+      l.className = "ppl";
+      l.textContent = label;
+      pt.insertBefore(l, pt.children[1] || null);
+      out.appendChild(pt);
+      return pt;
+    }
+    p.st.forEach(function (si, k) {
+      var name = (src.querySelectorAll("tbody.sg tr.st td")[si] || {}).textContent || "";
+      var pt = part("(" + (k + 1) + "/" + total + ") " + name.trim()), t = table.cloneNode(true);
+      [].forEach.call(t.querySelectorAll("tbody"), function (b) {
+        if (b.getAttribute("data-sg") !== String(si)) b.parentNode.removeChild(b);
+      });
+      pt.appendChild(t);
+      [lgd, sig, fine].forEach(function (e) {
+        if (e) pt.appendChild(e.cloneNode(true));
+      });
+    });
+    p.parts.forEach(function (k) {
+      var blk = q('[data-part="' + k + '"]');
+      if (!blk) return;
+      var pt = k === "annex" ? document.createElement("div") : part("");
+      if (k === "annex") {
+        pt.className = "ppart";
+        out.appendChild(pt);
+      }
+      pt.appendChild(blk.cloneNode(true));
+    });
+    [].forEach.call(out.querySelectorAll("p.ppl"), function (l) {
+      if (!l.textContent) l.parentNode.removeChild(l);
+    });
+  }
+  function partsClear() {
+    document.body.classList.remove("pp-split");
+    [].forEach.call(document.querySelectorAll(".pp-off"), function (e) {
+      e.classList.remove("pp-off");
+    });
+    if ($("printParts")) $("printParts").innerHTML = "";
+    if (partsClear.title !== undefined) document.title = partsClear.title;
+  }
+  if ($("partsBox")) $("partsBox").addEventListener("change", partsCount);
   $("printBtn").addEventListener("click", function () {
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    var p = D && D.owned && $("partsBox") ? partsPick() : null, src = $("sheetOut");
+    if (p && !p.st.length && !p.parts.length) {
+      say("เลือกอย่างน้อย 1 ส่วนก่อนพิมพ์", true);
+      return;
+    }
+    partsClear.title = document.title;
+    document.title = docCode(D) + (p && (p.split || p.st.length < p.all || p.parts.length < 3) ? " (part)" : "");
+    if (p && p.split) {
+      partsBuild(p);
+      document.body.classList.add("pp-split");
+    } else if (p) {
+      [].forEach.call(src.querySelectorAll("tbody[data-sg]"), function (b) {
+        b.classList.toggle("pp-off", p.st.indexOf(+b.getAttribute("data-sg")) < 0);
+      });
+      ["sign", "rec", "annex"].forEach(function (k) {
+        var e = src.querySelector('[data-part="' + k + '"]');
+        if (e) e.classList.toggle("pp-off", p.parts.indexOf(k) < 0);
+      });
+    }
+    window.addEventListener("afterprint", partsClear, { once: true });
     window.print();
+    setTimeout(partsClear, 1500);
   });
   $("fitBtn").addEventListener("click", function () {
     fitOn = !fitOn;
@@ -1124,7 +1258,7 @@
      เก็บ: ค่าในฟอร์มด้านบน + ข้อความในช่องกรอก + ช่องติ๊ก + ค่าที่เลือก ของเอกสารที่สร้างแล้ว · เปิดงาน = ตั้งฟอร์ม สร้างเอกสารใหม่ แล้วเติมข้อมูลกลับตามลำดับช่อง */
   var JOBK = "build_doc_jobs", jobPending = null, JOBF = ["sheet", "lang1", "lang2", "c1", "c2",
     "stdName", "project", "detail",
-    "contractor", "location"];
+    "contractor", "location", "supervisor", "drawRev", "area", "chkDate"];
   function jobsGet() {
     try {
       var j = JSON.parse(localStorage.getItem(JOBK) || "{}");

@@ -139,3 +139,19 @@
 /* 25 Nov 2026: keyboard focus on tick cells (doc.js markSync). Not printed. */
 .fm td.bx:focus-visible, .fm .wx:focus-visible, .fm .tick:focus-visible { outline: 2px solid #E07B00; outline-offset: -2px; border-radius: 2px; }
 @media print { .fm td.bx:focus, .fm .wx:focus, .fm .tick:focus { outline: none; } }
+
+/* 28 Nov 2026: print in parts (doc.js partsBuild). Screen: the copies stay hidden. Print: the chosen parts only. */
+#printParts { display: none; }
+.pparts { margin: 0 0 12px; padding: 10px 14px; border: 1px solid #d5dbe1; border-radius: 12px; background: #fff; }
+.pparts summary { cursor: pointer; font-weight: 600; }
+.pparts fieldset { border: 0; padding: 0; margin: 8px 0; }
+.pparts legend { font-weight: 600; font-size: 14px; }
+.pparts label { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0; overflow-wrap: anywhere; }
+.pparts input[type=checkbox] { margin-top: 4px; flex: none; }
+.fm .ppl { margin: 2mm 0 1mm; font-weight: 700; }
+@media print {
+  .fm .pp-off { display: none !important; }
+  body.pp-split #sheetOut { display: none !important; }
+  body.pp-split #printParts { display: block !important; }
+  .fm .ppart + .ppart { break-before: page; page-break-before: always; }
+}
