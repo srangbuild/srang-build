@@ -1214,6 +1214,19 @@
           + esc(B.itemHref(x)) + '">ดูใบนี้</a></p>';
       }).join("") + "</div></section>";
   }
+  // 28 Nov 2026 (28c): the time plan of the member (me.plan from the back end): end date, days left, renew. No automatic renewal.
+  function planCard() {
+    var P = me.plan;
+    if (!P || !P.until) return "";
+    var soon = !P.active || P.daysLeft <= 30;
+    return '<section class="sec"><h2>แผนของฉัน</h2><div class="card pad"><p style="margin:0"><b>' + esc(P.title
+      || P.id)
+      + "</b></p><p style=\"margin:4px 0 0\">" + (P.active ? "<span>ใช้ได้ถึง</span> " + esc(B.when(P.until))
+        + " · <span>เหลือ</span> "
+        + (+P.daysLeft || 0) + " <span>วัน</span>" : "<span>หมดอายุแล้ว</span> " + esc(B.when(P.until)))
+      + '</p><p class="note">ไม่ต่ออายุเอง ไม่ตัดเงินซ้ำ · ต่ออายุก่อนหมด วันที่เหลือต่อท้ายให้ · ใบที่ซื้อขาดไว้ยังเป็นของคุณตลอด</p><p style="margin:10px 0 0"><a class="b '
+      + (soon ? "pri" : "line") + ' sm" href="packages.html' + q + '#plan">ต่ออายุแผน</a></p></div></section>';
+  }
   function paneDocs() {
     var lib = libOf();
     var docRow = function (d) {
@@ -1239,7 +1252,8 @@
         + (ed ? "ฉบับของคุณ"
           : "ฉบับล่าสุดแล้ว") + "</span>" : '<span class="pill gray">' + (sys ? "ยังไม่เคยเปิด" : "ยังไม่เคยดาวน์โหลด")
         + "</span>";
-      var planTx = ed ? "แบบฉบับนี้ (เก็บได้ตลอด)" : d.plan === "updates" ? "แบบรับฉบับใหม่ตลอด" : "";
+      var planTx = d.pass ? "จากแผน (ใช้ได้ตามวันหมดอายุของแผน)" : ed ? "แบบฉบับนี้ (เก็บได้ตลอด)" : d.plan === "updates"
+        ? "แบบรับฉบับใหม่ตลอด" : "";
       var upg = ed && d.upgrade ? '<button class="b line sm" type="button" data-upg="' + esc(d.id)
         + '">อัปเกรดเป็นรับฉบับใหม่ ' + B.baht(d.upgrade) + "</button>" : "";
       return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + "<small>" + (planTx
@@ -1258,7 +1272,8 @@
     }).join(""), rpTop = rpOpen && !rpOrd && !lib.some(function (d) {
       return d.id === rpOpen;
     }) ? rpForm(rpOpen) : ""; // from a product page for a sheet that the member did not buy
-    return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + rpTop + (lib.length ? '<div class="docs">'
+    return planCard() + '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + rpTop + (lib.length
+      ? '<div class="docs">'
       + rows + '</div><p class="note">' + (DOCMODE
         ? "เปิดเอกสารได้ทุกเมื่อ กรอกข้อมูลงาน แล้วพิมพ์หรือบันทึกเป็น PDF · แบบฉบับนี้ = ได้ฉบับของวันที่ซื้อ ใช้ได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · เมื่อร้านแก้ข้อมูลที่ผิด คุณได้ข้อมูลที่แก้แล้วทันที ไม่มีค่าใช้จ่าย · ทุกหน้ามีชื่อผู้ได้รับสิทธิ์และเลขสิทธิ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)"
         : "ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)")

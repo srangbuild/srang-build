@@ -847,7 +847,7 @@
       + esc(tokWho() || "ร้าน") + '</b> · ออกจากระบบเองเมื่อปิดแท็บ หรือไม่ได้ใช้ 6 ชั่วโมง</p>')
       +
       '<div class="tools"><button type="button" class="pri" data-sh="load">' + (SHOP ? "โหลดข้อมูลใหม่" : "เชื่อมต่อและโหลดข้อมูล")
-      + "</button>" + (SHOP ? '<button type="button" data-sh="csv">ส่งออกคำสั่งซื้อ (CSV)</button>' : "")
+      + "</button>" + (SHOP ? '<button type="button" data-sh="csv">ส่งออกคำสั่งซื้อ (CSV)</button><button type="button" data-sh="seat">เปิดที่นั่งบริษัทหรือหน่วยงานรัฐ</button>' : "")
       + (SHOP ? '<span class="hint" style="margin:0;align-self:center">โหลดเมื่อ ' + esc(wh(SHOP._at))
         + " · หลังบ้านรุ่น " + esc(SHOP.setup.version) + "</span>" : "") + "</div>" + (shopBusy ? '<p class="hint" style="margin:8px 0 0">กำลังโหลด…</p>' : "")
       + (shopErr ? '<p class="hint" style="color:var(--bad);margin:8px 0 0">' + esc(shopErr) + "</p>" : "")
@@ -1721,6 +1721,35 @@
     }
     if (sh === "back") {
       shopAct("adminOrder", { order: id, status: "รอตรวจ" }, "ย้อนเป็นรอตรวจแล้ว " + id);
+      return;
+    }
+    // 28 Nov 2026 (28c): open plan seats after a company or agency quote is accepted (back end adminPlanGrant).
+    // Each e-mail must be a member already. "replace" = the seat order of a person who left: that seat closes and the new person keeps its end date.
+    if (sh === "seat") {
+      var org = prompt("ชื่อบริษัทหรือหน่วยงาน (พิมพ์ในอีเมลแจ้งผู้ใช้และบันทึกในคำสั่งซื้อ):", "");
+      if (!org || !org.trim()) return;
+      var ref = prompt("เลขที่ใบเสนอราคาหรือใบสั่งซื้อ:", "");
+      if (!ref || !ref.trim()) return;
+      var mails = prompt("อีเมลสมาชิกของผู้ใช้ทุกคน (คั่นด้วยเว้นวรรคหรือจุลภาค · ครั้งละไม่เกิน 100):",
+        "");
+      if (!mails || !mails.trim()) return;
+      var rep = prompt("เปลี่ยนคน: เลขคำสั่งซื้อที่นั่งเดิม (เว้นว่าง = เปิดที่นั่งใหม่):", "") || "";
+      if (!confirm("เปิดแผนรายปีให้ " + mails.trim().split(/[\s,;]+/).length + " คน ของ " + org.trim()
+        + " ?")) return;
+      adm("adminPlanGrant", {
+        plan: "P-12",
+        org: org.trim(),
+        ref: ref.trim(),
+        emails: mails.trim(),
+        replace: rep.trim()
+      })
+        .then(function (r) {
+          var got = (r && r.granted) || [], miss = (r && r.missing) || [];
+          toast("เปิดที่นั่งแล้ว " + got.length + " คน" + (miss.length ? " · ยังไม่เป็นสมาชิก: " + miss.join(", ") : ""));
+          shopLoad();
+        }).catch(function (e) {
+          toast(e.message || "ทำรายการไม่สำเร็จ");
+        });
       return;
     }
     // ส่งพัสดุ (สินค้าจริง เช่น สินค้าด้อม): ใส่บริษัทขนส่ง เลขพัสดุ และลิงก์ติดตามของบริษัท (ไม่บังคับ) · ระบบแสดงในหน้าติดตามและส่งอีเมลแจ้งลูกค้า

@@ -1,0 +1,25 @@
+/* packages.css (28 Nov 2026, 28c): the packages and prices page. Uses the colour tokens of site.css. */
+#main section { margin: 34px 0; }
+#main section .head h2 { margin: 0 0 4px; }
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.pk-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
+table.pk-tbl { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 15.5px; }
+table.pk-tbl th, table.pk-tbl td { border-bottom: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+table.pk-tbl thead th { background: #EEF2F6; color: var(--navy); font-weight: 600; font-size: 14.5px; }
+table.pk-tbl tbody tr:last-child td { border-bottom: 0; }
+table.pk-tbl td.num { white-space: nowrap; font-weight: 600; }
+.pk-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px 20px; display: grid; gap: 10px; }
+.pk-price b { font-family: "Kanit", "IBM Plex Sans Thai", sans-serif; font-size: 34px; color: var(--navy); margin-right: 8px; }
+.pk-price span { color: var(--mute); }
+.pk-list { margin: 0; padding-left: 20px; }
+.pk-list li { margin: 4px 0; }
+.pk-act { margin: 4px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pk-rules { margin-top: 14px; border-left: 4px solid var(--orange); background: #FFF7F2; border-radius: 0 12px 12px 0; padding: 10px 16px; }
+.pk-rules h3 { margin: 0 0 4px; font-size: 16px; }
+.pk-rules ul { margin: 0; padding-left: 20px; font-size: 15px; }
+ol.pk-steps { margin: 14px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 8px; }
+ol.pk-steps li { counter-increment: s; position: relative; padding: 8px 12px 8px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+ol.pk-steps li::before { content: counter(s); position: absolute; left: 12px; top: 9px; width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+ol.pk-steps b { display: block; }
+ol.pk-steps span { color: var(--mute); font-size: 14.5px; }
+@media (max-width: 600px) { .pk-price b { font-size: 28px; } table.pk-tbl { font-size: 14.5px; } }

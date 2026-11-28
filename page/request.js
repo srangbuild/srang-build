@@ -71,6 +71,9 @@
     $("kind").value = KIND0;
   }
   if (P.get("kind") && KINDS.indexOf(P.get("kind")) >= 0) $("kind").value = P.get("kind");
+  // 28 Nov 2026 (28c): the packages page sends the number of seats of the chosen company or agency package
+  var seatsQ = parseInt(P.get("seats") || "", 10), qtyBox = document.querySelector("input[name=qty]");
+  if (qtyBox && seatsQ > 0) qtyBox.value = String(Math.min(10000, seatsQ));
   function nLang() {
     var r = document.querySelector("input[name=n]:checked");
     return r ? +r.value : 2;

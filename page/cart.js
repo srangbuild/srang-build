@@ -120,7 +120,8 @@
       if (info.block) blocked++;
       else total += info.amt;
       if (!info.block) sv += s;
-      var sel = B.isMarket(x) || B.isCtry(B.varOf(id)) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="'
+      var pl = !!(B.isPlan && B.isPlan(x)); // 28 Nov 2026 (28c): a time plan has no edition choice and no language set-up
+      var sel = pl || B.isMarket(x) || B.isCtry(B.varOf(id)) ? "" : '<label class="ctl"><span class="note" style="margin:0">แบบสิทธิ์</span><select data-plan="'
         + esc(x.id) + '" aria-label="แบบสิทธิ์ของ ' + esc(x.id) + '"><option value="ed"' + (B.isUpd(id)
           ? "" : " selected") + ">ซื้อฉบับนี้ เก็บได้ตลอด · " + B.baht(B.cart.price(B.baseOf(id))) + "</option>"
         + (hasU ? '<option value="up"' + (B.isUpd(id) ? " selected" : "") + ">รับฉบับใหม่ตลอด · "
@@ -134,14 +135,16 @@
           return '<option value="' + v + '"' + (v === B.varOf(id) ? " selected" : "") + ">" + esc(B.LANGS[v])
             + "</option>";
         }).join("") + "</select></label>" : "";
-      var opt = B.isMarket(x) || (B.cfg && B.cfg.simple) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
+      var opt = pl || B.isMarket(x) || (B.cfg && B.cfg.simple) ? "" : '<div class="cfl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 0"><small style="flex:1 1 220px;color:#0F2A44">'
         + esc(cl || "ภาษา: " + B.LANGS[B.varOf(id)] + " · มาตรฐาน: ไทย") + '</small><button class="b line sm" type="button" data-cfg="'
         + esc(x.id)
         + '">แก้ภาษา มาตรฐาน และที่ตั้งงาน</button></div>';
-      return '<article class="card ln">' + thumb(x) + '<div class="tt"><div class="nm"><a href="'
+      return '<article class="card ln">' + (pl ? "" : thumb(x)) + '<div class="tt"><div class="nm"><a href="'
         + esc(B.itemHref(x)) + '">' + esc(B.code(x) + " " + x.title)
         + "</a><em>" + (info.block ? "–" : B.baht(info.amt)) + "</em></div>" +
-        "<small>" + (B.isMarket(x) ? "สินค้าฝากขาย · " + esc(x.kind || "") + (x.seller ? " โดย " + esc(x.seller) : "")
+        "<small>" + (pl ? "<span>แผนรายปี ใช้ได้ 1 ปีนับจากวันที่ร้านยืนยันยอด</span> · <span>ทุกใบที่เปิดใช้</span> "
+          + B.planSheets().length + " <span>ใบ</span> · <span>ไม่ต่ออายุเอง ไม่ตัดเงินซ้ำ</span>" : B.isMarket(x)
+          ? "สินค้าฝากขาย · " + esc(x.kind || "") + (x.seller ? " โดย " + esc(x.seller) : "")
           + " · " + esc({ file: "ดาวน์โหลดหลังชำระ", ship: "ส่งพัสดุ", manual: "ร้านส่งรายละเอียดทางอีเมล" }[x.delivery]
             || "ร้านส่งรายละเอียดทางอีเมล") : (B.isBundle(x) ? "ชุดรวม " + x.items.length + " ใบ: "
               + esc(x.items.join(" · ")) : esc(x.nPro) + " ข้อ · จุด H " + esc(x.nHold) + " · " + esc(x.pages
