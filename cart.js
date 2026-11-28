@@ -109,9 +109,10 @@
         + (cfgLine(rootId(id))
           ? '<small class="cf">' + esc(cfgLine(rootId(id))) + "</small>" : "") + "<small>"
         + (B.isMarket(x) ? esc(x.kind || "สินค้าฝากขาย") + (x.seller ? " โดย " + esc(x.seller) : "") : bd
-          ? "ชุดรวม " + x.items.length + " ใบ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : "ไฟล์ PDF") : esc(x.nPro)
+          ? "ชุดรวม " + x.items.length + " ใบ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : "เปิดใช้ในระบบเอกสาร") : esc(x.nPro)
           + " ข้อ · " + (B.isCtry(B.varOf(id)) ? "สร้างจากหน้าเอกสารอัจฉริยะ" : esc(x.pages || "")
-            + " หน้า · ไฟล์ PDF")) + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก ' + esc(B.baht(sv))
+            + " หน้า · เปิดใช้ในระบบเอกสาร")) + "</small>" + (sv > 0 ? '<small class="sv">ถูกกว่าซื้อแยก '
+              + esc(B.baht(sv))
               + "</small>" : "") + "</div><em>" + esc(B.baht(B.cart.price(id))) + '</em><button type="button" data-bc-del="'
         + esc(id) + '" aria-label="เอา ' + esc(x.id) + ' ออกจากตะกร้า">×</button></li>';
     }).join("");
@@ -400,10 +401,10 @@
       }).join("") + "</fieldset>" : "") + (hasU ? "<fieldset>"
         + step("แบบสิทธิ์")
         + card("cfu", "0", !o.upd, "ซื้อฉบับนี้ เก็บได้ตลอด",
-          "ได้ไฟล์ฉบับวันที่ซื้อ ดาวน์โหลดและพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
+          "ได้ฉบับของวันที่ซื้อ เปิดใช้และพิมพ์ได้ตลอด · ภายหลังอัปเกรดเป็นรับฉบับใหม่ได้ จ่ายเฉพาะส่วนต่าง",
           B.baht(B.cart.price(skuId(x, ed0, false))))
         + card("cfu", "1", !!o.upd, "รับฉบับใหม่ตลอด",
-          "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณดาวน์โหลดฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
+          "เมื่อกฎหมาย มาตรฐาน หรือข้อกำหนดเปลี่ยน ร้านออกฉบับใหม่ คุณเปิดใช้ฉบับล่าสุดได้ทุกครั้งโดยไม่จ่ายเพิ่ม และได้อีเมลแจ้ง",
           B.baht(B.cart.price(skuId(x, ed0, true)))) + "</fieldset>" : "")
       + '<div class="cf-sum" id="cfSum" aria-live="polite"></div>' + cfgFoot(o));
     var pick = function () {
@@ -417,7 +418,7 @@
         if (s) s.textContent = B.baht(B.cart.price(r.name === "cfe" ? skuId(x, r.value, p.upd) : skuId(x,
           p.ed, r.value === "1")));
       });
-      $("cfSum").innerHTML = '<b class="cf-p">' + esc(B.baht(B.cart.price(skuId(x, p.ed, p.upd)))) + "</b><small>ได้ไฟล์ PDF และใช้หน้าเอกสารอัจฉริยะได้ · มาตรฐานอ้างอิงและที่ตั้งงานตั้งได้ที่หน้าเอกสารอัจฉริยะ ไม่มีผลต่อราคา</small>";
+      $("cfSum").innerHTML = '<b class="cf-p">' + esc(B.baht(B.cart.price(skuId(x, p.ed, p.upd)))) + "</b><small>เปิดใช้ในระบบเอกสาร กรอก แล้วพิมพ์หรือบันทึกเป็น PDF ได้ · มาตรฐานอ้างอิงและที่ตั้งงานตั้งได้ในระบบเอกสาร ไม่มีผลต่อราคา</small>";
     };
     cf.onchange = sum;
     $("cfF").onsubmit = function (ev) {
@@ -528,7 +529,7 @@
         && cf.querySelector("input[name=cfu]:checked").value === "1";
       $("cfErr").textContent = k.err || "";
       $("cfSum").innerHTML = k.err ? "" : "<b>ฉบับที่จะใส่ตะกร้า:</b> " + esc(B.code(x)) + " · " + esc(k.cc
-        ? B.LANGS[B.varOf(k.id)] || "" : "ฉบับปกติ · ไฟล์ PDF "
+        ? B.LANGS[B.varOf(k.id)] || "" : "ฉบับปกติ · เอกสารในระบบ "
         + (B.LANGS[B.varOf(k.id)] || "") + " · เอกสารอัจฉริยะเลือกภาษาได้") + "<br>"
         + esc(cfgTx(w)) + '<br><b class="cf-p">' + esc(B.baht(B.cart.price(k.id + (up && !k.cc ? "+U" : ""))))
         + "</b>" + (k.cc

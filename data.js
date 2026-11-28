@@ -894,7 +894,8 @@ window.SITE = {
     "bankMin": 200,
     "docOn": true,
     "docFactor": 1.5,
-    "edFactor": 1.5
+    "edFactor": 1.5,
+    "deliver": "doc"
   },
   "sheetsNext": [
     "งานรั้วและประตูรั้ว",
@@ -1620,7 +1621,7 @@ window.SITE = {
       "href": "member.html#ask"
     }
   ],
-  "termsDate": "27 พ.ย. 2026",
+  "termsDate": "28 พ.ย. 2026",
   "privacyDate": "27 พ.ย. 2026",
   "scope": "3ed",
   "sheets": [

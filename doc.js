@@ -378,6 +378,12 @@
     });
     drawRight();
     if (!touched.c1) follow(); // 7 พ.ย. 2026: สิทธิ์มาถึงแล้ว เลือกประเทศเริ่มต้นใหม่ตามสิทธิ์ที่ซื้อ
+    /* 28 Nov 2026 (owner's order: the paid edition is this system): the link "เปิดเอกสาร" of the member page carries go=1.
+       The document of a bought sheet opens at once, in the languages of the edition (cc). Rights are known here. */
+    if (q.get("go") === "1" && OWN[$("sheet").value]) {
+      if ($("f-doc").requestSubmit) $("f-doc").requestSubmit();
+      else $("f-doc").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    }
   }).catch(function () {});
   function say(t, bad) {
     var m = $("msg");
@@ -898,7 +904,7 @@
       h += '<div class="dn"><span><b>' + esc(d.outside ? "ภาษาหรือมาตรฐานนี้ไม่อยู่ในฉบับที่คุณซื้อ จึงแสดงฉบับฟรี" : "นี่คือฉบับฟรี: ข้อหลัก 1 ภาษา")
         + "</b>" + (d.freeOne ? " · ฉบับฟรีแสดงเฉพาะภาษาที่ 1" : "") + " · ซื้อใบนี้เพื่อใช้ครบทุกข้อ และ 2 ภาษา</span>"
         + '<a class="b pri sm" href="' + esc(href) + '">' + esc(want && want !== "TH" ? "ซื้อฉบับ"
-          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a>" + (d.outside ? ' <button class="b line sm" type="button" id="useTH">ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว</button>' : "")
+          + ccName(want) + "ของใบนี้" : "ซื้อใบนี้") + "</a>" + (d.outside ? ' <button class="b line sm" type="button" id="useTH">ใช้ภาษาและมาตรฐานตามฉบับที่ซื้อ</button>' : "")
         + "</div>"; // 7 พ.ย. 2026: ทางกลับหนึ่งคลิก ไม่ต้องหาช่องประเทศเอง
     }
     if (cm.diff || (cm.none && (d.ccs || []).length > 1)) h += '<div class="pbar"><b>ค่าที่ต่างกัน:</b> '
@@ -1368,9 +1374,19 @@
   markSync($("sheetOut"));
   $("docNote").addEventListener("click", function (ev) { // 7 พ.ย. 2026: ปุ่ม "ใช้มาตรฐานไทยตามฉบับที่ซื้อแล้ว" สร้างเอกสารใหม่ด้วยมาตรฐานไทยทันที
     if (!ev.target.closest("#useTH")) return;
+    // 28 Nov 2026: languages follow the edition too (the back end sends the languages and standards of the right)
+    var rt = (D && D.right) || {}, okL = function (v) {
+      return !rt.langs || rt.langs.indexOf(base(v)) >= 0;
+    };
+    if (rt.langs && rt.langs.length) {
+      if (!okL($("lang1").value)) $("lang1").value = rt.langs.indexOf("th") >= 0 ? "th" : rt.langs.indexOf("en") >= 0
+        ? EN_DEF : $("lang1").value;
+      if (nLang() === 2 && (!okL($("lang2").value) || base($("lang2").value) === base($("lang1").value))) setN(1);
+      drawLang();
+    }
     touched.c1 = true;
     touched.c2 = true;
-    $("c1").value = "TH";
+    if (!rt.stds || rt.stds.indexOf($("c1").value) < 0) $("c1").value = "TH";
     $("c2").value = "";
     drawCc();
     if ($("f-doc").requestSubmit) $("f-doc").requestSubmit();

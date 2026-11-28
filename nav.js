@@ -71,8 +71,9 @@
         "packs",
         "แพ็กเกจตามงาน", "Packages by project"], ["sheets.html", "list",
           "ใบตรวจงานทีละใบ", "Check sheets"], ["market.html", "", "ร้านฝากขาย โปรแกรม หนังสือ",
-            "Marketplace"], ["doc.html", "", "ฟอร์มเอกสารอัจฉริยะ ภาษา มาตรฐาน กฎหมาย",
-              "Smart documents"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
+            "Marketplace"], ["request.html", "", "สั่งทำงานเฉพาะโครงการ", "Custom documents"]]
+        // 28 Nov 2026 (owner's order): no separate menu item for the document system. It is the same product:
+        // a bought sheet opens there from the member page, and the free form of a sheet opens there from the sheet's page.
     } : null,
     {
       t: "ความรู้",
