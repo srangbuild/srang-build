@@ -1522,23 +1522,23 @@
         || "";
       if (sh === "fxadd" && !fpk) return;
       if (!confirm("ยืนยันว่าเรื่อง " + id + " ผิดจริง และส่งเข้างานแก้" + (sh === "fxadd" ? " " + fpk : "ใหม่")
-        + "?\nลูกค้าได้ข้อความว่า ยืนยันแล้ว รอฉบับใหม่")) return;
+        + "?\nลูกค้าได้ข้อความว่า ยืนยันแล้ว รอแก้ไข")) return;
       shopAct("adminFix", sh === "fxnew" ? { op: "create", reports: [id], answer: fan } : { op: "add",
         fix: fpk, report: id,
         answer: fan }, "ส่งเรื่อง " + id + " เข้างานแก้แล้ว และแจ้งลูกค้าแล้ว");
       return;
     }
-    if (sh === "fxsave") { // a fix: status, edition date, shop note · ออกฉบับใหม่แล้ว closes every report of the fix
+    if (sh === "fxsave") { // a fix: status, date of the correction, shop note · แก้ในระบบแล้ว closes every report of the fix
       var fst = $("fx-st-" + id).value, fdt = (($("fx-fx-" + id) || {}).value || "").trim();
       if (fdt && !/^\d{4}-\d\d-\d\d$/.test(fdt)) {
-        toast("วันที่ของฉบับใหม่ ใช้รูปแบบ ปี-เดือน-วัน");
+        toast("วันที่แก้ ใช้รูปแบบ ปี-เดือน-วัน");
         return;
       }
-      if (fst === "ออกฉบับใหม่แล้ว" && !fdt) {
-        toast("ใส่วันที่ของฉบับใหม่ก่อน");
+      if (fst === "แก้ในระบบแล้ว" && !fdt) {
+        toast("ใส่วันที่แก้ก่อน");
         return;
       }
-      if (fst === "ออกฉบับใหม่แล้ว" && !confirm("ออกฉบับใหม่แล้ว: ทุกเรื่องในงาน " + id
+      if (fst === "แก้ในระบบแล้ว" && !confirm("แก้ในระบบแล้ว: ทุกเรื่องในงาน " + id
         + " เปลี่ยนเป็น แก้แล้ว และระบบแจ้งลูกค้าทุกคน?")) return;
       shopAct("adminFix", {
         op: "status",
@@ -1547,13 +1547,13 @@
         fixedIn: fdt,
         note: $("fx-nt-" + id).value.trim()
       },
-        "บันทึกงานแก้ " + id + (fst === "ออกฉบับใหม่แล้ว" ? " · แจ้งลูกค้าทุกคนในงานนี้แล้ว" : ""));
+        "บันทึกงานแก้ " + id + (fst === "แก้ในระบบแล้ว" ? " · แจ้งลูกค้าทุกคนในงานนี้แล้ว" : ""));
       return;
     }
     if (sh === "rpsave") { // report a problem in a document: status, answer, edition date of the fix
       var rpf = (($("rp-fx-" + id) || {}).value || "").trim();
       if (rpf && !/^\d{4}-\d\d-\d\d$/.test(rpf)) {
-        toast("วันที่ของฉบับที่แก้ ใช้รูปแบบ ปี-เดือน-วัน");
+        toast("วันที่แก้ ใช้รูปแบบ ปี-เดือน-วัน");
         return;
       }
       shopAct("adminReport", {
@@ -2387,11 +2387,11 @@
   // Save = the customer gets a message in the chat room and an email.
   // Fix queue (งานแก้เอกสาร, FX-): the shop checks a report against the official source. When the report is right, the shop
   // sends it to the fix queue (a new fix, or an open fix of the same document when two customers report the same error).
-  // When the new edition is out, the shop sets the fix to ออกฉบับใหม่แล้ว with the edition date: every report of that fix
+  // When the data is corrected in the document system, the shop sets the fix to แก้ในระบบแล้ว with the date: every report of that fix
   // becomes แก้แล้ว and each customer gets a message. The JSON file of the open fixes is the work list for the document files.
   var rpSeg = "รอตรวจ", fxSeg = "เปิดอยู่", RP_ST = ["รับเรื่องแล้ว", "กำลังตรวจ",
-    "ยืนยันแล้ว รอฉบับใหม่", "แก้แล้ว",
-    "ไม่ใช่ข้อผิดพลาด"], FX_ST = ["รอแก้", "กำลังแก้", "ออกฉบับใหม่แล้ว", "ยกเลิก"];
+    "ยืนยันแล้ว รอแก้ไข", "แก้แล้ว",
+    "ไม่ใช่ข้อผิดพลาด"], FX_ST = ["รอแก้", "กำลังแก้", "แก้ในระบบแล้ว", "ยกเลิก"];
   function rpToCheck(c) { // the shop has not decided yet
     return (c.status === RP_ST[0] || c.status === RP_ST[1]) && !c.fix;
   }
@@ -2401,7 +2401,7 @@
   function fixCard() {
     var all = SHOP.fixes || [], open = all.filter(fxOpen), list = fxSeg === "ทั้งหมด" ? all : open;
     return '<div class="card"><h2>งานแก้เอกสาร <span class="tag ' + (open.length ? "no" : "ok") + '">เปิดอยู่ '
-      + open.length + '</span></h2><p class="hint">เรื่องที่ร้านตรวจแล้วว่าผิดจริง รวมเป็นงานแก้ (1 งาน = 1 จุดที่ต้องแก้ในเอกสาร) · ไฟล์รายการงานแก้ไม่มีข้อมูลลูกค้า ใช้ส่งให้ระบบแก้ไฟล์เอกสาร · ออกฉบับใหม่แล้ว: เลือกสถานะ ออกฉบับใหม่แล้ว ใส่วันที่ของฉบับ แล้วกดบันทึก ลูกค้าทุกคนในงานนั้นได้รับแจ้งเอง</p><div class="chips">'
+      + open.length + '</span></h2><p class="hint">เรื่องที่ร้านตรวจแล้วว่าผิดจริง รวมเป็นงานแก้ (1 งาน = 1 จุดที่ต้องแก้ในเอกสาร) · ไฟล์รายการงานแก้ไม่มีข้อมูลลูกค้า ใช้ส่งให้ระบบแก้ไฟล์เอกสาร · แก้เสร็จแล้ว: เลือกสถานะ แก้ในระบบแล้ว ใส่วันที่แก้ แล้วกดบันทึก ลูกค้าทุกคนในงานนั้นได้รับแจ้งเอง และได้ข้อมูลที่แก้แล้วในระบบเอกสารทันที</p><div class="chips">'
       + ["เปิดอยู่", "ทั้งหมด"].map(function (s) {
         return '<button class="sm" type="button" data-sh="fxseg" data-v="' + s + '" aria-pressed="'
           + (s === fxSeg)
@@ -2414,13 +2414,13 @@
           + (f.item ? " · ข้อ " + esc(f.item) : "") + "<br><small>สร้างเมื่อ " + esc(wh(f.at)) + " โดย "
           + esc(f.by)
           + " · เรื่องที่แจ้ง " + f.reports.length + " เรื่อง: " + esc(f.reports.join(" ")) + (f.fixedIn
-            ? " · ออกในฉบับวันที่ " + esc(f.fixedIn) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap"><b>สิ่งที่ต้องแก้:</b> '
+            ? " · แก้เมื่อ " + esc(f.fixedIn) : "") + '</small><p style="margin:6px 0;white-space:pre-wrap"><b>สิ่งที่ต้องแก้:</b> '
           + esc(f.what) + "</p>" + (f.should ? '<p style="margin:6px 0;white-space:pre-wrap"><b>ค่าที่ลูกค้าเสนอ:</b> '
             + esc(f.should) + "</p>" : "") + '<div class="grid"><label>สถานะงาน<select id="fx-st-' + esc(f.id)
           + '">'
           + FX_ST.map(function (s) {
             return "<option" + (s === f.status ? " selected" : "") + ">" + s + "</option>";
-          }).join("") + '</select></label><label>ออกในฉบับวันที่<input type="date" id="fx-fx-' + esc(f.id)
+          }).join("") + '</select></label><label>วันที่แก้ในระบบ<input type="date" id="fx-fx-' + esc(f.id)
           + '" value="'
           + esc(f.fixedIn) + '"></label><label class="full">บันทึกของร้าน (ค่าที่ถูกต้อง และแหล่งอ้างอิงทางการที่ตรวจแล้ว)<textarea id="fx-nt-'
           + esc(f.id) + '" rows="2" maxlength="1000">' + esc(f.note) + '</textarea></label></div><div class="tools"><button class="sm pri" type="button" data-sh="fxsave" data-id="'
@@ -2431,7 +2431,7 @@
     if (!SHOP) return needShop("แจ้งปัญหาเอกสาร");
     if (!SHOP.reports) return '<div class="card"><h2>แจ้งปัญหาเอกสาร</h2><p class="hint">หลังบ้านรุ่น '
       + esc(SHOP.setup.version)
-      + " ยังไม่มีระบบแจ้งปัญหาเอกสาร · วาง Code.gs รุ่น 2026-11-28a แล้ว Deploy เป็น New version</p></div>";
+      + " ยังไม่มีระบบแจ้งปัญหาเอกสาร · วาง Code.gs รุ่น 2026-11-28b แล้ว Deploy เป็น New version</p></div>";
     var SEG = ["รอตรวจ"].concat(RP_ST, ["ทั้งหมด"]), all = SHOP.reports, fixes = SHOP.fixes || [],
       list = all.filter(function (c) {
         return rpSeg === "ทั้งหมด" || (rpSeg === "รอตรวจ" ? rpToCheck(c) : c.status === rpSeg);
@@ -2465,7 +2465,7 @@
             + "</p>" : "")
           + '<div class="grid"><label>สถานะ<select id="rp-st-' + esc(c.id) + '">' + RP_ST.map(function (s) {
             return "<option" + (s === c.status ? " selected" : "") + ">" + s + "</option>";
-          }).join("") + '</select></label><label>แก้ในฉบับวันที่<input type="date" id="rp-fx-' + esc(c.id)
+          }).join("") + '</select></label><label>วันที่แก้ในระบบ<input type="date" id="rp-fx-' + esc(c.id)
           + '" value="'
           + esc(c.fixedIn || "") + '"></label><label class="full">ข้อความถึงลูกค้า (ส่งในห้องแชตและอีเมล · เว้นว่างตอนส่งเข้างานแก้ = ใช้ข้อความมาตรฐาน)<textarea id="rp-an-'
           + esc(c.id) + '" rows="3" maxlength="1000">' + esc(c.answer) + '</textarea></label></div><div class="tools">'

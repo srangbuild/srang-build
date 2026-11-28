@@ -127,7 +127,7 @@
       return B.when(iso).replace(/ \d{4} /, " ");
     };
     return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "ชำระเงิน",
-      "ตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
+      "ตรวจยอด", "พร้อมใช้งาน", "เปิดเอกสารแล้ว"].map(function (nm, i) {
         var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "";
         return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + (done && times[i]
           ? "<small>" + esc(sw(times[i])) + "</small>" : "") + "</span>";
@@ -140,7 +140,7 @@
     var ids = B.cart.get(), total = ids.reduce(function (t, id) {
       return t + B.cart.price(id);
     }, 0);
-    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>เข้าสู่ระบบเพื่อสั่งซื้อ</h2><p style="margin:0">ไฟล์ที่ซื้อเก็บไว้ในบัญชีของคุณ ดาวน์โหลดซ้ำได้ทุกเมื่อ และระบบพิมพ์ชื่อผู้ซื้อกับเลขสิทธิ์ท้ายทุกหน้า จึงต้องมีบัญชีก่อนสั่งซื้อ · สมัครฟรี ใช้เวลาราว 1 นาที</p>'
+    $("view").innerHTML = '<div class="cog"><div class="card cosec"><h2>เข้าสู่ระบบเพื่อสั่งซื้อ</h2><p style="margin:0">เอกสารที่ซื้อเก็บไว้ในบัญชีของคุณ เปิดใช้ได้ทุกเมื่อ และระบบพิมพ์ชื่อผู้ซื้อกับเลขสิทธิ์ท้ายทุกหน้า จึงต้องมีบัญชีก่อนสั่งซื้อ · สมัครฟรี ใช้เวลาราว 1 นาที</p>'
       +
       '<div class="buy" style="margin:0"><a class="b pri" href="' + L("member.html") + '" data-next="1">เข้าสู่ระบบ หรือสมัครสมาชิก</a></div><p class="note">เข้าด้วย Google LINE Facebook TikTok หรืออีเมลก็ได้ · เข้าระบบแล้วระบบพากลับมาหน้านี้ ตะกร้ายังอยู่ครบ</p></div>'
       + summary(ids, total, false) + "</div>";
@@ -223,7 +223,7 @@
       '<div class="card cosec"><h2>3. วิธีชำระเงิน</h2><fieldset class="paym"><legend class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">เลือกวิธีชำระเงิน</legend>'
       + (canOnline ? PAY.curBar(me, total) : "") + '<div id="pmbox">' + drawPm() + "</div></fieldset>"
       + why + "</div>" +
-      '<div class="card cosec"><p class="note refund" style="margin:10px 0 0"><b>การคืนเงิน:</b> ยังไม่ได้ดาวน์โหลดไฟล์ แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · ดาวน์โหลดแล้วไม่คืนเงิน เว้นแต่ไฟล์เสียหาย เปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านส่งไฟล์ที่ถูกต้องให้หรือคืนเงิน)</p><label class="ck" style="margin-top:10px"><input type="checkbox" name="agree" required><span>ฉันอ่านและยอมรับ <a href="'
+      '<div class="card cosec"><p class="note refund" style="margin:10px 0 0"><b>การคืนเงิน:</b> ยังไม่ได้เปิดเอกสาร แจ้งขอคืนเงินได้ภายใน 7 วันนับจากวันที่ร้านยืนยันยอด · เปิดเอกสารแล้วไม่คืนเงิน เว้นแต่เอกสารเปิดไม่ได้ หรือไม่ตรงกับรายการที่สั่ง (ร้านแก้ไขให้ถูกต้องหรือคืนเงิน)</p><label class="ck" style="margin-top:10px"><input type="checkbox" name="agree" required><span>ฉันอ่านและยอมรับ <a href="'
       + L("terms.html") + '" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a> และเข้าใจว่าสินค้าเป็นไฟล์ดิจิทัล ใช้ในงานของตนเองและหน่วยงานของตน ห้ามขายหรือแจกจ่ายต่อ · ไฟล์ทุกหน้ามีชื่อและอีเมลของฉันพิมพ์ท้ายกระดาษ</span></label>'
       +
       (blocked ? '<p class="msg bad">มีรายการที่คุณมีอยู่แล้ว ' + blocked + ' รายการ <a href="' + L("cart.html")
@@ -363,20 +363,20 @@
     }
     steps(o.status === ST.paid ? 3 : 2);
     var paid = o.status === ST.paid, tl = trackUrl(o);
-    var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ดาวน์โหลดแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
+    var head = paid ? '<div class="ic" aria-hidden="true">✓</div><h1>ชำระเงินสำเร็จ</h1><p>ระบบเปิดสิทธิ์ใช้เอกสารแล้ว และส่งอีเมลพร้อมเลขสิทธิ์ของเอกสารทุกฉบับไปที่ '
       + (me.member.email ? pv(me.member.email) : "อีเมลของคุณ") + "</p>"
       : o.status === ST.check ? '<div class="ic wait" aria-hidden="true">⏳</div><h1>ได้รับสลิปแล้ว</h1><p>'
       + (me.pay && me.pay.slipAuto
         ? "ระบบกำลังตรวจสลิปกับธนาคารอัตโนมัติ หน้านี้อัปเดตผลให้เอง · ถ้าระบบตรวจไม่ได้ ร้านตรวจให้ภายใน "
         + esc(P.hours || 24) + " ชั่วโมง"
-        : "ร้านกำลังตรวจยอดเข้าบัญชี ภายใน " + esc(P.hours || 24) + " ชั่วโมง") + " · ตรวจแล้วระบบเปิดสิทธิ์ดาวน์โหลดและส่งอีเมลแจ้ง</p>"
+        : "ร้านกำลังตรวจยอดเข้าบัญชี ภายใน " + esc(P.hours || 24) + " ชั่วโมง") + " · ตรวจแล้วระบบเปิดสิทธิ์ใช้เอกสารและส่งอีเมลแจ้ง</p>"
       : '<div class="ic wait" aria-hidden="true">!</div><h1>คำสั่งซื้อ ' + esc(o.status) + "</h1>";
     $("view").innerHTML = '<div class="card done" style="margin-top:14px">' + head + '<span class="oid">'
       + esc(o.id) + "</span>" + tracker(o) +
       '<ul class="mini" style="width:100%;max-width:560px;text-align:left">' + o.items.map(function (id) {
         return "<li><span>" + esc(title(id)) + "<small>" + planTx(id) + "</small></span></li>";
       }).join("") + '<li><span><b>ยอดชำระ</b></span><b>' + B.thb(o.amount) + "</b></li></ul>" +
-      '<div class="row">' + (paid ? '<a class="b pri" href="' + L("member.html") + '#docs">ดาวน์โหลดเอกสาร</a><a class="b line" href="'
+      '<div class="row">' + (paid ? '<a class="b pri" href="' + L("member.html") + '#docs">เปิดเอกสารของฉัน</a><a class="b line" href="'
         + L("member.html") + '#orders">ใบเสร็จรับเงิน</a>' : '<a class="b pri" href="' + L("member.html")
         + '#orders">ดูคำสั่งซื้อของฉัน</a>') + (tl ? '<a class="b line" href="' + esc(tl) + '" target="_blank" rel="noopener">หน้าติดตามสถานะ</a>' : "")
       + "</div>" +

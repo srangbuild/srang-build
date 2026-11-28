@@ -10,8 +10,11 @@
     a.href = a.getAttribute("href") + q;
   });
   // รายการเดียวกับหลังบ้าน (Code.gs ตัวแปร RQ_KINDS และ RQ_LANGS)
+  // 28 Nov 2026 (owner's order: B2B and B2G sales): the last 2 kinds ask for a quote for several users (field จำนวน = users)
   var KINDS = ["ใบตรวจงานภาษาอื่น", "เกณฑ์ตามมาตรฐานของประเทศอื่น", "ใบตรวจงานตามแบบของโครงการ",
-    "Method statement", "เช็กลิสต์เอกสารขออนุญาต", "แบบฟอร์มอื่น"];
+    "Method statement", "เช็กลิสต์เอกสารขออนุญาต", "แบบฟอร์มอื่น",
+    "สิทธิ์ใช้งานสำหรับบริษัท (หลายผู้ใช้)",
+    "จัดซื้อสำหรับหน่วยงานรัฐ"];
   // 21 Nov 2026 launch scope 3ed: no other-language sheets, no other-country standard (the back end refuses them too)
   var S3 = !!(window.REGION.scope3 && window.REGION.scope3()), KIND0 = S3 ? "ใบตรวจงานตามแบบของโครงการ" : "ใบตรวจงานภาษาอื่น";
   if (S3) KINDS = KINDS.slice(2);

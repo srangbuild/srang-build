@@ -96,10 +96,22 @@
       say(e && e.message ? e.message : "ทำรายการไม่สำเร็จ", true);
     });
   }
-  function docLink(id) {
-    return '<a class="b pri sm" href="doc.html?item=' + encodeURIComponent(B.rootOf(id)) + "&cc="
-      + encodeURIComponent(B.varOf(id)) + '">สร้างเอกสาร ' + esc(B.rootOf(id)) + " " + esc(B.LANGS[B.varOf(id)]
-        || "") + "</a>";
+  /* 28 Nov 2026 (owner's order): the paid edition IS the document system (pay.deliver "doc"). A bought check sheet opens
+     there (fill in, print, save as PDF); the shop corrects data in one place and no ready PDF file goes out.
+     go=1 makes the document page build the document at once, in the languages of the edition (cc). */
+  var DOCMODE = !!(P && P.deliver === "doc");
+  function inSystem(id) { // check sheets and test records; shop test items (X) and consignment items keep their files
+    return DOCMODE && /^[FT]-/.test(String(id));
+  }
+  function docHref(id) {
+    return "doc.html?item=" + encodeURIComponent(B.rootOf(id)) + "&cc=" + encodeURIComponent(B.varOf(id))
+      + (DOCMODE ? "&go=1" : "");
+  }
+  function docLink(id, plain) { // plain = the row already shows the code and the title
+    var lab = B.LANGS[B.varOf(id)] || "";
+    return '<a class="b pri sm" href="' + docHref(id) + '"><span>' + (DOCMODE ? "เปิดเอกสาร" : "สร้างเอกสาร")
+      + "</span>" + (plain ? "" : " " + esc(B.rootOf(id)) + (lab ? " <span>" + esc(lab) + "</span>" : ""))
+      + "</a>";
   }
   function title(id) {
     var x = B.find(id);
@@ -751,7 +763,7 @@
       return w.replace(/ \d{4} /, " ");
     }; // วันที่สั้น ให้พอดีจอมือถือ
     return '<div class="trk" aria-label="ขั้นตอนของคำสั่งซื้อ">' + ["สั่งซื้อ", "ชำระเงิน",
-      "ตรวจยอด", "พร้อมดาวน์โหลด", "ได้รับไฟล์แล้ว"].map(function (nm, i) {
+      "ตรวจยอด", "พร้อมใช้งาน", "เปิดเอกสารแล้ว"].map(function (nm, i) {
         var done = i < stp, cl = done ? "d" : i === stp ? (o.status === ST.reject && i === 1 ? "x" : "a") : "",
           t = done && times[i] ? '<small>' + esc(sw(times[i])) + "</small>" : "";
         return '<span class="' + cl + '"><b>' + (done ? "✓" : i + 1) + "</b>" + nm + t + "</span>";
@@ -782,7 +794,7 @@
       + (B.demo ? '<button class="b line sm" type="button" data-approve="' + esc(o.id) + '">โหมดทดลอง: จำลองว่าร้านตรวจผ่านแล้ว</button>' : "");
     else if (o.status === ST.paid) body = '<div class="row" style="display:flex;flex-wrap:wrap;gap:8px">'
       + B.expand(o.items).map(function (id) {
-        return B.isCtry(B.varOf(id)) ? docLink(id) : '<button class="b line sm" type="button" data-dl="'
+        return B.isCtry(B.varOf(id)) || inSystem(id) ? docLink(id) : '<button class="b line sm" type="button" data-dl="'
           + esc(id) + '">ดาวน์โหลด ' + esc(id) + "</button>";
       }).join("") + '<button class="b line sm" type="button" data-rcpt="' + esc(o.id) + '">ใบเสร็จรับเงิน'
       + (o.receipt && o.receipt !== "pending" ? " " + esc(o.receipt) : "") + "</button>"
@@ -1146,7 +1158,7 @@
       todo.push(["orders", (o.status === ST.reject ? "แนบสลิปใหม่ของ " : "ชำระคำสั่งซื้อ ") + o.id
         + " ยอด " + B.thb(o.amount), o.status === ST.reject ? "bad" : ""]);
     });
-    if (c.newer) todo.push(["docs", "มีฉบับใหม่ของเอกสารที่คุณซื้อ " + c.newer + " ใบ ดาวน์โหลดได้ฟรี",
+    if (c.newer) todo.push(["docs", "มีฉบับใหม่ของเอกสารที่คุณซื้อ " + c.newer + (DOCMODE ? " ใบ ดูได้ที่เมนู เอกสารของฉัน" : " ใบ ดาวน์โหลดได้ฟรี"),
       ""]);
     // การแจ้งเตือน: ข้อความจากร้านในห้องแชตที่ยังไม่ได้อ่าน (นับที่หลังบ้าน 22 พ.ย. 2026) · สินค้าที่ส่งแล้ว
     if (+me.chatUnread > 0) todo.push(["ask", "ร้านส่งข้อความถึงคุณ " + (+me.chatUnread) + " ข้อความ กดเพื่ออ่าน",
@@ -1222,21 +1234,24 @@
             + (mx.delivery === "ship" ? "ส่งพัสดุ" : "ส่งทางอีเมล") + "</span>") + "</div>";
       }
       // 28 Nov 2026 (owner's order): the edition date shows in the back office only · the member sees the plan and whether a newer edition exists
-      var ed = d.plan === "edition";
+      var ed = d.plan === "edition", sys = inSystem(d.id);
       var st = d.newer ? '<span class="pill">มีฉบับใหม่</span>' : d.lastAt ? '<span class="pill ok">'
         + (ed ? "ฉบับของคุณ"
-          : "ฉบับล่าสุดแล้ว") + "</span>" : '<span class="pill gray">ยังไม่เคยดาวน์โหลด</span>';
+          : "ฉบับล่าสุดแล้ว") + "</span>" : '<span class="pill gray">' + (sys ? "ยังไม่เคยเปิด" : "ยังไม่เคยดาวน์โหลด")
+        + "</span>";
       var planTx = ed ? "แบบฉบับนี้ (เก็บได้ตลอด)" : d.plan === "updates" ? "แบบรับฉบับใหม่ตลอด" : "";
       var upg = ed && d.upgrade ? '<button class="b line sm" type="button" data-upg="' + esc(d.id)
         + '">อัปเกรดเป็นรับฉบับใหม่ ' + B.baht(d.upgrade) + "</button>" : "";
       return '<div class="doc card"><div><b>' + esc(d.id) + "</b> " + esc(d.title) + "<small>" + (planTx
         ? "<span>"
-        + planTx + "</span>" : "") + (d.lastAt ? (planTx ? " · " : "") + "<span>ดาวน์โหลดล่าสุด</span> "
-          + esc(B.when(d.lastAt))
+        + planTx + "</span>" : "") + (d.lastAt ? (planTx ? " · " : "") + "<span>" + (sys ? "เปิดล่าสุด" : "ดาวน์โหลดล่าสุด")
+          + "</span> " + esc(B.when(d.lastAt))
           : "") + (d.lic ? '<br>เลขสิทธิ์ <span style="font-family:Consolas,monospace">'
-            + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap"><button class="b '
-        + ((d.newer && !ed) || !d.lastAt ? "pri" : "line") + ' sm" type="button" data-dl="' + esc(d.id)
-        + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "") + "</button>" + upg + rpBtn(d.id) + "</span></div>";
+            + esc(d.lic) + "</span>" : "") + "</small></div>" + st + '<span class="row" style="display:flex;gap:6px;flex-wrap:wrap">'
+        + (sys ? docLink(d.id, true) : '<button class="b ' + ((d.newer && !ed) || !d.lastAt ? "pri" : "line")
+          + ' sm" type="button" data-dl="' + esc(d.id) + '">ดาวน์โหลด' + (d.newer && !ed ? "ฉบับใหม่" : "")
+          + "</button>")
+        + upg + rpBtn(d.id) + "</span></div>";
     };
     var rows = lib.map(function (d) { // the report form opens under its document
       return docRow(d) + (rpOpen === d.id && !rpOrd ? rpForm(d.id) : "");
@@ -1244,7 +1259,10 @@
       return d.id === rpOpen;
     }) ? rpForm(rpOpen) : ""; // from a product page for a sheet that the member did not buy
     return '<section class="sec"><h2>เอกสารฉบับมืออาชีพของฉัน</h2>' + rpTop + (lib.length ? '<div class="docs">'
-      + rows + '</div><p class="note">ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)</p>' : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>')
+      + rows + '</div><p class="note">' + (DOCMODE
+        ? "เปิดเอกสารได้ทุกเมื่อ กรอกข้อมูลงาน แล้วพิมพ์หรือบันทึกเป็น PDF · แบบฉบับนี้ = ได้ฉบับของวันที่ซื้อ ใช้ได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · เมื่อร้านแก้ข้อมูลที่ผิด คุณได้ข้อมูลที่แก้แล้วทันที ไม่มีค่าใช้จ่าย · ทุกหน้ามีชื่อผู้ได้รับสิทธิ์และเลขสิทธิ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)"
+        : "ดาวน์โหลดซ้ำได้ทุกเมื่อ · แบบฉบับนี้ = ได้ฉบับวันที่ซื้อ เก็บได้ตลอด อัปเกรดได้โดยจ่ายเฉพาะส่วนต่าง · แบบรับฉบับใหม่ = ได้ฉบับล่าสุดเสมอ · ไฟล์ทุกหน้ามีชื่อผู้ซื้อ เลขสิทธิ์ และวันเวลาดาวน์โหลดพิมพ์ท้ายกระดาษ · เมื่อร้านออกฉบับใหม่ ระบบแจ้งทางอีเมล (ปิดได้ในเมนู โปรไฟล์)")
+      + "</p>" : '<div class="card pad"><p style="margin:0">ยังไม่มีเอกสารฉบับมืออาชีพ</p><p class="note"><a href="#shop">ดูฉบับมืออาชีพที่เปิดขาย</a></p></div>')
       + "</section>" + rpList() +
       '<section class="sec"><h2>เอกสารฟรี</h2><div class="card pad"><p style="margin:0 0 10px">ใบตรวจงานฉบับฟรี (ข้อหลักที่ต้องดู) เปิดให้สมาชิกทุกคน</p><p style="margin:0;display:flex;gap:8px;flex-wrap:wrap"><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="TH">ไฟล์รวมฉบับฟรี ภาษาไทย</button><button class="b dark sm" type="button" data-dl="FREE-ALL" data-lang="EN">ไฟล์รวมฉบับฟรี ภาษาอังกฤษ</button><a class="b line sm" href="doc.html'
       + q + '" data-full="1">ฉบับฟรีภาษาอื่น</a><a class="b line sm" href="knowledge.html' + q + '">อ่านความรู้ก่อสร้าง</a></p></div></section>';
@@ -1334,7 +1352,8 @@
         + " · <span>แจ้งเมื่อ</span> " + esc(B.when(r.at)) + '</small><p class="rp-what">' + pv(r.what)
         + "</p>"
         + (r.answer ? '<p class="note"><span>ร้านตอบ:</span> ' + pv(r.answer) + "</p>" : "") + (r.fixed
-          ? '<p class="note"><span>แก้ในฉบับใหม่แล้ว</span></p>' : "") + "</div>";
+          ? '<p class="note"><span>แก้ในระบบแล้ว เปิดเอกสารของคุณได้เลย ไม่มีค่าใช้จ่าย</span></p>' : "")
+        + "</div>";
     }).join("") + "</div></section>";
   }
   function rpAdd(files) { // photos only · each photo goes through the same check and resize as a chat photo
